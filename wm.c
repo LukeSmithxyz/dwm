@@ -36,15 +36,6 @@ usage()
 	exit(1);
 }
 
-void
-error(char *errstr, ...) {
-	va_list ap;
-	va_start(ap, errstr);
-	vfprintf(stderr, errstr, ap);
-	va_end(ap);
-	exit(1);
-}
-
 static void
 scan_wins()
 {

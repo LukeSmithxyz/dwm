@@ -11,14 +11,12 @@ X11LIB = /usr/X11R6/lib
 VERSION = 0.0
 
 # includes and libs
-LIBS = -L${PREFIX}/lib -L/usr/lib -lc
-X11LIBS = -L${X11LIB} -lX11
+LIBS = -L${PREFIX}/lib -L/usr/lib -lc -L${X11LIB} -lX11
 
 # Linux/BSD
 CFLAGS = -g -Wall -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
 	-DVERSION=\"${VERSION}\"
 LDFLAGS = -g ${LIBS}
-X11LDFLAGS = ${LDFLAGS} ${X11LIBS}
 
 # Solaris
 #CFLAGS = -fast -xtarget=ultra ${INCLUDES} -DVERSION=\"${VERSION}\"

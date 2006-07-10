@@ -3,7 +3,9 @@
  * See LICENSE file for license details.
  */
 
-#include <X11/Xlib.h>
+#include "draw.h"
+#include "util.h"
+
 #include <X11/Xutil.h>
 
 /* WM atoms */
@@ -54,4 +56,3 @@ extern Cursor cursor[CurLast];
 extern Pixmap pmap;
 
 /* wm.c */
-extern void error(char *errstr, ...);
