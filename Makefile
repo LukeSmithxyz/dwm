@@ -3,11 +3,11 @@
 
 include config.mk
 
-WMSRC = wm.c draw.c util.c
+WMSRC = bar.c client.c draw.c event.c util.c wm.c
 WMOBJ = ${WMSRC:.c=.o}
 MENSRC = menu.c draw.c util.c
 MENOBJ = ${MENSRC:.c=.o}
-MAN = gridwm.1
+MAN1 = gridwm.1 gridmenu.1
 BIN = gridwm gridmenu     
 
 all: config gridwm gridmenu

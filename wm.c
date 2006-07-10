@@ -15,15 +15,15 @@
 
 /* X structs */
 Display *dpy;
-Window root;
-XRectangle rect;
-Pixmap pmap;
-Atom wm_atom[WMLast];
-Atom net_atom[NetLast];
+Window root, barwin;
+Atom wm_atom[WMLast], net_atom[NetLast];
 Cursor cursor[CurLast];
+XRectangle rect, barrect;
+Bool running = True;
 
+char *bartext, *shell;
 int screen, sel_screen;
-unsigned int kmask, numlock_mask;
+unsigned int lock_mask, numlock_mask;
 
 /* draw structs */
 Brush brush = {0};
@@ -166,7 +166,7 @@ init_lock_keys()
 	}
 	XFreeModifiermap(modmap);
 
-	kmask = 255 & ~(numlock_mask | LockMask);
+	lock_mask = 255 & ~(numlock_mask | LockMask);
 }
 
 static void
@@ -187,6 +187,7 @@ main(int argc, char *argv[])
 	XSetWindowAttributes wa;
 	unsigned int mask;
 	Window w;
+	XEvent ev;
 
 	/* command line args */
 	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
@@ -218,6 +219,9 @@ main(int argc, char *argv[])
 	if(other_wm_running)
 		error("gridwm: another window manager is already running\n");
 
+	if(!(shell = getenv("SHELL")))
+		shell = "/bin/sh";
+
 	rect.x = rect.y = 0;
 	rect.width = DisplayWidth(dpy, screen);
 	rect.height = DisplayHeight(dpy, screen);
@@ -244,18 +248,41 @@ main(int argc, char *argv[])
 
 	init_lock_keys();
 
-	pmap = XCreatePixmap(dpy, root, rect.width, rect.height,
+	brush.drawable = XCreatePixmap(dpy, root, rect.width, rect.height,
 			DefaultDepth(dpy, screen));
-
-	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
-	wa.cursor = cursor[CurNormal];
-	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+	brush.gc = XCreateGC(dpy, root, 0, 0);
 
 	/* style */
 	loadcolors(dpy, screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
 	loadfont(dpy, &brush.font, FONT);
 
+	wa.override_redirect = 1;
+	wa.background_pixmap = ParentRelative;
+	wa.event_mask = ExposureMask;
+
+	barrect = rect;
+	barrect.height = labelheight(&brush.font);
+	barrect.y = rect.height - barrect.height;
+	barwin = XCreateWindow(dpy, root, barrect.x, barrect.y,
+			barrect.width, barrect.height, 0, DefaultDepth(dpy, screen),
+			CopyFromParent, DefaultVisual(dpy, screen),
+			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
+	bartext = 0;
+	XDefineCursor(dpy, barwin, cursor[CurNormal]);
+	XMapRaised(dpy, barwin);
+	draw_bar();
+
+	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
+	wa.cursor = cursor[CurNormal];
+	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+
 	scan_wins();
+
+	while(running) {
+		XNextEvent(dpy, &ev);
+		if(handler[ev.type])
+			(handler[ev.type]) (&ev); /* call handler */
+	}
 
 	cleanup();
 	XCloseDisplay(dpy);

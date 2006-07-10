@@ -33,3 +33,4 @@ extern void loadcolors(Display *dpy, int screen, Brush *b,
 extern void loadfont(Display *dpy, Fnt *font, const char *fontstr);
 extern unsigned int textwidth_l(Fnt *font, char *text, unsigned int len);
 extern unsigned int textwidth(Fnt *font, char *text);
+extern unsigned int labelheight(Fnt *font);

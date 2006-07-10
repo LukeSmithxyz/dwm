@@ -162,3 +162,9 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 	}
 	font->height = font->ascent + font->descent;
 }
+
+unsigned int
+labelheight(Fnt *font)
+{
+	return font->height + 4;
+}

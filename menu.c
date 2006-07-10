@@ -53,7 +53,7 @@ static const int seek = 30;		/* 30px */
 
 static Brush brush = {0};
 
-static void draw_menu(void);
+static void draw_menu();
 static void kpress(XKeyEvent * e);
 
 static char version[] = "gridmenu - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
@@ -397,11 +397,10 @@ main(int argc, char *argv[])
 
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
-	wa.event_mask = ExposureMask | ButtonPressMask | KeyPressMask
-		| SubstructureRedirectMask | SubstructureNotifyMask;
+	wa.event_mask = ExposureMask | ButtonPressMask | KeyPressMask;
 
 	rect.width = DisplayWidth(dpy, screen);
-	rect.height = brush.font.height + 4;
+	rect.height = labelheight(&brush.font);
 	rect.y = DisplayHeight(dpy, screen) - rect.height;
 	rect.x = 0;
 
@@ -413,7 +412,7 @@ main(int argc, char *argv[])
 	XFlush(dpy);
 
 	/* pixmap */
-	brush.gc = XCreateGC(dpy, win, 0, 0);
+	brush.gc = XCreateGC(dpy, root, 0, 0);
 	brush.drawable = XCreatePixmap(dpy, win, rect.width, rect.height,
 			DefaultDepth(dpy, screen));
 	XFlush(dpy);

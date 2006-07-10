@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include "util.h"
 
 void
 error(char *errstr, ...) {
@@ -74,4 +79,22 @@ swap(void **p1, void **p2)
 	void *tmp = *p1;
 	*p1 = *p2;
 	*p2 = tmp;
+}
+
+void
+spawn(Display *dpy, const char *shell, const char *cmd)
+{
+	if(!cmd || !shell)
+		return;
+	if(fork() == 0) {
+		if(fork() == 0) {
+			if(dpy)
+				close(ConnectionNumber(dpy));
+			execl(shell, shell, "-c", cmd, (const char *)0);
+			fprintf(stderr, "gridwm: execl %s", shell);
+			perror(" failed");
+		}
+		exit (0);
+	}
+	wait(0);
 }
