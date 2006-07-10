@@ -5,7 +5,7 @@ include config.mk
 
 WMSRC = wm.c draw.c util.c
 WMOBJ = ${WMSRC:.c=.o}
-MENSRC = gridmenu.c draw.c util.c
+MENSRC = menu.c draw.c util.c
 MENOBJ = ${MENSRC:.c=.o}
 MAN = gridwm.1
 BIN = gridwm gridmenu     
