@@ -3,6 +3,7 @@
  * See LICENSE file for license details.
  */
 
+#include "config.h"
 #include "draw.h"
 #include "util.h"
 
@@ -48,11 +49,14 @@ struct Tag {
 extern Display *dpy;
 extern Window root;
 extern XRectangle rect;
-extern int screen, sel_screen;
-extern unsigned int kmask, numlock_mask;
 extern Atom wm_atom[WMLast];
 extern Atom net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern Pixmap pmap;
+
+extern int screen, sel_screen;
+extern unsigned int kmask, numlock_mask;
+
+extern Brush brush;
 
 /* wm.c */

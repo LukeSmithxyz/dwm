@@ -3,7 +3,7 @@
  * See LICENSE file for license details.
  */
 
-#define FONT	"fixed"
-#define FGCOLOR	"#000000"
-#define BGCOLOR	"#ffaa00"
-#define BOCOLOR	"#000000"
+#define FONT		"-*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-*"
+#define FGCOLOR		"#000000"
+#define BGCOLOR		"#ffaa00"
+#define BORDERCOLOR	"#000000"

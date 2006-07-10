@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void
 error(char *errstr, ...) {
@@ -16,3 +17,61 @@ error(char *errstr, ...) {
 	exit(1);
 }
 
+static void
+bad_malloc(unsigned int size)
+{
+	fprintf(stderr, "fatal: could not malloc() %d bytes\n",
+			(int) size);
+	exit(1);
+}
+
+void *
+emallocz(unsigned int size)
+{
+	void *res = calloc(1, size);
+	if(!res)
+		bad_malloc(size);
+	return res;
+}
+
+void *
+emalloc(unsigned int size)
+{
+	void *res = malloc(size);
+	if(!res)
+		bad_malloc(size);
+	return res;
+}
+
+void *
+erealloc(void *ptr, unsigned int size)
+{
+	void *res = realloc(ptr, size);
+	if(!res)
+		bad_malloc(size);
+	return res;
+}
+
+char *
+estrdup(const char *str)
+{
+	void *res = strdup(str);
+	if(!res)
+		bad_malloc(strlen(str));
+	return res;
+}
+
+void
+failed_assert(char *a, char *file, int line)
+{
+	fprintf(stderr, "Assertion \"%s\" failed at %s:%d\n", a, file, line);
+	abort();
+}
+
+void
+swap(void **p1, void **p2)
+{
+	void *tmp = *p1;
+	*p1 = *p2;
+	*p2 = tmp;
+}

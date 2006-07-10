@@ -14,7 +14,7 @@ drawborder(Display *dpy, Brush *b)
 {
 	XPoint points[5];
 	XSetLineAttributes(dpy, b->gc, 1, LineSolid, CapButt, JoinMiter);
-	XSetForeground(dpy, b->gc, b->color.border);
+	XSetForeground(dpy, b->gc, b->border);
 	points[0].x = b->rect.x;
 	points[0].y = b->rect.y;
 	points[1].x = b->rect.width - 1;
@@ -29,54 +29,54 @@ drawborder(Display *dpy, Brush *b)
 }
 
 void
-draw(Display *dpy, Brush *b)
+draw(Display *dpy, Brush *b, Bool border, const char *text)
 {
 	unsigned int x, y, w, h, len;
 	static char buf[256];
 	XGCValues gcv;
 
-	XSetForeground(dpy, b->gc, b->color.bg);
+	XSetForeground(dpy, b->gc, b->bg);
 	XFillRectangles(dpy, b->drawable, b->gc, &b->rect, 1);
 
-	if(b->border)
+	if(border)
 		drawborder(dpy, b);
 
-	if(!b->text)
+	if(!text)
 		return;
 
-	len = strlen(b->text);
+	len = strlen(text);
 	if(len >= sizeof(buf))
 		len = sizeof(buf) - 1;
-	memcpy(buf, b->text, len);
+	memcpy(buf, text, len);
 	buf[len] = 0;
 
-	h = b->font->ascent + b->font->descent;
-	y = b->rect.y + (b->rect.height / 2) - (h / 2) + b->font->ascent;
+	h = b->font.ascent + b->font.descent;
+	y = b->rect.y + (b->rect.height / 2) - (h / 2) + b->font.ascent;
 	x = b->rect.x + (h / 2);
 
 	/* shorten text if necessary */
-	while(len && (w = textwidth_l(b->font, buf, len)) > b->rect.width - h)
+	while(len && (w = textwidth_l(&b->font, buf, len)) > b->rect.width - h)
 		buf[--len] = 0;
 
 	if(w > b->rect.width)
 		return; /* too long */
 
-	gcv.foreground = b->color.fg;
-	gcv.background = b->color.bg;
-	if(b->font->set) {
+	gcv.foreground = b->fg;
+	gcv.background = b->bg;
+	if(b->font.set) {
 		XChangeGC(dpy, b->gc, GCForeground | GCBackground, &gcv);
-		XmbDrawImageString(dpy, b->drawable, b->font->set, b->gc,
+		XmbDrawImageString(dpy, b->drawable, b->font.set, b->gc,
 				x, y, buf, len);
 	}
 	else {
-		gcv.font = b->font->xfont->fid;
+		gcv.font = b->font.xfont->fid;
 		XChangeGC(dpy, b->gc, GCForeground | GCBackground | GCFont, &gcv);
 		XDrawImageString(dpy, b->drawable, b->gc, x, y, buf, len);
 	}
 }
 
 static unsigned long
-xloadcolor(Display *dpy, Colormap cmap, const char *colstr)
+xloadcolors(Display *dpy, Colormap cmap, const char *colstr)
 {
 	XColor color;
 	XAllocNamedColor(dpy, cmap, colstr, &color, &color);
@@ -84,13 +84,13 @@ xloadcolor(Display *dpy, Colormap cmap, const char *colstr)
 }
 
 void
-loadcolor(Display *dpy, int screen, Color *c,
+loadcolors(Display *dpy, int screen, Brush *b,
 		const char *bg, const char *fg, const char *border)
 {
 	Colormap cmap = DefaultColormap(dpy, screen);
-	c->bg = xloadcolor(dpy, cmap, bg);
-	c->fg = xloadcolor(dpy, cmap, fg);
-	c->border = xloadcolor(dpy, cmap, border);
+	b->bg = xloadcolors(dpy, cmap, bg);
+	b->fg = xloadcolors(dpy, cmap, fg);
+	b->border = xloadcolors(dpy, cmap, border);
 }
 
 unsigned int
@@ -160,4 +160,5 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 		font->ascent = font->xfont->ascent;
 		font->descent = font->xfont->descent;
 	}
+	font->height = font->ascent + font->descent;
 }

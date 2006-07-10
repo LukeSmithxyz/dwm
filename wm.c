@@ -13,15 +13,20 @@
 
 #include "wm.h"
 
+/* X structs */
 Display *dpy;
 Window root;
 XRectangle rect;
-int screen, sel_screen;
+Pixmap pmap;
 Atom wm_atom[WMLast];
 Atom net_atom[NetLast];
 Cursor cursor[CurLast];
+
+int screen, sel_screen;
 unsigned int kmask, numlock_mask;
-Pixmap pmap;
+
+/* draw structs */
+Brush brush = {0};
 
 enum { WM_PROTOCOL_DELWIN = 1 };
 
@@ -208,7 +213,7 @@ main(int argc, char *argv[])
 	XSetErrorHandler(startup_error_handler);
 	/* this causes an error if some other WM is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
-	XSync(dpy, False);
+	XFlush(dpy);
 
 	if(other_wm_running)
 		error("gridwm: another window manager is already running\n");
@@ -245,6 +250,10 @@ main(int argc, char *argv[])
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+
+	/* style */
+	loadcolors(dpy, screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
+	loadfont(dpy, &brush.font, FONT);
 
 	scan_wins();
 

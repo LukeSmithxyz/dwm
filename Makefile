@@ -5,10 +5,12 @@ include config.mk
 
 WMSRC = wm.c draw.c util.c
 WMOBJ = ${WMSRC:.c=.o}
+MENSRC = gridmenu.c draw.c util.c
+MENOBJ = ${MENSRC:.c=.o}
 MAN = gridwm.1
 BIN = gridwm gridmenu     
 
-all: config gridwm
+all: config gridwm gridmenu
 	@echo finished
 
 config:
@@ -22,18 +24,22 @@ config:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${WMOBJ}: wm.h draw.h config.h
+${WMOBJ}: wm.h draw.h config.h util.h
+
+gridmenu: ${MENOBJ}
+	@echo LD $@
+	@${CC} -o $@ ${MENOBJ} ${LDFLAGS}
 
 gridwm: ${WMOBJ}
 	@echo LD $@
 	@${CC} -o $@ ${WMOBJ} ${LDFLAGS}
 
 clean:
-	rm -f gridwm *.o
+	rm -f gridwm gridmenu *.o core
 
 dist: clean
 	mkdir -p gridwm-${VERSION}
-	cp -R Makefile README LICENSE config.mk ${WMSRC} ${MAN} gridwm-${VERSION}
+	cp -R Makefile README LICENSE config.mk *.h *.c ${MAN} gridwm-${VERSION}
 	tar -cf gridwm-${VERSION}.tar gridwm-${VERSION}
 	gzip gridwm-${VERSION}.tar
 	rm -rf gridwm-${VERSION}
