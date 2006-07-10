@@ -1,0 +1,84 @@
+.TH GRIDMENU 1 grid-0.0
+.SH NAME
+gridmenu \- grid window manager menu
+.SH SYNOPSIS
+.B gridmenu
+.RB [ \-v ]
+.RB [ \-t
+.IR title ]
+.SH DESCRIPTION
+.SS Overview
+.B gridmenu
+is a generic, highly customizable, and efficient menu for the X Window System,
+originally designed for
+.BR grid (1).
+It supports arbitrary, user defined menu contents.
+.SS Options
+.TP
+.B \-v
+prints version information to stdout, then exits.
+.TP
+.BI \-t " title"
+displays
+.I title
+above the menu.
+.SS Usage
+.B gridmenu
+reads a list of newline-separated items from stdin and creates a menu.
+When the user selects an item or enters any text and presses Enter, his choice
+is printed to stdout and
+.B gridmenu
+terminates.
+.SS Keyboard Control 
+.B gridmenu
+is completely controlled by the keyboard.  The following keys are recognized:
+.TP 2
+Any printable character
+appends the character to the text in the input field. This works as a filter:
+only items containing this text will be displayed.
+.TP 2
+Left/Right (Control-p/Control-n)
+select the previous/next item.
+.TP 2
+Tab (Control-i)
+copy the selected item to the input field.
+.TP 2
+Enter (Control-j)
+confirm selection and quit (print the selected item to stdout).
+.TP 2
+Shift-Enter (Shift-Control-j)
+confirm selection and quit (print the text in the input field to stdout).
+.TP 2
+Escape (Control-[)
+quit without selecting an item.
+.TP 2
+Backspace (Control-h)
+remove enough characters from the input field to change its filtering effect.
+.TP 2
+Control-u
+remove all characters from the input field.
+.SS Exit codes
+.B gridmenu
+returns
+.B 0
+if Enter is pressed on termination,
+.B 1
+if Escape is pressed.
+.SH ENVIRONMENT
+.TP
+GRID_FONT
+The X11 font used to display each item in the menu.
+.br
+Default: fixed
+.TP
+GRID_NORMCOLORS
+The foreground, background, and border colors of a label. Syntactically, three blank-separated color values of the form #RRGGBB are expected.
+.br
+Default: #222222 #eeeeee #666666
+.TP
+GRID_SELCOLORS
+Like GRID_NORMCOLORS, but for the selected label.
+.br
+Default: #ffffff #335577 #447799
+.SH SEE ALSO
+.BR gridwm (1)
