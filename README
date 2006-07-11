@@ -1,8 +1,16 @@
 gridwm
 ------
 
-gridwm is an automatic X11 window manager which arranges all windows in a grid.
-One goal is not to exceed 3kSLOC.
+gridwm is an extremly fast, small, and automatic X11 window manager.  It
+arranges all windows in a grid.
+
+
+Configuration
+-------------
+You have to edit the source code for configuration, this WM is intended to
+provide sane defaults, if something doesn't fits your needs, edit config.h and
+maybe key.c. To change the status output edit that status variable definition
+in wm.c.
 
 
 Requirements
@@ -30,12 +38,14 @@ Add the following line to your .xinitrc to start gridwm using startx:
 In order to connect gridwm to a specific display, make sure that
 the DISPLAY environment variable is set correctly, e.g.:
 
-    DISPLAY=foo.bar:1 exec wmii
+    DISPLAY=foo.bar:1 exec gridwm
 
 This will start gridwm on display :1 of the host foo.bar.
 
 
 Configuration
 -------------
-The configuration of gridwm is done by customizing the config.h
-source file.
+The configuration of gridwm is done by customizing the config.h source file. To
+customize the key bindings edit key.c. To change the status output, edit the
+status command definition in wm.c.
+
