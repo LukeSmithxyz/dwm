@@ -146,7 +146,7 @@ expose(XEvent *e)
 	Client *c;
 
 	if(ev->count == 0) {
-		if((c = getclient(ev->window)))
+		if((c = gettitle(ev->window)))
 			draw_client(c);
 		else if(ev->window == barwin)
 			draw_bar();

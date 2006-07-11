@@ -93,6 +93,7 @@ focus(Client *c)
 	}
 	XUnmapWindow(dpy, c->title);
 	draw_bar();
+	discard_events(EnterWindowMask);
 	XFlush(dpy);
 }
 
@@ -116,7 +117,7 @@ manage(Window w, XWindowAttributes *wa)
 	XGetTransientForHint(dpy, c->win, &c->trans);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
-	twa.event_mask = SubstructureNotifyMask | ExposureMask;
+	twa.event_mask = ExposureMask;
 
 	c->title = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,
@@ -191,11 +192,19 @@ unmanage(Client *c)
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
-	discard_events(EnterWindowMask);
 	if(stack)
 		focus(stack);
 }
 
+Client *
+gettitle(Window w)
+{
+	Client *c;
+	for(c = clients; c; c = c->next)
+		if(c->title == w)
+			return c;
+	return NULL;
+}
 
 Client *
 getclient(Window w)

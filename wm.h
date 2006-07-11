@@ -63,6 +63,7 @@ extern void draw_bar();
 extern void run(void *aux);
 extern void quit(void *aux);
 extern void kill(void *aux);
+extern void sel(void *aux);
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
@@ -73,6 +74,7 @@ extern void update_name(Client *c);
 extern void draw_client(Client *c);
 extern void resize(Client *c);
 extern void update_size(Client *c);
+extern Client *gettitle(Window w);
 
 /* event.c */
 extern unsigned int discard_events(long even_mask);

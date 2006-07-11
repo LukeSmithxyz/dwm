@@ -19,6 +19,8 @@ static const char *proglist[] = {
 static Key key[] = {
 	{ Mod1Mask, XK_Return, run, term },
 	{ Mod1Mask, XK_p, run, proglist }, 
+	{ Mod1Mask, XK_k, sel, "prev"}, 
+	{ Mod1Mask, XK_j, sel, "next"}, 
 	{ Mod1Mask | ShiftMask, XK_c, kill, NULL}, 
 	{ Mod1Mask | ShiftMask, XK_q, quit, NULL},
 };

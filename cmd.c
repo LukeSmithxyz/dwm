@@ -20,6 +20,22 @@ quit(void *aux)
 }
 
 void
+sel(void *aux)
+{
+	const char *arg = aux;
+	Client *c;
+
+	if(!arg || !stack)
+		return;
+	if(!strncmp(arg, "next", 5))
+		focus(stack->snext ? stack->snext : stack);
+	else if(!strncmp(arg, "prev", 5)) {
+		for(c = stack; c && c->snext; c = c->snext);
+		focus(c ? c : stack);
+	}
+}
+
+void
 kill(void *aux)
 {
 	Client *c = stack;
