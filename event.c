@@ -81,13 +81,11 @@ configurerequest(XEvent *e)
 static void
 destroynotify(XEvent *e)
 {
-#if 0
 	Client *c;
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
-	if((c = client_of_win(ev->window)))
-		destroy_client(c);
-#endif
+	if((c = getclient(ev->window)))
+		unmanage(c);
 }
 
 static void

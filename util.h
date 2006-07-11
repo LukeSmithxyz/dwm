@@ -17,3 +17,4 @@ extern void failed_assert(char *a, char *file, int line);
 void pipe_spawn(char *buf, unsigned int len, Display *dpy, const char *cmd);
 extern void spawn(Display *dpy, const char *cmd);
 extern void swap(void **p1, void **p2);
+unsigned char *getselection(unsigned long offset, unsigned long *len, unsigned long *remain);
