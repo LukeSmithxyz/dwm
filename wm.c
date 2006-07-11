@@ -24,7 +24,6 @@ Client *client = NULL;
 
 char *bartext, tag[256];
 int screen, sel_screen;
-unsigned int lock_mask, numlock_mask;
 
 /* draw structs */
 Brush brush = {0};
@@ -144,32 +143,6 @@ startup_error_handler(Display *dpy, XErrorEvent *error)
 }
 
 static void
-init_lock_keys()
-{
-	XModifierKeymap *modmap;
-	KeyCode numlock;
-	int i;
-	static int masks[] = {
-		ShiftMask, LockMask, ControlMask, Mod1Mask,
-		Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
-	};
-
-	numlock_mask = 0;
-	modmap = XGetModifierMapping(dpy);
-	numlock = XKeysymToKeycode(dpy, XStringToKeysym("Num_Lock"));
-
-	if(modmap && modmap->max_keypermod > 0) {
-		int max = (sizeof(masks) / sizeof(int)) * modmap->max_keypermod;
-		for(i = 0; i < max; i++)
-			if(numlock && (modmap->modifiermap[i] == numlock))
-				numlock_mask = masks[i / modmap->max_keypermod];
-	}
-	XFreeModifiermap(modmap);
-
-	lock_mask = 255 & ~(numlock_mask | LockMask);
-}
-
-static void
 cleanup()
 {
 	/*
@@ -243,7 +216,7 @@ main(int argc, char *argv[])
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
-	init_lock_keys();
+	update_keys();
 
 	brush.drawable = XCreatePixmap(dpy, root, rect.width, rect.height,
 			DefaultDepth(dpy, screen));

@@ -20,6 +20,7 @@ enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 enum { RFloat, RGrid, RLast };
 
 typedef struct Client Client;
+typedef struct Key Key;
 
 struct Client {
 	char name[256];
@@ -36,6 +37,13 @@ struct Client {
 	Client *snext;
 };
 
+struct Key {
+	unsigned long mod;
+	KeySym keysym;
+	void (*func)(char *arg);
+	char *arg;
+};
+
 extern Display *dpy;
 extern Window root, barwin;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
@@ -46,7 +54,6 @@ extern Bool grid;
 extern void (*handler[LASTEvent]) (XEvent *);
 
 extern int screen, sel_screen;
-extern unsigned int lock_mask, numlock_mask;
 extern char *bartext, tag[256];
 
 extern Brush brush;
@@ -55,9 +62,15 @@ extern Client *client;
 /* bar.c */
 extern void draw_bar();
 
+/* cmd.c */
+extern void run(char *arg);
+
 /* client.c */
 extern Client *create_client(Window w, XWindowAttributes *wa);
 extern void manage(Client *c);
+
+/* key.c */
+extern void update_keys();
 
 /* wm.c */
 extern int win_proto(Window w);
