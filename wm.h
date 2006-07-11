@@ -20,11 +20,10 @@ enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 enum { RFloat, RGrid, RLast };
 
 typedef struct Client Client;
-typedef struct Tag Tag;
 
 struct Client {
-	Tag *tag;
 	char name[256];
+	char tag[256];
 	int proto;
 	unsigned int border;
 	Bool fixedsize;
@@ -37,27 +36,21 @@ struct Client {
 	Client *snext;
 };
 
-struct Tag {
-	char name[256];
-	Client *stack;
-	XRectangle r;
-	Tag *next;
-	Tag *cnext;
-};
-
 extern Display *dpy;
 extern Window root, barwin;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern XRectangle rect, barrect;
 extern Bool running;
+extern Bool grid;
 extern void (*handler[LASTEvent]) (XEvent *);
 
 extern int screen, sel_screen;
 extern unsigned int lock_mask, numlock_mask;
-extern char *bartext;
+extern char *bartext, tag[256];
 
 extern Brush brush;
+extern Client *client;
 
 /* bar.c */
 extern void draw_bar();

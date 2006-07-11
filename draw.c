@@ -116,7 +116,7 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 	char **missing, *def;
 	int n;
 
-	missing = 0;
+	missing = NULL;
 	def = "?";
 	setlocale(LC_ALL, "");
 	if(font->set)
@@ -128,7 +128,7 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 		XFreeStringList(missing);
 		if(font->set) {
 			XFreeFontSet(dpy, font->set);
-			font->set = 0;
+			font->set = NULL;
 		}
 	}
 	if(font->set) {
@@ -151,7 +151,7 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 	else {
 		if(font->xfont)
 			XFreeFont(dpy, font->xfont);
-		font->xfont = 0;
+		font->xfont = NULL;
 		font->xfont = XLoadQueryFont(dpy, fontstr);
 		if (!font->xfont)
 			font->xfont = XLoadQueryFont(dpy, "fixed");

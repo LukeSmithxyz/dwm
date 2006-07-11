@@ -20,8 +20,9 @@ Atom wm_atom[WMLast], net_atom[NetLast];
 Cursor cursor[CurLast];
 XRectangle rect, barrect;
 Bool running = True;
+Client *client = NULL;
 
-char *bartext;
+char *bartext, tag[256];
 int screen, sel_screen;
 unsigned int lock_mask, numlock_mask;
 
@@ -74,12 +75,11 @@ win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
 	status = XGetWindowProperty(dpy, w, a, 0L, l, False, t, &real, &format,
 			&res, &extra, prop);
 
-	if(status != Success || *prop == 0) {
+	if(status != Success || *prop == NULL) {
 		return 0;
 	}
-	if(res == 0) {
+	if(res == 0)
 		free((void *) *prop);
-	}
 	return res;
 }
 
@@ -264,7 +264,7 @@ main(int argc, char *argv[])
 			barrect.width, barrect.height, 0, DefaultDepth(dpy, screen),
 			CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
-	bartext = 0;
+	bartext = NULL;
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 	draw_bar();

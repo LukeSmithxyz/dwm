@@ -34,15 +34,15 @@ static Window win;
 static XRectangle rect;
 static Bool done = False;
 
-static Item *allitem = 0;	/* first of all items */
-static Item *item = 0;	/* first of pattern matching items */
-static Item *sel = 0;
-static Item *nextoff = 0;
-static Item *prevoff = 0;
-static Item *curroff = 0;
+static Item *allitem = NULL;	/* first of all items */
+static Item *item = NULL;	/* first of pattern matching items */
+static Item *sel = NULL;
+static Item *nextoff = NULL;
+static Item *prevoff = NULL;
+static Item *curroff = NULL;
 
 static int screen;
-static char *title = 0;
+static char *title = NULL;
 static char text[4096];
 static int ret = 0;
 static int nitem = 0;
@@ -107,7 +107,7 @@ update_items(char *pattern)
 	else
 		cmdw = twidth;
 
-	item = j = 0;
+	item = j = NULL;
 	nitem = 0;
 
 	for(i = allitem; i; i=i->next)
@@ -117,7 +117,7 @@ update_items(char *pattern)
 			else
 				j->right = i;
 			i->left = j;
-			i->right = 0;
+			i->right = NULL;
 			j = i;
 			nitem++;
 		}
@@ -129,7 +129,7 @@ update_items(char *pattern)
 			else
 				j->right = i;
 			i->left = j;
-			i->right = 0;
+			i->right = NULL;
 			j = i;
 			nitem++;
 		}
@@ -319,7 +319,7 @@ kpress(XKeyEvent * e)
 static char *
 read_allitems()
 {
-	static char *maxname = 0;
+	static char *maxname = NULL;
 	char *p, buf[1024];
 	unsigned int len = 0, max = 0;
 	Item *i, *new;
@@ -336,7 +336,7 @@ read_allitems()
 		}
 
 		new = emalloc(sizeof(Item));
-		new->next = new->left = new->right = 0;
+		new->next = new->left = new->right = NULL;
 		new->text = p;
 		if(!i)
 			allitem = new;

@@ -14,7 +14,7 @@ update_client_name(Client *c)
 {
 	XTextProperty name;
 	int n;
-	char **list = 0;
+	char **list = NULL;
 
 	name.nitems = 0;
 	c->name[0] = 0;
