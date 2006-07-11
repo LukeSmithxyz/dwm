@@ -70,8 +70,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->r[RFloat].y = wa->y;
 	c->r[RFloat].width = wa->width;
 	c->r[RFloat].height = wa->height;
-	c->border = wa->border_width;
-	XSetWindowBorderWidth(dpy, c->win, 0);
+	XSetWindowBorderWidth(dpy, c->win, 1);
 	XSelectInput(dpy, c->win, CLIENT_MASK);
 	XGetTransientForHint(dpy, c->win, &c->trans);
 	if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize) || !c->size.flags)
@@ -97,7 +96,11 @@ manage(Window w, XWindowAttributes *wa)
 	c->snext = stack;
 	stack = c;
 	XMapWindow(dpy, c->win);
-	XGrabButton(dpy, AnyButton, Mod1Mask, c->win, False, ButtonPressMask,
+	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
+			GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(dpy, Button2, Mod1Mask, c->win, False, ButtonPressMask,
+			GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	focus(c);
 }
@@ -116,7 +119,7 @@ resize(Client *c)
 	e.y = c->r[RFloat].y;
 	e.width = c->r[RFloat].width;
 	e.height = c->r[RFloat].height;
-	e.border_width = c->border;
+	e.border_width = 0;
 	e.above = None;
 	e.override_redirect = False;
 	XSelectInput(dpy, c->win, CLIENT_MASK & ~StructureNotifyMask);

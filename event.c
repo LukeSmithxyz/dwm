@@ -86,8 +86,6 @@ configurerequest(XEvent *e)
 			c->r[RFloat].width = ev->width;
 		if(ev->value_mask & CWHeight)
 			c->r[RFloat].height = ev->height;
-		if(ev->value_mask & CWBorderWidth)
-			c->border = ev->border_width;
 	}
 
 	wc.x = ev->x;

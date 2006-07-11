@@ -13,19 +13,6 @@
 
 typedef struct Client Client;
 typedef struct Key Key;
-typedef enum Align Align;
-
-enum Align {
-	NORTH = 0x01,
-	EAST  = 0x02,
-	SOUTH = 0x04,
-	WEST  = 0x08,
-	NEAST = NORTH | EAST,
-	NWEST = NORTH | WEST,
-	SEAST = SOUTH | EAST,
-	SWEST = SOUTH | WEST,
-	CENTER = NEAST | SWEST
-};
 
 /* atoms */
 enum { WMProtocols, WMDelete, WMLast };
@@ -40,7 +27,6 @@ enum { RFloat, RGrid, RLast };
 struct Client {
 	char name[256];
 	char tag[256];
-	unsigned int border;
 	int proto;
 	Bool fixedsize;
 	Window win;
