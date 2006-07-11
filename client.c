@@ -104,19 +104,21 @@ manage(Window w, XWindowAttributes *wa)
 
 	c = emallocz(sizeof(Client));
 	c->win = w;
-	c->x = wa->x;
-	c->y = wa->y;
-	c->w = wa->width;
+	c->tx = c->x = wa->x;
+	c->ty = c->y = wa->y;
+	c->tw = c->w = wa->width;
 	c->h = wa->height;
+	c->th = barrect.height;
 	update_size(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
+	XSetWindowBorder(dpy, c->win, brush.border);
 	XSelectInput(dpy, c->win, CLIENT_MASK);
 	XGetTransientForHint(dpy, c->win, &c->trans);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
-	twa.event_mask = ExposureMask;
+	twa.event_mask = SubstructureNotifyMask | ExposureMask;
 
-	c->title = XCreateWindow(dpy, root, c->x, c->y, c->w, barrect.height,
+	c->title = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
@@ -145,7 +147,6 @@ resize(Client *c)
 	XConfigureEvent e;
 
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
-	XMoveResizeWindow(dpy, c->title, c->x + c->w / 3, c->y, 2 * c->w / 3, barrect.height);
 	e.type = ConfigureNotify;
 	e.event = c->win;
 	e.window = c->win;
@@ -177,7 +178,6 @@ unmanage(Client *c)
 	XSetErrorHandler(dummy_error_handler);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	XUnmapWindow(dpy, c->win);
 	XDestroyWindow(dpy, c->title);
 
 	for(l=&clients; *l && *l != c; l=&(*l)->next);
@@ -210,17 +210,20 @@ getclient(Window w)
 void
 draw_client(Client *c)
 {
-	if(!c)
-		return;
 	if(c == stack)
 		draw_bar();
 
+	c->tw = textwidth(&brush.font, c->name) + labelheight(&brush.font);
+	c->tx = c->x + c->w - c->tw + 2;
+	c->ty = c->y;
+	XMoveResizeWindow(dpy, c->title, c->tx, c->ty, c->tw, c->th);
+
 	brush.rect.x = brush.rect.y = 0;
-	brush.rect.width = 2 * c->w / 3;
-	brush.rect.height = barrect.height;
+	brush.rect.width = c->tw;
+	brush.rect.height = c->th;
 
 	draw(dpy, &brush, True, c->name);
-	XCopyArea(dpy, brush.drawable, c->title, brush.gc, 0, 0,
-			brush.rect.width, brush.rect.height, 0, 0);
+	XCopyArea(dpy, brush.drawable, c->title, brush.gc,
+			0, 0, c->tw, c->th, 0, 0);
 	XFlush(dpy);
 }

@@ -204,6 +204,10 @@ propertynotify(XEvent *e)
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {
 			update_name(c);
+			if(c == stack)
+				draw_bar();
+			else
+				draw_client(c);
 		}
 	}
 }

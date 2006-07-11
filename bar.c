@@ -15,7 +15,7 @@ draw_bar()
 	if(stack) {
 		brush.rect.width = textwidth(&brush.font, stack->name) + labelheight(&brush.font);
 		swap((void **)&brush.fg, (void **)&brush.bg);
-		draw(dpy, &brush, False, stack->name);
+		draw(dpy, &brush, True, stack->name);
 		swap((void **)&brush.fg, (void **)&brush.bg);
 		brush.rect.x += brush.rect.width;
 	}

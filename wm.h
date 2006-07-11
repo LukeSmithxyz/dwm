@@ -25,6 +25,7 @@ struct Client {
 	char name[256], tag[256];
 	int proto;
 	int x, y, w, h;
+	int tx, ty, tw, th;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	long flags; 
 	Window win;

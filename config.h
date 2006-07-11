@@ -6,5 +6,5 @@
 #define FONT		"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
 #define BGCOLOR		"#000000"
 #define FGCOLOR		"#ffaa00"
-#define BORDERCOLOR	"#000000"
+#define BORDERCOLOR	"#ee8800"
 #define STATUSDELAY	10 /* milliseconds */
