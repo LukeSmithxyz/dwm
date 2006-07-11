@@ -37,10 +37,6 @@ update_name(Client *c)
 		}
 	}
 	XFree(name.value);
-	if(c == stack)
-		draw_bar();
-	else
-		draw_client(c);
 }
 
 void
@@ -51,27 +47,52 @@ update_size(Client *c)
 	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
 		size.flags = PSize;
 	c->flags = size.flags;
-	c->basew = size.base_width;
-	c->baseh = size.base_height;
-	c->incw = size.width_inc;
-	c->inch = size.height_inc;
-	c->maxw = size.max_width;
-	c->maxh = size.max_height;
-	c->minw = size.min_width;
-	c->minh = size.min_height;
+	if(c->flags & PBaseSize) {
+		c->basew = size.base_width;
+		c->baseh = size.base_height;
+	}
+	else
+		c->basew = c->baseh = 0;
+	if(c->flags & PResizeInc) {
+		c->incw = size.width_inc;
+		c->inch = size.height_inc;
+	}
+	else
+		c->incw = c->inch = 0;
+	if(c->flags & PMaxSize) {
+		c->maxw = size.max_width;
+		c->maxh = size.max_height;
+	}
+	else
+		c->maxw = c->maxh = 0;
+	if(c->flags & PMinSize) {
+		c->minw = size.min_width;
+		c->minh = size.min_height;
+	}
+	else
+		c->minw = c->minh = 0;
 }
 
 void
 focus(Client *c)
 {
-	Client **l;
+	Client **l, *old;
+
+	old = stack;
 	for(l=&stack; *l && *l != c; l=&(*l)->snext);
 	eassert(*l == c);
 	*l = c->snext;
 	c->snext = stack;
 	stack = c;
 	XRaiseWindow(dpy, c->win);
+	XRaiseWindow(dpy, c->title);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+	if(old && old != c) {
+		XMapWindow(dpy, old->title);
+		draw_client(old);
+	}
+	XUnmapWindow(dpy, c->title);
+	draw_bar();
 	XFlush(dpy);
 }
 
@@ -91,7 +112,6 @@ manage(Window w, XWindowAttributes *wa)
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XSelectInput(dpy, c->win, CLIENT_MASK);
 	XGetTransientForHint(dpy, c->win, &c->trans);
-	update_name(c);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask;
@@ -100,6 +120,7 @@ manage(Window w, XWindowAttributes *wa)
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
+	update_name(c);
 
 	for(l=&clients; *l; l=&(*l)->next);
 	c->next = *l; /* *l == nil */
@@ -107,12 +128,14 @@ manage(Window w, XWindowAttributes *wa)
 	c->snext = stack;
 	stack = c;
 	XMapWindow(dpy, c->win);
+	XMapWindow(dpy, c->title);
 	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button2, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
+	resize(c);
 	focus(c);
 }
 
@@ -122,6 +145,7 @@ resize(Client *c)
 	XConfigureEvent e;
 
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+	XMoveResizeWindow(dpy, c->title, c->x + c->w / 3, c->y, 2 * c->w / 3, barrect.height);
 	e.type = ConfigureNotify;
 	e.event = c->win;
 	e.window = c->win;
@@ -186,7 +210,17 @@ getclient(Window w)
 void
 draw_client(Client *c)
 {
-	
+	if(!c)
+		return;
+	if(c == stack)
+		draw_bar();
 
+	brush.rect.x = brush.rect.y = 0;
+	brush.rect.width = 2 * c->w / 3;
+	brush.rect.height = barrect.height;
 
+	draw(dpy, &brush, True, c->name);
+	XCopyArea(dpy, brush.drawable, c->title, brush.gc, 0, 0,
+			brush.rect.width, brush.rect.height, 0, 0);
+	XFlush(dpy);
 }

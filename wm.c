@@ -245,10 +245,6 @@ main(int argc, char *argv[])
 
 	update_keys();
 
-	brush.drawable = XCreatePixmap(dpy, root, rect.width, rect.height,
-			DefaultDepth(dpy, screen));
-	brush.gc = XCreateGC(dpy, root, 0, 0);
-
 	/* style */
 	loadcolors(dpy, screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
 	loadfont(dpy, &brush.font, FONT);
@@ -266,6 +262,11 @@ main(int argc, char *argv[])
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
+
+	brush.drawable = XCreatePixmap(dpy, root, rect.width, barrect.height,
+			DefaultDepth(dpy, screen));
+	brush.gc = XCreateGC(dpy, root, 0, 0);
+
 	pipe_spawn(statustext, sizeof(statustext), dpy, (char **)status);
 	draw_bar();
 

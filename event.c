@@ -143,9 +143,12 @@ static void
 expose(XEvent *e)
 {
 	XExposeEvent *ev = &e->xexpose;
+	Client *c;
 
 	if(ev->count == 0) {
-		if(ev->window == barwin)
+		if((c = getclient(ev->window)))
+			draw_client(c);
+		else if(ev->window == barwin)
 			draw_bar();
 	}
 }
