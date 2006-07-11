@@ -65,8 +65,8 @@ extern void run(char *arg);
 extern void quit(char *arg);
 
 /* client.c */
-extern Client *create_client(Window w, XWindowAttributes *wa);
-extern void manage(Client *c);
+extern void manage(Window w, XWindowAttributes *wa);
+void unmanage(Client *c);
 extern Client * getclient(Window w);
 
 /* key.c */
@@ -74,3 +74,4 @@ extern void update_keys();
 extern void keypress(XEvent *e);
 
 /* wm.c */
+extern int error_handler(Display *dpy, XErrorEvent *error);

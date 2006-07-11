@@ -3,6 +3,7 @@
  * See LICENSE file for license details.
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <X11/Xatom.h>
 
@@ -36,10 +37,10 @@ update_client_name(Client *c)
 	XFree(name.value);
 }
 
-Client *
-create_client(Window w, XWindowAttributes *wa)
+void
+manage(Window w, XWindowAttributes *wa)
 {
-	Client *c;
+	Client *c, **l;
 	XSetWindowAttributes twa;
 	long msize;
 
@@ -68,23 +69,43 @@ create_client(Window w, XWindowAttributes *wa)
 			DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
-	XFlush(dpy);
 
-#if 0
-	for(t=&client, i=0; *t; t=&(*t)->next, i++);
-	c->next = *t; /* *t == nil */
-	*t = c;
-#endif
-	return c;
-}
-
-void
-manage(Client *c)
-{
+	for(l=&clients; *l; l=&(*l)->next);
+	c->next = *l; /* *l == nil */
+	*l = c;
 	XMapRaised(dpy, c->win);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
 }
+
+static int
+dummy_error_handler(Display *dpy, XErrorEvent *error)
+{
+	return 0;
+}
+
+void
+unmanage(Client *c)
+{
+	Client **l;
+
+	XGrabServer(dpy);
+	XSetErrorHandler(dummy_error_handler);
+
+	XUnmapWindow(dpy, c->win);
+	XDestroyWindow(dpy, c->title);
+
+	for(l=&clients; *l && *l != c; l=&(*l)->next);
+	eassert(*l == c);
+	*l = c->next;
+	free(c);
+
+	XFlush(dpy);
+	XSetErrorHandler(error_handler);
+	XUngrabServer(dpy);
+	/*flush_masked_events(EnterWindowMask); ? */
+}
+
 
 Client *
 getclient(Window w)

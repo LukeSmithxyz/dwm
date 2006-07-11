@@ -20,19 +20,18 @@ Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 XRectangle rect, barrect;
 Bool running = True;
-Client *clients = NULL;
 
 char *bartext, tag[256];
 int screen, sel_screen;
 
-/* draw structs */
 Brush brush = {0};
+Client *clients = NULL;
 
 enum { WM_PROTOCOL_DELWIN = 1 };
 
 static Bool other_wm_running;
-static int (*x_error_handler) (Display *, XErrorEvent *);
 static char version[] = "gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
+static int (*x_error_handler) (Display *, XErrorEvent *);
 
 static void
 usage()
@@ -56,7 +55,7 @@ scan_wins()
 			if(wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
 				continue;
 			if(wa.map_state == IsViewable)
-				manage(create_client(wins[i], &wa));
+				manage(wins[i], &wa);
 		}
 	}
 	if(wins)
@@ -69,7 +68,7 @@ scan_wins()
  * Other types of errors call Xlib's default error handler, which
  * calls exit().
  */
-static int
+int
 error_handler(Display *dpy, XErrorEvent *error)
 {
 	if(error->error_code == BadWindow

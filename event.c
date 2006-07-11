@@ -159,12 +159,8 @@ maprequest(XEvent *e)
 		return;
 	}
 
-	/*if(!client_of_win(ev->window))*/
-		/*manage(create_client(ev->window, &wa));*/
-	XMapRaised(dpy, ev->window);
-	XMoveResizeWindow(dpy, ev->window, rect.x, rect.y, rect.width, rect.height - barrect.height);
-	XSetInputFocus(dpy, ev->window, RevertToPointerRoot, CurrentTime);
-	XFlush(dpy);
+	if(!getclient(ev->window))
+		manage(ev->window, &wa);
 }
 
 static void
@@ -185,11 +181,9 @@ propertynotify(XEvent *e)
 static void
 unmapnotify(XEvent *e)
 {
-#if 0
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
-	if((c = client_of_win(ev->window)))
-		destroy_client(c);
-#endif
+	if((c = getclient(ev->window)))
+		unmanage(c);
 }
