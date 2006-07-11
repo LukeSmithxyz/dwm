@@ -14,5 +14,6 @@ extern char *estrdup(const char *str);
 			failed_assert(#a, __FILE__, __LINE__); \
 	} while (0)
 extern void failed_assert(char *a, char *file, int line);
+void pipe_spawn(char *buf, unsigned int len, Display *dpy, const char *cmd);
+extern void spawn(Display *dpy, const char *cmd);
 extern void swap(void **p1, void **p2);
-extern void spawn(Display *dpy, const char *shell, const char *cmd);

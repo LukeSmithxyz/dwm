@@ -55,7 +55,7 @@ extern void (*handler[LASTEvent]) (XEvent *);
 
 extern int screen, sel_screen;
 extern unsigned int lock_mask, numlock_mask;
-extern char *bartext, *shell;
+extern char *bartext;
 
 extern Brush brush;
 

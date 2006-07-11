@@ -13,6 +13,8 @@
 
 #include "util.h"
 
+static char *shell = NULL;
+
 void
 error(char *errstr, ...) {
 	va_list ap;
@@ -82,19 +84,65 @@ swap(void **p1, void **p2)
 }
 
 void
-spawn(Display *dpy, const char *shell, const char *cmd)
+spawn(Display *dpy, const char *cmd)
 {
-	if(!cmd || !shell)
+	if(!shell && !(shell = getenv("SHELL")))
+		shell = "/bin/sh";
+
+	if(!cmd)
 		return;
 	if(fork() == 0) {
 		if(fork() == 0) {
+			setsid();
 			if(dpy)
 				close(ConnectionNumber(dpy));
-			execl(shell, shell, "-c", cmd, (const char *)0);
-			fprintf(stderr, "gridwm: execl %s", shell);
+			execlp(shell, "shell", "-c", cmd, NULL);
+			fprintf(stderr, "gridwm: execvp %s", cmd);
 			perror(" failed");
 		}
 		exit (0);
+	}
+	wait(0);
+}
+
+void
+pipe_spawn(char *buf, unsigned int len, Display *dpy, const char *cmd)
+{
+	unsigned int l, n;
+	int pfd[2];
+
+	if(!shell && !(shell = getenv("SHELL")))
+		shell = "/bin/sh";
+
+	if(!cmd)
+		return;
+
+	if(pipe(pfd) == -1) {
+		perror("pipe");
+		exit(1);
+	}
+
+	if(fork() == 0) {
+		setsid();
+		if(dpy)
+			close(ConnectionNumber(dpy));
+		dup2(pfd[1], STDOUT_FILENO);
+		close(pfd[0]);
+		close(pfd[1]);
+		execlp(shell, "shell", "-c", cmd, NULL);
+		fprintf(stderr, "gridwm: execvp %s", cmd);
+		perror(" failed");
+	}
+	else {
+		n = 0;
+		close(pfd[1]);
+		while(l > n) {
+			if((l = read(pfd[0], buf + n, len - n)) < 1)
+				break;
+			n += l;
+		}
+		close(pfd[0]);
+		buf[n - 1] = 0;
 	}
 	wait(0);
 }

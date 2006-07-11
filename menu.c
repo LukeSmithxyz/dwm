@@ -356,6 +356,15 @@ main(int argc, char *argv[])
 	char *maxname;
 	XEvent ev;
 
+	char buf[256];
+
+	fputs(STATUSCMD, stdout);
+	fputs("\n", stdout);
+	pipe_spawn(buf, sizeof(buf), NULL, STATUSCMD);
+	fputs(buf, stderr);
+
+	return 0;
+
 	/* command line args */
 	for(i = 1; i < argc; i++) {
 		if (argv[i][0] == '-')

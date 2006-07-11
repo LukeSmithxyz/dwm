@@ -7,3 +7,5 @@
 #define BGCOLOR		"#000000"
 #define FGCOLOR		"#ffaa00"
 #define BORDERCOLOR	"#000000"
+#define STATUSCMD	"echo -n `date` `uptime | sed 's/.*://; s/,//g'`" \
+					" `acpi | awk '{print $4}' | sed 's/,//'`"

@@ -21,7 +21,7 @@ Cursor cursor[CurLast];
 XRectangle rect, barrect;
 Bool running = True;
 
-char *bartext, *shell;
+char *bartext;
 int screen, sel_screen;
 unsigned int lock_mask, numlock_mask;
 
@@ -56,7 +56,7 @@ scan_wins()
 			if(wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
 				continue;
 			if(wa.map_state == IsViewable)
-				/*manage*/;
+				manage(create_client(wins[i], &wa));
 		}
 	}
 	if(wins)
@@ -218,9 +218,6 @@ main(int argc, char *argv[])
 
 	if(other_wm_running)
 		error("gridwm: another window manager is already running\n");
-
-	if(!(shell = getenv("SHELL")))
-		shell = "/bin/sh";
 
 	rect.x = rect.y = 0;
 	rect.width = DisplayWidth(dpy, screen);

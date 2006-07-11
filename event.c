@@ -218,7 +218,6 @@ keymapnotify(XEvent *e)
 static void
 maprequest(XEvent *e)
 {
-#if 0
 	XMapRequestEvent *ev = &e->xmaprequest;
 	static XWindowAttributes wa;
 
@@ -231,9 +230,8 @@ maprequest(XEvent *e)
 		return;
 	}
 
-	if(!client_of_win(ev->window))
-		manage_client(create_client(ev->window, &wa));
-#endif
+	/*if(!client_of_win(ev->window))*/
+		manage(create_client(ev->window, &wa));
 }
 
 static void
