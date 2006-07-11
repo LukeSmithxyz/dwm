@@ -10,6 +10,8 @@
 #include "util.h"
 #include "wm.h"
 
+#define CLIENT_MASK		(StructureNotifyMask | PropertyChangeMask | EnterWindowMask)
+
 void
 update_name(Client *c)
 {
@@ -70,7 +72,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->r[RFloat].height = wa->height;
 	c->border = wa->border_width;
 	XSetWindowBorderWidth(dpy, c->win, 0);
-	XSelectInput(dpy, c->win, StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
+	XSelectInput(dpy, c->win, CLIENT_MASK);
 	XGetTransientForHint(dpy, c->win, &c->trans);
 	if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize) || !c->size.flags)
 		c->size.flags = PSize;
@@ -95,7 +97,32 @@ manage(Window w, XWindowAttributes *wa)
 	c->snext = stack;
 	stack = c;
 	XMapWindow(dpy, c->win);
+	XGrabButton(dpy, AnyButton, Mod1Mask, c->win, False, ButtonPressMask,
+			GrabModeAsync, GrabModeSync, None, None);
 	focus(c);
+}
+
+void
+resize(Client *c)
+{
+	XConfigureEvent e;
+
+	XMoveResizeWindow(dpy, c->win, c->r[RFloat].x, c->r[RFloat].y,
+			c->r[RFloat].width, c->r[RFloat].height);
+	e.type = ConfigureNotify;
+	e.event = c->win;
+	e.window = c->win;
+	e.x = c->r[RFloat].x;
+	e.y = c->r[RFloat].y;
+	e.width = c->r[RFloat].width;
+	e.height = c->r[RFloat].height;
+	e.border_width = c->border;
+	e.above = None;
+	e.override_redirect = False;
+	XSelectInput(dpy, c->win, CLIENT_MASK & ~StructureNotifyMask);
+	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&e);
+	XSelectInput(dpy, c->win, CLIENT_MASK);
+	XFlush(dpy);
 }
 
 static int
@@ -112,6 +139,7 @@ unmanage(Client *c)
 	XGrabServer(dpy);
 	XSetErrorHandler(dummy_error_handler);
 
+	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XUnmapWindow(dpy, c->win);
 	XDestroyWindow(dpy, c->title);
 
@@ -126,7 +154,7 @@ unmanage(Client *c)
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
-	flush_events(EnterWindowMask);
+	discard_events(EnterWindowMask);
 	if(stack)
 		focus(stack);
 }

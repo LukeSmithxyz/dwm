@@ -3,7 +3,7 @@
 
 include config.mk
 
-WMSRC = bar.c client.c cmd.c draw.c event.c key.c util.c wm.c
+WMSRC = bar.c client.c cmd.c draw.c event.c kb.c mouse.c util.c wm.c
 WMOBJ = ${WMSRC:.c=.o}
 MENSRC = menu.c draw.c util.c
 MENOBJ = ${MENSRC:.c=.o}

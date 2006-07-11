@@ -11,6 +11,22 @@
 
 #define WM_PROTOCOL_DELWIN 1
 
+typedef struct Client Client;
+typedef struct Key Key;
+typedef enum Align Align;
+
+enum Align {
+	NORTH = 0x01,
+	EAST  = 0x02,
+	SOUTH = 0x04,
+	WEST  = 0x08,
+	NEAST = NORTH | EAST,
+	NWEST = NORTH | WEST,
+	SEAST = SOUTH | EAST,
+	SWEST = SOUTH | WEST,
+	CENTER = NEAST | SWEST
+};
+
 /* atoms */
 enum { WMProtocols, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
@@ -20,9 +36,6 @@ enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 
 /* rects */
 enum { RFloat, RGrid, RLast };
-
-typedef struct Client Client;
-typedef struct Key Key;
 
 struct Client {
 	char name[256];
@@ -75,13 +88,18 @@ extern Client *getclient(Window w);
 extern void focus(Client *c);
 extern void update_name(Client *c);
 extern void draw_client(Client *c);
+extern void resize(Client *c);
 
 /* event.c */
-extern unsigned int flush_events(long even_mask);
+extern unsigned int discard_events(long even_mask);
 
 /* key.c */
 extern void update_keys();
 extern void keypress(XEvent *e);
+
+/* mouse.c */
+extern void mresize(Client *c);
+extern void mmove(Client *c);
 
 /* wm.c */
 extern int error_handler(Display *dpy, XErrorEvent *error);

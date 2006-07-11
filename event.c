@@ -12,6 +12,7 @@
 #include "wm.h"
 
 /* local functions */
+static void buttonpress(XEvent *e);
 static void configurerequest(XEvent *e);
 static void destroynotify(XEvent *e);
 static void enternotify(XEvent *e);
@@ -23,6 +24,7 @@ static void propertynotify(XEvent *e);
 static void unmapnotify(XEvent *e);
 
 void (*handler[LASTEvent]) (XEvent *) = {
+	[ButtonPress] = buttonpress,
 	[ConfigureRequest] = configurerequest,
 	[DestroyNotify] = destroynotify,
 	[EnterNotify] = enternotify,
@@ -36,12 +38,35 @@ void (*handler[LASTEvent]) (XEvent *) = {
 };
 
 unsigned int
-flush_events(long even_mask)
+discard_events(long even_mask)
 {
 	XEvent ev;
 	unsigned int n = 0;
 	while(XCheckMaskEvent(dpy, even_mask, &ev)) n++;
 	return n;
+}
+
+static void
+buttonpress(XEvent *e)
+{
+	XButtonPressedEvent *ev = &e->xbutton;
+	Client *c;
+
+	if((c = getclient(ev->window))) {
+		switch(ev->button) {
+		default:
+			break;
+		case Button1:
+			mmove(c);
+			break;
+		case Button2:
+			XLowerWindow(dpy, c->win);
+			break;
+		case Button3:
+			mresize(c);
+			break;
+		}
+	}
 }
 
 static void
@@ -51,9 +76,8 @@ configurerequest(XEvent *e)
 	XWindowChanges wc;
 	Client *c;
 
-	c = getclient(ev->window);
 	ev->value_mask &= ~CWSibling;
-	if(c) {
+	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWX)
 			c->r[RFloat].x = ev->x;
 		if(ev->value_mask & CWY)
