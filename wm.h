@@ -21,19 +21,15 @@ enum { NetSupported, NetWMName, NetLast };
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 
-/* rects */
-enum { RFloat, RGrid, RLast };
-
 struct Client {
-	char name[256];
-	char tag[256];
+	char name[256], tag[256];
 	int proto;
-	Bool fixedsize;
+	int x, y, w, h;
+	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+	long flags; 
 	Window win;
 	Window trans;
 	Window title;
-	XSizeHints size;
-	XRectangle r[RLast];
 	Client *next;
 	Client *snext;
 };
@@ -75,6 +71,7 @@ extern void focus(Client *c);
 extern void update_name(Client *c);
 extern void draw_client(Client *c);
 extern void resize(Client *c);
+extern void update_size(Client *c);
 
 /* event.c */
 extern unsigned int discard_events(long even_mask);

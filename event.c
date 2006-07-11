@@ -79,13 +79,13 @@ configurerequest(XEvent *e)
 	ev->value_mask &= ~CWSibling;
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWX)
-			c->r[RFloat].x = ev->x;
+			c->x = ev->x;
 		if(ev->value_mask & CWY)
-			c->r[RFloat].y = ev->y;
+			c->y = ev->y;
 		if(ev->value_mask & CWWidth)
-			c->r[RFloat].width = ev->width;
+			c->w = ev->width;
 		if(ev->value_mask & CWHeight)
-			c->r[RFloat].height = ev->height;
+			c->h = ev->height;
 	}
 
 	wc.x = ev->x;
@@ -179,7 +179,6 @@ static void
 propertynotify(XEvent *e)
 {
 	XPropertyEvent *ev = &e->xproperty;
-	long msize;
 	Client *c;
 
 	if(ev->state == PropertyDelete)
@@ -195,16 +194,9 @@ propertynotify(XEvent *e)
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &c->trans);
 				break;
+				update_size(c);
 			case XA_WM_NORMAL_HINTS:
-				if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize)
-						|| !c->size.flags)
-					c->size.flags = PSize;
-				if(c->size.flags & PMinSize && c->size.flags & PMaxSize
-						&& c->size.min_width == c->size.max_width
-						&& c->size.min_height == c->size.max_height)
-					c->fixedsize = True;
-				else
-					c->fixedsize = False;
+				update_size(c);
 				break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {

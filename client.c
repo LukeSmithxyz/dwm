@@ -44,6 +44,24 @@ update_name(Client *c)
 }
 
 void
+update_size(Client *c)
+{
+	XSizeHints size;
+	long msize;
+	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
+		size.flags = PSize;
+	c->flags = size.flags;
+	c->basew = size.base_width;
+	c->baseh = size.base_height;
+	c->incw = size.width_inc;
+	c->inch = size.height_inc;
+	c->maxw = size.max_width;
+	c->maxh = size.max_height;
+	c->minw = size.min_width;
+	c->minh = size.min_height;
+}
+
+void
 focus(Client *c)
 {
 	Client **l;
@@ -62,31 +80,24 @@ manage(Window w, XWindowAttributes *wa)
 {
 	Client *c, **l;
 	XSetWindowAttributes twa;
-	long msize;
 
 	c = emallocz(sizeof(Client));
 	c->win = w;
-	c->r[RFloat].x = wa->x;
-	c->r[RFloat].y = wa->y;
-	c->r[RFloat].width = wa->width;
-	c->r[RFloat].height = wa->height;
+	c->x = wa->x;
+	c->y = wa->y;
+	c->w = wa->width;
+	c->h = wa->height;
+	update_size(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XSelectInput(dpy, c->win, CLIENT_MASK);
 	XGetTransientForHint(dpy, c->win, &c->trans);
-	if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize) || !c->size.flags)
-		c->size.flags = PSize;
-	c->fixedsize =
-		(c->size.flags & PMinSize && c->size.flags & PMaxSize
-		 && c->size.min_width == c->size.max_width
-		 && c->size.min_height == c->size.max_height);
 	update_name(c);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask;
 
-	c->title = XCreateWindow(dpy, root, c->r[RFloat].x, c->r[RFloat].y,
-			c->r[RFloat].width, barrect.height, 0,
-			DefaultDepth(dpy, screen), CopyFromParent,
+	c->title = XCreateWindow(dpy, root, c->x, c->y, c->w, barrect.height,
+			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
@@ -110,15 +121,14 @@ resize(Client *c)
 {
 	XConfigureEvent e;
 
-	XMoveResizeWindow(dpy, c->win, c->r[RFloat].x, c->r[RFloat].y,
-			c->r[RFloat].width, c->r[RFloat].height);
+	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 	e.type = ConfigureNotify;
 	e.event = c->win;
 	e.window = c->win;
-	e.x = c->r[RFloat].x;
-	e.y = c->r[RFloat].y;
-	e.width = c->r[RFloat].width;
-	e.height = c->r[RFloat].height;
+	e.x = c->x;
+	e.y = c->y;
+	e.width = c->w;
+	e.height = c->h;
 	e.border_width = 0;
 	e.above = None;
 	e.override_redirect = False;

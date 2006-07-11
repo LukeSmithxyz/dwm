@@ -16,22 +16,22 @@
 static void
 mmatch(Client *c, int x1, int y1, int x2, int y2)
 {
-	c->r[RFloat].width = abs(x1 - x2);
-	c->r[RFloat].height = abs(y1 - y2);
-	c->r[RFloat].width -=
-		(c->r[RFloat].width - c->size.base_width) % c->size.width_inc;
-	c->r[RFloat].height -=
-		(c->r[RFloat].height - c->size.base_height) % c->size.height_inc;
-	if(c->size.min_width && c->r[RFloat].width < c->size.min_width)
-		c->r[RFloat].width = c->size.min_width;
-	if(c->size.min_height && c->r[RFloat].height < c->size.min_height)
-		c->r[RFloat].height = c->size.min_height;
-	if(c->size.max_width && c->r[RFloat].width > c->size.max_width)
-		c->r[RFloat].width = c->size.max_width;
-	if(c->size.max_height && c->r[RFloat].height > c->size.max_height)
-		c->r[RFloat].height = c->size.max_height;
-	c->r[RFloat].x = (x1 <= x2) ? x1 : x1 - c->r[RFloat].width;
-	c->r[RFloat].y = (y1 <= y2) ? y1 : y1 - c->r[RFloat].height;
+	c->w = abs(x1 - x2);
+	c->h = abs(y1 - y2);
+	if(c->incw)
+		c->w -= (c->w - c->basew) % c->incw;
+	if(c->inch)
+		c->h -= (c->h - c->baseh) % c->inch;
+	if(c->minw && c->w < c->minw)
+		c->w = c->minw;
+	if(c->minh && c->h < c->minh)
+		c->h = c->minh;
+	if(c->maxw && c->w > c->maxw)
+		c->w = c->maxw;
+	if(c->maxh && c->h > c->maxh)
+		c->h = c->maxh;
+	c->x = (x1 <= x2) ? x1 : x1 - c->w;
+	c->y = (y1 <= y2) ? y1 : y1 - c->h;
 }
 
 void
@@ -40,14 +40,13 @@ mresize(Client *c)
 	XEvent ev;
 	int old_cx, old_cy;
 
-	old_cx = c->r[RFloat].x;
-	old_cy = c->r[RFloat].y;
+	old_cx = c->x;
+	old_cy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XGrabServer(dpy);
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0,
-			c->r[RFloat].width, c->r[RFloat].height);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 	for(;;) {
 		XMaskEvent(dpy, MouseMask, &ev);
 		switch(ev.type) {
@@ -55,7 +54,7 @@ mresize(Client *c)
 		case MotionNotify:
 			XUngrabServer(dpy);
 			mmatch(c, old_cx, old_cy, ev.xmotion.x, ev.xmotion.y);
-			XResizeWindow(dpy, c->win, c->r[RFloat].width, c->r[RFloat].height);
+			XResizeWindow(dpy, c->win, c->w, c->h);
 			XGrabServer(dpy);
 			break;
 		case ButtonRelease:
@@ -75,8 +74,8 @@ mmove(Client *c)
 	unsigned int dui;
 	Window dummy;
 
-	old_cx = c->r[RFloat].x;
-	old_cy = c->r[RFloat].y;
+	old_cx = c->x;
+	old_cy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
@@ -88,10 +87,9 @@ mmove(Client *c)
 		default: break;
 		case MotionNotify:
 			XUngrabServer(dpy);
-			c->r[RFloat].x = old_cx + (ev.xmotion.x - x1);
-			c->r[RFloat].y = old_cy + (ev.xmotion.y - y1);
-			XMoveResizeWindow(dpy, c->win, c->r[RFloat].x, c->r[RFloat].y,
-					c->r[RFloat].width, c->r[RFloat].height);
+			c->x = old_cx + (ev.xmotion.x - x1);
+			c->y = old_cy + (ev.xmotion.y - y1);
+			XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 			XGrabServer(dpy);
 			break;
 		case ButtonRelease:

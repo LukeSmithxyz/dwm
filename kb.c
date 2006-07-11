@@ -8,7 +8,7 @@
 #include <X11/keysym.h>
 
 static const char *term[] = { 
-	"xterm", "-u8", "-bg", "black", "-fg", "white", "-fn",
+	"xterm", "-bg", "black", "-fg", "white", "-fn",
 	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", 0 
 };
 
