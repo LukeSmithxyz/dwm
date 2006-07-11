@@ -304,7 +304,7 @@ kpress(XKeyEvent * e)
 		}
 		break;
 	default:
-		if((num == 1) && !iscntrl((int) buf[0])) {
+		if(num && !iscntrl((int) buf[0])) {
 			buf[num] = 0;
 			if(len > 0)
 				strncat(text, buf, sizeof(text));

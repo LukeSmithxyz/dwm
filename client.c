@@ -10,8 +10,8 @@
 #include "util.h"
 #include "wm.h"
 
-static void
-update_client_name(Client *c)
+void
+update_name(Client *c)
 {
 	XTextProperty name;
 	int n;
@@ -38,6 +38,20 @@ update_client_name(Client *c)
 }
 
 void
+focus(Client *c)
+{
+	Client **l;
+	for(l=&stack; *l && *l != c; l=&(*l)->snext);
+	eassert(*l == c);
+	*l = c->snext;
+	c->snext = stack;
+	stack = c;
+	XRaiseWindow(dpy, c->win);
+	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+	XFlush(dpy);
+}
+
+void
 manage(Window w, XWindowAttributes *wa)
 {
 	Client *c, **l;
@@ -59,7 +73,7 @@ manage(Window w, XWindowAttributes *wa)
 		(c->size.flags & PMinSize && c->size.flags & PMaxSize
 		 && c->size.min_width == c->size.max_width
 		 && c->size.min_height == c->size.max_height);
-	update_client_name(c);
+	update_name(c);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask;
@@ -73,9 +87,10 @@ manage(Window w, XWindowAttributes *wa)
 	for(l=&clients; *l; l=&(*l)->next);
 	c->next = *l; /* *l == nil */
 	*l = c;
-	XMapRaised(dpy, c->win);
-	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	XFlush(dpy);
+	c->snext = stack;
+	stack = c;
+	XMapWindow(dpy, c->win);
+	focus(c);
 }
 
 static int
@@ -98,12 +113,15 @@ unmanage(Client *c)
 	for(l=&clients; *l && *l != c; l=&(*l)->next);
 	eassert(*l == c);
 	*l = c->next;
+	for(l=&stack; *l && *l != c; l=&(*l)->snext);
+	eassert(*l == c);
+	*l = c->snext;
 	free(c);
 
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
-	/*flush_masked_events(EnterWindowMask); ? */
+	flush_events(EnterWindowMask);
 }
 
 
@@ -116,3 +134,4 @@ getclient(Window w)
 			return c;
 	return NULL;
 }
+

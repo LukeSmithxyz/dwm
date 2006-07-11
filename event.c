@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <X11/keysym.h>
+#include <X11/Xatom.h>
 
 #include "wm.h"
 
@@ -35,7 +36,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 };
 
 unsigned int
-flush_masked_events(long even_mask)
+flush_events(long even_mask)
 {
 	XEvent ev;
 	unsigned int n = 0;
@@ -91,25 +92,18 @@ destroynotify(XEvent *e)
 static void
 enternotify(XEvent *e)
 {
-#if 0
 	XCrossingEvent *ev = &e->xcrossing;
 	Client *c;
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
 
-	if((c = client_of_win(ev->window))) {
-		Frame *f = c->sel;
-		Area *a = f->area;
-		if(a->mode == Colmax)
-			c = a->sel->client;
-		focus(c, False);
-	}
+	if((c = getclient(ev->window)))
+		focus(c);
 	else if(ev->window == root) {
 		sel_screen = True;
-		draw_frames();
+		/*draw_frames();*/
 	}
-#endif
 }
 
 static void
@@ -137,9 +131,7 @@ expose(XEvent *e)
 static void
 keymapnotify(XEvent *e)
 {
-#if 0
 	update_keys();
-#endif
 }
 
 static void
@@ -164,16 +156,40 @@ maprequest(XEvent *e)
 static void
 propertynotify(XEvent *e)
 {
-#if 0
 	XPropertyEvent *ev = &e->xproperty;
+	long msize;
 	Client *c;
 
 	if(ev->state == PropertyDelete)
 		return; /* ignore */
 
-	if((c = client_of_win(ev->window)))
-		prop_client(c, ev);
-#endif
+	if(ev->atom == wm_atom[WMProtocols]) {
+		c->proto = win_proto(c->win);
+		return;
+	}
+	if((c = getclient(ev->window))) {
+		switch (ev->atom) {
+			default: break;
+			case XA_WM_TRANSIENT_FOR:
+				XGetTransientForHint(dpy, c->win, &c->trans);
+				break;
+			case XA_WM_NORMAL_HINTS:
+				if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize)
+						|| !c->size.flags)
+					c->size.flags = PSize;
+				if(c->size.flags & PMinSize && c->size.flags & PMaxSize
+						&& c->size.min_width == c->size.max_width
+						&& c->size.min_height == c->size.max_height)
+					c->fixedsize = True;
+				else
+					c->fixedsize = False;
+				break;
+		}
+		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {
+			update_name(c);
+			/*draw_frame(c->sel);*/
+		}
+	}
 }
 
 static void

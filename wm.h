@@ -9,7 +9,10 @@
 
 #include <X11/Xutil.h>
 
+#define WM_PROTOCOL_DELWIN 1
+
 /* atoms */
+enum { WMProtocols, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
 
 /* cursor */
@@ -25,6 +28,7 @@ struct Client {
 	char name[256];
 	char tag[256];
 	unsigned int border;
+	int proto;
 	Bool fixedsize;
 	Window win;
 	Window trans;
@@ -44,18 +48,17 @@ struct Key {
 
 extern Display *dpy;
 extern Window root, barwin;
-extern Atom net_atom[NetLast];
+extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern XRectangle rect, barrect;
-extern Bool running;
-extern Bool grid;
+extern Bool running, sel_screen, grid;
 extern void (*handler[LASTEvent]) (XEvent *);
 
-extern int screen, sel_screen;
+extern int screen;
 extern char *bartext, tag[256];
 
 extern Brush brush;
-extern Client *clients;
+extern Client *clients, *stack;
 
 /* bar.c */
 extern void draw_bar();
@@ -66,8 +69,13 @@ extern void quit(char *arg);
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
-void unmanage(Client *c);
-extern Client * getclient(Window w);
+extern void unmanage(Client *c);
+extern Client *getclient(Window w);
+extern void focus(Client *c);
+extern void update_name(Client *c);
+
+/* event.c */
+extern unsigned int flush_events(long even_mask);
 
 /* key.c */
 extern void update_keys();
@@ -75,3 +83,5 @@ extern void keypress(XEvent *e);
 
 /* wm.c */
 extern int error_handler(Display *dpy, XErrorEvent *error);
+extern void send_message(Window w, Atom a, long value);
+extern int win_proto(Window w);

@@ -16,18 +16,18 @@
 /* X structs */
 Display *dpy;
 Window root, barwin;
-Atom net_atom[NetLast];
+Atom wm_atom[WMLast], net_atom[NetLast];
 Cursor cursor[CurLast];
 XRectangle rect, barrect;
 Bool running = True;
+Bool sel_screen;
 
 char *bartext, tag[256];
-int screen, sel_screen;
+int screen;
 
 Brush brush = {0};
 Client *clients = NULL;
-
-enum { WM_PROTOCOL_DELWIN = 1 };
+Client *stack = NULL;
 
 static Bool other_wm_running;
 static char version[] = "gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
@@ -60,6 +60,62 @@ scan_wins()
 	}
 	if(wins)
 		XFree(wins);
+}
+
+static int
+win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
+{
+	Atom real;
+	int format;
+	unsigned long res, extra;
+	int status;
+
+	status = XGetWindowProperty(dpy, w, a, 0L, l, False, t, &real, &format,
+			&res, &extra, prop);
+
+	if(status != Success || *prop == 0) {
+		return 0;
+	}
+	if(res == 0) {
+		free((void *) *prop);
+	}
+	return res;
+}
+
+int
+win_proto(Window w)
+{
+	Atom *protocols;
+	long res;
+	int protos = 0;
+	int i;
+
+	res = win_property(w, wm_atom[WMProtocols], XA_ATOM, 20L,
+			((unsigned char **) &protocols));
+	if(res <= 0) {
+		return protos;
+	}
+	for(i = 0; i < res; i++) {
+		if(protocols[i] == wm_atom[WMDelete])
+			protos |= WM_PROTOCOL_DELWIN;
+	}
+	free((char *) protocols);
+	return protos;
+}
+
+void
+send_message(Window w, Atom a, long value)
+{
+	XEvent e;
+
+	e.type = ClientMessage;
+	e.xclient.window = w;
+	e.xclient.message_type = a;
+	e.xclient.format = 32;
+	e.xclient.data.l[0] = value;
+	e.xclient.data.l[1] = CurrentTime;
+	XSendEvent(dpy, w, False, NoEventMask, &e);
+	XFlush(dpy);
 }
 
 /*
@@ -160,6 +216,8 @@ main(int argc, char *argv[])
 	x_error_handler = XSetErrorHandler(error_handler);
 
 	/* init atoms */
+	wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
+	wm_atom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
 
