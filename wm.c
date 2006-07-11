@@ -27,7 +27,7 @@ XRectangle rect, barrect;
 Bool running = True;
 Bool sel_screen;
 
-char *bartext, tag[256];
+char statustext[1024], tag[256];
 int screen;
 
 Brush brush = {0};
@@ -35,8 +35,14 @@ Client *clients = NULL;
 Client *stack = NULL;
 
 static Bool other_wm_running;
-static char version[] = "gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
+static const char version[] = "gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 static int (*x_error_handler) (Display *, XErrorEvent *);
+
+static const char *status[] = {
+	"sh", "-c", "echo -n `date '+%Y/%m/%d %H:%M'`" 
+	" `uptime | sed 's/.*://; s/,//g'`"
+	" `acpi | awk '{print $4}' | sed 's/,//'`", 0
+};
 
 static void
 usage()
@@ -258,9 +264,9 @@ main(int argc, char *argv[])
 			barrect.width, barrect.height, 0, DefaultDepth(dpy, screen),
 			CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
-	bartext = NULL;
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
+	pipe_spawn(statustext, sizeof(statustext), dpy, (char **)status);
 	draw_bar();
 
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
@@ -282,8 +288,10 @@ main(int argc, char *argv[])
 		t = timeout;
 		if(select(ConnectionNumber(dpy) + 1, &fds, NULL, NULL, &t) > 0)
 			continue;
-		else if(errno != EINTR)
+		else if(errno != EINTR) {
+			pipe_spawn(statustext, sizeof(statustext), dpy, (char **)status);
 			draw_bar();
+		}
 	}
 
 	cleanup();

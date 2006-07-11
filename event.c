@@ -187,7 +187,6 @@ propertynotify(XEvent *e)
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {
 			update_name(c);
-			/*draw_frame(c->sel);*/
 		}
 	}
 }

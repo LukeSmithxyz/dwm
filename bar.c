@@ -5,22 +5,24 @@
 
 #include "wm.h"
 
-static const char *status[] = {
-	"sh", "-c", "echo -n `date` `uptime | sed 's/.*://; s/,//g'`"
-		" `acpi | awk '{print $4}' | sed 's/,//'`", 0 \
-};
-
 void
 draw_bar()
 {
-	static char buf[1024];
-
-	buf[0] = 0;
-	pipe_spawn(buf, sizeof(buf), dpy, (char **)status);
-
 	brush.rect = barrect;
 	brush.rect.x = brush.rect.y = 0;
-	draw(dpy, &brush, False, buf);
+	draw(dpy, &brush, False, NULL);
+
+	if(stack) {
+		brush.rect.width = textwidth(&brush.font, stack->name) + labelheight(&brush.font);
+		swap((void **)&brush.fg, (void **)&brush.bg);
+		draw(dpy, &brush, False, stack->name);
+		swap((void **)&brush.fg, (void **)&brush.bg);
+		brush.rect.x += brush.rect.width;
+	}
+
+	brush.rect.width = textwidth(&brush.font, statustext) + labelheight(&brush.font);
+	brush.rect.x = barrect.x + barrect.width - brush.rect.width;
+	draw(dpy, &brush, False, statustext);
 
 	XCopyArea(dpy, brush.drawable, barwin, brush.gc, 0, 0, barrect.width,
 			barrect.height, 0, 0);

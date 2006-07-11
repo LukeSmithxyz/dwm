@@ -35,6 +35,10 @@ update_name(Client *c)
 		}
 	}
 	XFree(name.value);
+	if(c == stack)
+		draw_bar();
+	else
+		draw_client(c);
 }
 
 void
@@ -66,6 +70,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->r[RFloat].height = wa->height;
 	c->border = wa->border_width;
 	XSetWindowBorderWidth(dpy, c->win, 0);
+	XSelectInput(dpy, c->win, StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &c->trans);
 	if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize) || !c->size.flags)
 		c->size.flags = PSize;

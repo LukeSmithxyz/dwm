@@ -134,7 +134,7 @@ pipe_spawn(char *buf, unsigned int len, Display *dpy, char *argv[])
 			n += l;
 		}
 		close(pfd[0]);
-		buf[n - 1] = 0;
+		buf[n < len ? n : len - 1] = 0;
 	}
 	wait(0);
 }

@@ -7,4 +7,4 @@
 #define BGCOLOR		"#000000"
 #define FGCOLOR		"#ffaa00"
 #define BORDERCOLOR	"#000000"
-#define STATUSDELAY 1 /* milliseconds */
+#define STATUSDELAY	10 /* milliseconds */

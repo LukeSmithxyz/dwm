@@ -55,7 +55,7 @@ extern Bool running, sel_screen, grid;
 extern void (*handler[LASTEvent]) (XEvent *);
 
 extern int screen;
-extern char *bartext, tag[256];
+extern char statustext[1024], tag[256];
 
 extern Brush brush;
 extern Client *clients, *stack;
@@ -74,6 +74,7 @@ extern void unmanage(Client *c);
 extern Client *getclient(Window w);
 extern void focus(Client *c);
 extern void update_name(Client *c);
+extern void draw_client(Client *c);
 
 /* event.c */
 extern unsigned int flush_events(long even_mask);
