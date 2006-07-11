@@ -10,7 +10,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <X11/Xatom.h>
 
 #include "util.h"
 
@@ -138,41 +137,4 @@ pipe_spawn(char *buf, unsigned int len, Display *dpy, char *argv[])
 		buf[n - 1] = 0;
 	}
 	wait(0);
-}
-
-
-unsigned char *
-getselection(unsigned long offset, unsigned long *len, unsigned long *remain)
-{
-	Display *dpy;
-	Atom xa_clip_string;
-	Window w;
-	XEvent ev;
-	Atom typeret;
-	int format;
-	unsigned char *data;
-	unsigned char *result = NULL;
-
-	dpy = XOpenDisplay(0);
-	if(!dpy)
-		return NULL;
-	xa_clip_string = XInternAtom(dpy, "_SEL_STRING", False);
-	w = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 10, 10, 200, 200,
-			1, CopyFromParent, CopyFromParent);
-	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, xa_clip_string,
-			w, CurrentTime);
-	XFlush(dpy);
-	XNextEvent(dpy, &ev);
-	if(ev.type == SelectionNotify && ev.xselection.property != None) {
-		XGetWindowProperty(dpy, w, ev.xselection.property, offset, 4096L, False,
-				AnyPropertyType, &typeret, &format, len, remain, &data);
-		if(*len) {
-			result = emalloc(sizeof(unsigned char) * *len);
-			memcpy(result, data, *len);
-		}
-		XDeleteProperty(dpy, w, ev.xselection.property);
-	}
-	XDestroyWindow(dpy, w);
-	XCloseDisplay(dpy);
-	return result;
 }

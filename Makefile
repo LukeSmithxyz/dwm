@@ -7,12 +7,10 @@ WMSRC = bar.c client.c cmd.c draw.c event.c key.c util.c wm.c
 WMOBJ = ${WMSRC:.c=.o}
 MENSRC = menu.c draw.c util.c
 MENOBJ = ${MENSRC:.c=.o}
-SELSRC = gridsel.c util.c
-SELOBJ = ${SELSRC:.c=.o}
 MAN1 = gridwm.1 gridmenu.1
-BIN = gridwm gridmenu gridsel 
+BIN = gridwm gridmenu
 
-all: config gridwm gridmenu gridsel
+all: config gridwm gridmenu
 	@echo finished
 
 config:
@@ -35,10 +33,6 @@ gridmenu: ${MENOBJ}
 gridwm: ${WMOBJ}
 	@echo LD $@
 	@${CC} -o $@ ${WMOBJ} ${LDFLAGS}
-
-gridsel: ${SELOBJ}
-	@echo LD $@
-	@${CC} -o $@ ${SELOBJ} ${LDFLAGS}
 
 clean:
 	rm -f gridwm gridmenu *.o core
