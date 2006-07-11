@@ -93,11 +93,12 @@ spawn(Display *dpy, const char *cmd)
 		return;
 	if(fork() == 0) {
 		if(fork() == 0) {
-			setsid();
 			if(dpy)
 				close(ConnectionNumber(dpy));
-			execlp(shell, "shell", "-c", cmd, NULL);
-			fprintf(stderr, "gridwm: execvp %s", cmd);
+			setsid();
+			fprintf(stderr, "gridwm: execlp %s %s -c %s", shell, shell, cmd);
+			execlp(shell, shell, "-c", cmd, NULL);
+			fprintf(stderr, "gridwm: execlp %s", cmd);
 			perror(" failed");
 		}
 		exit (0);
@@ -123,14 +124,14 @@ pipe_spawn(char *buf, unsigned int len, Display *dpy, const char *cmd)
 	}
 
 	if(fork() == 0) {
-		setsid();
 		if(dpy)
 			close(ConnectionNumber(dpy));
+		setsid();
 		dup2(pfd[1], STDOUT_FILENO);
 		close(pfd[0]);
 		close(pfd[1]);
-		execlp(shell, "shell", "-c", cmd, NULL);
-		fprintf(stderr, "gridwm: execvp %s", cmd);
+		execlp(shell, shell, "-c", cmd, NULL);
+		fprintf(stderr, "gridwm: execlp %s", cmd);
 		perror(" failed");
 	}
 	else {

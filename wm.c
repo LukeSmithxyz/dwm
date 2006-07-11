@@ -16,11 +16,11 @@
 /* X structs */
 Display *dpy;
 Window root, barwin;
-Atom wm_atom[WMLast], net_atom[NetLast];
+Atom net_atom[NetLast];
 Cursor cursor[CurLast];
 XRectangle rect, barrect;
 Bool running = True;
-Client *client = NULL;
+Client *clients = NULL;
 
 char *bartext, tag[256];
 int screen, sel_screen;
@@ -61,46 +61,6 @@ scan_wins()
 	}
 	if(wins)
 		XFree(wins);
-}
-
-static int
-win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
-{
-	Atom real;
-	int format;
-	unsigned long res, extra;
-	int status;
-
-	status = XGetWindowProperty(dpy, w, a, 0L, l, False, t, &real, &format,
-			&res, &extra, prop);
-
-	if(status != Success || *prop == NULL) {
-		return 0;
-	}
-	if(res == 0)
-		free((void *) *prop);
-	return res;
-}
-
-int
-win_proto(Window w)
-{
-	Atom *protocols;
-	long res;
-	int protos = 0;
-	int i;
-
-	res = win_property(w, wm_atom[WMProtocols], XA_ATOM, 20L,
-			((unsigned char **) &protocols));
-	if(res <= 0) {
-		return protos;
-	}
-	for(i = 0; i < res; i++) {
-		if(protocols[i] == wm_atom[WMDelete])
-			protos |= WM_PROTOCOL_DELWIN;
-	}
-	free((char *) protocols);
-	return protos;
 }
 
 /*
@@ -201,9 +161,6 @@ main(int argc, char *argv[])
 	x_error_handler = XSetErrorHandler(error_handler);
 
 	/* init atoms */
-	wm_atom[WMState] = XInternAtom(dpy, "WM_STATE", False);
-	wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
-	wm_atom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
 
@@ -242,7 +199,8 @@ main(int argc, char *argv[])
 	XMapRaised(dpy, barwin);
 	draw_bar();
 
-	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
+	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
+					| LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 

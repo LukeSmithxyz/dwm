@@ -2,6 +2,7 @@ gridwm
 ------
 
 gridwm is an automatic X11 window manager which arranges all windows in a grid.
+One goal is not to exceed 3kSLOC.
 
 
 Requirements

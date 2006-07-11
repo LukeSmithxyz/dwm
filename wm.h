@@ -10,7 +10,6 @@
 #include <X11/Xutil.h>
 
 /* atoms */
-enum { WMState, WMProtocols, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
 
 /* cursor */
@@ -25,7 +24,6 @@ typedef struct Key Key;
 struct Client {
 	char name[256];
 	char tag[256];
-	int proto;
 	unsigned int border;
 	Bool fixedsize;
 	Window win;
@@ -46,7 +44,7 @@ struct Key {
 
 extern Display *dpy;
 extern Window root, barwin;
-extern Atom wm_atom[WMLast], net_atom[NetLast];
+extern Atom net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern XRectangle rect, barrect;
 extern Bool running;
@@ -57,20 +55,22 @@ extern int screen, sel_screen;
 extern char *bartext, tag[256];
 
 extern Brush brush;
-extern Client *client;
+extern Client *clients;
 
 /* bar.c */
 extern void draw_bar();
 
 /* cmd.c */
 extern void run(char *arg);
+extern void quit(char *arg);
 
 /* client.c */
 extern Client *create_client(Window w, XWindowAttributes *wa);
 extern void manage(Client *c);
+extern Client * getclient(Window w);
 
 /* key.c */
 extern void update_keys();
+extern void keypress(XEvent *e);
 
 /* wm.c */
-extern int win_proto(Window w);

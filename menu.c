@@ -358,8 +358,6 @@ main(int argc, char *argv[])
 
 	char buf[256];
 
-	fputs(STATUSCMD, stdout);
-	fputs("\n", stdout);
 	pipe_spawn(buf, sizeof(buf), NULL, STATUSCMD);
 	fputs(buf, stderr);
 

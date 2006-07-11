@@ -10,4 +10,6 @@
 #define STATUSCMD	"echo -n `date` `uptime | sed 's/.*://; s/,//g'`" \
 					" `acpi | awk '{print $4}' | sed 's/,//'`"
 #define KEYS		\
-	{ Mod1Mask, XK_Return, run, "xterm -u8 -bg black -fg white -fn -*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-*" },
+	{ Mod1Mask, XK_Return, run, "xterm -u8 -bg black -fg white -fn '-*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-*'" }, \
+	{ Mod1Mask | ShiftMask, XK_q, quit, NULL},
+

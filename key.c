@@ -24,3 +24,20 @@ update_keys()
 		XGrabKey(dpy, code, key[i].mod, root, True, GrabModeAsync, GrabModeAsync);
 	}
 }
+
+void
+keypress(XEvent *e)
+{
+	XKeyEvent *ev = &e->xkey;
+	unsigned int i, len;
+	KeySym keysym;
+
+	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
+	len = sizeof(key) / sizeof(key[0]);
+	for(i = 0; i < len; i++)
+		if((keysym == key[i].keysym) && (key[i].mod == ev->state)) {
+			if(key[i].func)
+				key[i].func(key[i].arg);
+			return;
+		}
+}

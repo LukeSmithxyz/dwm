@@ -38,7 +38,7 @@ loadfont(Blitz *blitz, BlitzFont *font)
 	font->set = XCreateFontSet(blitz->dpy, fontname, &missing, &n, &def);
 	if(missing) {
 		while(n--)
-			fprintf(stderr, "liblitz: missing fontset: %s\n", missing[n]);
+			fprintf(stderr, "missing fontset: %s\n", missing[n]);
 		XFreeStringList(missing);
 		if(font->set) {
 			XFreeFontSet(blitz->dpy, font->set);
@@ -72,7 +72,7 @@ loadfont(Blitz *blitz, BlitzFont *font)
 			font->xfont = XLoadQueryFont(blitz->dpy, fontname);
 		}
 		if (!font->xfont) {
-			fprintf(stderr, "%s", "liblitz: error, cannot load 'fixed' font\n");
+			fprintf(stderr, "%s", "error, cannot load 'fixed' font\n");
 			exit(1);
 		}
 		font->ascent = font->xfont->ascent;

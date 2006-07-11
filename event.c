@@ -16,7 +16,6 @@ static void destroynotify(XEvent *e);
 static void enternotify(XEvent *e);
 static void leavenotify(XEvent *e);
 static void expose(XEvent *e);
-static void keypress(XEvent *e);
 static void keymapnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void propertynotify(XEvent *e);
@@ -47,80 +46,36 @@ flush_masked_events(long even_mask)
 static void
 configurerequest(XEvent *e)
 {
-#if 0
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
-	XRectangle *frect;
 	Client *c;
 
-	c = client_of_win(ev->window);
+	c = getclient(ev->window);
 	ev->value_mask &= ~CWSibling;
 	if(c) {
-		gravitate_client(c, True);
-
 		if(ev->value_mask & CWX)
-			c->rect.x = ev->x;
+			c->r[RFloat].x = ev->x;
 		if(ev->value_mask & CWY)
-			c->rect.y = ev->y;
+			c->r[RFloat].y = ev->y;
 		if(ev->value_mask & CWWidth)
-			c->rect.width = ev->width;
+			c->r[RFloat].width = ev->width;
 		if(ev->value_mask & CWHeight)
-			c->rect.height = ev->height;
+			c->r[RFloat].height = ev->height;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-
-		gravitate_client(c, False);
-
-		if(c->frame) {
-			if(c->sel->area->floating)
-				frect=&c->sel->rect;
-			else
-				frect=&c->sel->revert;
-
-			if(c->rect.width >= screen->rect.width && c->rect.height >= screen->rect.height) {
-				frect->y = wc.y = -height_of_bar();
-				frect->x = wc.x = -def.border;
-			}
-			else {
-				frect->y = wc.y = c->rect.y - height_of_bar();
-				frect->x = wc.x = c->rect.x - def.border;
-			}
-			frect->width = wc.width = c->rect.width + 2 * def.border;
-			frect->height = wc.height = c->rect.height + def.border
-				+ height_of_bar();
-			wc.border_width = 1;
-			wc.sibling = None;
-			wc.stack_mode = ev->detail;
-			if(c->sel->area->view != screen->sel)
-				wc.x += 2 * screen->rect.width;
-			if(c->sel->area->floating) {
-				XConfigureWindow(dpy, c->framewin, ev->value_mask, &wc);
-				configure_client(c);
-			}
-		}
 	}
 
 	wc.x = ev->x;
 	wc.y = ev->y;
 	wc.width = ev->width;
 	wc.height = ev->height;
-
-	if(c && c->frame) {
-		wc.x = def.border;
-		wc.y = height_of_bar();
-		wc.width = c->sel->rect.width - 2 * def.border;
-		wc.height = c->sel->rect.height - def.border - height_of_bar();
-	}
-
 	wc.border_width = 0;
 	wc.sibling = None;
 	wc.stack_mode = Above;
 	ev->value_mask &= ~CWStackMode;
 	ev->value_mask |= CWBorderWidth;
 	XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-
 	XFlush(dpy);
-#endif
 }
 
 static void
@@ -182,32 +137,6 @@ expose(XEvent *e)
 }
 
 static void
-keypress(XEvent *e)
-{
-#if 0
-	XKeyEvent *ev = &e->xkey;
-	KeySym k = 0;
-	char buf[32];
-	int n;
-	static Frame *f;
-
-
-	ev->state &= valid_mask;
-	if((f = frame_of_win(ev->window))) {
-		buf[0] = 0;
-		n = XLookupString(ev, buf, sizeof(buf), &k, 0);
-		if(IsFunctionKey(k) || IsKeypadKey(k) || IsMiscFunctionKey(k)
-				|| IsPFKey(k) || IsPrivateKeypadKey(k))
-			return;
-		buf[n] = 0;
-		blitz_kpress_input(&f->tagbar, ev->state, k, buf);
-	}
-	else
-		key(root, ev->state, (KeyCode) ev->keycode);
-#endif
-}
-
-static void
 keymapnotify(XEvent *e)
 {
 #if 0
@@ -231,7 +160,11 @@ maprequest(XEvent *e)
 	}
 
 	/*if(!client_of_win(ev->window))*/
-		manage(create_client(ev->window, &wa));
+		/*manage(create_client(ev->window, &wa));*/
+	XMapRaised(dpy, ev->window);
+	XMoveResizeWindow(dpy, ev->window, rect.x, rect.y, rect.width, rect.height - barrect.height);
+	XSetInputFocus(dpy, ev->window, RevertToPointerRoot, CurrentTime);
+	XFlush(dpy);
 }
 
 static void

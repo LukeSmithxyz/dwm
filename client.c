@@ -51,7 +51,6 @@ create_client(Window w, XWindowAttributes *wa)
 	c->r[RFloat].height = wa->height;
 	c->border = wa->border_width;
 	XSetWindowBorderWidth(dpy, c->win, 0);
-	c->proto = win_proto(c->win);
 	XGetTransientForHint(dpy, c->win, &c->trans);
 	if(!XGetWMNormalHints(dpy, c->win, &c->size, &msize) || !c->size.flags)
 		c->size.flags = PSize;
@@ -59,7 +58,6 @@ create_client(Window w, XWindowAttributes *wa)
 		(c->size.flags & PMinSize && c->size.flags & PMaxSize
 		 && c->size.min_width == c->size.max_width
 		 && c->size.min_height == c->size.max_height);
-	XAddToSaveSet(dpy, c->win);
 	update_client_name(c);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
@@ -86,4 +84,14 @@ manage(Client *c)
 	XMapRaised(dpy, c->win);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
+}
+
+Client *
+getclient(Window w)
+{
+	Client *c;
+	for(c = clients; c; c = c->next)
+		if(c->win == w)
+			return c;
+	return NULL;
 }
