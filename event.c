@@ -92,7 +92,7 @@ configurerequest(XEvent *e)
 	wc.y = ev->y;
 	wc.width = ev->width;
 	wc.height = ev->height;
-	wc.border_width = 0;
+	wc.border_width = 1;
 	wc.sibling = None;
 	wc.stack_mode = Above;
 	ev->value_mask &= ~CWStackMode;
