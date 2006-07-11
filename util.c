@@ -14,8 +14,6 @@
 
 #include "util.h"
 
-static char *shell = NULL;
-
 void
 error(char *errstr, ...) {
 	va_list ap;
@@ -85,21 +83,17 @@ swap(void **p1, void **p2)
 }
 
 void
-spawn(Display *dpy, const char *cmd)
+spawn(Display *dpy, char *argv[])
 {
-	if(!shell && !(shell = getenv("SHELL")))
-		shell = "/bin/sh";
-
-	if(!cmd)
+	if(!argv || !argv[0])
 		return;
 	if(fork() == 0) {
 		if(fork() == 0) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
-			fprintf(stderr, "gridwm: execlp %s %s -c %s", shell, shell, cmd);
-			execlp(shell, shell, "-c", cmd, NULL);
-			fprintf(stderr, "gridwm: execlp %s", cmd);
+			execvp(argv[0], argv);
+			fprintf(stderr, "gridwm: execvp %s", argv[0]);
 			perror(" failed");
 		}
 		exit (0);
@@ -108,15 +102,12 @@ spawn(Display *dpy, const char *cmd)
 }
 
 void
-pipe_spawn(char *buf, unsigned int len, Display *dpy, const char *cmd)
+pipe_spawn(char *buf, unsigned int len, Display *dpy, char *argv[])
 {
 	unsigned int l, n;
 	int pfd[2];
 
-	if(!shell && !(shell = getenv("SHELL")))
-		shell = "/bin/sh";
-
-	if(!cmd)
+	if(!argv || !argv[0])
 		return;
 
 	if(pipe(pfd) == -1) {
@@ -131,8 +122,8 @@ pipe_spawn(char *buf, unsigned int len, Display *dpy, const char *cmd)
 		dup2(pfd[1], STDOUT_FILENO);
 		close(pfd[0]);
 		close(pfd[1]);
-		execlp(shell, shell, "-c", cmd, NULL);
-		fprintf(stderr, "gridwm: execlp %s", cmd);
+		execvp(argv[0], argv);
+		fprintf(stderr, "gridwm: execvp %s", argv[0]);
 		perror(" failed");
 	}
 	else {

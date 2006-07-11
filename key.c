@@ -7,8 +7,20 @@
 
 #include <X11/keysym.h>
 
+static const char *term[] = { 
+	"xterm", "-u8", "-bg", "black", "-fg", "white", "-fn",
+	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", 0 
+};
+
+static const char *proglist[] = {
+		"sh", "-c", "exec `ls -lL /bin /sbin /usr/bin /usr/local/bin 2>/dev/null | awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | gridmenu`", 0
+};
+
 static Key key[] = {
-	KEYS
+	{ Mod1Mask, XK_Return, run, term },
+	{ Mod1Mask, XK_p, run, proglist }, 
+	{ Mod1Mask | ShiftMask, XK_c, kill, NULL}, 
+	{ Mod1Mask | ShiftMask, XK_q, quit, NULL},
 };
 
 void
@@ -37,7 +49,7 @@ keypress(XEvent *e)
 	for(i = 0; i < len; i++)
 		if((keysym == key[i].keysym) && (key[i].mod == ev->state)) {
 			if(key[i].func)
-				key[i].func(key[i].arg);
+				key[i].func(key[i].aux);
 			return;
 		}
 }

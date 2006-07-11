@@ -122,6 +122,8 @@ unmanage(Client *c)
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
 	flush_events(EnterWindowMask);
+	if(stack)
+		focus(stack);
 }
 
 
@@ -135,3 +137,10 @@ getclient(Window w)
 	return NULL;
 }
 
+void
+draw_client(Client *c)
+{
+	
+
+
+}

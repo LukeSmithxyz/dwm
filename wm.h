@@ -42,8 +42,8 @@ struct Client {
 struct Key {
 	unsigned long mod;
 	KeySym keysym;
-	void (*func)(char *arg);
-	char *arg;
+	void (*func)(void *aux);
+	void *aux;
 };
 
 extern Display *dpy;
@@ -64,8 +64,9 @@ extern Client *clients, *stack;
 extern void draw_bar();
 
 /* cmd.c */
-extern void run(char *arg);
-extern void quit(char *arg);
+extern void run(void *aux);
+extern void quit(void *aux);
+extern void kill(void *aux);
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);

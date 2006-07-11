@@ -3,9 +3,14 @@
  * See LICENSE file for license details.
  */
 
+#include <errno.h>
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <sys/types.h>
+#include <sys/time.h>
 
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
@@ -160,12 +165,9 @@ startup_error_handler(Display *dpy, XErrorEvent *error)
 static void
 cleanup()
 {
-	/*
-	Client *c;
-	for(c=client; c; c=c->next)
-		reparent_client(c, root, c->sel->rect.x, c->sel->rect.y);
+	while(clients)
+		unmanage(clients);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-	*/
 }
 
 int
@@ -176,6 +178,11 @@ main(int argc, char *argv[])
 	unsigned int mask;
 	Window w;
 	XEvent ev;
+	fd_set fds;
+	struct timeval t, timeout = {
+		.tv_usec = 0,
+		.tv_sec = STATUSDELAY,
+	};
 
 	/* command line args */
 	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
@@ -264,9 +271,19 @@ main(int argc, char *argv[])
 	scan_wins();
 
 	while(running) {
-		XNextEvent(dpy, &ev);
-		if(handler[ev.type])
-			(handler[ev.type]) (&ev); /* call handler */
+		if(XPending(dpy) > 0) {
+			XNextEvent(dpy, &ev);
+			if(handler[ev.type])
+				(handler[ev.type]) (&ev); /* call handler */
+			continue;
+		}
+		FD_ZERO(&fds);
+		FD_SET(ConnectionNumber(dpy), &fds);
+		t = timeout;
+		if(select(ConnectionNumber(dpy) + 1, &fds, NULL, NULL, &t) > 0)
+			continue;
+		else if(errno != EINTR)
+			draw_bar();
 	}
 
 	cleanup();

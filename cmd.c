@@ -5,22 +5,22 @@
 
 #include "wm.h"
 #include <stdio.h>
+#include <string.h>
 
 void
-run(char *arg)
+run(void *aux)
 {
-	spawn(dpy, arg);
+	spawn(dpy, aux);
 }
 
 void
-quit(char *arg)
+quit(void *aux)
 {
-	fputs("quit\n", stderr);
 	running = False;
 }
 
 void
-kill(char *arg)
+kill(void *aux)
 {
 	Client *c = stack;
 
