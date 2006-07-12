@@ -13,16 +13,18 @@ static const char *term[] = {
 };
 
 static const char *proglist[] = {
-		"sh", "-c", "exec `ls -lL /bin /sbin /usr/bin /usr/local/bin 2>/dev/null | awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | gridmenu`", 0
+		"sh", "-c", "exec `ls -lL /bin /sbin /usr/bin /usr/local/bin 2>/dev/null "
+		"| awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | gridmenu`", 0
 };
 
 static Key key[] = {
 	{ Mod1Mask, XK_Return, run, term },
 	{ Mod1Mask, XK_p, run, proglist }, 
-	{ Mod1Mask, XK_k, sel, "prev"}, 
-	{ Mod1Mask, XK_j, sel, "next"}, 
-	{ Mod1Mask | ShiftMask, XK_c, kill, NULL}, 
-	{ Mod1Mask | ShiftMask, XK_q, quit, NULL},
+	{ Mod1Mask, XK_k, sel, "prev" }, 
+	{ Mod1Mask, XK_j, sel, "next" }, 
+	{ Mod1Mask, XK_g, arrange, NULL }, 
+	{ Mod1Mask | ShiftMask, XK_c, kill, NULL }, 
+	{ Mod1Mask | ShiftMask, XK_q, quit, NULL },
 };
 
 void

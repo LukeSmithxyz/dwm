@@ -3,12 +3,80 @@
  * See LICENSE file for license details.
  */
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xatom.h>
 
 #include "util.h"
 #include "wm.h"
+
+void
+arrange(void *aux)
+{
+	Client *c;
+	int n, cols, rows, gw, gh, i, j;
+    float rt, fd;
+
+	if(!clients)
+		return;
+	for(n = 0, c = clients; c; c = c->next, n++);
+	rt = sqrt(n);
+	if(modff(rt, &fd) < 0.5)
+		rows = floor(rt);
+	else
+		rows = ceil(rt);
+	if(rows * rows < n)
+		cols = rows + 1;
+	else
+		cols = rows;
+
+	gw = (sw - 1)  / cols;
+	gh = (sh - bh - 1) / rows;
+
+	for(i = j = 0, c = clients; c; c = c->next) {
+		c->x = i * gw;
+		c->y = j * gh + bh;
+		c->w = gw;
+		c->h = gh;
+		resize(c);
+		if(++i == cols) {
+			j++;
+			i = 0;
+		}
+	}
+}
+
+void
+sel(void *aux)
+{
+	const char *arg = aux;
+	Client *c = NULL;
+
+	if(!arg || !stack)
+		return;
+	if(!strncmp(arg, "next", 5))
+		c = stack->snext ? stack->snext : stack;
+	else if(!strncmp(arg, "prev", 5))
+		for(c = stack; c && c->snext; c = c->snext);
+	if(!c)
+		c = stack;
+	raise(c);
+	focus(c);
+}
+
+void
+kill(void *aux)
+{
+	Client *c = stack;
+
+	if(!c)
+		return;
+	if(c->proto & WM_PROTOCOL_DELWIN)
+		send_message(c->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+	else
+		XKillClient(dpy, c->win);
+}
 
 static void
 resize_title(Client *c)
@@ -113,7 +181,7 @@ focus(Client *c)
 		draw_client(old);
 	}
 	XUnmapWindow(dpy, c->title);
-	draw_client(old);
+	draw_client(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
 }

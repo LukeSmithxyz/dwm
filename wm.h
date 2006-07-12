@@ -58,12 +58,6 @@ extern Client *clients, *stack;
 /* bar.c */
 extern void draw_bar();
 
-/* cmd.c */
-extern void run(void *aux);
-extern void quit(void *aux);
-extern void kill(void *aux);
-extern void sel(void *aux);
-
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
 extern void unmanage(Client *c);
@@ -76,9 +70,14 @@ extern void update_size(Client *c);
 extern Client *gettitle(Window w);
 extern void raise(Client *c);
 extern void lower(Client *c);
+extern void kill(void *aux);
+extern void sel(void *aux);
 
 /* event.c */
 extern void discard_events(long even_mask);
+
+/* grid.c */
+extern void arrange();
 
 /* key.c */
 extern void update_keys();
@@ -92,3 +91,5 @@ extern void mmove(Client *c);
 extern int error_handler(Display *dpy, XErrorEvent *error);
 extern void send_message(Window w, Atom a, long value);
 extern int win_proto(Window w);
+extern void run(void *aux);
+extern void quit(void *aux);

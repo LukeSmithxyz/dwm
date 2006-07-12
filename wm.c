@@ -175,6 +175,18 @@ cleanup()
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 }
 
+void
+run(void *aux)
+{
+	spawn(dpy, aux);
+}
+
+void
+quit(void *aux)
+{
+	running = False;
+}
+
 int
 main(int argc, char *argv[])
 {
