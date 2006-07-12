@@ -174,12 +174,6 @@ cleanup()
 }
 
 void
-run(void *aux)
-{
-	spawn(dpy, aux);
-}
-
-void
 quit(void *aux)
 {
 	running = False;
@@ -250,8 +244,8 @@ main(int argc, char *argv[])
 	update_keys();
 
 	/* style */
-	loadcolors(dpy, screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
-	loadfont(dpy, &brush.font, FONT);
+	loadcolors(screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
+	loadfont(&brush.font, FONT);
 
 	th = texth(&brush.font);
 

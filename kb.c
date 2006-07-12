@@ -9,13 +9,13 @@
 
 /********** CUSTOMIZE **********/
 
-char *term[] = { 
+const char *term[] = { 
 	"aterm", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
 	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
 };
 
 static Key key[] = {
-	{ Mod1Mask, XK_Return, run, term },
+	{ Mod1Mask, XK_Return, (void (*)(void *))spawn, term },
 	{ Mod1Mask, XK_k, sel, "prev" }, 
 	{ Mod1Mask, XK_j, sel, "next" }, 
 	{ Mod1Mask, XK_g, grid, NULL }, 
@@ -28,7 +28,7 @@ static Key key[] = {
 /********** CUSTOMIZE **********/
 
 void
-update_keys()
+update_keys(void)
 {
 	unsigned int i, len;
 	KeyCode code;

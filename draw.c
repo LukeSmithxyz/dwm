@@ -11,7 +11,7 @@
 #include "wm.h"
 
 static void
-drawborder(Display *dpy, Brush *b)
+drawborder(Brush *b)
 {
 	XPoint points[5];
 	XSetLineAttributes(dpy, b->gc, 1, LineSolid, CapButt, JoinMiter);
@@ -30,9 +30,10 @@ drawborder(Display *dpy, Brush *b)
 }
 
 void
-draw(Display *dpy, Brush *b, Bool border, const char *text)
+draw(Brush *b, Bool border, const char *text)
 {
-	unsigned int x, y, w, h, len;
+	int x, y, w, h;
+	unsigned int len;
 	static char buf[256];
 	XGCValues gcv;
 	XRectangle r = { b->x, b->y, b->w, b->h };
@@ -42,7 +43,7 @@ draw(Display *dpy, Brush *b, Bool border, const char *text)
 
 	w = 0;
 	if(border)
-		drawborder(dpy, b);
+		drawborder(b);
 
 	if(!text)
 		return;
@@ -79,7 +80,7 @@ draw(Display *dpy, Brush *b, Bool border, const char *text)
 }
 
 static unsigned long
-xloadcolors(Display *dpy, Colormap cmap, const char *colstr)
+xloadcolors(Colormap cmap, const char *colstr)
 {
 	XColor color;
 	XAllocNamedColor(dpy, cmap, colstr, &color, &color);
@@ -87,13 +88,13 @@ xloadcolors(Display *dpy, Colormap cmap, const char *colstr)
 }
 
 void
-loadcolors(Display *dpy, int screen, Brush *b,
+loadcolors(int scr, Brush *b,
 		const char *bg, const char *fg, const char *border)
 {
-	Colormap cmap = DefaultColormap(dpy, screen);
-	b->bg = xloadcolors(dpy, cmap, bg);
-	b->fg = xloadcolors(dpy, cmap, fg);
-	b->border = xloadcolors(dpy, cmap, border);
+	Colormap cmap = DefaultColormap(dpy, scr);
+	b->bg = xloadcolors(cmap, bg);
+	b->fg = xloadcolors(cmap, fg);
+	b->border = xloadcolors(cmap, border);
 }
 
 unsigned int
@@ -120,13 +121,12 @@ texth(Fnt *font)
 }
 
 void
-loadfont(Display *dpy, Fnt *font, const char *fontstr)
+loadfont(Fnt *font, const char *fontstr)
 {
 	char **missing, *def;
-	int n;
+	int i, n;
 
 	missing = NULL;
-	def = "?";
 	setlocale(LC_ALL, "");
 	if(font->set)
 		XFreeFontSet(dpy, font->set);
@@ -144,7 +144,6 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 		XFontSetExtents *font_extents;
 		XFontStruct **xfonts;
 		char **font_names;
-		unsigned int i;
 
 		font->ascent = font->descent = 0;
 		font_extents = XExtentsOfFontSet(font->set);

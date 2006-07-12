@@ -87,15 +87,6 @@ extern char stext[1024], *tags[TLast];
 extern Brush brush;
 extern Client *clients, *stack;
 
-/* draw.c */
-extern void draw(Display *dpy, Brush *b, Bool border, const char *text);
-extern void loadcolors(Display *dpy, int screen, Brush *b,
-		const char *bg, const char *fg, const char *bo);
-extern void loadfont(Display *dpy, Fnt *font, const char *fontstr);
-extern unsigned int textnw(Fnt *font, char *text, unsigned int len);
-extern unsigned int textw(Fnt *font, char *text);
-extern unsigned int texth(Fnt *font);
-
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
 extern void unmanage(Client *c);
@@ -115,11 +106,20 @@ extern void floating(void *aux);
 extern void grid(void *aux);
 extern void gravitate(Client *c, Bool invert);
 
+/* draw.c */
+extern void draw(Brush *b, Bool border, const char *text);
+extern void loadcolors(int scr, Brush *b,
+		const char *bg, const char *fg, const char *bo);
+extern void loadfont(Fnt *font, const char *fontstr);
+extern unsigned int textnw(Fnt *font, char *text, unsigned int len);
+extern unsigned int textw(Fnt *font, char *text);
+extern unsigned int texth(Fnt *font);
+
 /* event.c */
 extern void discard_events(long even_mask);
 
-/* key.c */
-extern void update_keys();
+/* kb.c */
+extern void update_keys(void);
 extern void keypress(XEvent *e);
 
 /* mouse.c */
@@ -127,17 +127,16 @@ extern void mresize(Client *c);
 extern void mmove(Client *c);
 
 /* util.c */
-extern void error(char *errstr, ...);
+extern void error(const char *errstr, ...);
 extern void *emallocz(unsigned int size);
 extern void *emalloc(unsigned int size);
 extern void *erealloc(void *ptr, unsigned int size);
 extern char *estrdup(const char *str);
-extern void spawn(Display *dpy, char *argv[]);
+extern void spawn(char *argv[]);
 extern void swap(void **p1, void **p2);
 
 /* wm.c */
-extern int error_handler(Display *dpy, XErrorEvent *error);
+extern int error_handler(Display *dsply, XErrorEvent *e);
 extern void send_message(Window w, Atom a, long value);
 extern int win_proto(Window w);
-extern void run(void *aux);
 extern void quit(void *aux);

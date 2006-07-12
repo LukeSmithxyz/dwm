@@ -14,7 +14,7 @@
 #include "wm.h"
 
 void
-error(char *errstr, ...) {
+error(const char *errstr, ...) {
 	va_list ap;
 	va_start(ap, errstr);
 	vfprintf(stderr, errstr, ap);
@@ -75,7 +75,7 @@ swap(void **p1, void **p2)
 }
 
 void
-spawn(Display *dpy, char *argv[])
+spawn(char *argv[])
 {
 	if(!argv || !argv[0])
 		return;

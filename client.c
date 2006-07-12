@@ -360,7 +360,7 @@ resize(Client *c)
 }
 
 static int
-dummy_error_handler(Display *dpy, XErrorEvent *error)
+dummy_error_handler(Display *dsply, XErrorEvent *err)
 {
 	return 0;
 }
@@ -425,12 +425,12 @@ draw_client(Client *c)
 		if(c->tags[i]) {
 			brush.x += brush.w;
 			brush.w = textw(&brush.font, c->tags[i]) + brush.font.height;
-			draw(dpy, &brush, True, c->tags[i]);
+			draw(&brush, True, c->tags[i]);
 		}
 	}
 	brush.x += brush.w;
 	brush.w = textw(&brush.font, c->name) + brush.font.height;
-	draw(dpy, &brush, True, c->name);
+	draw(&brush, True, c->name);
 	XCopyArea(dpy, brush.drawable, c->title, brush.gc,
 			0, 0, c->tw, c->th, 0, 0);
 	XFlush(dpy);
