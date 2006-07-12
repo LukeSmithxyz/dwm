@@ -3,14 +3,12 @@
 
 include config.mk
 
-WMSRC = bar.c client.c draw.c event.c kb.c mouse.c util.c wm.c
-WMOBJ = ${WMSRC:.c=.o}
-MENSRC = menu.c draw.c util.c
-MENOBJ = ${MENSRC:.c=.o}
-MAN1 = gridwm.1 gridmenu.1
-BIN = gridwm gridmenu
+SRC = client.c draw.c event.c kb.c mouse.c util.c wm.c
+OBJ = ${SRC:.c=.o}
+MAN1 = gridwm.1 
+BIN = gridwm
 
-all: config gridwm gridmenu
+all: config gridwm
 	@echo finished
 
 config:
@@ -24,18 +22,14 @@ config:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${WMOBJ}: wm.h draw.h config.h util.h
+${OBJ}: wm.h
 
-gridmenu: ${MENOBJ}
+gridwm: ${OBJ}
 	@echo LD $@
-	@${CC} -o $@ ${MENOBJ} ${LDFLAGS}
-
-gridwm: ${WMOBJ}
-	@echo LD $@
-	@${CC} -o $@ ${WMOBJ} ${LDFLAGS}
+	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
-	rm -f gridwm gridmenu *.o core
+	rm -f gridwm *.o core
 
 dist: clean
 	mkdir -p gridwm-${VERSION}

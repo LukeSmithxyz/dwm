@@ -3,14 +3,9 @@
  * See LICENSE file for license details.
  */
 
-#include <errno.h>
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <sys/types.h>
-#include <sys/time.h>
 
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
@@ -28,17 +23,6 @@ char *tags[TLast] = {
 	[Twork] = "work",
 };
 
-/* commands */
-static char *cmdwallpaper[] = {
-	"feh", "--bg-scale", "/home/garbeam/wallpaper/bg.jpg", NULL
-};
-
-static char *cmdstatus[] = {
-	"sh", "-c", "echo -n `date '+%Y-%m-%d %H:%M'`" 
-	" `uptime | sed 's/.*://; s/,//g'`"
-	" `acpi | awk '{print $4}' | sed 's/,//'`", NULL
-};
-
 /********** CUSTOMIZE **********/
 
 /* X structs */
@@ -51,7 +35,7 @@ Bool issel;
 
 char stext[1024];
 int tsel = Tdev; /* default tag */
-int screen, sx, sy, sw, sh, bx, by, bw, bh;
+int screen, sx, sy, sw, sh, th;
 
 Brush brush = {0};
 Client *clients = NULL;
@@ -209,11 +193,6 @@ main(int argc, char *argv[])
 	unsigned int mask;
 	Window w;
 	XEvent ev;
-	fd_set fds;
-	struct timeval t, timeout = {
-		.tv_usec = 0,
-		.tv_sec = STATUSDELAY,
-	};
 
 	/* command line args */
 	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
@@ -245,7 +224,6 @@ main(int argc, char *argv[])
 	if(other_wm_running)
 		error("gridwm: another window manager is already running\n");
 
-	spawn(dpy, cmdwallpaper);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
@@ -275,24 +253,10 @@ main(int argc, char *argv[])
 	loadcolors(dpy, screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
 	loadfont(dpy, &brush.font, FONT);
 
-	wa.override_redirect = 1;
-	wa.background_pixmap = ParentRelative;
-	wa.event_mask = ExposureMask;
+	th = texth(&brush.font);
 
-	bx = by = 0;
-	bw = sw;
-	bh = texth(&brush.font);
-	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
-			CopyFromParent, DefaultVisual(dpy, screen),
-			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
-	XDefineCursor(dpy, barwin, cursor[CurNormal]);
-	XMapRaised(dpy, barwin);
-
-	brush.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
+	brush.drawable = XCreatePixmap(dpy, root, sw, th, DefaultDepth(dpy, screen));
 	brush.gc = XCreateGC(dpy, root, 0, 0);
-
-	pipe_spawn(stext, sizeof(stext), dpy, cmdstatus);
-	draw_bar();
 
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
 					| LeaveWindowMask;
@@ -303,21 +267,9 @@ main(int argc, char *argv[])
 	scan_wins();
 
 	while(running) {
-		if(XPending(dpy) > 0) {
-			XNextEvent(dpy, &ev);
-			if(handler[ev.type])
-				(handler[ev.type]) (&ev); /* call handler */
-			continue;
-		}
-		FD_ZERO(&fds);
-		FD_SET(ConnectionNumber(dpy), &fds);
-		t = timeout;
-		if(select(ConnectionNumber(dpy) + 1, &fds, NULL, NULL, &t) > 0)
-			continue;
-		else if(errno != EINTR) {
-			pipe_spawn(stext, sizeof(stext), dpy, cmdstatus);
-			draw_bar();
-		}
+		XNextEvent(dpy, &ev);
+		if(handler[ev.type])
+			(handler[ev.type])(&ev); /* call handler */
 	}
 
 	cleanup();

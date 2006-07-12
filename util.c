@@ -11,7 +11,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "util.h"
+#include "wm.h"
 
 void
 error(char *errstr, ...) {
@@ -60,17 +60,10 @@ erealloc(void *ptr, unsigned int size)
 char *
 estrdup(const char *str)
 {
-	void *res = strdup(str);
+	char *res = strdup(str);
 	if(!res)
 		bad_malloc(strlen(str));
 	return res;
-}
-
-void
-failed_assert(char *a, char *file, int line)
-{
-	fprintf(stderr, "Assertion \"%s\" failed at %s:%d\n", a, file, line);
-	abort();
 }
 
 void
@@ -96,46 +89,6 @@ spawn(Display *dpy, char *argv[])
 			perror(" failed");
 		}
 		exit (0);
-	}
-	wait(0);
-}
-
-void
-pipe_spawn(char *buf, unsigned int len, Display *dpy, char *argv[])
-{
-	unsigned int l, n;
-	int pfd[2];
-
-	if(!argv || !argv[0])
-		return;
-
-	if(pipe(pfd) == -1) {
-		perror("pipe");
-		exit(1);
-	}
-
-	if(fork() == 0) {
-		if(dpy)
-			close(ConnectionNumber(dpy));
-		setsid();
-		dup2(pfd[1], STDOUT_FILENO);
-		close(pfd[0]);
-		close(pfd[1]);
-		execvp(argv[0], argv);
-		fprintf(stderr, "gridwm: execvp %s", argv[0]);
-		perror(" failed");
-	}
-	else {
-		l = n = 0;
-		close(pfd[1]);
-		while(n < len) {
-			if((l = read(pfd[0], buf + n, len - n)) < 1)
-				break;
-			n += l;
-		}
-		while(l > n);
-		close(pfd[0]);
-		buf[n < len ? n : len - 1] = 0;
 	}
 	wait(0);
 }

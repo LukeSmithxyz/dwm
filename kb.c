@@ -9,25 +9,19 @@
 
 /********** CUSTOMIZE **********/
 
-char *cmdterm[] = { 
+char *term[] = { 
 	"aterm", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
 	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
 };
 
-char *cmdproglist[] = {
-		"sh", "-c", "exec `ls -lL /bin /sbin /usr/bin /usr/local/bin 2>/dev/null "
-		"| awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | gridmenu`", 0
-};
-
 static Key key[] = {
-	{ Mod1Mask, XK_Return, run, cmdterm },
-	{ Mod1Mask, XK_p, run, cmdproglist}, 
+	{ Mod1Mask, XK_Return, run, term },
 	{ Mod1Mask, XK_k, sel, "prev" }, 
 	{ Mod1Mask, XK_j, sel, "next" }, 
 	{ Mod1Mask, XK_g, grid, NULL }, 
 	{ Mod1Mask, XK_f, floating, NULL }, 
 	{ Mod1Mask, XK_m, max, NULL }, 
-	{ Mod1Mask | ShiftMask, XK_c, kill, NULL }, 
+	{ Mod1Mask | ShiftMask, XK_c, ckill, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_q, quit, NULL },
 };
 

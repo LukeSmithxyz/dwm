@@ -37,7 +37,5 @@ This will start gridwm on display :1 of the host foo.bar.
 
 Configuration
 -------------
-The configuration of gridwm is done by customizing the config.h source file. To
-customize the key bindings edit kb.c. To change the status output, edit the
-status command definition in wm.c.
-
+The configuration of gridwm is done by customizing the wm.h source file. To
+customize the key bindings edit kb.c.

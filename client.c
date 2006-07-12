@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
-#include "util.h"
 #include "wm.h"
 
 void (*arrange)(void *aux);
@@ -19,9 +19,9 @@ max(void *aux)
 	if(!stack)
 		return;
 	stack->x = sx;
-	stack->y = bh;
+	stack->y = sy;
 	stack->w = sw - 2 * stack->border;
-	stack->h = sh - bh - 2 * stack->border;
+	stack->h = sh - 2 * stack->border;
 	resize(stack);
 	discard_events(EnterWindowMask);
 }
@@ -59,11 +59,11 @@ grid(void *aux)
 		cols = rows;
 
 	gw = (sw - 2)  / cols;
-	gh = (sh - bh - 2) / rows;
+	gh = (sh - 2) / rows;
 
 	for(i = j = 0, c = clients; c; c = c->next) {
 		c->x = i * gw;
-		c->y = j * gh + bh;
+		c->y = j * gh;
 		c->w = gw;
 		c->h = gh;
 		resize(c);
@@ -89,12 +89,12 @@ sel(void *aux)
 		for(c = stack; c && c->snext; c = c->snext);
 	if(!c)
 		c = stack;
-	raise(c);
+	craise(c);
 	focus(c);
 }
 
 void
-kill(void *aux)
+ckill(void *aux)
 {
 	Client *c = stack;
 
@@ -114,8 +114,8 @@ resize_title(Client *c)
 	c->tw = 0;
 	for(i = 0; i < TLast; i++)
 		if(c->tags[i])
-			c->tw += textw(&brush.font, c->tags[i]) + bh;
-	c->tw += textw(&brush.font, c->name) + bh;
+			c->tw += textw(&brush.font, c->tags[i]) + brush.font.height;
+	c->tw += textw(&brush.font, c->name) + brush.font.height;
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
@@ -190,7 +190,7 @@ update_size(Client *c)
 }
 
 void
-raise(Client *c)
+craise(Client *c)
 {
 	XRaiseWindow(dpy, c->win);
 	XRaiseWindow(dpy, c->title);
@@ -234,11 +234,9 @@ manage(Window w, XWindowAttributes *wa)
 	c->win = w;
 	c->tx = c->x = wa->x;
 	c->ty = c->y = wa->y;
-	if(c->y < bh)
-		c->ty = c->y += bh;
 	c->tw = c->w = wa->width;
 	c->h = wa->height;
-	c->th = bh;
+	c->th = th;
 	c->border = 1;
 	update_size(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
@@ -379,10 +377,8 @@ unmanage(Client *c)
 	XDestroyWindow(dpy, c->title);
 
 	for(l=&clients; *l && *l != c; l=&(*l)->next);
-	eassert(*l == c);
 	*l = c->next;
 	for(l=&stack; *l && *l != c; l=&(*l)->snext);
-	eassert(*l == c);
 	*l = c->snext;
 	free(c);
 
@@ -418,10 +414,8 @@ void
 draw_client(Client *c)
 {
 	int i;
-	if(c == stack) {
-		draw_bar();
+	if(c == stack)
 		return;
-	}
 
 	brush.x = brush.y = 0;
 	brush.h = c->th;
@@ -430,12 +424,12 @@ draw_client(Client *c)
 	for(i = 0; i < TLast; i++) {
 		if(c->tags[i]) {
 			brush.x += brush.w;
-			brush.w = textw(&brush.font, c->tags[i]) + bh;
+			brush.w = textw(&brush.font, c->tags[i]) + brush.font.height;
 			draw(dpy, &brush, True, c->tags[i]);
 		}
 	}
 	brush.x += brush.w;
-	brush.w = textw(&brush.font, c->name) + bh;
+	brush.w = textw(&brush.font, c->name) + brush.font.height;
 	draw(dpy, &brush, True, c->name);
 	XCopyArea(dpy, brush.drawable, c->title, brush.gc,
 			0, 0, c->tw, c->th, 0, 0);

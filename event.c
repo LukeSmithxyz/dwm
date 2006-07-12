@@ -51,7 +51,7 @@ buttonpress(XEvent *e)
 	Client *c;
 
 	if((c = getclient(ev->window))) {
-		raise(c);
+		craise(c);
 		switch(ev->button) {
 		default:
 			break;
@@ -147,8 +147,6 @@ expose(XEvent *e)
 	if(ev->count == 0) {
 		if((c = gettitle(ev->window)))
 			draw_client(c);
-		else if(ev->window == barwin)
-			draw_bar();
 	}
 }
 
@@ -203,10 +201,7 @@ propertynotify(XEvent *e)
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {
 			update_name(c);
-			if(c == stack)
-				draw_bar();
-			else
-				draw_client(c);
+			draw_client(c);
 		}
 	}
 }

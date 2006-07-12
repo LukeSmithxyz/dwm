@@ -6,8 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "draw.h"
-#include "util.h"
+#include <X11/Xlocale.h>
+
+#include "wm.h"
 
 static void
 drawborder(Display *dpy, Brush *b)

@@ -3,15 +3,25 @@
  * See LICENSE file for license details.
  */
 
-#include "config.h"
-#include "draw.h"
-#include "util.h"
+#include <X11/Xlib.h>
 
-#include <X11/Xutil.h>
+/********** CUSTOMIZE **********/
 
+#define FONT		"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
+#define BGCOLOR		"#666699"
+#define FGCOLOR		"#ffffff"
+#define BORDERCOLOR	"#9999CC"
+#define STATUSDELAY	10 /* seconds */
 #define WM_PROTOCOL_DELWIN 1
 
+/* tags */
+enum { Tscratch, Tdev, Tirc, Twww, Twork, TLast };
+
+/********** CUSTOMIZE **********/
+
+typedef struct Brush Brush;
 typedef struct Client Client;
+typedef struct Fnt Fnt;
 typedef struct Key Key;
 
 /* atoms */
@@ -20,6 +30,24 @@ enum { NetSupported, NetWMName, NetLast };
 
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
+
+struct Fnt {
+	XFontStruct *xfont;
+	XFontSet set;
+	int ascent;
+	int descent;
+	int height;
+};
+
+struct Brush {
+	GC gc;
+	Drawable drawable;
+	int x, y, w, h;
+	Fnt font;
+	unsigned long bg;
+	unsigned long fg;
+	unsigned long border;
+};
 
 struct Client {
 	char name[256];
@@ -46,21 +74,27 @@ struct Key {
 };
 
 extern Display *dpy;
-extern Window root, barwin;
+extern Window root;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern Bool running, issel;
 extern void (*handler[LASTEvent]) (XEvent *);
 extern void (*arrange)(void *aux);
 
-extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh;
+extern int tsel, screen, sx, sy, sw, sh, th;
 extern char stext[1024], *tags[TLast];
 
 extern Brush brush;
 extern Client *clients, *stack;
 
-/* bar.c */
-extern void draw_bar();
+/* draw.c */
+extern void draw(Display *dpy, Brush *b, Bool border, const char *text);
+extern void loadcolors(Display *dpy, int screen, Brush *b,
+		const char *bg, const char *fg, const char *bo);
+extern void loadfont(Display *dpy, Fnt *font, const char *fontstr);
+extern unsigned int textnw(Fnt *font, char *text, unsigned int len);
+extern unsigned int textw(Fnt *font, char *text);
+extern unsigned int texth(Fnt *font);
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
@@ -72,9 +106,9 @@ extern void draw_client(Client *c);
 extern void resize(Client *c);
 extern void update_size(Client *c);
 extern Client *gettitle(Window w);
-extern void raise(Client *c);
+extern void craise(Client *c);
 extern void lower(Client *c);
-extern void kill(void *aux);
+extern void ckill(void *aux);
 extern void sel(void *aux);
 extern void max(void *aux);
 extern void floating(void *aux);
@@ -91,6 +125,15 @@ extern void keypress(XEvent *e);
 /* mouse.c */
 extern void mresize(Client *c);
 extern void mmove(Client *c);
+
+/* util.c */
+extern void error(char *errstr, ...);
+extern void *emallocz(unsigned int size);
+extern void *emalloc(unsigned int size);
+extern void *erealloc(void *ptr, unsigned int size);
+extern char *estrdup(const char *str);
+extern void spawn(Display *dpy, char *argv[]);
+extern void swap(void **p1, void **p2);
 
 /* wm.c */
 extern int error_handler(Display *dpy, XErrorEvent *error);
