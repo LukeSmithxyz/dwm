@@ -72,12 +72,11 @@ extern void raise(Client *c);
 extern void lower(Client *c);
 extern void kill(void *aux);
 extern void sel(void *aux);
+extern void max(void *aux);
+extern void arrange();
 
 /* event.c */
 extern void discard_events(long even_mask);
-
-/* grid.c */
-extern void arrange();
 
 /* key.c */
 extern void update_keys();

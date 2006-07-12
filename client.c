@@ -12,6 +12,18 @@
 #include "wm.h"
 
 void
+max(void *aux)
+{
+	if(!stack)
+		return;
+	stack->x = sx;
+	stack->y = bh;
+	stack->w = sw - 2;
+	stack->h = sh - bh - 2;
+	resize(stack);
+}
+
+void
 arrange(void *aux)
 {
 	Client *c;
