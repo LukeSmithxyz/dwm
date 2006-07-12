@@ -4,7 +4,7 @@
  */
 
 #define FONT		"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
-#define BGCOLOR		"#0c0c33"
-#define FGCOLOR		"#b2c8cd"
-#define BORDERCOLOR	"#3030c0"
-#define STATUSDELAY	10 /* milliseconds */
+#define BGCOLOR		"#666699"
+#define FGCOLOR		"#ffffff"
+#define BORDERCOLOR	"#9999CC"
+#define STATUSDELAY	10 /* seconds */

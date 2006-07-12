@@ -23,12 +23,11 @@ Display *dpy;
 Window root, barwin;
 Atom wm_atom[WMLast], net_atom[NetLast];
 Cursor cursor[CurLast];
-XRectangle rect, barrect;
 Bool running = True;
 Bool sel_screen;
 
 char statustext[1024], tag[256];
-int screen;
+int screen, sx, sy, sw, sh, bx, by, bw, bh;
 
 Brush brush = {0};
 Client *clients = NULL;
@@ -39,7 +38,7 @@ static const char version[] = "gridwm - " VERSION ", (C)opyright MMVI Anselm R. 
 static int (*x_error_handler) (Display *, XErrorEvent *);
 
 static const char *status[] = {
-	"sh", "-c", "echo -n `date '+%Y/%m/%d %H:%M'`" 
+	"sh", "-c", "echo -n `date '+%Y-%m-%d %H:%M'`" 
 	" `uptime | sed 's/.*://; s/,//g'`"
 	" `acpi | awk '{print $4}' | sed 's/,//'`", 0
 };
@@ -220,9 +219,9 @@ main(int argc, char *argv[])
 	if(other_wm_running)
 		error("gridwm: another window manager is already running\n");
 
-	rect.x = rect.y = 0;
-	rect.width = DisplayWidth(dpy, screen);
-	rect.height = DisplayHeight(dpy, screen);
+	sx = sy = 0;
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
 	sel_screen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 
 	XSetErrorHandler(0);
@@ -253,18 +252,16 @@ main(int argc, char *argv[])
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ExposureMask;
 
-	barrect = rect;
-	barrect.height = labelheight(&brush.font);
-	barrect.y = rect.height - barrect.height;
-	barwin = XCreateWindow(dpy, root, barrect.x, barrect.y,
-			barrect.width, barrect.height, 0, DefaultDepth(dpy, screen),
+	bx = by = 0;
+	bw = sw;
+	bh = texth(&brush.font);
+	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
 			CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 
-	brush.drawable = XCreatePixmap(dpy, root, rect.width, barrect.height,
-			DefaultDepth(dpy, screen));
+	brush.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	brush.gc = XCreateGC(dpy, root, 0, 0);
 
 	pipe_spawn(statustext, sizeof(statustext), dpy, (char **)status);

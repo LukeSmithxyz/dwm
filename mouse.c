@@ -45,21 +45,21 @@ mresize(Client *c)
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
-	XGrabServer(dpy);
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 	for(;;) {
-		XMaskEvent(dpy, MouseMask, &ev);
+		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
 		switch(ev.type) {
 		default: break;
+		case Expose:
+			handler[Expose](&ev);
+			break;
 		case MotionNotify:
-			XUngrabServer(dpy);
+			XFlush(dpy);
 			mmatch(c, old_cx, old_cy, ev.xmotion.x, ev.xmotion.y);
 			XResizeWindow(dpy, c->win, c->w, c->h);
-			XGrabServer(dpy);
 			break;
 		case ButtonRelease:
 			resize(c);
-			XUngrabServer(dpy);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		}
@@ -80,21 +80,21 @@ mmove(Client *c)
 				None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
-	XGrabServer(dpy);
 	for(;;) {
-		XMaskEvent(dpy, MouseMask, &ev);
+		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
 		switch (ev.type) {
 		default: break;
+		case Expose:
+			handler[Expose](&ev);
+			break;
 		case MotionNotify:
-			XUngrabServer(dpy);
+			XFlush(dpy);
 			c->x = old_cx + (ev.xmotion.x - x1);
 			c->y = old_cy + (ev.xmotion.y - y1);
 			XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
-			XGrabServer(dpy);
 			break;
 		case ButtonRelease:
 			resize(c);
-			XUngrabServer(dpy);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		}

@@ -31,7 +31,6 @@ struct Item {
 static Display *dpy;
 static Window root;
 static Window win;
-static XRectangle rect;
 static Bool done = False;
 
 static Item *allitem = NULL;	/* first of all items */
@@ -41,14 +40,14 @@ static Item *nextoff = NULL;
 static Item *prevoff = NULL;
 static Item *curroff = NULL;
 
-static int screen;
+static int screen, mx, my, mw, mh;
 static char *title = NULL;
 static char text[4096];
 static int ret = 0;
 static int nitem = 0;
 static unsigned int cmdw = 0;
-static unsigned int twidth = 0;
-static unsigned int cwidth = 0;
+static unsigned int tw = 0;
+static unsigned int cw = 0;
 static const int seek = 30;		/* 30px */
 
 static Brush brush = {0};
@@ -74,21 +73,21 @@ update_offsets()
 		return;
 
 	for(nextoff = curroff; nextoff; nextoff=nextoff->right) {
-		tw = textwidth(&brush.font, nextoff->text);
-		if(tw > rect.width / 3)
-			tw = rect.width / 3;
+		tw = textw(&brush.font, nextoff->text);
+		if(tw > mw / 3)
+			tw = mw / 3;
 		w += tw + brush.font.height;
-		if(w > rect.width)
+		if(w > mw)
 			break;
 	}
 
 	w = cmdw + 2 * seek;
 	for(prevoff = curroff; prevoff && prevoff->left; prevoff=prevoff->left) {
-		tw = textwidth(&brush.font, prevoff->left->text);
-		if(tw > rect.width / 3)
-			tw = rect.width / 3;
+		tw = textw(&brush.font, prevoff->left->text);
+		if(tw > mw / 3)
+			tw = mw / 3;
 		w += tw + brush.font.height;
-		if(w > rect.width)
+		if(w > mw)
 			break;
 	}
 }
@@ -103,9 +102,9 @@ update_items(char *pattern)
 		return;
 
 	if(!title || *pattern)
-		cmdw = cwidth;
+		cmdw = cw;
 	else
-		cmdw = twidth;
+		cmdw = tw;
 
 	item = j = NULL;
 	nitem = 0;
@@ -143,42 +142,40 @@ update_items(char *pattern)
 static void
 draw_menu()
 {
-	unsigned int offx = 0;
 	Item *i;
 
-	brush.rect = rect;
-	brush.rect.x = 0;
-	brush.rect.y = 0;
+	brush.x = 0;
+	brush.y = 0;
+	brush.w = mw;
+	brush.h = mh;
 	draw(dpy, &brush, False, 0);
 
 	/* print command */
 	if(!title || text[0]) {
-		cmdw = cwidth;
+		cmdw = cw;
 		if(cmdw && item)
-			brush.rect.width = cmdw;
+			brush.w = cmdw;
 		draw(dpy, &brush, False, text);
 	}
 	else {
-		cmdw = twidth;
-		brush.rect.width = cmdw;
+		cmdw = tw;
+		brush.w = cmdw;
 		draw(dpy, &brush, False, title);
 	}
-	offx += brush.rect.width;
+	brush.x += brush.w;
 
 	if(curroff) {
-		brush.rect.x = offx;
-		brush.rect.width = seek;
-		offx += brush.rect.width;
+		brush.w = seek;
 		draw(dpy, &brush, False, (curroff && curroff->left) ? "<" : 0);
+		brush.x += brush.w;
 
 		/* determine maximum items */
 		for(i = curroff; i != nextoff; i=i->right) {
 			brush.border = False;
-			brush.rect.x = offx;
-			brush.rect.width = textwidth(&brush.font, i->text);
-			if(brush.rect.width > rect.width / 3)
-				brush.rect.width = rect.width / 3;
-			brush.rect.width += brush.font.height;
+			brush.w = textw(&brush.font, i->text);
+			if(brush.w > mw / 3)
+				brush.w = mw / 3;
+			brush.w += brush.font.height;
 			if(sel == i) {
 				swap((void **)&brush.fg, (void **)&brush.bg);
 				draw(dpy, &brush, True, i->text);
@@ -186,15 +183,14 @@ draw_menu()
 			}
 			else
 				draw(dpy, &brush, False, i->text);
-			offx += brush.rect.width;
+			brush.x += brush.w;
 		}
 
-		brush.rect.x = rect.width - seek;
-		brush.rect.width = seek;
+		brush.x = mw - seek;
+		brush.w = seek;
 		draw(dpy, &brush, False, nextoff ? ">" : 0);
 	}
-	XCopyArea(dpy, brush.drawable, win, brush.gc, 0, 0, rect.width,
-			rect.height, 0, 0);
+	XCopyArea(dpy, brush.drawable, win, brush.gc, 0, 0, mw, mh, 0, 0);
 	XFlush(dpy);
 }
 
@@ -399,36 +395,35 @@ main(int argc, char *argv[])
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ExposureMask | ButtonPressMask | KeyPressMask;
 
-	rect.width = DisplayWidth(dpy, screen);
-	rect.height = labelheight(&brush.font);
-	rect.y = DisplayHeight(dpy, screen) - rect.height;
-	rect.x = 0;
+	mx = my = 0;
+	mw = DisplayWidth(dpy, screen);
+	mh = texth(&brush.font);
 
-	win = XCreateWindow(dpy, root, rect.x, rect.y,
-			rect.width, rect.height, 0, DefaultDepth(dpy, screen),
-			CopyFromParent, DefaultVisual(dpy, screen),
+	win = XCreateWindow(dpy, root, mx, my, mw, mh, 0,
+			DefaultDepth(dpy, screen), CopyFromParent,
+			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, win, XCreateFontCursor(dpy, XC_xterm));
 	XFlush(dpy);
 
 	/* pixmap */
 	brush.gc = XCreateGC(dpy, root, 0, 0);
-	brush.drawable = XCreatePixmap(dpy, win, rect.width, rect.height,
+	brush.drawable = XCreatePixmap(dpy, win, mw, mh,
 			DefaultDepth(dpy, screen));
 	XFlush(dpy);
 
 	if(maxname)
-		cwidth = textwidth(&brush.font, maxname) + brush.font.height;
-	if(cwidth > rect.width / 3)
-		cwidth = rect.width / 3;
+		cw = textw(&brush.font, maxname) + brush.font.height;
+	if(cw > mw / 3)
+		cw = mw / 3;
 
 	if(title) {
-		twidth = textwidth(&brush.font, title) + brush.font.height;
-		if(twidth > rect.width / 3)
-			twidth = rect.width / 3;
+		tw = textw(&brush.font, title) + brush.font.height;
+		if(tw > mw / 3)
+			tw = mw / 3;
 	}
 
-	cmdw = title ? twidth : cwidth;
+	cmdw = title ? tw : cw;
 
 	text[0] = 0;
 	update_items(text);

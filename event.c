@@ -37,13 +37,11 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 
-unsigned int
+void
 discard_events(long even_mask)
 {
 	XEvent ev;
-	unsigned int n = 0;
-	while(XCheckMaskEvent(dpy, even_mask, &ev)) n++;
-	return n;
+	while(XCheckMaskEvent(dpy, even_mask, &ev));
 }
 
 static void
@@ -53,6 +51,7 @@ buttonpress(XEvent *e)
 	Client *c;
 
 	if((c = getclient(ev->window))) {
+		raise(c);
 		switch(ev->button) {
 		default:
 			break;
@@ -60,7 +59,7 @@ buttonpress(XEvent *e)
 			mmove(c);
 			break;
 		case Button2:
-			XLowerWindow(dpy, c->win);
+			lower(c);
 			break;
 		case Button3:
 			mresize(c);
@@ -122,10 +121,8 @@ enternotify(XEvent *e)
 
 	if((c = getclient(ev->window)))
 		focus(c);
-	else if(ev->window == root) {
+	else if(ev->window == root)
 		sel_screen = True;
-		/*draw_frames();*/
-	}
 }
 
 static void
@@ -133,10 +130,8 @@ leavenotify(XEvent *e)
 {
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if((ev->window == root) && !ev->same_screen) {
+	if((ev->window == root) && !ev->same_screen)
 		sel_screen = True;
-		/*draw_frames();*/
-	}
 }
 
 static void

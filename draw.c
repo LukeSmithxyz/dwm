@@ -15,16 +15,16 @@ drawborder(Display *dpy, Brush *b)
 	XPoint points[5];
 	XSetLineAttributes(dpy, b->gc, 1, LineSolid, CapButt, JoinMiter);
 	XSetForeground(dpy, b->gc, b->border);
-	points[0].x = b->rect.x;
-	points[0].y = b->rect.y;
-	points[1].x = b->rect.width - 1;
+	points[0].x = b->x;
+	points[0].y = b->y;
+	points[1].x = b->w - 1;
 	points[1].y = 0;
 	points[2].x = 0;
-	points[2].y = b->rect.height - 1;
-	points[3].x = -(b->rect.width - 1);
+	points[2].y = b->h - 1;
+	points[3].x = -(b->w - 1);
 	points[3].y = 0;
 	points[4].x = 0;
-	points[4].y = -(b->rect.height - 1);
+	points[4].y = -(b->h - 1);
 	XDrawLines(dpy, b->drawable, b->gc, points, 5, CoordModePrevious);
 }
 
@@ -34,9 +34,10 @@ draw(Display *dpy, Brush *b, Bool border, const char *text)
 	unsigned int x, y, w, h, len;
 	static char buf[256];
 	XGCValues gcv;
+	XRectangle r = { b->x, b->y, b->w, b->h };
 
 	XSetForeground(dpy, b->gc, b->bg);
-	XFillRectangles(dpy, b->drawable, b->gc, &b->rect, 1);
+	XFillRectangles(dpy, b->drawable, b->gc, &r, 1);
 
 	if(border)
 		drawborder(dpy, b);
@@ -51,14 +52,14 @@ draw(Display *dpy, Brush *b, Bool border, const char *text)
 	buf[len] = 0;
 
 	h = b->font.ascent + b->font.descent;
-	y = b->rect.y + (b->rect.height / 2) - (h / 2) + b->font.ascent;
-	x = b->rect.x + (h / 2);
+	y = b->y + (b->h / 2) - (h / 2) + b->font.ascent;
+	x = b->x + (h / 2);
 
 	/* shorten text if necessary */
-	while(len && (w = textwidth_l(&b->font, buf, len)) > b->rect.width - h)
+	while(len && (w = textnw(&b->font, buf, len)) > b->w - h)
 		buf[--len] = 0;
 
-	if(w > b->rect.width)
+	if(w > b->w)
 		return; /* too long */
 
 	gcv.foreground = b->fg;
@@ -94,20 +95,26 @@ loadcolors(Display *dpy, int screen, Brush *b,
 }
 
 unsigned int
-textwidth_l(Fnt *font, char *text, unsigned int len)
+textnw(Fnt *font, char *text, unsigned int len)
 {
+	XRectangle r;
 	if(font->set) {
-		XRectangle r;
-		XmbTextExtents(font->set, text, len, 0, &r);
+		XmbTextExtents(font->set, text, len, NULL, &r);
 		return r.width;
 	}
 	return XTextWidth(font->xfont, text, len);
 }
 
 unsigned int
-textwidth(Fnt *font, char *text)
+textw(Fnt *font, char *text)
 {
-	return textwidth_l(font, text, strlen(text));
+	return textnw(font, text, strlen(text));
+}
+
+unsigned int
+texth(Fnt *font)
+{
+	return font->height + 4;
 }
 
 void
@@ -161,10 +168,4 @@ loadfont(Display *dpy, Fnt *font, const char *fontstr)
 		font->descent = font->xfont->descent;
 	}
 	font->height = font->ascent + font->descent;
-}
-
-unsigned int
-labelheight(Fnt *font)
-{
-	return font->height + 4;
 }

@@ -46,11 +46,10 @@ extern Display *dpy;
 extern Window root, barwin;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
-extern XRectangle rect, barrect;
 extern Bool running, sel_screen, grid;
 extern void (*handler[LASTEvent]) (XEvent *);
 
-extern int screen;
+extern int screen, sx, sy, sw, sh, bx, by, bw, bh;
 extern char statustext[1024], tag[256];
 
 extern Brush brush;
@@ -75,9 +74,11 @@ extern void draw_client(Client *c);
 extern void resize(Client *c);
 extern void update_size(Client *c);
 extern Client *gettitle(Window w);
+extern void raise(Client *c);
+extern void lower(Client *c);
 
 /* event.c */
-extern unsigned int discard_events(long even_mask);
+extern void discard_events(long even_mask);
 
 /* key.c */
 extern void update_keys();

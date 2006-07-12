@@ -20,7 +20,7 @@ struct Fnt {
 struct Brush {
 	GC gc;
 	Drawable drawable;
-	XRectangle rect;
+	int x, y, w, h;
 	Fnt font;
 	unsigned long bg;
 	unsigned long fg;
@@ -31,6 +31,6 @@ extern void draw(Display *dpy, Brush *b, Bool border, const char *text);
 extern void loadcolors(Display *dpy, int screen, Brush *b,
 		const char *bg, const char *fg, const char *bo);
 extern void loadfont(Display *dpy, Fnt *font, const char *fontstr);
-extern unsigned int textwidth_l(Fnt *font, char *text, unsigned int len);
-extern unsigned int textwidth(Fnt *font, char *text);
-extern unsigned int labelheight(Fnt *font);
+extern unsigned int textnw(Fnt *font, char *text, unsigned int len);
+extern unsigned int textw(Fnt *font, char *text);
+extern unsigned int texth(Fnt *font);
