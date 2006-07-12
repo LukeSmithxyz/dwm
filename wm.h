@@ -27,6 +27,8 @@ struct Client {
 	int x, y, w, h;
 	int tx, ty, tw, th;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+	int grav;
+	unsigned int border;
 	long flags; 
 	Window win;
 	Window trans;
@@ -73,7 +75,8 @@ extern void lower(Client *c);
 extern void kill(void *aux);
 extern void sel(void *aux);
 extern void max(void *aux);
-extern void arrange();
+extern void arrange(void *aux);
+extern void gravitate(Client *c, Bool invert);
 
 /* event.c */
 extern void discard_events(long even_mask);

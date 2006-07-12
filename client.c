@@ -18,9 +18,10 @@ max(void *aux)
 		return;
 	stack->x = sx;
 	stack->y = bh;
-	stack->w = sw - 2;
-	stack->h = sh - bh - 2;
+	stack->w = sw - 2 * stack->border;
+	stack->h = sh - bh - 2 * stack->border;
 	resize(stack);
+	discard_events(EnterWindowMask);
 }
 
 void
@@ -43,8 +44,8 @@ arrange(void *aux)
 	else
 		cols = rows;
 
-	gw = (sw - 1)  / cols;
-	gh = (sh - bh - 1) / rows;
+	gw = (sw - 2 * c->border)  / cols;
+	gh = (sh - bh - 2 * c->border) / rows;
 
 	for(i = j = 0, c = clients; c; c = c->next) {
 		c->x = i * gw;
@@ -57,6 +58,7 @@ arrange(void *aux)
 			i = 0;
 		}
 	}
+	discard_events(EnterWindowMask);
 }
 
 void
@@ -161,6 +163,10 @@ update_size(Client *c)
 	}
 	else
 		c->minw = c->minh = 0;
+	if(c->flags & PWinGravity)
+		c->grav = size.win_gravity;
+	else
+		c->grav = NorthWestGravity;
 }
 
 void
@@ -213,6 +219,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->tw = c->w = wa->width;
 	c->h = wa->height;
 	c->th = bh;
+	c->border = 1;
 	update_size(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XSetWindowBorder(dpy, c->win, brush.border);
@@ -247,6 +254,61 @@ manage(Window w, XWindowAttributes *wa)
 }
 
 void
+gravitate(Client *c, Bool invert)
+{
+	int dx = 0, dy = 0;
+
+	switch(c->grav) {
+	case StaticGravity:
+	case NorthWestGravity:
+	case NorthGravity:
+	case NorthEastGravity:
+		dy = c->border;
+		break;
+	case EastGravity:
+	case CenterGravity:
+	case WestGravity:
+		dy = -(c->h / 2) + c->border;
+		break;
+	case SouthEastGravity:
+	case SouthGravity:
+	case SouthWestGravity:
+		dy = -c->h;
+		break;
+	default:
+		break;
+	}
+
+	switch (c->grav) {
+	case StaticGravity:
+	case NorthWestGravity:
+	case WestGravity:
+	case SouthWestGravity:
+		dx = c->border;
+		break;
+	case NorthGravity:
+	case CenterGravity:
+	case SouthGravity:
+		dx = -(c->w / 2) + c->border;
+		break;
+	case NorthEastGravity:
+	case EastGravity:
+	case SouthEastGravity:
+		dx = -(c->w + c->border);
+		break;
+	default:
+		break;
+	}
+
+	if(invert) {
+		dx = -dx;
+		dy = -dy;
+	}
+	c->x += dx;
+	c->y += dy;
+}
+
+void
 resize(Client *c)
 {
 	XConfigureEvent e;
@@ -260,7 +322,7 @@ resize(Client *c)
 	e.y = c->y;
 	e.width = c->w;
 	e.height = c->h;
-	e.border_width = 0;
+	e.border_width = c->border;
 	e.above = None;
 	e.override_redirect = False;
 	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&e);
