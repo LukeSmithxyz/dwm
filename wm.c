@@ -95,13 +95,12 @@ win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
 int
 win_proto(Window w)
 {
-	Atom *protocols;
+	unsigned char *protocols;
 	long res;
 	int protos = 0;
 	int i;
 
-	res = win_property(w, wm_atom[WMProtocols], XA_ATOM, 20L,
-			((unsigned char **) &protocols));
+	res = win_property(w, wm_atom[WMProtocols], XA_ATOM, 20L, &protocols);
 	if(res <= 0) {
 		return protos;
 	}

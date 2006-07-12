@@ -44,8 +44,8 @@ arrange(void *aux)
 	else
 		cols = rows;
 
-	gw = (sw - 2 * c->border)  / cols;
-	gh = (sh - bh - 2 * c->border) / rows;
+	gw = (sw - 2)  / cols;
+	gh = (sh - bh - 2) / rows;
 
 	for(i = j = 0, c = clients; c; c = c->next) {
 		c->x = i * gw;

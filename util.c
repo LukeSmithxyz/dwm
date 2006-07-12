@@ -126,13 +126,14 @@ pipe_spawn(char *buf, unsigned int len, Display *dpy, char *argv[])
 		perror(" failed");
 	}
 	else {
-		n = 0;
+		l = n = 0;
 		close(pfd[1]);
-		while(l > n) {
+		while(n < len) {
 			if((l = read(pfd[0], buf + n, len - n)) < 1)
 				break;
 			n += l;
 		}
+		while(l > n);
 		close(pfd[0]);
 		buf[n < len ? n : len - 1] = 0;
 	}

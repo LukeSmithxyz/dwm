@@ -39,6 +39,7 @@ draw(Display *dpy, Brush *b, Bool border, const char *text)
 	XSetForeground(dpy, b->gc, b->bg);
 	XFillRectangles(dpy, b->drawable, b->gc, &r, 1);
 
+	w = 0;
 	if(border)
 		drawborder(dpy, b);
 
