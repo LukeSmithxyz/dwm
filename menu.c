@@ -12,9 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <time.h>
 #include <unistd.h>
 #include <X11/cursorfont.h>
 #include <X11/Xutil.h>
@@ -58,11 +55,7 @@ static void kpress(XKeyEvent * e);
 static char version[] = "gridmenu - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 
 static void
-usage()
-{
-	fprintf(stderr, "%s", "usage: gridmenu [-v] [-t <title>]\n");
-	exit(1);
-}
+usage() { error("usage: gridmenu [-v] [-t <title>]\n"); }
 
 static void
 update_offsets()
@@ -213,25 +206,11 @@ kpress(XKeyEvent * e)
 	/* first check if a control mask is omitted */
 	if(e->state & ControlMask) {
 		switch (ksym) {
-		case XK_H:
+		default:	/* ignore other control sequences */
+			return;
+			break;
 		case XK_h:
 			ksym = XK_BackSpace;
-			break;
-		case XK_I:
-		case XK_i:
-			ksym = XK_Tab;
-			break;
-		case XK_J:
-		case XK_j:
-			ksym = XK_Return;
-			break;
-		case XK_N:
-		case XK_n:
-			ksym = XK_Right;
-			break;
-		case XK_P:
-		case XK_p:
-			ksym = XK_Left;
 			break;
 		case XK_U:
 		case XK_u:
@@ -243,12 +222,9 @@ kpress(XKeyEvent * e)
 		case XK_bracketleft:
 			ksym = XK_Escape;
 			break;
-		default:	/* ignore other control sequences */
-			return;
-			break;
 		}
 	}
-	switch (ksym) {
+	switch(ksym) {
 	case XK_Left:
 		if(!(sel && sel->left))
 			return;
@@ -432,21 +408,18 @@ main(int argc, char *argv[])
 	XFlush(dpy);
 
 	/* main event loop */
-	while(!XNextEvent(dpy, &ev)) {
+	while(!done && !XNextEvent(dpy, &ev)) {
 		switch (ev.type) {
-			case KeyPress:
-				kpress(&ev.xkey);
-				break;
-			case Expose:
-				if(ev.xexpose.count == 0) {
-					draw_menu();
-				}
-				break;
-			default:
-				break;
-		}
-		if(done)
+		case KeyPress:
+			kpress(&ev.xkey);
 			break;
+		case Expose:
+			if(ev.xexpose.count == 0)
+				draw_menu();
+			break;
+		default:
+			break;
+		}
 	}
 
 	XUngrabKeyboard(dpy, CurrentTime);

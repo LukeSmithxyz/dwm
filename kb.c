@@ -7,26 +7,31 @@
 
 #include <X11/keysym.h>
 
-static const char *term[] = { 
+/********** CUSTOMIZE **********/
+
+char *cmdterm[] = { 
 	"aterm", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
-	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", 0 
+	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
 };
 
-static const char *proglist[] = {
+char *cmdproglist[] = {
 		"sh", "-c", "exec `ls -lL /bin /sbin /usr/bin /usr/local/bin 2>/dev/null "
 		"| awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | gridmenu`", 0
 };
 
 static Key key[] = {
-	{ Mod1Mask, XK_Return, run, term },
-	{ Mod1Mask, XK_p, run, proglist }, 
+	{ Mod1Mask, XK_Return, run, cmdterm },
+	{ Mod1Mask, XK_p, run, cmdproglist}, 
 	{ Mod1Mask, XK_k, sel, "prev" }, 
 	{ Mod1Mask, XK_j, sel, "next" }, 
-	{ Mod1Mask, XK_g, arrange, NULL }, 
+	{ Mod1Mask, XK_g, grid, NULL }, 
+	{ Mod1Mask, XK_f, floating, NULL }, 
 	{ Mod1Mask, XK_m, max, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_c, kill, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_q, quit, NULL },
 };
+
+/********** CUSTOMIZE **********/
 
 void
 update_keys()

@@ -11,6 +11,8 @@
 #include "util.h"
 #include "wm.h"
 
+void (*arrange)(void *aux);
+
 void
 max(void *aux)
 {
@@ -25,12 +27,24 @@ max(void *aux)
 }
 
 void
-arrange(void *aux)
+floating(void *aux)
+{
+	Client *c;
+
+	arrange = floating;
+	for(c = stack; c; c = c->snext)
+		resize(c);
+	discard_events(EnterWindowMask);
+}
+
+void
+grid(void *aux)
 {
 	Client *c;
 	int n, cols, rows, gw, gh, i, j;
     float rt, fd;
 
+	arrange = grid;
 	if(!clients)
 		return;
 	for(n = 0, c = clients; c; c = c->next, n++);
@@ -95,7 +109,13 @@ kill(void *aux)
 static void
 resize_title(Client *c)
 {
-	c->tw = textw(&brush.font, c->name) + bh;
+	int i;
+
+	c->tw = 0;
+	for(i = 0; i < TLast; i++)
+		if(c->tags[i])
+			c->tw += textw(&brush.font, c->tags[i]) + bh;
+	c->tw += textw(&brush.font, c->name) + bh;
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
@@ -190,8 +210,8 @@ focus(Client *c)
 
 	old = stack;
 	for(l = &stack; *l && *l != c; l = &(*l)->snext);
-	eassert(*l == c);
-	*l = c->snext;
+	if(*l)
+		*l = c->snext;
 	c->snext = stack;
 	stack = c;
 	if(old && old != c) {
@@ -230,17 +250,16 @@ manage(Window w, XWindowAttributes *wa)
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask;
 
+	c->tags[tsel] = tags[tsel];
 	c->title = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
-	update_name(c);
 
+	update_name(c);
 	for(l=&clients; *l; l=&(*l)->next);
 	c->next = *l; /* *l == nil */
 	*l = c;
-	c->snext = stack;
-	stack = c;
 	XMapRaised(dpy, c->win);
 	XMapRaised(dpy, c->title);
 	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
@@ -249,7 +268,7 @@ manage(Window w, XWindowAttributes *wa)
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
-	resize(c);
+	arrange(NULL);
 	focus(c);
 }
 
@@ -308,11 +327,24 @@ gravitate(Client *c, Bool invert)
 	c->y += dy;
 }
 
+
 void
 resize(Client *c)
 {
 	XConfigureEvent e;
 
+	if(c->incw)
+		c->w -= (c->w - c->basew) % c->incw;
+	if(c->inch)
+		c->h -= (c->h - c->baseh) % c->inch;
+	if(c->minw && c->w < c->minw)
+		c->w = c->minw;
+	if(c->minh && c->h < c->minh)
+		c->h = c->minh;
+	if(c->maxw && c->w > c->maxw)
+		c->w = c->maxw;
+	if(c->maxh && c->h > c->maxh)
+		c->h = c->maxh;
 	resize_title(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 	e.type = ConfigureNotify;
@@ -357,6 +389,7 @@ unmanage(Client *c)
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
+	arrange(NULL);
 	if(stack)
 		focus(stack);
 }
@@ -384,15 +417,25 @@ getclient(Window w)
 void
 draw_client(Client *c)
 {
+	int i;
 	if(c == stack) {
 		draw_bar();
 		return;
 	}
 
 	brush.x = brush.y = 0;
-	brush.w = c->tw;
 	brush.h = c->th;
 
+	brush.w = 0;
+	for(i = 0; i < TLast; i++) {
+		if(c->tags[i]) {
+			brush.x += brush.w;
+			brush.w = textw(&brush.font, c->tags[i]) + bh;
+			draw(dpy, &brush, True, c->tags[i]);
+		}
+	}
+	brush.x += brush.w;
+	brush.w = textw(&brush.font, c->name) + bh;
 	draw(dpy, &brush, True, c->name);
 	XCopyArea(dpy, brush.drawable, c->title, brush.gc,
 			0, 0, c->tw, c->th, 0, 0);

@@ -18,15 +18,39 @@
 
 #include "wm.h"
 
+/********** CUSTOMIZE **********/
+
+char *tags[TLast] = {
+	[Tscratch] = "scratch",
+	[Tdev] = "dev",
+	[Tirc] = "irc",
+	[Twww] = "www",
+	[Twork] = "work",
+};
+
+/* commands */
+static char *cmdwallpaper[] = {
+	"feh", "--bg-scale", "/home/garbeam/wallpaper/bg.jpg", NULL
+};
+
+static char *cmdstatus[] = {
+	"sh", "-c", "echo -n `date '+%Y-%m-%d %H:%M'`" 
+	" `uptime | sed 's/.*://; s/,//g'`"
+	" `acpi | awk '{print $4}' | sed 's/,//'`", NULL
+};
+
+/********** CUSTOMIZE **********/
+
 /* X structs */
 Display *dpy;
 Window root, barwin;
 Atom wm_atom[WMLast], net_atom[NetLast];
 Cursor cursor[CurLast];
 Bool running = True;
-Bool sel_screen;
+Bool issel;
 
-char statustext[1024], tag[256];
+char stext[1024];
+int tsel = Tdev; /* default tag */
 int screen, sx, sy, sw, sh, bx, by, bw, bh;
 
 Brush brush = {0};
@@ -34,21 +58,12 @@ Client *clients = NULL;
 Client *stack = NULL;
 
 static Bool other_wm_running;
-static const char version[] = "gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
+static const char version[] =
+	"gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 static int (*x_error_handler) (Display *, XErrorEvent *);
 
-static const char *status[] = {
-	"sh", "-c", "echo -n `date '+%Y-%m-%d %H:%M'`" 
-	" `uptime | sed 's/.*://; s/,//g'`"
-	" `acpi | awk '{print $4}' | sed 's/,//'`", 0
-};
-
 static void
-usage()
-{
-	fputs("usage: gridwm [-v]\n", stderr);
-	exit(1);
-}
+usage() {	error("usage: gridwm [-v]\n"); }
 
 static void
 scan_wins()
@@ -230,10 +245,11 @@ main(int argc, char *argv[])
 	if(other_wm_running)
 		error("gridwm: another window manager is already running\n");
 
+	spawn(dpy, cmdwallpaper);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	sel_screen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
+	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 
 	XSetErrorHandler(0);
 	x_error_handler = XSetErrorHandler(error_handler);
@@ -275,7 +291,7 @@ main(int argc, char *argv[])
 	brush.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	brush.gc = XCreateGC(dpy, root, 0, 0);
 
-	pipe_spawn(statustext, sizeof(statustext), dpy, (char **)status);
+	pipe_spawn(stext, sizeof(stext), dpy, cmdstatus);
 	draw_bar();
 
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
@@ -283,6 +299,7 @@ main(int argc, char *argv[])
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
+	arrange = grid;
 	scan_wins();
 
 	while(running) {
@@ -298,7 +315,7 @@ main(int argc, char *argv[])
 		if(select(ConnectionNumber(dpy) + 1, &fds, NULL, NULL, &t) > 0)
 			continue;
 		else if(errno != EINTR) {
-			pipe_spawn(statustext, sizeof(statustext), dpy, (char **)status);
+			pipe_spawn(stext, sizeof(stext), dpy, cmdstatus);
 			draw_bar();
 		}
 	}

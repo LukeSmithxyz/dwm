@@ -22,7 +22,8 @@ enum { NetSupported, NetWMName, NetLast };
 enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
 
 struct Client {
-	char name[256], tag[256];
+	char name[256];
+	char *tags[TLast];
 	int proto;
 	int x, y, w, h;
 	int tx, ty, tw, th;
@@ -48,11 +49,12 @@ extern Display *dpy;
 extern Window root, barwin;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
-extern Bool running, sel_screen, grid;
+extern Bool running, issel;
 extern void (*handler[LASTEvent]) (XEvent *);
+extern void (*arrange)(void *aux);
 
-extern int screen, sx, sy, sw, sh, bx, by, bw, bh;
-extern char statustext[1024], tag[256];
+extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh;
+extern char stext[1024], *tags[TLast];
 
 extern Brush brush;
 extern Client *clients, *stack;
@@ -75,7 +77,8 @@ extern void lower(Client *c);
 extern void kill(void *aux);
 extern void sel(void *aux);
 extern void max(void *aux);
-extern void arrange(void *aux);
+extern void floating(void *aux);
+extern void grid(void *aux);
 extern void gravitate(Client *c, Bool invert);
 
 /* event.c */

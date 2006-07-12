@@ -13,27 +13,6 @@
 #define ButtonMask      (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask       (ButtonMask | PointerMotionMask)
 
-static void
-mmatch(Client *c, int x1, int y1, int x2, int y2)
-{
-	c->w = abs(x1 - x2);
-	c->h = abs(y1 - y2);
-	if(c->incw)
-		c->w -= (c->w - c->basew) % c->incw;
-	if(c->inch)
-		c->h -= (c->h - c->baseh) % c->inch;
-	if(c->minw && c->w < c->minw)
-		c->w = c->minw;
-	if(c->minh && c->h < c->minh)
-		c->h = c->minh;
-	if(c->maxw && c->w > c->maxw)
-		c->w = c->maxw;
-	if(c->maxh && c->h > c->maxh)
-		c->h = c->maxh;
-	c->x = (x1 <= x2) ? x1 : x1 - c->w;
-	c->y = (y1 <= y2) ? y1 : y1 - c->h;
-}
-
 void
 mresize(Client *c)
 {
@@ -55,11 +34,13 @@ mresize(Client *c)
 			break;
 		case MotionNotify:
 			XFlush(dpy);
-			mmatch(c, old_cx, old_cy, ev.xmotion.x, ev.xmotion.y);
-			XResizeWindow(dpy, c->win, c->w, c->h);
+			c->w = abs(old_cx - ev.xmotion.x);
+			c->h = abs(old_cy - ev.xmotion.y);
+			c->x = (old_cx <= ev.xmotion.x) ? old_cx : old_cx - c->w;
+			c->y = (old_cy <= ev.xmotion.y) ? old_cy : old_cy - c->h;
+			resize(c);
 			break;
 		case ButtonRelease:
-			resize(c);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		}
@@ -91,10 +72,9 @@ mmove(Client *c)
 			XFlush(dpy);
 			c->x = old_cx + (ev.xmotion.x - x1);
 			c->y = old_cy + (ev.xmotion.y - y1);
-			XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+			resize(c);
 			break;
 		case ButtonRelease:
-			resize(c);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		}

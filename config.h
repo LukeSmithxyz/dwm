@@ -8,3 +8,8 @@
 #define FGCOLOR		"#ffffff"
 #define BORDERCOLOR	"#9999CC"
 #define STATUSDELAY	10 /* seconds */
+
+/* tags, see wm.c for further config */
+enum { Tscratch, Tdev, Tirc, Twww, Twork, /* never remove: */ TLast };
+
+/* see kb.c for shortcut customization */

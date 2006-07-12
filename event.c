@@ -126,7 +126,7 @@ enternotify(XEvent *e)
 	if((c = getclient(ev->window)))
 		focus(c);
 	else if(ev->window == root)
-		sel_screen = True;
+		issel = True;
 }
 
 static void
@@ -135,7 +135,7 @@ leavenotify(XEvent *e)
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->window == root) && !ev->same_screen)
-		sel_screen = True;
+		issel = True;
 }
 
 static void
