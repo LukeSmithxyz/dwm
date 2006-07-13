@@ -101,6 +101,7 @@ sel(void *aux)
 	if(!c)
 		c = stack;
 	craise(c);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
 	focus(c);
 }
 
@@ -235,6 +236,7 @@ focus(Client *c)
 	draw_client(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
+	discard_events(EnterWindowMask);
 }
 
 void
@@ -279,6 +281,7 @@ manage(Window w, XWindowAttributes *wa)
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	arrange();
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
 	focus(c);
 }
 
