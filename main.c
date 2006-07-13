@@ -38,9 +38,8 @@ int tsel = Tdev; /* default tag */
 int screen, sx, sy, sw, sh, th;
 
 DC dc = {0};
-Client *cstart = NULL;
-Client *cend = NULL;
-Client *csel = NULL;
+Client *clients = NULL;
+Client *sel = NULL;
 
 static Bool other_wm_running;
 static const char version[] =
@@ -169,8 +168,10 @@ startup_error_handler(Display *dpy, XErrorEvent *error)
 static void
 cleanup()
 {
-	while(csel)
-		unmanage(csel);
+	while(sel) {
+		resize(sel);
+		unmanage(sel);
+	}
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 }
 

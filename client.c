@@ -13,48 +13,85 @@
 
 static void (*arrange)(Arg *) = floating;
 
-static Client *
-next(Client *c)
+static void
+center(Client *c)
 {
-	for(c = c->next; c && !c->tags[tsel]; c = c->next);
-	return c;
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
 }
 
 static Client *
-prev(Client *c)
+next(Client *c)
 {
-	for(c = c->prev; c && !c->tags[tsel]; c = c->prev);
+	for(; c && !c->tags[tsel]; c = c->next);
 	return c;
+}
+
+void
+zoom(Arg *arg)
+{
+	Client **l;
+
+	if(!sel)
+		return;
+
+	for(l = &clients; *l && *l != sel; l = &(*l)->next);
+	*l = sel->next;
+
+	sel->next = clients; /* pop */
+	clients = sel;
+	arrange(NULL);
+	center(sel);
+	focus(sel);
 }
 
 void
 max(Arg *arg)
 {
-	if(!csel)
+	if(!sel)
 		return;
-	csel->x = sx;
-	csel->y = sy;
-	csel->w = sw - 2 * csel->border;
-	csel->h = sh - 2 * csel->border;
-	craise(csel);
-	resize(csel);
+	sel->x = sx;
+	sel->y = sy;
+	sel->w = sw - 2 * sel->border;
+	sel->h = sh - 2 * sel->border;
+	craise(sel);
+	resize(sel);
 	discard_events(EnterWindowMask);
+}
+
+void
+view(Arg *arg)
+{
+	tsel = arg->i;
+	arrange(NULL);
 }
 
 void
 tag(Arg *arg)
 {
-	if(!csel)
+	int i, n;
+	if(!sel)
 		return;
 
-	if(arg->i == tsel)
-		return;
+	if(arg->i == tsel) {
+		for(n = i = 0; i < TLast; i++)
+			if(sel->tags[i])
+				n++;
+		if(n < 2)
+			return;
+	}
 
-	if(csel->tags[arg->i])
-		csel->tags[arg->i] = NULL; /* toggle tag */
+	if(sel->tags[arg->i])
+		sel->tags[arg->i] = NULL; /* toggle tag */
 	else
-		csel->tags[arg->i] = tags[arg->i];
+		sel->tags[arg->i] = tags[arg->i];
 	arrange(NULL);
+}
+
+static void
+ban_client(Client *c)
+{
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	XMoveWindow(dpy, c->title, c->tx + 2 * sw, c->ty);
 }
 
 void
@@ -63,10 +100,18 @@ floating(Arg *arg)
 	Client *c;
 
 	arrange = floating;
-	if(!csel)
-		return;
-	for(c = csel; c; c = next(c))
-		resize(c);
+	for(c = clients; c; c = c->next) {
+		if(c->tags[tsel])
+			resize(c);
+		else
+			ban_client(c);
+	}
+	if(sel && !sel->tags[tsel]) {
+		if((sel = next(clients))) {
+			craise(sel);
+			focus(sel);
+		}
+	}
 	discard_events(EnterWindowMask);
 }
 
@@ -78,31 +123,43 @@ tiling(Arg *arg)
     float rt, fd;
 
 	arrange = tiling;
-	if(!csel)
-		return;
-	for(n = 0, c = csel; c; c = next(c), n++);
-	rt = sqrt(n);
-	if(modff(rt, &fd) < 0.5)
-		rows = floor(rt);
-	else
-		rows = ceil(rt);
-	if(rows * rows < n)
-		cols = rows + 1;
-	else
-		cols = rows;
+	for(n = 0, c = clients; c; c = next(c->next), n++);
+	if(n) {
+		rt = sqrt(n);
+		if(modff(rt, &fd) < 0.5)
+			rows = floor(rt);
+		else
+			rows = ceil(rt);
+		if(rows * rows < n)
+			cols = rows + 1;
+		else
+			cols = rows;
 
-	gw = (sw - 2)  / cols;
-	gh = (sh - 2) / rows;
+		gw = (sw - 2)  / cols;
+		gh = (sh - 2) / rows;
+	}
+	else
+		cols = rows = gw = gh = 0;
 
-	for(i = j = 0, c = csel; c; c = next(c)) {
-		c->x = i * gw;
-		c->y = j * gh;
-		c->w = gw;
-		c->h = gh;
-		resize(c);
-		if(++i == cols) {
-			j++;
-			i = 0;
+	for(i = j = 0, c = clients; c; c = c->next) {
+		if(c->tags[tsel]) {
+			c->x = i * gw;
+			c->y = j * gh;
+			c->w = gw;
+			c->h = gh;
+			resize(c);
+			if(++i == cols) {
+				j++;
+				i = 0;
+			}
+		}
+		else
+			ban_client(c);
+	}
+	if(sel && !sel->tags[tsel]) {
+		if((sel = next(clients))) {
+			craise(sel);
+			focus(sel);
 		}
 	}
 	discard_events(EnterWindowMask);
@@ -113,14 +170,12 @@ prevc(Arg *arg)
 {
 	Client *c;
 
-	if(!csel)
+	if(!sel)
 		return;
 
-	if(!(c = prev(csel)))
-		c = prev(cend);
-	if(c) {
+	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
 		craise(c);
-		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
+		center(c);
 		focus(c);
 	}
 }
@@ -130,15 +185,15 @@ nextc(Arg *arg)
 {
 	Client *c;
    
-	if(!csel)
+	if(!sel)
 		return;
 
-	if(!(c = next(csel)))
-		c = next(cstart);
-
+	if(!(c = next(sel->next)))
+		c = next(clients);
 	if(c) {
 		craise(c);
-		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
+		center(c);
+		c->revert = sel;
 		focus(c);
 	}
 }
@@ -146,14 +201,12 @@ nextc(Arg *arg)
 void
 ckill(Arg *arg)
 {
-	Client *c = csel;
-
-	if(!c)
+	if(!sel)
 		return;
-	if(c->proto & WM_PROTOCOL_DELWIN)
-		send_message(c->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+	if(sel->proto & WM_PROTOCOL_DELWIN)
+		send_message(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
 	else
-		XKillClient(dpy, c->win);
+		XKillClient(dpy, sel->win);
 }
 
 static void
@@ -256,12 +309,12 @@ lower(Client *c)
 void
 focus(Client *c)
 {
-	if(csel && csel != c) {
-		XSetWindowBorder(dpy, csel->win, dc.bg);
-		XMapWindow(dpy, csel->title);
-		draw_client(csel);
+	if(sel && sel != c) {
+		XSetWindowBorder(dpy, sel->win, dc.bg);
+		XMapWindow(dpy, sel->title);
+		draw_client(sel);
 	}
-	csel = c;
+	sel = c;
 	XUnmapWindow(dpy, c->title);
 	XSetWindowBorder(dpy, c->win, dc.fg);
 	draw_client(c);
@@ -273,7 +326,7 @@ focus(Client *c)
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	Client *c;
+	Client *c, **l;
 	XSetWindowAttributes twa;
 
 	c = emallocz(sizeof(Client));
@@ -284,6 +337,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->h = wa->height;
 	c->th = th;
 	c->border = 1;
+	c->proto = win_proto(c->win);
 	update_size(c);
 	XSelectInput(dpy, c->win,
 			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
@@ -300,13 +354,9 @@ manage(Window w, XWindowAttributes *wa)
 
 	update_name(c);
 
-	if(!cstart)
-		cstart = cend = c;
-	else {
-		cend->next = c;
-		c->prev = cend;
-		cend = c;
-	}
+	for(l = &clients; *l; l = &(*l)->next);
+	c->next = *l; /* *l == nil */
+	*l = c;
 
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMapRaised(dpy, c->win);
@@ -318,7 +368,7 @@ manage(Window w, XWindowAttributes *wa)
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	arrange(NULL);
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
+	center(c);
 	focus(c);
 }
 
@@ -420,26 +470,21 @@ dummy_error_handler(Display *dsply, XErrorEvent *err)
 void
 unmanage(Client *c)
 {
+	Client **l;
+
 	XGrabServer(dpy);
 	XSetErrorHandler(dummy_error_handler);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->title);
 
-	if(c->prev) {
-		c->prev->next = c->next;
-		if(csel == c)
-			csel = c->prev;
-	}
-	if(c->next) {
-		c->next->prev = c->prev;
-		if(csel == c)
-			csel = c->next;
-	}
-	if(cstart == c)
-		cstart = c->next;
-	if(cend == c)
-		cend = c->prev;
+	for(l = &clients; *l && *l != c; l = &(*l)->next);
+	*l = c->next;
+	for(l = &clients; *l; l = &(*l)->next)
+		if((*l)->revert == c)
+			(*l)->revert = NULL;
+	if(sel == c)
+		sel = sel->revert ? sel->revert : clients;
 
 	free(c);
 
@@ -447,15 +492,15 @@ unmanage(Client *c)
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
 	arrange(NULL);
-	if(csel)
-		focus(csel);
+	if(sel)
+		focus(sel);
 }
 
 Client *
 gettitle(Window w)
 {
 	Client *c;
-	for(c = cstart; c; c = c->next)
+	for(c = clients; c; c = c->next)
 		if(c->title == w)
 			return c;
 	return NULL;
@@ -465,7 +510,7 @@ Client *
 getclient(Window w)
 {
 	Client *c;
-	for(c = cstart; c; c = c->next)
+	for(c = clients; c; c = c->next)
 		if(c->win == w)
 			return c;
 	return NULL;
@@ -475,7 +520,7 @@ void
 draw_client(Client *c)
 {
 	int i;
-	if(c == csel)
+	if(c == sel)
 		return;
 
 	dc.x = dc.y = 0;

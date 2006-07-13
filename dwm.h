@@ -68,7 +68,7 @@ struct Client {
 	Window trans;
 	Window title;
 	Client *next;
-	Client *prev;
+	Client *revert;
 };
 
 struct Key {
@@ -89,7 +89,7 @@ extern int tsel, screen, sx, sy, sw, sh, th;
 extern char stext[1024], *tags[TLast];
 
 extern DC dc;
-extern Client *cstart, *cend, *csel;
+extern Client *clients, *sel;
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
@@ -109,7 +109,9 @@ extern void prevc(Arg *arg);
 extern void max(Arg *arg);
 extern void floating(Arg *arg);
 extern void tiling(Arg *arg);
-void tag(Arg *arg);
+extern void tag(Arg *arg);
+extern void view(Arg *arg);
+extern void zoom(Arg *arg);
 extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */
