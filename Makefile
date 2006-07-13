@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC = client.c dev.c draw.c event.c util.c wm.c
+SRC = client.c dev.c draw.c event.c main.c util.c
 OBJ = ${SRC:.c=.o}
 MAN1 = dwm.1 
 BIN = dwm
@@ -22,7 +22,7 @@ config:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${OBJ}: wm.h
+${OBJ}: dwm.h
 
 dwm: ${OBJ}
 	@echo LD $@

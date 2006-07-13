@@ -11,7 +11,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
-#include "wm.h"
+#include "dwm.h"
 
 /********** CUSTOMIZE **********/
 
@@ -244,10 +244,12 @@ main(int argc, char *argv[])
 	update_keys();
 
 	/* style */
-	initcolors(BGCOLOR, FGCOLOR, BORDERCOLOR);
-	initfont(&dc.font, FONT);
+	dc.bg = initcolor(BGCOLOR);
+	dc.fg = initcolor(FGCOLOR);
+	dc.border = initcolor(BORDERCOLOR);
+	initfont(FONT);
 
-	th = texth(&dc.font);
+	th = dc.font.height + 4;
 
 	dc.drawable = XCreatePixmap(dpy, root, sw, th, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);

@@ -3,7 +3,7 @@
  * See LICENSE file for license details.
  */
 
-#include "wm.h"
+#include "dwm.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -9,7 +9,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
-#include "wm.h"
+#include "dwm.h"
 
 /* local functions */
 static void buttonpress(XEvent *e);

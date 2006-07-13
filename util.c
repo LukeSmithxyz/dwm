@@ -11,7 +11,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "wm.h"
+#include "dwm.h"
 
 void
 error(const char *errstr, ...) {

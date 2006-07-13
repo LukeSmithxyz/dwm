@@ -9,7 +9,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-#include "wm.h"
+#include "dwm.h"
 
 static void floating(void);
 static void tiling(void);
@@ -125,8 +125,8 @@ resize_title(Client *c)
 	c->tw = 0;
 	for(i = 0; i < TLast; i++)
 		if(c->tags[i])
-			c->tw += textw(&dc.font, c->tags[i]) + dc.font.height;
-	c->tw += textw(&dc.font, c->name) + dc.font.height;
+			c->tw += textw(c->tags[i]) + dc.font.height;
+	c->tw += textw(c->name) + dc.font.height;
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
@@ -226,10 +226,12 @@ focus(Client *c)
 	c->snext = stack;
 	stack = c;
 	if(old && old != c) {
+		XSetWindowBorder(dpy, old->win, dc.bg);
 		XMapWindow(dpy, old->title);
 		draw_client(old);
 	}
 	XUnmapWindow(dpy, c->title);
+	XSetWindowBorder(dpy, c->win, dc.fg);
 	draw_client(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
@@ -250,8 +252,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->th = th;
 	c->border = 1;
 	update_size(c);
-	XSetWindowBorderWidth(dpy, c->win, 1);
-	XSetWindowBorder(dpy, c->win, dc.border);
 	XSelectInput(dpy, c->win,
 			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &c->trans);
@@ -269,6 +269,7 @@ manage(Window w, XWindowAttributes *wa)
 	for(l=&clients; *l; l=&(*l)->next);
 	c->next = *l; /* *l == nil */
 	*l = c;
+	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMapRaised(dpy, c->win);
 	XMapRaised(dpy, c->title);
 	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
@@ -435,12 +436,12 @@ draw_client(Client *c)
 	for(i = 0; i < TLast; i++) {
 		if(c->tags[i]) {
 			dc.x += dc.w;
-			dc.w = textw(&dc.font, c->tags[i]) + dc.font.height;
+			dc.w = textw(c->tags[i]) + dc.font.height;
 			draw(True, c->tags[i]);
 		}
 	}
 	dc.x += dc.w;
-	dc.w = textw(&dc.font, c->name) + dc.font.height;
+	dc.w = textw(c->name) + dc.font.height;
 	draw(True, c->name);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
 			0, 0, c->tw, c->th, 0, 0);

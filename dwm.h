@@ -8,10 +8,9 @@
 /********** CUSTOMIZE **********/
 
 #define FONT		"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
-#define BGCOLOR		"#666699"
-#define FGCOLOR		"#ffffff"
-#define BORDERCOLOR	"#9999CC"
-#define STATUSDELAY	10 /* seconds */
+#define BGCOLOR		"DarkSlateGrey"
+#define FGCOLOR		"LightSteelBlue"
+#define BORDERCOLOR	"SlateGray"
 #define WM_PROTOCOL_DELWIN 1
 
 /* tags */
@@ -106,11 +105,11 @@ extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */
 extern void draw(Bool border, const char *text);
-extern void initcolors(const char *bg, const char *fg, const char *bo);
-extern void initfont(Fnt *font, const char *fontstr);
-extern unsigned int textnw(Fnt *font, char *text, unsigned int len);
-extern unsigned int textw(Fnt *font, char *text);
-extern unsigned int texth(Fnt *font);
+extern unsigned long initcolor(const char *colstr);
+extern void initfont(const char *fontstr);
+extern unsigned int textnw(char *text, unsigned int len);
+extern unsigned int textw(char *text);
+extern unsigned int texth(void);
 
 /* event.c */
 extern void discard_events(long even_mask);
@@ -121,6 +120,12 @@ extern void keypress(XEvent *e);
 extern void mresize(Client *c);
 extern void mmove(Client *c);
 
+/* main.c */
+extern int error_handler(Display *dsply, XErrorEvent *e);
+extern void send_message(Window w, Atom a, long value);
+extern int win_proto(Window w);
+extern void quit(void *aux);
+
 /* util.c */
 extern void error(const char *errstr, ...);
 extern void *emallocz(unsigned int size);
@@ -129,9 +134,3 @@ extern void *erealloc(void *ptr, unsigned int size);
 extern char *estrdup(const char *str);
 extern void spawn(char *argv[]);
 extern void swap(void **p1, void **p2);
-
-/* wm.c */
-extern int error_handler(Display *dsply, XErrorEvent *e);
-extern void send_message(Window w, Atom a, long value);
-extern int win_proto(Window w);
-extern void quit(void *aux);
