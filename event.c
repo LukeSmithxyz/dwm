@@ -89,6 +89,7 @@ configurerequest(XEvent *e)
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
 		gravitate(c, False);
+		resize(c, True);
 	}
 
 	wc.x = ev->x;
@@ -179,6 +180,7 @@ static void
 propertynotify(XEvent *e)
 {
 	XPropertyEvent *ev = &e->xproperty;
+	Window trans;
 	Client *c;
 
 	if(ev->state == PropertyDelete)
@@ -192,9 +194,10 @@ propertynotify(XEvent *e)
 		switch (ev->atom) {
 			default: break;
 			case XA_WM_TRANSIENT_FOR:
-				XGetTransientForHint(dpy, c->win, &c->trans);
+				XGetTransientForHint(dpy, c->win, &trans);
+				if(!c->floating && (c->floating = (trans != 0)))
+					arrange(NULL);
 				break;
-				update_size(c);
 			case XA_WM_NORMAL_HINTS:
 				update_size(c);
 				break;

@@ -11,10 +11,11 @@
 
 #include "dwm.h"
 
-static void (*arrange)(Arg *) = tiling;
+void (*arrange)(Arg *) = tiling;
 
 static Rule rule[] = {
-	{ "Firefox-bin", "Gecko", { [Twww] = "www" } },
+	/* class			instance	tags						floating */
+	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
 };
 
 static Client *
@@ -64,25 +65,25 @@ view(Arg *arg)
 }
 
 void
-tag(Arg *arg)
+tappend(Arg *arg)
 {
-	int i, n;
 	if(!sel)
 		return;
 
-	if(arg->i == tsel) {
-		for(n = i = 0; i < TLast; i++)
-			if(sel->tags[i])
-				n++;
-		if(n < 2)
-			return;
-	}
-
-	if(sel->tags[arg->i])
-		sel->tags[arg->i] = NULL; /* toggle tag */
-	else
-		sel->tags[arg->i] = tags[arg->i];
+	sel->tags[arg->i] = tags[arg->i];
 	arrange(NULL);
+}
+
+void
+ttrunc(Arg *arg)
+{
+	int i;
+	if(!sel)
+		return;
+
+	for(i = 0; i < TLast; i++)
+		sel->tags[i] = NULL;
+	tappend(arg);
 }
 
 static void
@@ -122,13 +123,18 @@ tiling(Arg *arg)
 	w = sw - mw;
 	arrange = tiling;
 	for(n = 0, c = clients; c; c = c->next)
-		if(c->tags[tsel])
+		if(c->tags[tsel] && !c->floating)
 			n++;
 
 	h = (n > 1) ? sh / (n - 1) : sh;
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(c->tags[tsel]) {
+			if(c->floating) {
+				craise(c);
+				resize(c, True);
+				continue;
+			}
 			if(n == 1) {
 				c->x = sx;
 				c->y = sy;
@@ -330,14 +336,13 @@ init_tags(Client *c)
 
 	if(XGetClassHint(dpy, c->win, &ch)) {
 		if(ch.res_class && ch.res_name) {
-			fprintf(stderr, "%s:%s\n", ch.res_class, ch.res_name);
 			for(i = 0; i < len; i++)
 				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
 					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
 				{
-			fprintf(stderr, "->>>%s:%s\n", ch.res_class, ch.res_name);
 					for(j = 0; j < TLast; j++)
 						c->tags[j] = rule[i].tags[j];
+					c->floating = rule[i].floating;
 					matched = True;
 					break;
 				}
@@ -357,6 +362,7 @@ manage(Window w, XWindowAttributes *wa)
 {
 	Client *c, **l;
 	XSetWindowAttributes twa;
+	Window trans;
 
 	c = emallocz(sizeof(Client));
 	c->win = w;
@@ -370,7 +376,7 @@ manage(Window w, XWindowAttributes *wa)
 	update_size(c);
 	XSelectInput(dpy, c->win,
 			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
-	XGetTransientForHint(dpy, c->win, &c->trans);
+	XGetTransientForHint(dpy, c->win, &trans);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask;
@@ -396,6 +402,11 @@ manage(Window w, XWindowAttributes *wa)
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
+
+	if(!c->floating)
+		c->floating = trans
+			|| ((c->maxw == c->minw) && (c->maxh == c->minh));
+
 	arrange(NULL);
 	if(c->tags[tsel])
 		focus(c);

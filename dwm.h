@@ -66,8 +66,8 @@ struct Client {
 	int grav;
 	unsigned int border;
 	long flags; 
+	Bool floating;
 	Window win;
-	Window trans;
 	Window title;
 	Client *next;
 	Client *revert;
@@ -77,6 +77,7 @@ struct Rule {
 	const char *class;
 	const char *instance;
 	char *tags[TLast];
+	Bool floating;
 };
 
 struct Key {
@@ -91,7 +92,8 @@ extern Window root;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern Bool running, issel;
-extern void (*handler[LASTEvent]) (XEvent *);
+extern void (*handler[LASTEvent])(XEvent *);
+extern void (*arrange)(Arg *);
 
 extern int tsel, screen, sx, sy, sw, sh, mw, th;
 extern char *tags[TLast];
@@ -117,7 +119,8 @@ extern void prevc(Arg *arg);
 extern void max(Arg *arg);
 extern void floating(Arg *arg);
 extern void tiling(Arg *arg);
-extern void tag(Arg *arg);
+extern void ttrunc(Arg *arg);
+extern void tappend(Arg *arg);
 extern void view(Arg *arg);
 extern void zoom(Arg *arg);
 extern void gravitate(Client *c, Bool invert);
