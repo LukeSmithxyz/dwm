@@ -13,7 +13,7 @@
 
 static void floating(void);
 static void tiling(void);
-static void (*arrange)(void) = tiling;
+static void (*arrange)(void) = floating;
 
 void
 max(void *aux)

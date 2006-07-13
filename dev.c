@@ -13,7 +13,7 @@
 /********** CUSTOMIZE **********/
 
 const char *term[] = { 
-	"aterm", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
+	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
 	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
 };
 const char *browse[] = { "firefox", NULL };
