@@ -104,7 +104,7 @@ mresize(Client *c)
 			c->h = abs(ocy - ev.xmotion.y);
 			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
 			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
-			resize(c);
+			resize(c, True);
 			break;
 		case ButtonRelease:
 			XUngrabPointer(dpy, CurrentTime);
@@ -138,7 +138,7 @@ mmove(Client *c)
 			XFlush(dpy);
 			c->x = ocx + (ev.xmotion.x - x1);
 			c->y = ocy + (ev.xmotion.y - y1);
-			resize(c);
+			resize(c, False);
 			break;
 		case ButtonRelease:
 			XUngrabPointer(dpy, CurrentTime);

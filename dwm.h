@@ -106,7 +106,7 @@ extern Client *getclient(Window w);
 extern void focus(Client *c);
 extern void update_name(Client *c);
 extern void draw_client(Client *c);
-extern void resize(Client *c);
+extern void resize(Client *c, Bool inc);
 extern void update_size(Client *c);
 extern Client *gettitle(Window w);
 extern void craise(Client *c);

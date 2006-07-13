@@ -52,7 +52,7 @@ max(Arg *arg)
 	sel->w = sw - 2 * sel->border;
 	sel->h = sh - 2 * sel->border;
 	craise(sel);
-	resize(sel);
+	resize(sel, False);
 	discard_events(EnterWindowMask);
 }
 
@@ -100,7 +100,7 @@ floating(Arg *arg)
 	arrange = floating;
 	for(c = clients; c; c = c->next) {
 		if(c->tags[tsel])
-			resize(c);
+			resize(c, True);
 		else
 			ban_client(c);
 	}
@@ -125,29 +125,29 @@ tiling(Arg *arg)
 		if(c->tags[tsel])
 			n++;
 
-	h = (n > 2) ? sh / (n - 2) : sh;
+	h = (n > 1) ? sh / (n - 1) : sh;
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(c->tags[tsel]) {
 			if(n == 1) {
 				c->x = sx;
 				c->y = sy;
-				c->w = sw;
-				c->h = sh;
+				c->w = sw - 2 * c->border;
+				c->h = sh - 2 * c->border;
 			}
-			else if(i == 1) {
+			else if(i == 0) {
 				c->x = sx;
 				c->y = sy;
-				c->w = mw;
-				c->h = sh;
+				c->w = mw - 2 * c->border;
+				c->h = sh - 2 * c->border;
 			}
 			else {
 				c->x = sx + mw;
-				c->y = sy + (i - 2) * h;
-				c->w = w;
-				c->h = h;
+				c->y = sy + (i - 1) * h;
+				c->w = w - 2 * c->border;
+				c->h = h - 2 * c->border;
 			}
-			resize(c);
+			resize(c, False);
 			i++;
 		}
 		else
@@ -304,14 +304,11 @@ lower(Client *c)
 void
 focus(Client *c)
 {
-	if(sel && sel != c) {
-		XSetWindowBorder(dpy, sel->win, dc.bg);
-		XMapWindow(dpy, sel->title);
-		draw_client(sel);
-	}
+	Client *old = sel;
+
 	sel = c;
-	XUnmapWindow(dpy, c->title);
-	XSetWindowBorder(dpy, c->win, dc.fg);
+	if(old && old != c)
+		draw_client(old);
 	draw_client(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
@@ -463,14 +460,16 @@ gravitate(Client *c, Bool invert)
 
 
 void
-resize(Client *c)
+resize(Client *c, Bool inc)
 {
 	XConfigureEvent e;
 
-	if(c->incw)
-		c->w -= (c->w - c->basew) % c->incw;
-	if(c->inch)
-		c->h -= (c->h - c->baseh) % c->inch;
+	if(inc) {
+		if(c->incw)
+			c->w -= (c->w - c->basew) % c->incw;
+		if(c->inch)
+			c->h -= (c->h - c->baseh) % c->inch;
+	}
 	if(c->minw && c->w < c->minw)
 		c->w = c->minw;
 	if(c->minh && c->h < c->minh)
@@ -554,8 +553,14 @@ void
 draw_client(Client *c)
 {
 	int i;
-	if(c == sel)
+	if(c == sel) {
+		XUnmapWindow(dpy, c->title);
+		XSetWindowBorder(dpy, c->win, dc.fg);
 		return;
+	}
+
+	XSetWindowBorder(dpy, c->win, dc.bg);
+	XMapWindow(dpy, c->title);
 
 	dc.x = dc.y = 0;
 	dc.h = c->th;

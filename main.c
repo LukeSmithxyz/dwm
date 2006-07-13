@@ -168,7 +168,7 @@ static void
 cleanup()
 {
 	while(sel) {
-		resize(sel);
+		resize(sel, True);
 		unmanage(sel);
 	}
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
