@@ -26,7 +26,7 @@ static Key key[] = {
 	{ Mod1Mask, XK_k, sel, "prev" }, 
 	{ Mod1Mask, XK_j, sel, "next" }, 
 	{ Mod1Mask, XK_t, tiling, NULL }, 
-	{ Mod1Mask, XK_f, tiling, NULL }, 
+	{ Mod1Mask, XK_f, floating, NULL }, 
 	{ Mod1Mask, XK_m, max, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_c, ckill, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_q, quit, NULL },
