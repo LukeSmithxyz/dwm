@@ -20,16 +20,21 @@ const char *browse[] = { "firefox", NULL };
 const char *xlock[] = { "xlock", NULL };
 
 static Key key[] = {
-	{ Mod1Mask, XK_Return, (void (*)(void *))spawn, term },
-	{ Mod1Mask, XK_w, (void (*)(void *))spawn, browse },
-	{ Mod1Mask, XK_l, (void (*)(void *))spawn, xlock },
-	{ Mod1Mask, XK_k, sel, "prev" }, 
-	{ Mod1Mask, XK_j, sel, "next" }, 
-	{ Mod1Mask, XK_t, tiling, NULL }, 
-	{ Mod1Mask, XK_f, floating, NULL }, 
-	{ Mod1Mask, XK_m, max, NULL }, 
-	{ Mod1Mask | ShiftMask, XK_c, ckill, NULL }, 
-	{ Mod1Mask | ShiftMask, XK_q, quit, NULL },
+	{ Mod1Mask, XK_Return, spawn, { .argv = term } },
+	{ Mod1Mask, XK_w, spawn, { .argv = browse } },
+	{ Mod1Mask, XK_l, spawn, { .argv = xlock } },
+	{ Mod1Mask, XK_k, prevc, { 0 } },
+	{ Mod1Mask, XK_j, nextc, { 0 } }, 
+	{ Mod1Mask, XK_t, tiling, { 0 } }, 
+	{ Mod1Mask, XK_f, floating, { 0 } }, 
+	{ Mod1Mask, XK_m, max, { 0 } }, 
+	{ Mod1Mask, XK_0, tag, { .i = Tscratch } }, 
+	{ Mod1Mask, XK_1, tag, { .i = Tdev } }, 
+	{ Mod1Mask, XK_2, tag, { .i = Tirc } }, 
+	{ Mod1Mask, XK_3, tag, { .i = Twww } }, 
+	{ Mod1Mask, XK_4, tag, { .i = Twork } }, 
+	{ Mod1Mask | ShiftMask, XK_c, ckill, { 0 } }, 
+	{ Mod1Mask | ShiftMask, XK_q, quit, { 0 } },
 };
 
 /********** CUSTOMIZE **********/
@@ -60,7 +65,7 @@ keypress(XEvent *e)
 	for(i = 0; i < len; i++)
 		if((keysym == key[i].keysym) && (key[i].mod == ev->state)) {
 			if(key[i].func)
-				key[i].func(key[i].aux);
+				key[i].func(&key[i].arg);
 			return;
 		}
 }

@@ -75,8 +75,9 @@ swap(void **p1, void **p2)
 }
 
 void
-spawn(char *argv[])
+spawn(Arg *arg)
 {
+	char **argv = (char **)arg->argv;
 	if(!argv || !argv[0])
 		return;
 	if(fork() == 0) {

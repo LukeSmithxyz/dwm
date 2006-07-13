@@ -11,44 +11,76 @@
 
 #include "dwm.h"
 
-static void (*arrange)(void *) = floating;
+static void (*arrange)(Arg *) = floating;
+
+static Client *
+next(Client *c)
+{
+	for(c = c->next; c && !c->tags[tsel]; c = c->next);
+	return c;
+}
+
+static Client *
+prev(Client *c)
+{
+	for(c = c->prev; c && !c->tags[tsel]; c = c->prev);
+	return c;
+}
 
 void
-max(void *aux)
+max(Arg *arg)
 {
-	if(!stack)
+	if(!csel)
 		return;
-	stack->x = sx;
-	stack->y = sy;
-	stack->w = sw - 2 * stack->border;
-	stack->h = sh - 2 * stack->border;
-	craise(stack);
-	resize(stack);
+	csel->x = sx;
+	csel->y = sy;
+	csel->w = sw - 2 * csel->border;
+	csel->h = sh - 2 * csel->border;
+	craise(csel);
+	resize(csel);
 	discard_events(EnterWindowMask);
 }
 
 void
-floating(void *aux)
+tag(Arg *arg)
+{
+	if(!csel)
+		return;
+
+	if(arg->i == tsel)
+		return;
+
+	if(csel->tags[arg->i])
+		csel->tags[arg->i] = NULL; /* toggle tag */
+	else
+		csel->tags[arg->i] = tags[arg->i];
+	arrange(NULL);
+}
+
+void
+floating(Arg *arg)
 {
 	Client *c;
 
 	arrange = floating;
-	for(c = stack; c; c = c->snext)
+	if(!csel)
+		return;
+	for(c = csel; c; c = next(c))
 		resize(c);
 	discard_events(EnterWindowMask);
 }
 
 void
-tiling(void *aux)
+tiling(Arg *arg)
 {
 	Client *c;
 	int n, cols, rows, gw, gh, i, j;
     float rt, fd;
 
 	arrange = tiling;
-	if(!clients)
+	if(!csel)
 		return;
-	for(n = 0, c = clients; c; c = c->next, n++);
+	for(n = 0, c = csel; c; c = next(c), n++);
 	rt = sqrt(n);
 	if(modff(rt, &fd) < 0.5)
 		rows = floor(rt);
@@ -62,7 +94,7 @@ tiling(void *aux)
 	gw = (sw - 2)  / cols;
 	gh = (sh - 2) / rows;
 
-	for(i = j = 0, c = clients; c; c = c->next) {
+	for(i = j = 0, c = csel; c; c = next(c)) {
 		c->x = i * gw;
 		c->y = j * gh;
 		c->w = gw;
@@ -77,28 +109,44 @@ tiling(void *aux)
 }
 
 void
-sel(void *aux)
+prevc(Arg *arg)
 {
-	const char *arg = aux;
-	Client *c = NULL;
+	Client *c;
 
-	if(!arg || !stack)
+	if(!csel)
 		return;
-	if(!strncmp(arg, "next", 5))
-		c = stack->snext ? stack->snext : stack;
-	else if(!strncmp(arg, "prev", 5))
-		for(c = stack; c && c->snext; c = c->snext);
-	if(!c)
-		c = stack;
-	craise(c);
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
-	focus(c);
+
+	if(!(c = prev(csel)))
+		c = prev(cend);
+	if(c) {
+		craise(c);
+		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
+		focus(c);
+	}
 }
 
 void
-ckill(void *aux)
+nextc(Arg *arg)
 {
-	Client *c = stack;
+	Client *c;
+   
+	if(!csel)
+		return;
+
+	if(!(c = next(csel)))
+		c = next(cstart);
+
+	if(c) {
+		craise(c);
+		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
+		focus(c);
+	}
+}
+
+void
+ckill(Arg *arg)
+{
+	Client *c = csel;
 
 	if(!c)
 		return;
@@ -208,19 +256,12 @@ lower(Client *c)
 void
 focus(Client *c)
 {
-	Client **l, *old;
-
-	old = stack;
-	for(l = &stack; *l && *l != c; l = &(*l)->snext);
-	if(*l)
-		*l = c->snext;
-	c->snext = stack;
-	stack = c;
-	if(old && old != c) {
-		XSetWindowBorder(dpy, old->win, dc.bg);
-		XMapWindow(dpy, old->title);
-		draw_client(old);
+	if(csel && csel != c) {
+		XSetWindowBorder(dpy, csel->win, dc.bg);
+		XMapWindow(dpy, csel->title);
+		draw_client(csel);
 	}
+	csel = c;
 	XUnmapWindow(dpy, c->title);
 	XSetWindowBorder(dpy, c->win, dc.fg);
 	draw_client(c);
@@ -232,7 +273,7 @@ focus(Client *c)
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	Client *c, **l;
+	Client *c;
 	XSetWindowAttributes twa;
 
 	c = emallocz(sizeof(Client));
@@ -258,9 +299,15 @@ manage(Window w, XWindowAttributes *wa)
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
 	update_name(c);
-	for(l=&clients; *l; l=&(*l)->next);
-	c->next = *l; /* *l == nil */
-	*l = c;
+
+	if(!cstart)
+		cstart = cend = c;
+	else {
+		cend->next = c;
+		c->prev = cend;
+		cend = c;
+	}
+
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMapRaised(dpy, c->win);
 	XMapRaised(dpy, c->title);
@@ -373,33 +420,42 @@ dummy_error_handler(Display *dsply, XErrorEvent *err)
 void
 unmanage(Client *c)
 {
-	Client **l;
-
 	XGrabServer(dpy);
 	XSetErrorHandler(dummy_error_handler);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->title);
 
-	for(l=&clients; *l && *l != c; l=&(*l)->next);
-	*l = c->next;
-	for(l=&stack; *l && *l != c; l=&(*l)->snext);
-	*l = c->snext;
+	if(c->prev) {
+		c->prev->next = c->next;
+		if(csel == c)
+			csel = c->prev;
+	}
+	if(c->next) {
+		c->next->prev = c->prev;
+		if(csel == c)
+			csel = c->next;
+	}
+	if(cstart == c)
+		cstart = c->next;
+	if(cend == c)
+		cend = c->prev;
+
 	free(c);
 
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
 	arrange(NULL);
-	if(stack)
-		focus(stack);
+	if(csel)
+		focus(csel);
 }
 
 Client *
 gettitle(Window w)
 {
 	Client *c;
-	for(c = clients; c; c = c->next)
+	for(c = cstart; c; c = c->next)
 		if(c->title == w)
 			return c;
 	return NULL;
@@ -409,7 +465,7 @@ Client *
 getclient(Window w)
 {
 	Client *c;
-	for(c = clients; c; c = c->next)
+	for(c = cstart; c; c = c->next)
 		if(c->win == w)
 			return c;
 	return NULL;
@@ -419,7 +475,7 @@ void
 draw_client(Client *c)
 {
 	int i;
-	if(c == stack)
+	if(c == csel)
 		return;
 
 	dc.x = dc.y = 0;

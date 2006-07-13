@@ -22,6 +22,12 @@ typedef struct DC DC;
 typedef struct Client Client;
 typedef struct Fnt Fnt;
 typedef struct Key Key;
+typedef union Arg Arg;
+
+union Arg {
+	const char **argv;
+	int i;
+};
 
 /* atoms */
 enum { WMProtocols, WMDelete, WMLast };
@@ -62,14 +68,14 @@ struct Client {
 	Window trans;
 	Window title;
 	Client *next;
-	Client *snext;
+	Client *prev;
 };
 
 struct Key {
 	unsigned long mod;
 	KeySym keysym;
-	void (*func)(void *aux);
-	void *aux;
+	void (*func)(Arg *arg);
+	Arg arg;
 };
 
 extern Display *dpy;
@@ -83,7 +89,7 @@ extern int tsel, screen, sx, sy, sw, sh, th;
 extern char stext[1024], *tags[TLast];
 
 extern DC dc;
-extern Client *clients, *stack;
+extern Client *cstart, *cend, *csel;
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
@@ -97,11 +103,13 @@ extern void update_size(Client *c);
 extern Client *gettitle(Window w);
 extern void craise(Client *c);
 extern void lower(Client *c);
-extern void ckill(void *aux);
-extern void sel(void *aux);
-extern void max(void *aux);
-extern void floating(void *aux);
-extern void tiling(void *aux);
+extern void ckill(Arg *arg);
+extern void nextc(Arg *arg);
+extern void prevc(Arg *arg);
+extern void max(Arg *arg);
+extern void floating(Arg *arg);
+extern void tiling(Arg *arg);
+void tag(Arg *arg);
 extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */
@@ -125,7 +133,7 @@ extern void mmove(Client *c);
 extern int error_handler(Display *dsply, XErrorEvent *e);
 extern void send_message(Window w, Atom a, long value);
 extern int win_proto(Window w);
-extern void quit(void *aux);
+extern void quit(Arg *arg);
 
 /* util.c */
 extern void error(const char *errstr, ...);
@@ -133,5 +141,5 @@ extern void *emallocz(unsigned int size);
 extern void *emalloc(unsigned int size);
 extern void *erealloc(void *ptr, unsigned int size);
 extern char *estrdup(const char *str);
-extern void spawn(char *argv[]);
+extern void spawn(Arg *arg);
 extern void swap(void **p1, void **p2);
