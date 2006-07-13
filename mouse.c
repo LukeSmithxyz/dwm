@@ -1,6 +1,5 @@
 /*
  * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
- * (C)opyright MMVI Kris Maglione <fbsdaemon@gmail.com>
  * See LICENSE file for license details.
  */
 
@@ -17,10 +16,10 @@ void
 mresize(Client *c)
 {
 	XEvent ev;
-	int old_cx, old_cy;
+	int ocx, ocy;
 
-	old_cx = c->x;
-	old_cy = c->y;
+	ocx = c->x;
+	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
@@ -34,10 +33,10 @@ mresize(Client *c)
 			break;
 		case MotionNotify:
 			XFlush(dpy);
-			c->w = abs(old_cx - ev.xmotion.x);
-			c->h = abs(old_cy - ev.xmotion.y);
-			c->x = (old_cx <= ev.xmotion.x) ? old_cx : old_cx - c->w;
-			c->y = (old_cy <= ev.xmotion.y) ? old_cy : old_cy - c->h;
+			c->w = abs(ocx - ev.xmotion.x);
+			c->h = abs(ocy - ev.xmotion.y);
+			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
+			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
 			resize(c);
 			break;
 		case ButtonRelease:
@@ -51,12 +50,12 @@ void
 mmove(Client *c)
 {
 	XEvent ev;
-	int x1, y1, old_cx, old_cy, di;
+	int x1, y1, ocx, ocy, di;
 	unsigned int dui;
 	Window dummy;
 
-	old_cx = c->x;
-	old_cy = c->y;
+	ocx = c->x;
+	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
@@ -70,8 +69,8 @@ mmove(Client *c)
 			break;
 		case MotionNotify:
 			XFlush(dpy);
-			c->x = old_cx + (ev.xmotion.x - x1);
-			c->y = old_cy + (ev.xmotion.y - y1);
+			c->x = ocx + (ev.xmotion.x - x1);
+			c->y = ocy + (ev.xmotion.y - y1);
 			resize(c);
 			break;
 		case ButtonRelease:
