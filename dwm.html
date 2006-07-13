@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<title>dwm - dynamic window manager</title>
+		<meta name="author" content="Anselm R. Garbe">
+		<meta name="generator" content="ed">
+		<meta name="copyright" content="(C)opyright 2006 by Anselm R. Garbe">
+		<style type="text/css">
+			body {
+				color: #000000;
+				font-family: sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<center>
+			<img src="logo.png"/><br />
+			<h3>dynamic window manager</h3>
+		<center>
+		<h2>Description</h3>
+		<p>
+		dwm is a dynamic window manager for X11.
+		</p>
+		<h2>Differences to wmii</h2	
+		<p>
+		In contrast to wmii, dwm is only a window manager, and nothing else.
+		Hence, it is much smaller, faster and simpler. dwm does
+		<b>not</b> include following features wmii provides:
+		</p>
+		<ul>
+			<li>9P support</li>
+			<li>status bar</li>
+			<li>menu</li>
+			<li>editable tagbars</li>
+			<li>shell-based config/control file</li>
+			<li>small tools (selection printer, mouse warper)</li>
+		</ul>
+		<p>
+		dwm is only a single binary, it's source code is intended to never
+		exceed 2000 SLOC.
+		</p>
+		<p>
+		dwm is customized through editing its source code, that makes it
+		extremely fast and secure - it does not process any input data which
+		hasn't been known at compile time, except window title names.
+		</p>
+		<p>
+		dwm is based on tagging and dynamic window management (however simpler
+		than wmii or larswm).
+		</p>
+		<p>
+		dwm don't distinguishes between layers, there is no floating or managed
+		layer. Wether the clients of currently selected tag are managed or not
+		managed, you can re-arrange all clients on the fly. Popup- and
+		fixed-size windows are treated unmanaged. 
+		</p>
+		<p>
+		dwm uses 1-pixel borders to provide the maximum of screen real
+		estate to clients. Small titlebars are only drawn in front of unfocused
+		clients.
+		</p>
+		<p>
+		garbeam <b>don't</b> wants any feedback to dwm. If you ask for support,
+		feature requests or if you report bugs, they will be <b>ignored</b>
+		with a high chance. dwm is only intended to fit garbeam's needs,
+		however you are free to download and distribute/relicense it, with the
+		conditions of the <a href="http://wmii.de/cgi-bin/hgwebdir.cgi/dwm?f=f10eb1139362;file=LICENSE;style=raw">MIT/X Consortium license</a>.
+		</p>
+		<h2>Development</h2>
+		<p>
+		dwm is actively developed in parallel to wmii. You can <a href="http://wmii.de/cgi-bin/hgwebdir.cgi/dwm">browse</a> its source code repository or get a copy using <a href="http://www.selenic.com/mercurial/">Mercurial</a> with following command:
+		</p>
+		<p>
+		<em>hg clone http://wmii.de/cgi-bin/hgwebdir.cgi/dwm</em>
+		</p>
+		<p>--Anselm</p>
+	</body>
+</html>

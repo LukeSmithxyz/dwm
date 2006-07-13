@@ -19,7 +19,7 @@ enum { Tscratch, Tdev, Tirc, Twww, Twork, TLast };
 
 /********** CUSTOMIZE **********/
 
-typedef struct Brush Brush;
+typedef struct DC DC;
 typedef struct Client Client;
 typedef struct Fnt Fnt;
 typedef struct Key Key;
@@ -39,7 +39,7 @@ struct Fnt {
 	int height;
 };
 
-struct Brush {
+struct DC { /* draw context */
 	GC gc;
 	Drawable drawable;
 	int x, y, w, h;
@@ -79,12 +79,11 @@ extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern Bool running, issel;
 extern void (*handler[LASTEvent]) (XEvent *);
-extern void (*arrange)(void *aux);
 
 extern int tsel, screen, sx, sy, sw, sh, th;
 extern char stext[1024], *tags[TLast];
 
-extern Brush brush;
+extern DC dc;
 extern Client *clients, *stack;
 
 /* client.c */
@@ -102,15 +101,13 @@ extern void lower(Client *c);
 extern void ckill(void *aux);
 extern void sel(void *aux);
 extern void max(void *aux);
-extern void floating(void *aux);
-extern void grid(void *aux);
+extern void toggle(void *aux);
 extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */
-extern void draw(Brush *b, Bool border, const char *text);
-extern void loadcolors(int scr, Brush *b,
-		const char *bg, const char *fg, const char *bo);
-extern void loadfont(Fnt *font, const char *fontstr);
+extern void draw(Bool border, const char *text);
+extern void initcolors(const char *bg, const char *fg, const char *bo);
+extern void initfont(Fnt *font, const char *fontstr);
 extern unsigned int textnw(Fnt *font, char *text, unsigned int len);
 extern unsigned int textw(Fnt *font, char *text);
 extern unsigned int texth(Fnt *font);

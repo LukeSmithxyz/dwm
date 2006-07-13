@@ -11,7 +11,9 @@
 
 #include "wm.h"
 
-void (*arrange)(void *aux);
+static void floating(void);
+static void tiling(void);
+static void (*arrange)(void) = tiling;
 
 void
 max(void *aux)
@@ -26,25 +28,23 @@ max(void *aux)
 	discard_events(EnterWindowMask);
 }
 
-void
-floating(void *aux)
+static void
+floating(void)
 {
 	Client *c;
 
-	arrange = floating;
 	for(c = stack; c; c = c->snext)
 		resize(c);
 	discard_events(EnterWindowMask);
 }
 
-void
-grid(void *aux)
+static void
+tiling(void)
 {
 	Client *c;
 	int n, cols, rows, gw, gh, i, j;
     float rt, fd;
 
-	arrange = grid;
 	if(!clients)
 		return;
 	for(n = 0, c = clients; c; c = c->next, n++);
@@ -74,6 +74,17 @@ grid(void *aux)
 	}
 	discard_events(EnterWindowMask);
 }
+
+void
+toggle(void *aux)
+{
+	if(arrange == floating)
+		arrange = tiling;
+	else
+		arrange = floating;
+	arrange();
+}
+
 
 void
 sel(void *aux)
@@ -114,8 +125,8 @@ resize_title(Client *c)
 	c->tw = 0;
 	for(i = 0; i < TLast; i++)
 		if(c->tags[i])
-			c->tw += textw(&brush.font, c->tags[i]) + brush.font.height;
-	c->tw += textw(&brush.font, c->name) + brush.font.height;
+			c->tw += textw(&dc.font, c->tags[i]) + dc.font.height;
+	c->tw += textw(&dc.font, c->name) + dc.font.height;
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
@@ -240,7 +251,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->border = 1;
 	update_size(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
-	XSetWindowBorder(dpy, c->win, brush.border);
+	XSetWindowBorder(dpy, c->win, dc.border);
 	XSelectInput(dpy, c->win,
 			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &c->trans);
@@ -266,7 +277,7 @@ manage(Window w, XWindowAttributes *wa)
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
-	arrange(NULL);
+	arrange();
 	focus(c);
 }
 
@@ -385,7 +396,7 @@ unmanage(Client *c)
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
-	arrange(NULL);
+	arrange();
 	if(stack)
 		focus(stack);
 }
@@ -417,21 +428,21 @@ draw_client(Client *c)
 	if(c == stack)
 		return;
 
-	brush.x = brush.y = 0;
-	brush.h = c->th;
+	dc.x = dc.y = 0;
+	dc.h = c->th;
 
-	brush.w = 0;
+	dc.w = 0;
 	for(i = 0; i < TLast; i++) {
 		if(c->tags[i]) {
-			brush.x += brush.w;
-			brush.w = textw(&brush.font, c->tags[i]) + brush.font.height;
-			draw(&brush, True, c->tags[i]);
+			dc.x += dc.w;
+			dc.w = textw(&dc.font, c->tags[i]) + dc.font.height;
+			draw(True, c->tags[i]);
 		}
 	}
-	brush.x += brush.w;
-	brush.w = textw(&brush.font, c->name) + brush.font.height;
-	draw(&brush, True, c->name);
-	XCopyArea(dpy, brush.drawable, c->title, brush.gc,
+	dc.x += dc.w;
+	dc.w = textw(&dc.font, c->name) + dc.font.height;
+	draw(True, c->name);
+	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
 			0, 0, c->tw, c->th, 0, 0);
 	XFlush(dpy);
 }

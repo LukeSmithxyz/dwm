@@ -14,14 +14,10 @@ VERSION = 0.0
 LIBS = -L${PREFIX}/lib -L/usr/lib -lc -lm -L${X11LIB} -lX11
 
 # Linux/BSD
-CFLAGS = -Os -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
+CFLAGS = -g -Wall -O2 -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
 	-DVERSION=\"${VERSION}\"
-LDFLAGS = ${LIBS}
-#CFLAGS  += -W -Wstrict-prototypes -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Waggregate-return -Wnested-externs -Winline -Wwrite-strings -Wundef -Wsign-compare -Wmissing-prototypes -Wredundant-decls
+LDFLAGS = -g ${LIBS}
 
-#CFLAGS = -g -Wall -O2 -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
-#	-DVERSION=\"${VERSION}\"
-#LDFLAGS = -g ${LIBS}
 
 # Solaris
 #CFLAGS = -fast -xtarget=ultra ${INCLUDES} -DVERSION=\"${VERSION}\"

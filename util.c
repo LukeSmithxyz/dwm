@@ -85,7 +85,7 @@ spawn(char *argv[])
 				close(ConnectionNumber(dpy));
 			setsid();
 			execvp(argv[0], argv);
-			fprintf(stderr, "gridwm: execvp %s", argv[0]);
+			fprintf(stderr, "dwm: execvp %s", argv[0]);
 			perror(" failed");
 		}
 		exit (0);

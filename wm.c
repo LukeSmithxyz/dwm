@@ -37,17 +37,17 @@ char stext[1024];
 int tsel = Tdev; /* default tag */
 int screen, sx, sy, sw, sh, th;
 
-Brush brush = {0};
+DC dc = {0};
 Client *clients = NULL;
 Client *stack = NULL;
 
 static Bool other_wm_running;
 static const char version[] =
-	"gridwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
+	"dwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 static int (*x_error_handler) (Display *, XErrorEvent *);
 
 static void
-usage() {	error("usage: gridwm [-v]\n"); }
+usage() {	error("usage: dwm [-v]\n"); }
 
 static void
 scan_wins()
@@ -149,7 +149,7 @@ error_handler(Display *dpy, XErrorEvent *error)
 			|| (error->request_code == X_GrabKey
 				&& error->error_code == BadAccess))
 		return 0;
-	fprintf(stderr, "gridwm: fatal error: request code=%d, error code=%d\n",
+	fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
 			error->request_code, error->error_code);
 	return x_error_handler(dpy, error); /* may call exit() */
 }
@@ -203,7 +203,7 @@ main(int argc, char *argv[])
 
 	dpy = XOpenDisplay(0);
 	if(!dpy)
-		error("gridwm: cannot connect X server\n");
+		error("dwm: cannot connect X server\n");
 
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
@@ -216,7 +216,7 @@ main(int argc, char *argv[])
 	XFlush(dpy);
 
 	if(other_wm_running)
-		error("gridwm: another window manager is already running\n");
+		error("dwm: another window manager is already running\n");
 
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
@@ -244,20 +244,19 @@ main(int argc, char *argv[])
 	update_keys();
 
 	/* style */
-	loadcolors(screen, &brush, BGCOLOR, FGCOLOR, BORDERCOLOR);
-	loadfont(&brush.font, FONT);
+	initcolors(BGCOLOR, FGCOLOR, BORDERCOLOR);
+	initfont(&dc.font, FONT);
 
-	th = texth(&brush.font);
+	th = texth(&dc.font);
 
-	brush.drawable = XCreatePixmap(dpy, root, sw, th, DefaultDepth(dpy, screen));
-	brush.gc = XCreateGC(dpy, root, 0, 0);
+	dc.drawable = XCreatePixmap(dpy, root, sw, th, DefaultDepth(dpy, screen));
+	dc.gc = XCreateGC(dpy, root, 0, 0);
 
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
 					| LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
-	arrange = grid;
 	scan_wins();
 
 	while(running) {

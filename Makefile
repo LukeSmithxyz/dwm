@@ -1,18 +1,18 @@
-# gridwm - grid window manager
+# dwm - dynamic window manager
 #   (C)opyright MMVI Anselm R. Garbe
 
 include config.mk
 
 SRC = client.c draw.c event.c kb.c mouse.c util.c wm.c
 OBJ = ${SRC:.c=.o}
-MAN1 = gridwm.1 
-BIN = gridwm
+MAN1 = dwm.1 
+BIN = dwm
 
-all: config gridwm
+all: config dwm
 	@echo finished
 
 config:
-	@echo gridwm build options:
+	@echo dwm build options:
 	@echo "LIBS     = ${LIBS}"
 	@echo "CFLAGS   = ${CFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
@@ -24,19 +24,19 @@ config:
 
 ${OBJ}: wm.h
 
-gridwm: ${OBJ}
+dwm: ${OBJ}
 	@echo LD $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
-	rm -f gridwm *.o core
+	rm -f dwm *.o core
 
 dist: clean
-	mkdir -p gridwm-${VERSION}
-	cp -R Makefile README LICENSE config.mk *.h *.c ${MAN} gridwm-${VERSION}
-	tar -cf gridwm-${VERSION}.tar gridwm-${VERSION}
-	gzip gridwm-${VERSION}.tar
-	rm -rf gridwm-${VERSION}
+	mkdir -p dwm-${VERSION}
+	cp -R Makefile README LICENSE config.mk *.h *.c ${MAN} dwm-${VERSION}
+	tar -cf dwm-${VERSION}.tar dwm-${VERSION}
+	gzip dwm-${VERSION}.tar
+	rm -rf dwm-${VERSION}
 
 install: all
 	@mkdir -p ${DESTDIR}${PREFIX}/bin

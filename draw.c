@@ -11,39 +11,39 @@
 #include "wm.h"
 
 static void
-drawborder(Brush *b)
+drawborder(void)
 {
 	XPoint points[5];
-	XSetLineAttributes(dpy, b->gc, 1, LineSolid, CapButt, JoinMiter);
-	XSetForeground(dpy, b->gc, b->border);
-	points[0].x = b->x;
-	points[0].y = b->y;
-	points[1].x = b->w - 1;
+	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
+	XSetForeground(dpy, dc.gc, dc.border);
+	points[0].x = dc.x;
+	points[0].y = dc.y;
+	points[1].x = dc.w - 1;
 	points[1].y = 0;
 	points[2].x = 0;
-	points[2].y = b->h - 1;
-	points[3].x = -(b->w - 1);
+	points[2].y = dc.h - 1;
+	points[3].x = -(dc.w - 1);
 	points[3].y = 0;
 	points[4].x = 0;
-	points[4].y = -(b->h - 1);
-	XDrawLines(dpy, b->drawable, b->gc, points, 5, CoordModePrevious);
+	points[4].y = -(dc.h - 1);
+	XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
 }
 
 void
-draw(Brush *b, Bool border, const char *text)
+draw(Bool border, const char *text)
 {
 	int x, y, w, h;
 	unsigned int len;
 	static char buf[256];
 	XGCValues gcv;
-	XRectangle r = { b->x, b->y, b->w, b->h };
+	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
-	XSetForeground(dpy, b->gc, b->bg);
-	XFillRectangles(dpy, b->drawable, b->gc, &r, 1);
+	XSetForeground(dpy, dc.gc, dc.bg);
+	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 
 	w = 0;
 	if(border)
-		drawborder(b);
+		drawborder();
 
 	if(!text)
 		return;
@@ -54,33 +54,33 @@ draw(Brush *b, Bool border, const char *text)
 	memcpy(buf, text, len);
 	buf[len] = 0;
 
-	h = b->font.ascent + b->font.descent;
-	y = b->y + (b->h / 2) - (h / 2) + b->font.ascent;
-	x = b->x + (h / 2);
+	h = dc.font.ascent + dc.font.descent;
+	y = dc.y + (dc.h / 2) - (h / 2) + dc.font.ascent;
+	x = dc.x + (h / 2);
 
 	/* shorten text if necessary */
-	while(len && (w = textnw(&b->font, buf, len)) > b->w - h)
+	while(len && (w = textnw(&dc.font, buf, len)) > dc.w - h)
 		buf[--len] = 0;
 
-	if(w > b->w)
+	if(w > dc.w)
 		return; /* too long */
 
-	gcv.foreground = b->fg;
-	gcv.background = b->bg;
-	if(b->font.set) {
-		XChangeGC(dpy, b->gc, GCForeground | GCBackground, &gcv);
-		XmbDrawImageString(dpy, b->drawable, b->font.set, b->gc,
+	gcv.foreground = dc.fg;
+	gcv.background = dc.bg;
+	if(dc.font.set) {
+		XChangeGC(dpy, dc.gc, GCForeground | GCBackground, &gcv);
+		XmbDrawImageString(dpy, dc.drawable, dc.font.set, dc.gc,
 				x, y, buf, len);
 	}
 	else {
-		gcv.font = b->font.xfont->fid;
-		XChangeGC(dpy, b->gc, GCForeground | GCBackground | GCFont, &gcv);
-		XDrawImageString(dpy, b->drawable, b->gc, x, y, buf, len);
+		gcv.font = dc.font.xfont->fid;
+		XChangeGC(dpy, dc.gc, GCForeground | GCBackground | GCFont, &gcv);
+		XDrawImageString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
 }
 
 static unsigned long
-xloadcolors(Colormap cmap, const char *colstr)
+xinitcolors(Colormap cmap, const char *colstr)
 {
 	XColor color;
 	XAllocNamedColor(dpy, cmap, colstr, &color, &color);
@@ -88,13 +88,12 @@ xloadcolors(Colormap cmap, const char *colstr)
 }
 
 void
-loadcolors(int scr, Brush *b,
-		const char *bg, const char *fg, const char *border)
+initcolors(const char *bg, const char *fg, const char *border)
 {
-	Colormap cmap = DefaultColormap(dpy, scr);
-	b->bg = xloadcolors(cmap, bg);
-	b->fg = xloadcolors(cmap, fg);
-	b->border = xloadcolors(cmap, border);
+	Colormap cmap = DefaultColormap(dpy, screen);
+	dc.bg = xinitcolors(cmap, bg);
+	dc.fg = xinitcolors(cmap, fg);
+	dc.border = xinitcolors(cmap, border);
 }
 
 unsigned int
@@ -121,7 +120,7 @@ texth(Fnt *font)
 }
 
 void
-loadfont(Fnt *font, const char *fontstr)
+initfont(Fnt *font, const char *fontstr)
 {
 	char **missing, *def;
 	int i, n;
@@ -164,7 +163,7 @@ loadfont(Fnt *font, const char *fontstr)
 		if (!font->xfont)
 			font->xfont = XLoadQueryFont(dpy, "fixed");
 		if (!font->xfont)
-			error("error, cannot load 'fixed' font\n");
+			error("error, cannot init 'fixed' font\n");
 		font->ascent = font->xfont->ascent;
 		font->descent = font->xfont->descent;
 	}
