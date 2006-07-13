@@ -115,11 +115,9 @@ extern unsigned int texth(Fnt *font);
 /* event.c */
 extern void discard_events(long even_mask);
 
-/* kb.c */
+/* dev.c */
 extern void update_keys(void);
 extern void keypress(XEvent *e);
-
-/* mouse.c */
 extern void mresize(Client *c);
 extern void mmove(Client *c);
 

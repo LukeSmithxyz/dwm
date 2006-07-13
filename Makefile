@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC = client.c draw.c event.c kb.c mouse.c util.c wm.c
+SRC = client.c dev.c draw.c event.c util.c wm.c
 OBJ = ${SRC:.c=.o}
 MAN1 = dwm.1 
 BIN = dwm
