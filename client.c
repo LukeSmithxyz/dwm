@@ -60,8 +60,13 @@ max(Arg *arg)
 void
 view(Arg *arg)
 {
+	Client *c;
+
 	tsel = arg->i;
 	arrange(NULL);
+
+	for(c = clients; c; c = next(c->next))
+		draw_client(c);
 }
 
 void
