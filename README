@@ -1,5 +1,5 @@
-dwm
-------
+dwm - dynamic window manager
+----------------------------
 
 dwm is an extremly fast, small, and dynamic X11 window manager.
 
@@ -21,7 +21,7 @@ necessary as root):
 
 
 Running dwm
---------------
+-----------
 Add the following line to your .xinitrc to start dwm using startx:
 
     exec dwm
