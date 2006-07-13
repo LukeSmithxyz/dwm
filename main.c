@@ -33,9 +33,8 @@ Cursor cursor[CurLast];
 Bool running = True;
 Bool issel;
 
-char stext[1024];
 int tsel = Tdev; /* default tag */
-int screen, sx, sy, sw, sh, th;
+int screen, sx, sy, sw, sh, mw, th;
 
 DC dc = {0};
 Client *clients = NULL;
@@ -223,6 +222,7 @@ main(int argc, char *argv[])
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
+	mw = (sw * MASTERW) / 100;
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 
 	XSetErrorHandler(0);

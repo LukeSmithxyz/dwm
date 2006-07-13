@@ -7,22 +7,24 @@
 
 /********** CUSTOMIZE **********/
 
-#define FONT		"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
-#define BGCOLOR		"DarkSlateGrey"
-#define FGCOLOR		"LightSteelBlue"
-#define BORDERCOLOR	"SlateGray"
-#define WM_PROTOCOL_DELWIN 1
+#define FONT				"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
+#define BGCOLOR				"#666699"
+#define FGCOLOR				"#ffffff"
+#define BORDERCOLOR			"#9999CC"
+#define MASTERW				52 /* percent */
+#define WM_PROTOCOL_DELWIN	1
 
 /* tags */
 enum { Tscratch, Tdev, Tirc, Twww, Twork, TLast };
 
 /********** CUSTOMIZE **********/
 
+typedef union Arg Arg;
 typedef struct DC DC;
 typedef struct Client Client;
 typedef struct Fnt Fnt;
 typedef struct Key Key;
-typedef union Arg Arg;
+typedef struct Rule Rule;
 
 union Arg {
 	const char **argv;
@@ -71,6 +73,12 @@ struct Client {
 	Client *revert;
 };
 
+struct Rule {
+	const char *class;
+	const char *instance;
+	char *tags[TLast];
+};
+
 struct Key {
 	unsigned long mod;
 	KeySym keysym;
@@ -85,8 +93,8 @@ extern Cursor cursor[CurLast];
 extern Bool running, issel;
 extern void (*handler[LASTEvent]) (XEvent *);
 
-extern int tsel, screen, sx, sy, sw, sh, th;
-extern char stext[1024], *tags[TLast];
+extern int tsel, screen, sx, sy, sw, sh, mw, th;
+extern char *tags[TLast];
 
 extern DC dc;
 extern Client *clients, *sel;

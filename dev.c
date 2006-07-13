@@ -20,8 +20,7 @@ const char *browse[] = { "firefox", NULL };
 const char *xlock[] = { "xlock", NULL };
 
 static Key key[] = {
-	{ Mod1Mask, XK_Return, zoom, { 0 } },
-	{ Mod1Mask, XK_t, spawn, { .argv = term } },
+	{ Mod1Mask, XK_Return, spawn, { .argv = term } },
 	{ Mod1Mask, XK_w, spawn, { .argv = browse } },
 	{ Mod1Mask, XK_l, spawn, { .argv = xlock } },
 	{ Mod1Mask, XK_k, prevc, { 0 } },
@@ -33,6 +32,7 @@ static Key key[] = {
 	{ Mod1Mask, XK_3, view, { .i = Twww } }, 
 	{ Mod1Mask, XK_4, view, { .i = Twork } }, 
 	{ Mod1Mask, XK_space, tiling, { 0 } }, 
+	{ Mod1Mask | ShiftMask, XK_Return, zoom, { 0 } },
 	{ Mod1Mask | ShiftMask, XK_space, floating, { 0 } }, 
 	{ Mod1Mask | ShiftMask, XK_0, tag, { .i = Tscratch } }, 
 	{ Mod1Mask | ShiftMask, XK_1, tag, { .i = Tdev } }, 
@@ -48,10 +48,10 @@ static Key key[] = {
 void
 update_keys(void)
 {
-	unsigned int i, len;
+	static unsigned int len = key ? sizeof(key) / sizeof(key[0]) : 0;
+	unsigned int i;
 	KeyCode code;
 
-	len = sizeof(key) / sizeof(key[0]);
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
 		XUngrabKey(dpy, code, key[i].mod, root);
@@ -63,11 +63,11 @@ void
 keypress(XEvent *e)
 {
 	XKeyEvent *ev = &e->xkey;
-	unsigned int i, len;
+	static unsigned int len = key ? sizeof(key) / sizeof(key[0]) : 0;
+	unsigned int i;
 	KeySym keysym;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	len = sizeof(key) / sizeof(key[0]);
 	for(i = 0; i < len; i++)
 		if((keysym == key[i].keysym) && (key[i].mod == ev->state)) {
 			if(key[i].func)

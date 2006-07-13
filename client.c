@@ -3,21 +3,19 @@
  * See LICENSE file for license details.
  */
 
-#include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
 #include "dwm.h"
 
-static void (*arrange)(Arg *) = floating;
+static void (*arrange)(Arg *) = tiling;
 
-static void
-center(Client *c)
-{
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
-}
+static Rule rule[] = {
+	{ "Firefox-bin", "Gecko", { [Twww] = "www" } },
+};
 
 static Client *
 next(Client *c)
@@ -29,18 +27,18 @@ next(Client *c)
 void
 zoom(Arg *arg)
 {
-	Client **l;
+	Client **l, *old;
 
-	if(!sel)
+	if(!(old = sel))
 		return;
 
 	for(l = &clients; *l && *l != sel; l = &(*l)->next);
 	*l = sel->next;
 
-	sel->next = clients; /* pop */
-	clients = sel;
+	old->next = clients; /* pop */
+	clients = old;
+	sel = old;
 	arrange(NULL);
-	center(sel);
 	focus(sel);
 }
 
@@ -119,39 +117,38 @@ void
 tiling(Arg *arg)
 {
 	Client *c;
-	int n, cols, rows, gw, gh, i, j;
-    float rt, fd;
+	int n, i, w, h;
 
+	w = sw - mw;
 	arrange = tiling;
-	for(n = 0, c = clients; c; c = next(c->next), n++);
-	if(n) {
-		rt = sqrt(n);
-		if(modff(rt, &fd) < 0.5)
-			rows = floor(rt);
-		else
-			rows = ceil(rt);
-		if(rows * rows < n)
-			cols = rows + 1;
-		else
-			cols = rows;
+	for(n = 0, c = clients; c; c = c->next)
+		if(c->tags[tsel])
+			n++;
 
-		gw = (sw - 2)  / cols;
-		gh = (sh - 2) / rows;
-	}
-	else
-		cols = rows = gw = gh = 0;
+	h = (n > 2) ? sh / (n - 2) : sh;
 
-	for(i = j = 0, c = clients; c; c = c->next) {
+	for(i = 0, c = clients; c; c = c->next) {
 		if(c->tags[tsel]) {
-			c->x = i * gw;
-			c->y = j * gh;
-			c->w = gw;
-			c->h = gh;
-			resize(c);
-			if(++i == cols) {
-				j++;
-				i = 0;
+			if(n == 1) {
+				c->x = sx;
+				c->y = sy;
+				c->w = sw;
+				c->h = sh;
 			}
+			else if(i == 1) {
+				c->x = sx;
+				c->y = sy;
+				c->w = mw;
+				c->h = sh;
+			}
+			else {
+				c->x = sx + mw;
+				c->y = sy + (i - 2) * h;
+				c->w = w;
+				c->h = h;
+			}
+			resize(c);
+			i++;
 		}
 		else
 			ban_client(c);
@@ -175,7 +172,6 @@ prevc(Arg *arg)
 
 	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
 		craise(c);
-		center(c);
 		focus(c);
 	}
 }
@@ -192,7 +188,6 @@ nextc(Arg *arg)
 		c = next(clients);
 	if(c) {
 		craise(c);
-		center(c);
 		c->revert = sel;
 		focus(c);
 	}
@@ -323,6 +318,43 @@ focus(Client *c)
 	discard_events(EnterWindowMask);
 }
 
+static void
+init_tags(Client *c)
+{
+	XClassHint ch;
+	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
+	unsigned int i, j;
+	Bool matched = False;
+
+	if(!len) {
+		c->tags[tsel] = tags[tsel];
+		return;
+	}
+
+	if(XGetClassHint(dpy, c->win, &ch)) {
+		if(ch.res_class && ch.res_name) {
+			fprintf(stderr, "%s:%s\n", ch.res_class, ch.res_name);
+			for(i = 0; i < len; i++)
+				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
+					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
+				{
+			fprintf(stderr, "->>>%s:%s\n", ch.res_class, ch.res_name);
+					for(j = 0; j < TLast; j++)
+						c->tags[j] = rule[i].tags[j];
+					matched = True;
+					break;
+				}
+		}
+		if(ch.res_class)
+			XFree(ch.res_class);
+		if(ch.res_name)
+			XFree(ch.res_name);
+	}
+
+	if(!matched)
+		c->tags[tsel] = tags[tsel];
+}
+
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -346,13 +378,13 @@ manage(Window w, XWindowAttributes *wa)
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask;
 
-	c->tags[tsel] = tags[tsel];
 	c->title = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
 	update_name(c);
+	init_tags(c);
 
 	for(l = &clients; *l; l = &(*l)->next);
 	c->next = *l; /* *l == nil */
@@ -368,8 +400,10 @@ manage(Window w, XWindowAttributes *wa)
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	arrange(NULL);
-	center(c);
-	focus(c);
+	if(c->tags[tsel])
+		focus(c);
+	else
+		ban_client(c);
 }
 
 void
