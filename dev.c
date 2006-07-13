@@ -17,13 +17,16 @@ const char *term[] = {
 	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
 };
 const char *browse[] = { "firefox", NULL };
+const char *xlock[] = { "xlock", NULL };
 
 static Key key[] = {
 	{ Mod1Mask, XK_Return, (void (*)(void *))spawn, term },
 	{ Mod1Mask, XK_w, (void (*)(void *))spawn, browse },
+	{ Mod1Mask, XK_l, (void (*)(void *))spawn, xlock },
 	{ Mod1Mask, XK_k, sel, "prev" }, 
 	{ Mod1Mask, XK_j, sel, "next" }, 
-	{ Mod1Mask, XK_space, toggle, NULL }, 
+	{ Mod1Mask, XK_t, tiling, NULL }, 
+	{ Mod1Mask, XK_f, tiling, NULL }, 
 	{ Mod1Mask, XK_m, max, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_c, ckill, NULL }, 
 	{ Mod1Mask | ShiftMask, XK_q, quit, NULL },

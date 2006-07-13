@@ -100,7 +100,8 @@ extern void lower(Client *c);
 extern void ckill(void *aux);
 extern void sel(void *aux);
 extern void max(void *aux);
-extern void toggle(void *aux);
+extern void floating(void *aux);
+extern void tiling(void *aux);
 extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */

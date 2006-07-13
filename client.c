@@ -11,9 +11,7 @@
 
 #include "dwm.h"
 
-static void floating(void);
-static void tiling(void);
-static void (*arrange)(void) = floating;
+static void (*arrange)(void *) = floating;
 
 void
 max(void *aux)
@@ -24,27 +22,30 @@ max(void *aux)
 	stack->y = sy;
 	stack->w = sw - 2 * stack->border;
 	stack->h = sh - 2 * stack->border;
+	craise(stack);
 	resize(stack);
 	discard_events(EnterWindowMask);
 }
 
-static void
-floating(void)
+void
+floating(void *aux)
 {
 	Client *c;
 
+	arrange = floating;
 	for(c = stack; c; c = c->snext)
 		resize(c);
 	discard_events(EnterWindowMask);
 }
 
-static void
-tiling(void)
+void
+tiling(void *aux)
 {
 	Client *c;
 	int n, cols, rows, gw, gh, i, j;
     float rt, fd;
 
+	arrange = tiling;
 	if(!clients)
 		return;
 	for(n = 0, c = clients; c; c = c->next, n++);
@@ -74,17 +75,6 @@ tiling(void)
 	}
 	discard_events(EnterWindowMask);
 }
-
-void
-toggle(void *aux)
-{
-	if(arrange == floating)
-		arrange = tiling;
-	else
-		arrange = floating;
-	arrange();
-}
-
 
 void
 sel(void *aux)
@@ -280,7 +270,7 @@ manage(Window w, XWindowAttributes *wa)
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
-	arrange();
+	arrange(NULL);
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
 	focus(c);
 }
@@ -400,7 +390,7 @@ unmanage(Client *c)
 	XFlush(dpy);
 	XSetErrorHandler(error_handler);
 	XUngrabServer(dpy);
-	arrange();
+	arrange(NULL);
 	if(stack)
 		focus(stack);
 }
