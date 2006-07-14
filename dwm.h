@@ -9,13 +9,13 @@
 
 #define FONT				"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
 #define BGCOLOR				"#666699"
-#define FGCOLOR				"#ffffff"
+#define FGCOLOR				"#eeeeee"
 #define BORDERCOLOR			"#9999CC"
 #define MASTERW				52 /* percent */
 #define WM_PROTOCOL_DELWIN	1
 
 /* tags */
-enum { Tscratch, Tdev, Tirc, Twww, Twork, TLast };
+enum { Tscratch, Tdev, Twww, Twork, TLast };
 
 /********** CUSTOMIZE **********/
 

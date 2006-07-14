@@ -3,10 +3,12 @@
  * See LICENSE file for license details.
  */
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
@@ -19,7 +21,6 @@
 char *tags[TLast] = {
 	[Tscratch] = "scratch",
 	[Tdev] = "dev",
-	[Tirc] = "irc",
 	[Twww] = "www",
 	[Twork] = "work",
 };
@@ -185,13 +186,13 @@ quit(Arg *arg)
 int
 main(int argc, char *argv[])
 {
-	int i;
+	int i, n;
+	fd_set rd;
 	XSetWindowAttributes wa;
 	unsigned int mask;
 	Window w;
 	XEvent ev;
 
-	/* command line args */
 	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
 		switch (argv[i][1]) {
 		case 'v':
@@ -278,10 +279,31 @@ main(int argc, char *argv[])
 	scan_wins();
 	draw_bar();
 
+	/* main event loop, reads status text from stdin as well */
 	while(running) {
-		XNextEvent(dpy, &ev);
-		if(handler[ev.type])
-			(handler[ev.type])(&ev); /* call handler */
+		FD_ZERO(&rd);
+		FD_SET(0, &rd);
+		FD_SET(ConnectionNumber(dpy), &rd);
+
+		i = select(ConnectionNumber(dpy) + 1, &rd, 0, 0, 0);
+		if(i == -1 && errno == EINTR)
+			continue;
+		if(i < 0)
+			error("select failed\n");
+		else if(i > 0) {
+			if(FD_ISSET(ConnectionNumber(dpy), &rd) && XPending(dpy) > 0) {
+				XNextEvent(dpy, &ev);
+				if(handler[ev.type])
+					(handler[ev.type])(&ev); /* call handler */
+			}
+			if(FD_ISSET(0, &rd)) {
+				i = n = 0;
+				while((i = getchar()) != '\n' && n < sizeof(stext) - 1)
+					stext[n++] = i;
+				stext[n] = 0;
+				draw_bar();
+			}
+		}
 	}
 
 	cleanup();
