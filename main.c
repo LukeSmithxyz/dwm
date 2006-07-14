@@ -264,6 +264,10 @@ main(int argc, char *argv[])
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 
+	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
+	dc.gc = XCreateGC(dpy, root, 0, 0);
+	draw_bar();
+
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
@@ -272,15 +276,12 @@ main(int argc, char *argv[])
 
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
-	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
-	dc.gc = XCreateGC(dpy, root, 0, 0);
-
 	strcpy(stext, "dwm-"VERSION);
 	scan_wins();
-	draw_bar();
 
 	/* main event loop, reads status text from stdin as well */
 	while(running) {
+Mainloop:
 		FD_ZERO(&rd);
 		FD_SET(0, &rd);
 		FD_SET(ConnectionNumber(dpy), &rd);
@@ -298,8 +299,15 @@ main(int argc, char *argv[])
 			}
 			if(FD_ISSET(0, &rd)) {
 				i = n = 0;
-				while((i = getchar()) != '\n' && n < sizeof(stext) - 1)
+				for(;;) {
+					if((i = getchar()) == EOF) {
+						stext[0] = 0;
+						goto Mainloop;
+					}
+					if(i == '\n' || n >= sizeof(stext) - 1)
+						break;
 					stext[n++] = i;
+				}
 				stext[n] = 0;
 				draw_bar();
 			}

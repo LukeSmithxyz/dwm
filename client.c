@@ -404,8 +404,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->next = *l; /* *l == nil */
 	*l = c;
 
-	XMapRaised(dpy, c->win);
-	XMapRaised(dpy, c->title);
 	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button2, Mod1Mask, c->win, False, ButtonPressMask,
@@ -418,10 +416,17 @@ manage(Window w, XWindowAttributes *wa)
 			|| ((c->maxw == c->minw) && (c->maxh == c->minh));
 
 	arrange(NULL);
-	if(c->tags[tsel])
+	/* mapping the window now prevents flicker */
+	if(c->tags[tsel]) {
+		XMapRaised(dpy, c->win);
+		XMapRaised(dpy, c->title);
 		focus(c);
-	else
+	}
+	else {
 		ban_client(c);
+		XMapRaised(dpy, c->win);
+		XMapRaised(dpy, c->title);
+	}
 }
 
 void
