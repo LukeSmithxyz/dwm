@@ -190,6 +190,7 @@ main(int argc, char *argv[])
 	fd_set rd;
 	XSetWindowAttributes wa;
 	unsigned int mask;
+	Bool readstdin = True;
 	Window w;
 	XEvent ev;
 
@@ -283,7 +284,8 @@ main(int argc, char *argv[])
 Mainloop:
 	while(running) {
 		FD_ZERO(&rd);
-		FD_SET(STDIN_FILENO, &rd);
+		if(readstdin)
+			FD_SET(STDIN_FILENO, &rd);
 		FD_SET(ConnectionNumber(dpy), &rd);
 
 		i = select(ConnectionNumber(dpy) + 1, &rd, 0, 0, 0);
@@ -299,11 +301,13 @@ Mainloop:
 						(handler[ev.type])(&ev); /* call handler */
 				}
 			}
-			if(FD_ISSET(STDIN_FILENO, &rd)) {
+			if(readstdin && FD_ISSET(STDIN_FILENO, &rd)) {
 				i = n = 0;
 				for(;;) {
 					if((i = getchar()) == EOF) {
-						stext[0] = 0;
+						/* broken pipe/end of producer */
+						readstdin = False;
+						strcpy(stext, "broken pipe");
 						goto Mainloop;
 					}
 					if(i == '\n' || n >= sizeof(stext) - 1)
