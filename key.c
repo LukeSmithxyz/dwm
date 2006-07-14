@@ -3,12 +3,23 @@
  * See LICENSE file for license details.
  */
 
-#include "dwm.h"
-
+#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <X11/keysym.h>
+#include <X11/Xatom.h>
+
+#include "dwm.h"
+
+static void ckill(Arg *arg);
+static void nextc(Arg *arg);
+static void prevc(Arg *arg);
+static void max(Arg *arg);
+static void ttrunc(Arg *arg);
+static void tappend(Arg *arg);
+static void zoom(Arg *arg);
 
 /********** CUSTOMIZE **********/
 
@@ -19,7 +30,7 @@ const char *term[] = {
 const char *browse[] = { "firefox", NULL };
 const char *xlock[] = { "xlock", NULL };
 
-static Key key[] = {
+Key key[] = {
 	/* modifier				key			function	arguments */
 	{ Mod1Mask,				XK_Return,	zoom,		{ 0 } },
 	{ Mod1Mask,				XK_k,		prevc,		{ 0 } },
@@ -49,7 +60,7 @@ static Key key[] = {
 /********** CUSTOMIZE **********/
 
 void
-update_keys(void)
+grabkeys()
 {
 	static unsigned int len = key ? sizeof(key) / sizeof(key[0]) : 0;
 	unsigned int i;
@@ -58,7 +69,8 @@ update_keys(void)
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
 		XUngrabKey(dpy, code, key[i].mod, root);
-		XGrabKey(dpy, code, key[i].mod, root, True, GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, key[i].mod, root, True,
+				GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -79,73 +91,102 @@ keypress(XEvent *e)
 		}
 }
 
-#define ButtonMask      (ButtonPressMask | ButtonReleaseMask)
-#define MouseMask       (ButtonMask | PointerMotionMask)
-
-void
-mresize(Client *c)
+static void
+zoom(Arg *arg)
 {
-	XEvent ev;
-	int ocx, ocy;
+	Client **l, *c;
 
-	ocx = c->x;
-	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-				None, cursor[CurResize], CurrentTime) != GrabSuccess)
+	if(!sel)
 		return;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
-	for(;;) {
-		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
-		switch(ev.type) {
-		default: break;
-		case Expose:
-			handler[Expose](&ev);
-			break;
-		case MotionNotify:
-			XFlush(dpy);
-			c->w = abs(ocx - ev.xmotion.x);
-			c->h = abs(ocy - ev.xmotion.y);
-			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
-			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
-			resize(c, True);
-			break;
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
-		}
+
+	if(sel == next(clients) && sel->next)  {
+		if((c = next(sel->next)))
+			sel = c;
+	}
+
+	for(l = &clients; *l && *l != sel; l = &(*l)->next);
+	*l = sel->next;
+
+	sel->next = clients; /* pop */
+	clients = sel;
+	arrange(NULL);
+	focus(sel);
+}
+
+static void
+max(Arg *arg)
+{
+	if(!sel)
+		return;
+	sel->x = sx;
+	sel->y = sy + bh;
+	sel->w = sw - 2 * sel->border;
+	sel->h = sh - 2 * sel->border - bh;
+	craise(sel);
+	resize(sel, False);
+}
+
+static void
+tappend(Arg *arg)
+{
+	if(!sel)
+		return;
+
+	sel->tags[arg->i] = tags[arg->i];
+	arrange(NULL);
+}
+
+static void
+ttrunc(Arg *arg)
+{
+	int i;
+	if(!sel)
+		return;
+
+	for(i = 0; i < TLast; i++)
+		sel->tags[i] = NULL;
+	tappend(arg);
+}
+
+static void
+prevc(Arg *arg)
+{
+	Client *c;
+
+	if(!sel)
+		return;
+
+	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
+		craise(c);
+		focus(c);
 	}
 }
 
-void
-mmove(Client *c)
+static void
+nextc(Arg *arg)
 {
-	XEvent ev;
-	int x1, y1, ocx, ocy, di;
-	unsigned int dui;
-	Window dummy;
-
-	ocx = c->x;
-	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-				None, cursor[CurMove], CurrentTime) != GrabSuccess)
+	Client *c;
+   
+	if(!sel)
 		return;
-	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
-	for(;;) {
-		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
-		switch (ev.type) {
-		default: break;
-		case Expose:
-			handler[Expose](&ev);
-			break;
-		case MotionNotify:
-			XFlush(dpy);
-			c->x = ocx + (ev.xmotion.x - x1);
-			c->y = ocy + (ev.xmotion.y - y1);
-			resize(c, False);
-			break;
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
-		}
+
+	if(!(c = next(sel->next)))
+		c = next(clients);
+	if(c) {
+		craise(c);
+		c->revert = sel;
+		focus(c);
 	}
 }
+
+static void
+ckill(Arg *arg)
+{
+	if(!sel)
+		return;
+	if(sel->proto & WM_PROTOCOL_DELWIN)
+		send_message(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+	else
+		XKillClient(dpy, sel->win);
+}
+

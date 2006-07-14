@@ -7,10 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
 #include "dwm.h"
+
+#define ButtonMask      (ButtonPressMask | ButtonReleaseMask)
+#define MouseMask       (ButtonMask | PointerMotionMask)
 
 /* local functions */
 static void buttonpress(XEvent *e);
@@ -19,7 +23,6 @@ static void destroynotify(XEvent *e);
 static void enternotify(XEvent *e);
 static void leavenotify(XEvent *e);
 static void expose(XEvent *e);
-static void keymapnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void propertynotify(XEvent *e);
 static void unmapnotify(XEvent *e);
@@ -32,21 +35,100 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[LeaveNotify] = leavenotify,
 	[Expose] = expose,
 	[KeyPress] = keypress,
-	[KeymapNotify] = keymapnotify,
 	[MapRequest] = maprequest,
 	[PropertyNotify] = propertynotify,
 	[UnmapNotify] = unmapnotify
 };
 
 static void
+mresize(Client *c)
+{
+	XEvent ev;
+	int ocx, ocy;
+
+	ocx = c->x;
+	ocy = c->y;
+	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+				None, cursor[CurResize], CurrentTime) != GrabSuccess)
+		return;
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+	for(;;) {
+		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
+		switch(ev.type) {
+		default: break;
+		case Expose:
+			handler[Expose](&ev);
+			break;
+		case MotionNotify:
+			XFlush(dpy);
+			c->w = abs(ocx - ev.xmotion.x);
+			c->h = abs(ocy - ev.xmotion.y);
+			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
+			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
+			resize(c, True);
+			break;
+		case ButtonRelease:
+			XUngrabPointer(dpy, CurrentTime);
+			return;
+		}
+	}
+}
+
+static void
+mmove(Client *c)
+{
+	XEvent ev;
+	int x1, y1, ocx, ocy, di;
+	unsigned int dui;
+	Window dummy;
+
+	ocx = c->x;
+	ocy = c->y;
+	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+				None, cursor[CurMove], CurrentTime) != GrabSuccess)
+		return;
+	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
+	for(;;) {
+		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
+		switch (ev.type) {
+		default: break;
+		case Expose:
+			handler[Expose](&ev);
+			break;
+		case MotionNotify:
+			XFlush(dpy);
+			c->x = ocx + (ev.xmotion.x - x1);
+			c->y = ocy + (ev.xmotion.y - y1);
+			resize(c, False);
+			break;
+		case ButtonRelease:
+			XUngrabPointer(dpy, CurrentTime);
+			return;
+		}
+	}
+}
+
+static void
 buttonpress(XEvent *e)
 {
+	int x;
+	Arg a;
 	XButtonPressedEvent *ev = &e->xbutton;
 	Client *c;
 
-	if(barwin == ev->window)
-		barclick(ev);
+	if(barwin == ev->window) {
+		x = (arrange == floating) ? textw("~") : 0;
+		for(a.i = 0; a.i < TLast; a.i++) {
+			x += textw(tags[a.i]);
+			if(ev->x < x) {
+				view(&a);
+				break;
+			}
+		}
+	}
 	else if((c = getclient(ev->window))) {
+		if(arrange == tiling && !c->floating)
+			return;
 		craise(c);
 		switch(ev->button) {
 		default:
@@ -147,12 +229,6 @@ expose(XEvent *e)
 		else if((c = gettitle(ev->window)))
 			draw_client(c);
 	}
-}
-
-static void
-keymapnotify(XEvent *e)
-{
-	update_keys();
 }
 
 static void

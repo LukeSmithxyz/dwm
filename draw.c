@@ -10,6 +10,71 @@
 
 #include "dwm.h"
 
+void
+draw_bar()
+{
+	int i;
+
+	dc.x = dc.y = 0;
+	dc.w = bw;
+	drawtext(NULL, False, False);
+
+	if(arrange == floating) {
+		dc.w = textw("~");
+		drawtext("~", False, False);
+	}
+	else
+		dc.w = 0;
+	for(i = 0; i < TLast; i++) {
+		dc.x += dc.w;
+		dc.w = textw(tags[i]);
+		drawtext(tags[i], i == tsel, True);
+	}
+	if(sel) {
+		dc.x += dc.w;
+		dc.w = textw(sel->name);
+		drawtext(sel->name, True, True);
+	}
+	dc.w = textw(stext);
+	dc.x = bx + bw - dc.w;
+	drawtext(stext, False, False);
+
+	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
+	XFlush(dpy);
+}
+
+void
+draw_client(Client *c)
+{
+	int i;
+	if(c == sel) {
+		draw_bar();
+		XUnmapWindow(dpy, c->title);
+		XSetWindowBorder(dpy, c->win, dc.fg);
+		return;
+	}
+
+	XSetWindowBorder(dpy, c->win, dc.bg);
+	XMapWindow(dpy, c->title);
+
+	dc.x = dc.y = 0;
+
+	dc.w = 0;
+	for(i = 0; i < TLast; i++) {
+		if(c->tags[i]) {
+			dc.x += dc.w;
+			dc.w = textw(c->tags[i]);
+			drawtext(c->tags[i], False, True);
+		}
+	}
+	dc.x += dc.w;
+	dc.w = textw(c->name);
+	drawtext(c->name, False, True);
+	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
+			0, 0, c->tw, c->th, 0, 0);
+	XFlush(dpy);
+}
+
 static void
 drawborder(void)
 {
@@ -103,7 +168,7 @@ textnw(char *text, unsigned int len)
 unsigned int
 textw(char *text)
 {
-	return textnw(text, strlen(text));
+	return textnw(text, strlen(text)) + dc.font.height;
 }
 
 void

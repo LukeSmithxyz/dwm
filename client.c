@@ -11,14 +11,12 @@
 
 #include "dwm.h"
 
-void (*arrange)(Arg *) = tiling;
-
 static Rule rule[] = {
 	/* class			instance	tags						floating */
 	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
 };
 
-static Client *
+Client *
 next(Client *c)
 {
 	for(; c && !c->tags[tsel]; c = c->next);
@@ -26,200 +24,10 @@ next(Client *c)
 }
 
 void
-zoom(Arg *arg)
-{
-	Client **l, *c;
-
-	if(!sel)
-		return;
-
-	if(sel == next(clients) && sel->next)  {
-		if((c = next(sel->next)))
-			sel = c;
-	}
-
-	for(l = &clients; *l && *l != sel; l = &(*l)->next);
-	*l = sel->next;
-
-	sel->next = clients; /* pop */
-	clients = sel;
-	arrange(NULL);
-	focus(sel);
-}
-
-void
-max(Arg *arg)
-{
-	if(!sel)
-		return;
-	sel->x = sx;
-	sel->y = sy + bh;
-	sel->w = sw - 2 * sel->border;
-	sel->h = sh - 2 * sel->border - bh;
-	craise(sel);
-	resize(sel, False);
-}
-
-void
-view(Arg *arg)
-{
-	Client *c;
-
-	tsel = arg->i;
-	arrange(NULL);
-
-	for(c = clients; c; c = next(c->next))
-		draw_client(c);
-	draw_bar();
-}
-
-void
-tappend(Arg *arg)
-{
-	if(!sel)
-		return;
-
-	sel->tags[arg->i] = tags[arg->i];
-	arrange(NULL);
-}
-
-void
-ttrunc(Arg *arg)
-{
-	int i;
-	if(!sel)
-		return;
-
-	for(i = 0; i < TLast; i++)
-		sel->tags[i] = NULL;
-	tappend(arg);
-}
-
-static void
 ban_client(Client *c)
 {
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMoveWindow(dpy, c->title, c->tx + 2 * sw, c->ty);
-}
-
-void
-floating(Arg *arg)
-{
-	Client *c;
-
-	arrange = floating;
-	for(c = clients; c; c = c->next) {
-		if(c->tags[tsel])
-			resize(c, True);
-		else
-			ban_client(c);
-	}
-	if(sel && !sel->tags[tsel]) {
-		if((sel = next(clients))) {
-			craise(sel);
-			focus(sel);
-		}
-	}
-	draw_bar();
-}
-
-void
-tiling(Arg *arg)
-{
-	Client *c;
-	int n, i, w, h;
-
-	w = sw - mw;
-	arrange = tiling;
-	for(n = 0, c = clients; c; c = c->next)
-		if(c->tags[tsel] && !c->floating)
-			n++;
-
-	if(n > 1)
-		h = (sh - bh) / (n - 1);
-	else
-		h = sh - bh;
-
-	for(i = 0, c = clients; c; c = c->next) {
-		if(c->tags[tsel]) {
-			if(c->floating) {
-				craise(c);
-				resize(c, True);
-				continue;
-			}
-			if(n == 1) {
-				c->x = sx;
-				c->y = sy + bh;
-				c->w = sw - 2 * c->border;
-				c->h = sh - 2 * c->border - bh;
-			}
-			else if(i == 0) {
-				c->x = sx;
-				c->y = sy + bh;
-				c->w = mw - 2 * c->border;
-				c->h = sh - 2 * c->border - bh;
-			}
-			else {
-				c->x = sx + mw;
-				c->y = sy + (i - 1) * h + bh;
-				c->w = w - 2 * c->border;
-				c->h = h - 2 * c->border;
-			}
-			resize(c, False);
-			i++;
-		}
-		else
-			ban_client(c);
-	}
-	if(!sel || (sel && !sel->tags[tsel])) {
-		if((sel = next(clients))) {
-			craise(sel);
-			focus(sel);
-		}
-	}
-	draw_bar();
-}
-
-void
-prevc(Arg *arg)
-{
-	Client *c;
-
-	if(!sel)
-		return;
-
-	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
-		craise(c);
-		focus(c);
-	}
-}
-
-void
-nextc(Arg *arg)
-{
-	Client *c;
-   
-	if(!sel)
-		return;
-
-	if(!(c = next(sel->next)))
-		c = next(clients);
-	if(c) {
-		craise(c);
-		c->revert = sel;
-		focus(c);
-	}
-}
-
-void
-ckill(Arg *arg)
-{
-	if(!sel)
-		return;
-	if(sel->proto & WM_PROTOCOL_DELWIN)
-		send_message(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
-	else
-		XKillClient(dpy, sel->win);
 }
 
 static void
@@ -230,8 +38,8 @@ resize_title(Client *c)
 	c->tw = 0;
 	for(i = 0; i < TLast; i++)
 		if(c->tags[i])
-			c->tw += textw(c->tags[i]) + dc.font.height;
-	c->tw += textw(c->name) + dc.font.height;
+			c->tw += textw(c->tags[i]);
+	c->tw += textw(c->name);
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
@@ -583,36 +391,4 @@ getclient(Window w)
 		if(c->win == w)
 			return c;
 	return NULL;
-}
-
-void
-draw_client(Client *c)
-{
-	int i;
-	if(c == sel) {
-		draw_bar();
-		XUnmapWindow(dpy, c->title);
-		XSetWindowBorder(dpy, c->win, dc.fg);
-		return;
-	}
-
-	XSetWindowBorder(dpy, c->win, dc.bg);
-	XMapWindow(dpy, c->title);
-
-	dc.x = dc.y = 0;
-
-	dc.w = 0;
-	for(i = 0; i < TLast; i++) {
-		if(c->tags[i]) {
-			dc.x += dc.w;
-			dc.w = textw(c->tags[i]) + dc.font.height;
-			drawtext(c->tags[i], False, True);
-		}
-	}
-	dc.x += dc.w;
-	dc.w = textw(c->name) + dc.font.height;
-	drawtext(c->name, False, True);
-	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
-			0, 0, c->tw, c->th, 0, 0);
-	XFlush(dpy);
 }

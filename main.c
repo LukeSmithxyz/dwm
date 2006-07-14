@@ -239,7 +239,7 @@ main(int argc, char *argv[])
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
-	update_keys();
+	grabkeys();
 
 	/* style */
 	dc.bg = initcolor(BGCOLOR);
