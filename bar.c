@@ -22,16 +22,15 @@ barclick(XButtonPressedEvent *e)
 void
 draw_bar()
 {
-	int i;
+	int i, modw;
 	char *mode = arrange == tiling ? "#" : "~";
 
 	dc.x = dc.y = 0;
 	dc.w = bw;
 	drawtext(NULL, False, False);
 
-	dc.w = textw(mode) + dc.font.height;
-	drawtext(mode, True, True);
-
+	modw = textw(mode) + dc.font.height;
+	dc.w = 0;
 	for(i = 0; i < TLast; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]) + dc.font.height;
@@ -43,8 +42,13 @@ draw_bar()
 		drawtext(sel->name, True, True);
 	}
 	dc.w = textw(stext) + dc.font.height;
-	dc.x = bx + bw - dc.w;
+	dc.x = bx + bw - dc.w - modw;
 	drawtext(stext, False, False);
+
+	dc.x = bx + bw - modw;
+	dc.w = modw;
+	drawtext(mode, True, True);
+
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XFlush(dpy);
 }
