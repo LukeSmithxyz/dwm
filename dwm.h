@@ -103,6 +103,7 @@ extern Client *clients, *sel;
 
 /* bar.c */
 extern void draw_bar();
+extern void barclick(XButtonPressedEvent *e);
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);

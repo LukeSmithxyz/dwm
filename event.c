@@ -50,7 +50,9 @@ buttonpress(XEvent *e)
 	XButtonPressedEvent *ev = &e->xbutton;
 	Client *c;
 
-	if((c = getclient(ev->window))) {
+	if(barwin == ev->window)
+		barclick(ev);
+	else if((c = getclient(ev->window))) {
 		craise(c);
 		switch(ev->button) {
 		default:

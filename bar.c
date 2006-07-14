@@ -6,6 +6,20 @@
 #include "dwm.h"
 
 void
+barclick(XButtonPressedEvent *e)
+{
+	int x = 0;
+	Arg a;
+	for(a.i = 0; a.i < TLast; a.i++) {
+		x += textw(tags[a.i]) + dc.font.height;
+		if(e->x < x) {
+			view(&a);
+			return;
+		}
+	}
+}
+
+void
 draw_bar()
 {
 	int i;
