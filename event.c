@@ -87,7 +87,7 @@ configurerequest(XEvent *e)
 		if(ev->value_mask & CWHeight)
 			c->h = ev->height;
 		if(ev->value_mask & CWBorderWidth)
-			c->border = ev->border_width;
+			c->border = 1;
 		gravitate(c, False);
 		resize(c, True);
 	}

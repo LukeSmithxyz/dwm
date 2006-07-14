@@ -14,9 +14,12 @@ VERSION = 0.0
 LIBS = -L${PREFIX}/lib -L/usr/lib -lc -L${X11LIB} -lX11
 
 # Linux/BSD
-CFLAGS = -g -Wall -O2 -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
+CFLAGS = -Os -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
 	-DVERSION=\"${VERSION}\"
-LDFLAGS = -g ${LIBS}
+LDFLAGS = ${LIBS}
+#CFLAGS = -g -Wall -O2 -I. -I${PREFIX}/include -I/usr/include -I${X11INC} \
+#	-DVERSION=\"${VERSION}\"
+#LDFLAGS = -g ${LIBS}
 
 
 # Solaris

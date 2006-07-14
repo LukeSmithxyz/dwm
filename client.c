@@ -398,7 +398,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->next = *l; /* *l == nil */
 	*l = c;
 
-	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMapRaised(dpy, c->win);
 	XMapRaised(dpy, c->title);
 	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
@@ -495,6 +494,7 @@ resize(Client *c, Bool inc)
 	if(c->maxh && c->h > c->maxh)
 		c->h = c->maxh;
 	resize_title(c);
+	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 	e.type = ConfigureNotify;
 	e.event = c->win;
