@@ -23,11 +23,15 @@ void
 draw_bar()
 {
 	int i;
+	char *mode = arrange == tiling ? "#" : "~";
+
 	dc.x = dc.y = 0;
 	dc.w = bw;
 	drawtext(NULL, False, False);
 
-	dc.w = 0;
+	dc.w = textw(mode) + dc.font.height;
+	drawtext(mode, True, True);
+
 	for(i = 0; i < TLast; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]) + dc.font.height;

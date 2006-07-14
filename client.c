@@ -120,6 +120,7 @@ floating(Arg *arg)
 			focus(sel);
 		}
 	}
+	draw_bar();
 }
 
 void
@@ -176,6 +177,7 @@ tiling(Arg *arg)
 			focus(sel);
 		}
 	}
+	draw_bar();
 }
 
 void
