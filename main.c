@@ -283,7 +283,7 @@ main(int argc, char *argv[])
 Mainloop:
 	while(running) {
 		FD_ZERO(&rd);
-		FD_SET(0, &rd);
+		FD_SET(STDIN_FILENO, &rd);
 		FD_SET(ConnectionNumber(dpy), &rd);
 
 		i = select(ConnectionNumber(dpy) + 1, &rd, 0, 0, 0);
@@ -292,12 +292,14 @@ Mainloop:
 		if(i < 0)
 			error("select failed\n");
 		else if(i > 0) {
-			if(FD_ISSET(ConnectionNumber(dpy), &rd) && XPending(dpy) > 0) {
-				XNextEvent(dpy, &ev);
-				if(handler[ev.type])
-					(handler[ev.type])(&ev); /* call handler */
+			if(FD_ISSET(ConnectionNumber(dpy), &rd)) {
+				while(XPending(dpy)) {
+					XNextEvent(dpy, &ev);
+					if(handler[ev.type])
+						(handler[ev.type])(&ev); /* call handler */
+				}
 			}
-			if(FD_ISSET(0, &rd)) {
+			if(FD_ISSET(STDIN_FILENO, &rd)) {
 				i = n = 0;
 				for(;;) {
 					if((i = getchar()) == EOF) {
