@@ -88,18 +88,21 @@ struct Key {
 };
 
 extern Display *dpy;
-extern Window root;
+extern Window root, barwin;
 extern Atom wm_atom[WMLast], net_atom[NetLast];
 extern Cursor cursor[CurLast];
 extern Bool running, issel;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 
-extern int tsel, screen, sx, sy, sw, sh, mw, th;
-extern char *tags[TLast];
+extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+extern char *tags[TLast], stext[1024];
 
 extern DC dc;
 extern Client *clients, *sel;
+
+/* bar.c */
+extern void draw_bar();
 
 /* client.c */
 extern void manage(Window w, XWindowAttributes *wa);
@@ -126,7 +129,7 @@ extern void zoom(Arg *arg);
 extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */
-extern void draw(Bool border, const char *text);
+extern void drawtext(const char *text, Bool border);
 extern unsigned long initcolor(const char *colstr);
 extern void initfont(const char *fontstr);
 extern unsigned int textnw(char *text, unsigned int len);

@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
@@ -34,7 +35,8 @@ Bool running = True;
 Bool issel;
 
 int tsel = Tdev; /* default tag */
-int screen, sx, sy, sw, sh, mw, th;
+int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+char stext[1024];
 
 DC dc = {0};
 Client *clients = NULL;
@@ -42,7 +44,7 @@ Client *sel = NULL;
 
 static Bool other_wm_running;
 static const char version[] =
-	"dwm - " VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
+	"dwm-" VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 static int (*x_error_handler) (Display *, XErrorEvent *);
 
 static void
@@ -219,12 +221,6 @@ main(int argc, char *argv[])
 	if(other_wm_running)
 		error("dwm: another window manager is already running\n");
 
-	sx = sy = 0;
-	sw = DisplayWidth(dpy, screen);
-	sh = DisplayHeight(dpy, screen);
-	mw = (sw * MASTERW) / 100;
-	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
-
 	XSetErrorHandler(0);
 	x_error_handler = XSetErrorHandler(error_handler);
 
@@ -233,10 +229,8 @@ main(int argc, char *argv[])
 	wm_atom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-
 	XChangeProperty(dpy, root, net_atom[NetSupported], XA_ATOM, 32,
 			PropModeReplace, (unsigned char *) net_atom, NetLast);
-
 
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
@@ -251,17 +245,38 @@ main(int argc, char *argv[])
 	dc.border = initcolor(BORDERCOLOR);
 	initfont(FONT);
 
-	th = dc.font.height + 4;
+	sx = sy = 0;
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
+	mw = (sw * MASTERW) / 100;
 
-	dc.drawable = XCreatePixmap(dpy, root, sw, th, DefaultDepth(dpy, screen));
-	dc.gc = XCreateGC(dpy, root, 0, 0);
+	wa.override_redirect = 1;
+	wa.background_pixmap = ParentRelative;
+	wa.event_mask = ExposureMask;
+
+	bx = by = 0;
+	bw = sw;
+	dc.h = bh = dc.font.height + 4;
+	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
+			CopyFromParent, DefaultVisual(dpy, screen),
+			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
+	XDefineCursor(dpy, barwin, cursor[CurNormal]);
+	XMapRaised(dpy, barwin);
+
+	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 
 	wa.event_mask = SubstructureRedirectMask | EnterWindowMask \
 					| LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
+
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
+	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
+	dc.gc = XCreateGC(dpy, root, 0, 0);
+
+	strcpy(stext, "dwm-"VERSION);
 	scan_wins();
+	draw_bar();
 
 	while(running) {
 		XNextEvent(dpy, &ev);

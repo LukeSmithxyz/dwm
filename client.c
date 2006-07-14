@@ -49,9 +49,9 @@ max(Arg *arg)
 	if(!sel)
 		return;
 	sel->x = sx;
-	sel->y = sy;
+	sel->y = sy + bh;
 	sel->w = sw - 2 * sel->border;
-	sel->h = sh - 2 * sel->border;
+	sel->h = sh - 2 * sel->border - bh;
 	craise(sel);
 	resize(sel, False);
 	discard_events(EnterWindowMask);
@@ -67,6 +67,7 @@ view(Arg *arg)
 
 	for(c = clients; c; c = next(c->next))
 		draw_client(c);
+	draw_bar();
 }
 
 void
@@ -131,7 +132,10 @@ tiling(Arg *arg)
 		if(c->tags[tsel] && !c->floating)
 			n++;
 
-	h = (n > 1) ? sh / (n - 1) : sh;
+	if(n > 1)
+		h = (sh - bh) / (n - 1);
+	else
+		h = sh - bh;
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(c->tags[tsel]) {
@@ -142,19 +146,19 @@ tiling(Arg *arg)
 			}
 			if(n == 1) {
 				c->x = sx;
-				c->y = sy;
+				c->y = sy + bh;
 				c->w = sw - 2 * c->border;
-				c->h = sh - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
 			}
 			else if(i == 0) {
 				c->x = sx;
-				c->y = sy;
+				c->y = sy + bh;
 				c->w = mw - 2 * c->border;
-				c->h = sh - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
 			}
 			else {
 				c->x = sx + mw;
-				c->y = sy + (i - 1) * h;
+				c->y = sy + (i - 1) * h + bh;
 				c->w = w - 2 * c->border;
 				c->h = h - 2 * c->border;
 			}
@@ -373,9 +377,11 @@ manage(Window w, XWindowAttributes *wa)
 	c->win = w;
 	c->tx = c->x = wa->x;
 	c->ty = c->y = wa->y;
+	if(c->y < bh)
+		c->ty = c->y += bh;
 	c->tw = c->w = wa->width;
 	c->h = wa->height;
-	c->th = th;
+	c->th = bh;
 	c->border = 1;
 	c->proto = win_proto(c->win);
 	update_size(c);
@@ -570,6 +576,7 @@ draw_client(Client *c)
 {
 	int i;
 	if(c == sel) {
+		draw_bar();
 		XUnmapWindow(dpy, c->title);
 		XSetWindowBorder(dpy, c->win, dc.fg);
 		return;
@@ -579,19 +586,18 @@ draw_client(Client *c)
 	XMapWindow(dpy, c->title);
 
 	dc.x = dc.y = 0;
-	dc.h = c->th;
 
 	dc.w = 0;
 	for(i = 0; i < TLast; i++) {
 		if(c->tags[i]) {
 			dc.x += dc.w;
 			dc.w = textw(c->tags[i]) + dc.font.height;
-			draw(True, c->tags[i]);
+			drawtext(c->tags[i], True);
 		}
 	}
 	dc.x += dc.w;
 	dc.w = textw(c->name) + dc.font.height;
-	draw(True, c->name);
+	drawtext(c->name, True);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
 			0, 0, c->tw, c->th, 0, 0);
 	XFlush(dpy);

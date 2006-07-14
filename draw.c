@@ -30,7 +30,7 @@ drawborder(void)
 }
 
 void
-draw(Bool border, const char *text)
+drawtext(const char *text, Bool border)
 {
 	int x, y, w, h;
 	unsigned int len;
