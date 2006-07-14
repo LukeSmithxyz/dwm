@@ -65,6 +65,9 @@ view(Arg *arg)
 	tsel = arg->i;
 	arrange(NULL);
 
+	if((c = next(clients)))
+		focus(c);
+
 	for(c = clients; c; c = next(c->next))
 		draw_client(c);
 	draw_bar();
