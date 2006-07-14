@@ -29,7 +29,7 @@ dwm: ${OBJ}
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
-	rm -f dwm *.o core
+	rm -f dwm *.o core dwm-${VERSION}.tar.gz
 
 dist: clean
 	mkdir -p dwm-${VERSION}

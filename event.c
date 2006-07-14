@@ -142,7 +142,9 @@ expose(XEvent *e)
 	Client *c;
 
 	if(ev->count == 0) {
-		if((c = gettitle(ev->window)))
+		if(barwin == ev->window)
+			draw_bar();
+		else if((c = gettitle(ev->window)))
 			draw_client(c);
 	}
 }
