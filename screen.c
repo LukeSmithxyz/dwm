@@ -15,9 +15,9 @@ view(Arg *arg)
 	tsel = arg->i;
 	arrange(NULL);
 
-	for(c = clients; c; c = next(c->next))
-		draw_client(c);
-	draw_bar();
+	for(c = clients; c; c = getnext(c->next))
+		drawtitle(c);
+	drawstatus();
 }
 
 void
@@ -30,15 +30,15 @@ floating(Arg *arg)
 		if(c->tags[tsel])
 			resize(c, True);
 		else
-			ban_client(c);
+			ban(c);
 	}
 	if(sel && !sel->tags[tsel]) {
-		if((sel = next(clients))) {
-			craise(sel);
+		if((sel = getnext(clients))) {
+			higher(sel);
 			focus(sel);
 		}
 	}
-	draw_bar();
+	drawstatus();
 }
 
 void
@@ -61,7 +61,7 @@ tiling(Arg *arg)
 	for(i = 0, c = clients; c; c = c->next) {
 		if(c->tags[tsel]) {
 			if(c->floating) {
-				craise(c);
+				higher(c);
 				resize(c, True);
 				continue;
 			}
@@ -87,14 +87,14 @@ tiling(Arg *arg)
 			i++;
 		}
 		else
-			ban_client(c);
+			ban(c);
 	}
 	if(!sel || (sel && !sel->tags[tsel])) {
-		if((sel = next(clients))) {
-			craise(sel);
+		if((sel = getnext(clients))) {
+			higher(sel);
 			focus(sel);
 		}
 	}
-	draw_bar();
+	drawstatus();
 }
 

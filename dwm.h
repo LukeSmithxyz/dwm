@@ -107,22 +107,22 @@ extern void manage(Window w, XWindowAttributes *wa);
 extern void unmanage(Client *c);
 extern Client *getclient(Window w);
 extern void focus(Client *c);
-extern void update_name(Client *c);
+extern void settitle(Client *c);
 extern void resize(Client *c, Bool inc);
-extern void update_size(Client *c);
+extern void setsize(Client *c);
 extern Client *gettitle(Window w);
-extern void craise(Client *c);
+extern void higher(Client *c);
 extern void lower(Client *c);
 extern void gravitate(Client *c, Bool invert);
-extern void ban_client(Client *c);
-extern Client *next(Client *c);
+extern void ban(Client *c);
+extern Client *getnext(Client *c);
 
 /* draw.c */
-extern void draw_bar();
-extern void draw_client(Client *c);
+extern void drawstatus();
+extern void drawtitle(Client *c);
 extern void drawtext(const char *text, Bool invert, Bool border);
-extern unsigned long initcolor(const char *colstr);
-extern void initfont(const char *fontstr);
+extern unsigned long getcolor(const char *colstr);
+extern void setfont(const char *fontstr);
 extern unsigned int textnw(char *text, unsigned int len);
 extern unsigned int textw(char *text);
 extern unsigned int texth(void);
@@ -132,9 +132,9 @@ extern void grabkeys();
 extern void keypress(XEvent *e);
 
 /* main.c */
-extern int error_handler(Display *dsply, XErrorEvent *e);
-extern void send_message(Window w, Atom a, long value);
-extern int win_proto(Window w);
+extern int xerror(Display *dsply, XErrorEvent *e);
+extern void sendevent(Window w, Atom a, long value);
+extern int proto(Window w);
 extern void quit(Arg *arg);
 
 /* screen.c */

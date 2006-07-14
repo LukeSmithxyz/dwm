@@ -46,7 +46,7 @@ Client *sel = NULL;
 static Bool other_wm_running;
 static const char version[] =
 	"dwm-" VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
-static int (*x_error_handler) (Display *, XErrorEvent *);
+static int (*x_xerror) (Display *, XErrorEvent *);
 
 static void
 usage() {	error("usage: dwm [-v]\n"); }
@@ -94,7 +94,7 @@ win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
 }
 
 int
-win_proto(Window w)
+proto(Window w)
 {
 	unsigned char *protocols;
 	long res;
@@ -114,7 +114,7 @@ win_proto(Window w)
 }
 
 void
-send_message(Window w, Atom a, long value)
+sendevent(Window w, Atom a, long value)
 {
 	XEvent e;
 
@@ -135,7 +135,7 @@ send_message(Window w, Atom a, long value)
  * calls exit().
  */
 int
-error_handler(Display *dpy, XErrorEvent *error)
+xerror(Display *dpy, XErrorEvent *error)
 {
 	if(error->error_code == BadWindow
 			|| (error->request_code == X_SetInputFocus
@@ -153,7 +153,7 @@ error_handler(Display *dpy, XErrorEvent *error)
 		return 0;
 	fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
 			error->request_code, error->error_code);
-	return x_error_handler(dpy, error); /* may call exit() */
+	return x_xerror(dpy, error); /* may call exit() */
 }
 
 /*
@@ -161,7 +161,7 @@ error_handler(Display *dpy, XErrorEvent *error)
  * is already running.
  */
 static int
-startup_error_handler(Display *dpy, XErrorEvent *error)
+startup_xerror(Display *dpy, XErrorEvent *error)
 {
 	other_wm_running = True;
 	return -1;
@@ -215,7 +215,7 @@ main(int argc, char *argv[])
 
 	/* check if another WM is already running */
 	other_wm_running = False;
-	XSetErrorHandler(startup_error_handler);
+	XSetErrorHandler(startup_xerror);
 	/* this causes an error if some other WM is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
 	XFlush(dpy);
@@ -224,7 +224,7 @@ main(int argc, char *argv[])
 		error("dwm: another window manager is already running\n");
 
 	XSetErrorHandler(0);
-	x_error_handler = XSetErrorHandler(error_handler);
+	x_xerror = XSetErrorHandler(xerror);
 
 	/* init atoms */
 	wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -242,10 +242,10 @@ main(int argc, char *argv[])
 	grabkeys();
 
 	/* style */
-	dc.bg = initcolor(BGCOLOR);
-	dc.fg = initcolor(FGCOLOR);
-	dc.border = initcolor(BORDERCOLOR);
-	initfont(FONT);
+	dc.bg = getcolor(BGCOLOR);
+	dc.fg = getcolor(FGCOLOR);
+	dc.border = getcolor(BORDERCOLOR);
+	setfont(FONT);
 
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
@@ -267,7 +267,7 @@ main(int argc, char *argv[])
 
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
-	draw_bar();
+	drawstatus();
 
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 
@@ -315,7 +315,7 @@ Mainloop:
 					stext[n++] = i;
 				}
 				stext[n] = 0;
-				draw_bar();
+				drawstatus();
 			}
 		}
 	}

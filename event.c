@@ -129,7 +129,7 @@ buttonpress(XEvent *e)
 	else if((c = getclient(ev->window))) {
 		if(arrange == tiling && !c->floating)
 			return;
-		craise(c);
+		higher(c);
 		switch(ev->button) {
 		default:
 			break;
@@ -225,9 +225,9 @@ expose(XEvent *e)
 
 	if(ev->count == 0) {
 		if(barwin == ev->window)
-			draw_bar();
+			drawstatus();
 		else if((c = gettitle(ev->window)))
-			draw_client(c);
+			drawtitle(c);
 	}
 }
 
@@ -262,7 +262,7 @@ propertynotify(XEvent *e)
 
 	if((c = getclient(ev->window))) {
 		if(ev->atom == wm_atom[WMProtocols]) {
-			c->proto = win_proto(c->win);
+			c->proto = proto(c->win);
 			return;
 		}
 		switch (ev->atom) {
@@ -273,12 +273,12 @@ propertynotify(XEvent *e)
 					arrange(NULL);
 				break;
 			case XA_WM_NORMAL_HINTS:
-				update_size(c);
+				setsize(c);
 				break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {
-			update_name(c);
-			draw_client(c);
+			settitle(c);
+			drawtitle(c);
 		}
 	}
 }

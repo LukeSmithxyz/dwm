@@ -99,8 +99,8 @@ zoom(Arg *arg)
 	if(!sel)
 		return;
 
-	if(sel == next(clients) && sel->next)  {
-		if((c = next(sel->next)))
+	if(sel == getnext(clients) && sel->next)  {
+		if((c = getnext(sel->next)))
 			sel = c;
 	}
 
@@ -122,7 +122,7 @@ max(Arg *arg)
 	sel->y = sy + bh;
 	sel->w = sw - 2 * sel->border;
 	sel->h = sh - 2 * sel->border - bh;
-	craise(sel);
+	higher(sel);
 	resize(sel, False);
 }
 
@@ -157,7 +157,7 @@ prevc(Arg *arg)
 		return;
 
 	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
-		craise(c);
+		higher(c);
 		focus(c);
 	}
 }
@@ -170,10 +170,10 @@ nextc(Arg *arg)
 	if(!sel)
 		return;
 
-	if(!(c = next(sel->next)))
-		c = next(clients);
+	if(!(c = getnext(sel->next)))
+		c = getnext(clients);
 	if(c) {
-		craise(c);
+		higher(c);
 		c->revert = sel;
 		focus(c);
 	}
@@ -185,7 +185,7 @@ ckill(Arg *arg)
 	if(!sel)
 		return;
 	if(sel->proto & WM_PROTOCOL_DELWIN)
-		send_message(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+		sendevent(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
 	else
 		XKillClient(dpy, sel->win);
 }

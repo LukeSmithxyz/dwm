@@ -11,7 +11,7 @@
 #include "dwm.h"
 
 void
-draw_bar()
+drawstatus()
 {
 	int i;
 
@@ -44,11 +44,11 @@ draw_bar()
 }
 
 void
-draw_client(Client *c)
+drawtitle(Client *c)
 {
 	int i;
 	if(c == sel) {
-		draw_bar();
+		drawstatus();
 		XUnmapWindow(dpy, c->title);
 		XSetWindowBorder(dpy, c->win, dc.fg);
 		return;
@@ -145,7 +145,7 @@ drawtext(const char *text, Bool invert, Bool border)
 }
 
 unsigned long
-initcolor(const char *colstr)
+getcolor(const char *colstr)
 {
 	XColor color;
 	Colormap cmap = DefaultColormap(dpy, screen);
@@ -172,7 +172,7 @@ textw(char *text)
 }
 
 void
-initfont(const char *fontstr)
+setfont(const char *fontstr)
 {
 	char **missing, *def;
 	int i, n;

@@ -17,14 +17,14 @@ static Rule rule[] = {
 };
 
 Client *
-next(Client *c)
+getnext(Client *c)
 {
 	for(; c && !c->tags[tsel]; c = c->next);
 	return c;
 }
 
 void
-ban_client(Client *c)
+ban(Client *c)
 {
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMoveWindow(dpy, c->title, c->tx + 2 * sw, c->ty);
@@ -48,7 +48,7 @@ resize_title(Client *c)
 }
 
 void
-update_name(Client *c)
+settitle(Client *c)
 {
 	XTextProperty name;
 	int n;
@@ -76,7 +76,7 @@ update_name(Client *c)
 }
 
 void
-update_size(Client *c)
+setsize(Client *c)
 {
 	XSizeHints size;
 	long msize;
@@ -114,7 +114,7 @@ update_size(Client *c)
 }
 
 void
-craise(Client *c)
+higher(Client *c)
 {
 	XRaiseWindow(dpy, c->win);
 	XRaiseWindow(dpy, c->title);
@@ -136,8 +136,8 @@ focus(Client *c)
 	XFlush(dpy);
 	sel = c;
 	if(old && old != c)
-		draw_client(old);
-	draw_client(c);
+		drawtitle(old);
+	drawtitle(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
@@ -196,8 +196,8 @@ manage(Window w, XWindowAttributes *wa)
 	c->h = wa->height;
 	c->th = bh;
 	c->border = 1;
-	c->proto = win_proto(c->win);
-	update_size(c);
+	c->proto = proto(c->win);
+	setsize(c);
 	XSelectInput(dpy, c->win,
 			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
@@ -210,7 +210,7 @@ manage(Window w, XWindowAttributes *wa)
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
-	update_name(c);
+	settitle(c);
 	init_tags(c);
 
 	for(l = &clients; *l; l = &(*l)->next);
@@ -236,7 +236,7 @@ manage(Window w, XWindowAttributes *wa)
 		focus(c);
 	}
 	else {
-		ban_client(c);
+		ban(c);
 		XMapRaised(dpy, c->win);
 		XMapRaised(dpy, c->title);
 	}
@@ -339,7 +339,7 @@ resize(Client *c, Bool inc)
 }
 
 static int
-dummy_error_handler(Display *dsply, XErrorEvent *err)
+dummy_xerror(Display *dsply, XErrorEvent *err)
 {
 	return 0;
 }
@@ -350,7 +350,7 @@ unmanage(Client *c)
 	Client **l;
 
 	XGrabServer(dpy);
-	XSetErrorHandler(dummy_error_handler);
+	XSetErrorHandler(dummy_xerror);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->title);
@@ -366,7 +366,7 @@ unmanage(Client *c)
 	free(c);
 
 	XFlush(dpy);
-	XSetErrorHandler(error_handler);
+	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
 	arrange(NULL);
 	if(sel)
