@@ -280,8 +280,8 @@ main(int argc, char *argv[])
 	scan_wins();
 
 	/* main event loop, reads status text from stdin as well */
-	while(running) {
 Mainloop:
+	while(running) {
 		FD_ZERO(&rd);
 		FD_SET(0, &rd);
 		FD_SET(ConnectionNumber(dpy), &rd);
