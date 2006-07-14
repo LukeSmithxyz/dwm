@@ -28,13 +28,15 @@ next(Client *c)
 void
 zoom(Arg *arg)
 {
-	Client **l;
+	Client **l, *c;
 
 	if(!sel)
 		return;
 
-	if(sel == next(clients)) 
-		sel = next(sel->next);
+	if(sel == next(clients) && sel->next)  {
+		if((c = next(sel->next)))
+			sel = c;
+	}
 
 	for(l = &clients; *l && *l != sel; l = &(*l)->next);
 	*l = sel->next;
@@ -497,6 +499,10 @@ resize(Client *c, Bool inc)
 		if(c->inch)
 			c->h -= (c->h - c->baseh) % c->inch;
 	}
+	if(c->x > sw) /* might happen on restart */
+		c->x = sw - c->w;
+	if(c->y > sh)
+		c->ty = c->y = sh - c->h;
 	if(c->minw && c->w < c->minw)
 		c->w = c->minw;
 	if(c->minh && c->h < c->minh)
