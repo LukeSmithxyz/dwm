@@ -598,12 +598,12 @@ draw_client(Client *c)
 		if(c->tags[i]) {
 			dc.x += dc.w;
 			dc.w = textw(c->tags[i]) + dc.font.height;
-			drawtext(c->tags[i], True);
+			drawtext(c->tags[i], False, True);
 		}
 	}
 	dc.x += dc.w;
 	dc.w = textw(c->name) + dc.font.height;
-	drawtext(c->name, True);
+	drawtext(c->name, False, True);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
 			0, 0, c->tw, c->th, 0, 0);
 	XFlush(dpy);

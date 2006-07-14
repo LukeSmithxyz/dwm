@@ -130,7 +130,7 @@ extern void zoom(Arg *arg);
 extern void gravitate(Client *c, Bool invert);
 
 /* draw.c */
-extern void drawtext(const char *text, Bool border);
+extern void drawtext(const char *text, Bool invert, Bool border);
 extern unsigned long initcolor(const char *colstr);
 extern void initfont(const char *fontstr);
 extern unsigned int textnw(char *text, unsigned int len);
@@ -153,4 +153,3 @@ extern void quit(Arg *arg);
 extern void error(const char *errstr, ...);
 extern void *emallocz(unsigned int size);
 extern void spawn(Arg *arg);
-extern void swap(void **p1, void **p2);

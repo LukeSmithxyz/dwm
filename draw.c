@@ -30,7 +30,7 @@ drawborder(void)
 }
 
 void
-drawtext(const char *text, Bool border)
+drawtext(const char *text, Bool invert, Bool border)
 {
 	int x, y, w, h;
 	unsigned int len;
@@ -38,7 +38,7 @@ drawtext(const char *text, Bool border)
 	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
-	XSetForeground(dpy, dc.gc, dc.bg);
+	XSetForeground(dpy, dc.gc, invert ? dc.fg : dc.bg);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 
 	w = 0;
@@ -65,8 +65,8 @@ drawtext(const char *text, Bool border)
 	if(w > dc.w)
 		return; /* too long */
 
-	gcv.foreground = dc.fg;
-	gcv.background = dc.bg;
+	gcv.foreground = invert ? dc.bg : dc.fg;
+	gcv.background = invert ? dc.fg : dc.bg;
 	if(dc.font.set) {
 		XChangeGC(dpy, dc.gc, GCForeground | GCBackground, &gcv);
 		XmbDrawImageString(dpy, dc.drawable, dc.font.set, dc.gc,

@@ -39,14 +39,6 @@ emallocz(unsigned int size)
 }
 
 void
-swap(void **p1, void **p2)
-{
-	void *tmp = *p1;
-	*p1 = *p2;
-	*p2 = tmp;
-}
-
-void
 spawn(Arg *arg)
 {
 	char **argv = (char **)arg->argv;
