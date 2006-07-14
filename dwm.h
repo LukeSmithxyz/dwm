@@ -137,9 +137,6 @@ extern unsigned int textnw(char *text, unsigned int len);
 extern unsigned int textw(char *text);
 extern unsigned int texth(void);
 
-/* event.c */
-extern void discard_events(long even_mask);
-
 /* dev.c */
 extern void update_keys(void);
 extern void keypress(XEvent *e);
@@ -155,8 +152,5 @@ extern void quit(Arg *arg);
 /* util.c */
 extern void error(const char *errstr, ...);
 extern void *emallocz(unsigned int size);
-extern void *emalloc(unsigned int size);
-extern void *erealloc(void *ptr, unsigned int size);
-extern char *estrdup(const char *str);
 extern void spawn(Arg *arg);
 extern void swap(void **p1, void **p2);

@@ -4,6 +4,7 @@
  */
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <X11/keysym.h>
@@ -36,13 +37,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[PropertyNotify] = propertynotify,
 	[UnmapNotify] = unmapnotify
 };
-
-void
-discard_events(long even_mask)
-{
-	XEvent ev;
-	while(XCheckMaskEvent(dpy, even_mask, &ev));
-}
 
 static void
 buttonpress(XEvent *e)

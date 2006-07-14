@@ -28,17 +28,19 @@ next(Client *c)
 void
 zoom(Arg *arg)
 {
-	Client **l, *old;
+	Client **l;
 
-	if(!(old = sel))
+	if(!sel)
 		return;
+
+	if(sel == next(clients)) 
+		sel = next(sel->next);
 
 	for(l = &clients; *l && *l != sel; l = &(*l)->next);
 	*l = sel->next;
 
-	old->next = clients; /* pop */
-	clients = old;
-	sel = old;
+	sel->next = clients; /* pop */
+	clients = sel;
 	arrange(NULL);
 	focus(sel);
 }
@@ -54,7 +56,6 @@ max(Arg *arg)
 	sel->h = sh - 2 * sel->border - bh;
 	craise(sel);
 	resize(sel, False);
-	discard_events(EnterWindowMask);
 }
 
 void
@@ -64,9 +65,6 @@ view(Arg *arg)
 
 	tsel = arg->i;
 	arrange(NULL);
-
-	if((c = next(clients)))
-		focus(c);
 
 	for(c = clients; c; c = next(c->next))
 		draw_client(c);
@@ -120,7 +118,6 @@ floating(Arg *arg)
 			focus(sel);
 		}
 	}
-	discard_events(EnterWindowMask);
 }
 
 void
@@ -171,13 +168,12 @@ tiling(Arg *arg)
 		else
 			ban_client(c);
 	}
-	if(sel && !sel->tags[tsel]) {
+	if(!sel || (sel && !sel->tags[tsel])) {
 		if((sel = next(clients))) {
 			craise(sel);
 			focus(sel);
 		}
 	}
-	discard_events(EnterWindowMask);
 }
 
 void
@@ -323,14 +319,16 @@ void
 focus(Client *c)
 {
 	Client *old = sel;
+	XEvent ev;
 
+	XFlush(dpy);
 	sel = c;
 	if(old && old != c)
 		draw_client(old);
 	draw_client(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
-	discard_events(EnterWindowMask);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 static void
