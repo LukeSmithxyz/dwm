@@ -2,71 +2,39 @@
  * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
+#include "dwm.h"
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-#include "dwm.h"
+/********** CUSTOMIZE **********/
+
+char *tags[TLast] = {
+	[Tscratch] = "scratch",
+	[Tdev] = "dev",
+	[Twww] = "www",
+	[Twork] = "work",
+};
 
 static Rule rule[] = {
 	/* class			instance	tags						dofloat */
 	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
 };
 
+/********** CUSTOMIZE **********/
+
+/* extern functions */
+
 void (*arrange)(Arg *) = dotile;
 
-Client *
-getnext(Client *c)
-{
-	for(; c && !c->tags[tsel]; c = c->next);
-	return c;
-}
-
 void
-settags(Client *c)
+appendtag(Arg *arg)
 {
-	XClassHint ch;
-	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
-	unsigned int i, j;
-	Bool matched = False;
-
-	if(!len) {
-		c->tags[tsel] = tags[tsel];
+	if(!sel)
 		return;
-	}
 
-	if(XGetClassHint(dpy, c->win, &ch)) {
-		if(ch.res_class && ch.res_name) {
-			for(i = 0; i < len; i++)
-				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
-					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
-				{
-					for(j = 0; j < TLast; j++)
-						c->tags[j] = rule[i].tags[j];
-					c->dofloat = rule[i].dofloat;
-					matched = True;
-					break;
-				}
-		}
-		if(ch.res_class)
-			XFree(ch.res_class);
-		if(ch.res_name)
-			XFree(ch.res_name);
-	}
-
-	if(!matched)
-		c->tags[tsel] = tags[tsel];
-}
-
-void
-view(Arg *arg)
-{
-	tsel = arg->i;
+	sel->tags[arg->i] = tags[arg->i];
 	arrange(NULL);
-	drawall();
 }
 
 void
@@ -147,14 +115,11 @@ dotile(Arg *arg)
 	drawall();
 }
 
-void
-appendtag(Arg *arg)
+Client *
+getnext(Client *c)
 {
-	if(!sel)
-		return;
-
-	sel->tags[arg->i] = tags[arg->i];
-	arrange(NULL);
+	for(; c && !c->tags[tsel]; c = c->next);
+	return c;
 }
 
 void
@@ -169,3 +134,46 @@ replacetag(Arg *arg)
 	appendtag(arg);
 }
 
+void
+settags(Client *c)
+{
+	XClassHint ch;
+	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
+	unsigned int i, j;
+	Bool matched = False;
+
+	if(!len) {
+		c->tags[tsel] = tags[tsel];
+		return;
+	}
+
+	if(XGetClassHint(dpy, c->win, &ch)) {
+		if(ch.res_class && ch.res_name) {
+			for(i = 0; i < len; i++)
+				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
+					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
+				{
+					for(j = 0; j < TLast; j++)
+						c->tags[j] = rule[i].tags[j];
+					c->dofloat = rule[i].dofloat;
+					matched = True;
+					break;
+				}
+		}
+		if(ch.res_class)
+			XFree(ch.res_class);
+		if(ch.res_name)
+			XFree(ch.res_name);
+	}
+
+	if(!matched)
+		c->tags[tsel] = tags[tsel];
+}
+
+void
+view(Arg *arg)
+{
+	tsel = arg->i;
+	arrange(NULL);
+	drawall();
+}

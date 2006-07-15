@@ -104,53 +104,52 @@ extern Client *clients, *sel;
 
 /* client.c */
 extern void ban(Client *c);
-extern void manage(Window w, XWindowAttributes *wa);
-extern void unmanage(Client *c);
-extern Client *getclient(Window w);
 extern void focus(Client *c);
-extern void settitle(Client *c);
+extern void focusnext(Arg *arg);
+extern void focusprev(Arg *arg);
+extern Client *getclient(Window w);
+extern Client *getctitle(Window w);
+extern void gravitate(Client *c, Bool invert);
+extern void higher(Client *c);
+extern void killclient(Arg *arg);
+extern void lower(Client *c);
+extern void manage(Window w, XWindowAttributes *wa);
+extern void maximize(Arg *arg);
 extern void resize(Client *c, Bool inc);
 extern void setsize(Client *c);
-extern Client *getctitle(Window w);
-extern void higher(Client *c);
-extern void lower(Client *c);
-extern void gravitate(Client *c, Bool invert);
+extern void settitle(Client *c);
+extern void unmanage(Client *c);
 extern void zoom(Arg *arg);
-extern void maximize(Arg *arg);
-extern void focusprev(Arg *arg);
-extern void focusnext(Arg *arg);
-extern void killclient(Arg *arg);
 
 /* draw.c */
 extern void drawall();
 extern void drawstatus();
-extern void drawtitle(Client *c);
 extern void drawtext(const char *text, Bool invert, Bool border);
+extern void drawtitle(Client *c);
 extern unsigned long getcolor(const char *colstr);
 extern void setfont(const char *fontstr);
 extern unsigned int textnw(char *text, unsigned int len);
 extern unsigned int textw(char *text);
-extern unsigned int texth(void);
 
 /* event.c */
 extern void grabkeys();
 
 /* main.c */
-extern void quit(Arg *arg);
-extern int xerror(Display *dsply, XErrorEvent *ee);
-extern void sendevent(Window w, Atom a, long value);
 extern int getproto(Window w);
+extern void quit(Arg *arg);
+extern void sendevent(Window w, Atom a, long value);
+extern int xerror(Display *dsply, XErrorEvent *ee);
 
 /* tag.c */
-extern Client *getnext(Client *c);
-extern void settags(Client *c);
+extern void appendtag(Arg *arg);
 extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
-extern void view(Arg *arg);
-extern void appendtag(Arg *arg);
+extern Client *getnext(Client *c);
 extern void replacetag(Arg *arg);
+extern void settags(Client *c);
+extern void view(Arg *arg);
 
 /* util.c */
-extern void eprint(const char *errstr, ...);
 extern void *emallocz(unsigned int size);
+extern void eprint(const char *errstr, ...);
 extern void spawn(Arg *arg);

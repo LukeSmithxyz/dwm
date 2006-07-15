@@ -2,21 +2,14 @@
  * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
+#include "dwm.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-#include "dwm.h"
-
-void
-ban(Client *c)
-{
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-	XMoveWindow(dpy, c->title, c->tx + 2 * sw, c->ty);
-}
+/* static functions */
 
 static void
 resizetitle(Client *c)
@@ -35,84 +28,19 @@ resizetitle(Client *c)
 	XMoveResizeWindow(dpy, c->title, c->tx, c->ty, c->tw, c->th);
 }
 
-void
-settitle(Client *c)
+static int
+xerrordummy(Display *dsply, XErrorEvent *ee)
 {
-	XTextProperty name;
-	int n;
-	char **list = NULL;
-
-	name.nitems = 0;
-	c->name[0] = 0;
-	XGetTextProperty(dpy, c->win, &name, net_atom[NetWMName]);
-	if(!name.nitems)
-		XGetWMName(dpy, c->win, &name);
-	if(!name.nitems)
-		return;
-	if(name.encoding == XA_STRING)
-		strncpy(c->name, (char *)name.value, sizeof(c->name));
-	else {
-		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
-				&& n > 0 && *list)
-		{
-			strncpy(c->name, *list, sizeof(c->name));
-			XFreeStringList(list);
-		}
-	}
-	XFree(name.value);
-	resizetitle(c);
+	return 0;
 }
 
-void
-setsize(Client *c)
-{
-	XSizeHints size;
-	long msize;
-	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
-		size.flags = PSize;
-	c->flags = size.flags;
-	if(c->flags & PBaseSize) {
-		c->basew = size.base_width;
-		c->baseh = size.base_height;
-	}
-	else
-		c->basew = c->baseh = 0;
-	if(c->flags & PResizeInc) {
-		c->incw = size.width_inc;
-		c->inch = size.height_inc;
-	}
-	else
-		c->incw = c->inch = 0;
-	if(c->flags & PMaxSize) {
-		c->maxw = size.max_width;
-		c->maxh = size.max_height;
-	}
-	else
-		c->maxw = c->maxh = 0;
-	if(c->flags & PMinSize) {
-		c->minw = size.min_width;
-		c->minh = size.min_height;
-	}
-	else
-		c->minw = c->minh = 0;
-	if(c->flags & PWinGravity)
-		c->grav = size.win_gravity;
-	else
-		c->grav = NorthWestGravity;
-}
+/* extern functions */
 
 void
-higher(Client *c)
+ban(Client *c)
 {
-	XRaiseWindow(dpy, c->win);
-	XRaiseWindow(dpy, c->title);
-}
-
-void
-lower(Client *c)
-{
-	XLowerWindow(dpy, c->title);
-	XLowerWindow(dpy, c->win);
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	XMoveWindow(dpy, c->title, c->tx + 2 * sw, c->ty);
 }
 
 void
@@ -129,6 +57,137 @@ focus(Client *c)
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XFlush(dpy);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+}
+
+void
+focusnext(Arg *arg)
+{
+	Client *c;
+   
+	if(!sel)
+		return;
+
+	if(!(c = getnext(sel->next)))
+		c = getnext(clients);
+	if(c) {
+		higher(c);
+		c->revert = sel;
+		focus(c);
+	}
+}
+
+void
+focusprev(Arg *arg)
+{
+	Client *c;
+
+	if(!sel)
+		return;
+
+	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
+		higher(c);
+		focus(c);
+	}
+}
+
+Client *
+getclient(Window w)
+{
+	Client *c;
+	for(c = clients; c; c = c->next)
+		if(c->win == w)
+			return c;
+	return NULL;
+}
+
+Client *
+getctitle(Window w)
+{
+	Client *c;
+	for(c = clients; c; c = c->next)
+		if(c->title == w)
+			return c;
+	return NULL;
+}
+
+void
+gravitate(Client *c, Bool invert)
+{
+	int dx = 0, dy = 0;
+
+	switch(c->grav) {
+	case StaticGravity:
+	case NorthWestGravity:
+	case NorthGravity:
+	case NorthEastGravity:
+		dy = c->border;
+		break;
+	case EastGravity:
+	case CenterGravity:
+	case WestGravity:
+		dy = -(c->h / 2) + c->border;
+		break;
+	case SouthEastGravity:
+	case SouthGravity:
+	case SouthWestGravity:
+		dy = -c->h;
+		break;
+	default:
+		break;
+	}
+
+	switch (c->grav) {
+	case StaticGravity:
+	case NorthWestGravity:
+	case WestGravity:
+	case SouthWestGravity:
+		dx = c->border;
+		break;
+	case NorthGravity:
+	case CenterGravity:
+	case SouthGravity:
+		dx = -(c->w / 2) + c->border;
+		break;
+	case NorthEastGravity:
+	case EastGravity:
+	case SouthEastGravity:
+		dx = -(c->w + c->border);
+		break;
+	default:
+		break;
+	}
+
+	if(invert) {
+		dx = -dx;
+		dy = -dy;
+	}
+	c->x += dx;
+	c->y += dy;
+}
+
+void
+higher(Client *c)
+{
+	XRaiseWindow(dpy, c->win);
+	XRaiseWindow(dpy, c->title);
+}
+
+void
+killclient(Arg *arg)
+{
+	if(!sel)
+		return;
+	if(sel->proto & WM_PROTOCOL_DELWIN)
+		sendevent(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+	else
+		XKillClient(dpy, sel->win);
+}
+
+void
+lower(Client *c)
+{
+	XLowerWindow(dpy, c->title);
+	XLowerWindow(dpy, c->win);
 }
 
 void
@@ -195,60 +254,17 @@ manage(Window w, XWindowAttributes *wa)
 }
 
 void
-gravitate(Client *c, Bool invert)
+maximize(Arg *arg)
 {
-	int dx = 0, dy = 0;
-
-	switch(c->grav) {
-	case StaticGravity:
-	case NorthWestGravity:
-	case NorthGravity:
-	case NorthEastGravity:
-		dy = c->border;
-		break;
-	case EastGravity:
-	case CenterGravity:
-	case WestGravity:
-		dy = -(c->h / 2) + c->border;
-		break;
-	case SouthEastGravity:
-	case SouthGravity:
-	case SouthWestGravity:
-		dy = -c->h;
-		break;
-	default:
-		break;
-	}
-
-	switch (c->grav) {
-	case StaticGravity:
-	case NorthWestGravity:
-	case WestGravity:
-	case SouthWestGravity:
-		dx = c->border;
-		break;
-	case NorthGravity:
-	case CenterGravity:
-	case SouthGravity:
-		dx = -(c->w / 2) + c->border;
-		break;
-	case NorthEastGravity:
-	case EastGravity:
-	case SouthEastGravity:
-		dx = -(c->w + c->border);
-		break;
-	default:
-		break;
-	}
-
-	if(invert) {
-		dx = -dx;
-		dy = -dy;
-	}
-	c->x += dx;
-	c->y += dy;
+	if(!sel)
+		return;
+	sel->x = sx;
+	sel->y = sy + bh;
+	sel->w = sw - 2 * sel->border;
+	sel->h = sh - 2 * sel->border - bh;
+	higher(sel);
+	resize(sel, False);
 }
-
 
 void
 resize(Client *c, Bool inc)
@@ -290,10 +306,70 @@ resize(Client *c, Bool inc)
 	XFlush(dpy);
 }
 
-static int
-xerrordummy(Display *dsply, XErrorEvent *ee)
+void
+setsize(Client *c)
 {
-	return 0;
+	XSizeHints size;
+	long msize;
+	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
+		size.flags = PSize;
+	c->flags = size.flags;
+	if(c->flags & PBaseSize) {
+		c->basew = size.base_width;
+		c->baseh = size.base_height;
+	}
+	else
+		c->basew = c->baseh = 0;
+	if(c->flags & PResizeInc) {
+		c->incw = size.width_inc;
+		c->inch = size.height_inc;
+	}
+	else
+		c->incw = c->inch = 0;
+	if(c->flags & PMaxSize) {
+		c->maxw = size.max_width;
+		c->maxh = size.max_height;
+	}
+	else
+		c->maxw = c->maxh = 0;
+	if(c->flags & PMinSize) {
+		c->minw = size.min_width;
+		c->minh = size.min_height;
+	}
+	else
+		c->minw = c->minh = 0;
+	if(c->flags & PWinGravity)
+		c->grav = size.win_gravity;
+	else
+		c->grav = NorthWestGravity;
+}
+
+void
+settitle(Client *c)
+{
+	XTextProperty name;
+	int n;
+	char **list = NULL;
+
+	name.nitems = 0;
+	c->name[0] = 0;
+	XGetTextProperty(dpy, c->win, &name, net_atom[NetWMName]);
+	if(!name.nitems)
+		XGetWMName(dpy, c->win, &name);
+	if(!name.nitems)
+		return;
+	if(name.encoding == XA_STRING)
+		strncpy(c->name, (char *)name.value, sizeof(c->name));
+	else {
+		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
+				&& n > 0 && *list)
+		{
+			strncpy(c->name, *list, sizeof(c->name));
+			XFreeStringList(list);
+		}
+	}
+	XFree(name.value);
+	resizetitle(c);
 }
 
 void
@@ -325,26 +401,6 @@ unmanage(Client *c)
 		focus(sel);
 }
 
-Client *
-getctitle(Window w)
-{
-	Client *c;
-	for(c = clients; c; c = c->next)
-		if(c->title == w)
-			return c;
-	return NULL;
-}
-
-Client *
-getclient(Window w)
-{
-	Client *c;
-	for(c = clients; c; c = c->next)
-		if(c->win == w)
-			return c;
-	return NULL;
-}
-
 void
 zoom(Arg *arg)
 {
@@ -365,59 +421,4 @@ zoom(Arg *arg)
 	clients = sel;
 	arrange(NULL);
 	focus(sel);
-}
-
-void
-maximize(Arg *arg)
-{
-	if(!sel)
-		return;
-	sel->x = sx;
-	sel->y = sy + bh;
-	sel->w = sw - 2 * sel->border;
-	sel->h = sh - 2 * sel->border - bh;
-	higher(sel);
-	resize(sel, False);
-}
-
-void
-focusprev(Arg *arg)
-{
-	Client *c;
-
-	if(!sel)
-		return;
-
-	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
-		higher(c);
-		focus(c);
-	}
-}
-
-void
-focusnext(Arg *arg)
-{
-	Client *c;
-   
-	if(!sel)
-		return;
-
-	if(!(c = getnext(sel->next)))
-		c = getnext(clients);
-	if(c) {
-		higher(c);
-		c->revert = sel;
-		focus(c);
-	}
-}
-
-void
-killclient(Arg *arg)
-{
-	if(!sel)
-		return;
-	if(sel->proto & WM_PROTOCOL_DELWIN)
-		sendevent(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
-	else
-		XKillClient(dpy, sel->win);
 }

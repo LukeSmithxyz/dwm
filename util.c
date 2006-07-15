@@ -2,24 +2,15 @@
  * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
+#include "dwm.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "dwm.h"
-
-void
-eprint(const char *errstr, ...) {
-	va_list ap;
-	va_start(ap, errstr);
-	vfprintf(stderr, errstr, ap);
-	va_end(ap);
-	exit(1);
-}
+/* static functions */
 
 static void
 bad_malloc(unsigned int size)
@@ -29,6 +20,8 @@ bad_malloc(unsigned int size)
 	exit(1);
 }
 
+/* extern functions */
+
 void *
 emallocz(unsigned int size)
 {
@@ -36,6 +29,15 @@ emallocz(unsigned int size)
 	if(!res)
 		bad_malloc(size);
 	return res;
+}
+
+void
+eprint(const char *errstr, ...) {
+	va_list ap;
+	va_start(ap, errstr);
+	vfprintf(stderr, errstr, ap);
+	va_end(ap);
+	exit(1);
 }
 
 void

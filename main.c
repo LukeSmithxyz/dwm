@@ -3,31 +3,17 @@
  * See LICENSE file for license details.
  */
 
+#include "dwm.h"
+
 #include <errno.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
-#include "dwm.h"
-
-/********** CUSTOMIZE **********/
-
-char *tags[TLast] = {
-	[Tscratch] = "scratch",
-	[Tdev] = "dev",
-	[Twww] = "www",
-	[Twork] = "work",
-};
-
-/********** CUSTOMIZE **********/
-
-/* X structs */
 Display *dpy;
 Window root, barwin;
 Atom wm_atom[WMLast], net_atom[NetLast];
@@ -48,8 +34,17 @@ static const char version[] =
 	"dwm-" VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 
+/* static functions */
+
 static void
-usage() {	eprint("usage: dwm [-v]\n"); }
+cleanup()
+{
+	while(sel) {
+		resize(sel, True);
+		unmanage(sel);
+	}
+	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+}
 
 static void
 scan()
@@ -73,22 +68,6 @@ scan()
 		XFree(wins);
 }
 
-static void
-cleanup()
-{
-	while(sel) {
-		resize(sel, True);
-		unmanage(sel);
-	}
-	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-}
-
-void
-quit(Arg *arg)
-{
-	running = False;
-}
-
 static int
 win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
 {
@@ -108,6 +87,19 @@ win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
 	}
 	return res;
 }
+
+/*
+ * Startup Error handler to check if another window manager
+ * is already running.
+ */
+static int
+xerrorstart(Display *dsply, XErrorEvent *ee)
+{
+	otherwm = True;
+	return -1;
+}
+
+/* extern functions */
 
 int
 getproto(Window w)
@@ -144,15 +136,10 @@ sendevent(Window w, Atom a, long value)
 	XFlush(dpy);
 }
 
-/*
- * Startup Error handler to check if another window manager
- * is already running.
- */
-static int
-xerrorstart(Display *dsply, XErrorEvent *ee)
+void
+quit(Arg *arg)
 {
-	otherwm = True;
-	return -1;
+	running = False;
 }
 
 /*
@@ -201,7 +188,7 @@ main(int argc, char *argv[])
 			exit(0);
 			break;
 		default:
-			usage();
+			eprint("usage: dwm [-v]\n");
 			break;
 		}
 	}
