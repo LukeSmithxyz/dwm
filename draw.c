@@ -29,51 +29,18 @@ drawborder(void)
 	XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
 }
 
-/* extern functions */
-
-void
-drawall()
+static unsigned int
+textnw(char *text, unsigned int len)
 {
-	Client *c;
-
-	for(c = clients; c; c = getnext(c->next))
-		drawtitle(c);
-	drawstatus();
+	XRectangle r;
+	if(dc.font.set) {
+		XmbTextExtents(dc.font.set, text, len, NULL, &r);
+		return r.width;
+	}
+	return XTextWidth(dc.font.xfont, text, len);
 }
 
-void
-drawstatus()
-{
-	int i;
-	Bool istile = arrange == dotile;
-
-	dc.x = dc.y = 0;
-	dc.w = bw;
-	drawtext(NULL, !istile, False);
-
-	dc.w = 0;
-	for(i = 0; i < TLast; i++) {
-		dc.x += dc.w;
-		dc.w = textw(tags[i]);
-		if(istile)
-			drawtext(tags[i], (i == tsel), True);
-		else
-			drawtext(tags[i], (i != tsel), True);
-	}
-	if(sel) {
-		dc.x += dc.w;
-		dc.w = textw(sel->name);
-		drawtext(sel->name, istile, True);
-	}
-	dc.w = textw(stext);
-	dc.x = bx + bw - dc.w;
-	drawtext(stext, !istile, False);
-
-	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
-	XFlush(dpy);
-}
-
-void
+static void
 drawtext(const char *text, Bool invert, Bool border)
 {
 	int x, y, w, h;
@@ -121,6 +88,50 @@ drawtext(const char *text, Bool invert, Bool border)
 		XChangeGC(dpy, dc.gc, GCForeground | GCBackground | GCFont, &gcv);
 		XDrawImageString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
+}
+
+/* extern functions */
+
+void
+drawall()
+{
+	Client *c;
+
+	for(c = clients; c; c = getnext(c->next))
+		drawtitle(c);
+	drawstatus();
+}
+
+void
+drawstatus()
+{
+	int i;
+	Bool istile = arrange == dotile;
+
+	dc.x = dc.y = 0;
+	dc.w = bw;
+	drawtext(NULL, !istile, False);
+
+	dc.w = 0;
+	for(i = 0; i < TLast; i++) {
+		dc.x += dc.w;
+		dc.w = textw(tags[i]);
+		if(istile)
+			drawtext(tags[i], (i == tsel), True);
+		else
+			drawtext(tags[i], (i != tsel), True);
+	}
+	if(sel) {
+		dc.x += dc.w;
+		dc.w = textw(sel->name);
+		drawtext(sel->name, istile, True);
+	}
+	dc.w = textw(stext);
+	dc.x = bx + bw - dc.w;
+	drawtext(stext, !istile, False);
+
+	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
+	XFlush(dpy);
 }
 
 void
@@ -216,17 +227,6 @@ setfont(const char *fontstr)
 		dc.font.descent = dc.font.xfont->descent;
 	}
 	dc.font.height = dc.font.ascent + dc.font.descent;
-}
-
-unsigned int
-textnw(char *text, unsigned int len)
-{
-	XRectangle r;
-	if(dc.font.set) {
-		XmbTextExtents(dc.font.set, text, len, NULL, &r);
-		return r.width;
-	}
-	return XTextWidth(dc.font.xfont, text, len);
 }
 
 unsigned int

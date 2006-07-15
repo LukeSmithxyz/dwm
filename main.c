@@ -16,10 +16,10 @@
 
 Display *dpy;
 Window root, barwin;
-Atom wm_atom[WMLast], net_atom[NetLast];
+Atom wmatom[WMLast], netatom[NetLast];
 Cursor cursor[CurLast];
 Bool running = True;
-Bool issel;
+Bool issel = True;
 
 int tsel = Tdev; /* default tag */
 int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
@@ -30,8 +30,6 @@ Client *clients = NULL;
 Client *sel = NULL;
 
 static Bool otherwm;
-static const char version[] =
-	"dwm-" VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 
 /* static functions */
@@ -109,12 +107,12 @@ getproto(Window w)
 	int protos = 0;
 	int i;
 
-	res = win_property(w, wm_atom[WMProtocols], XA_ATOM, 20L, &protocols);
+	res = win_property(w, wmatom[WMProtocols], XA_ATOM, 20L, &protocols);
 	if(res <= 0) {
 		return protos;
 	}
 	for(i = 0; i < res; i++) {
-		if(protocols[i] == wm_atom[WMDelete])
+		if(protocols[i] == wmatom[WMDelete])
 			protos |= WM_PROTOCOL_DELWIN;
 	}
 	free((char *) protocols);
@@ -184,7 +182,8 @@ main(int argc, char *argv[])
 	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
 		switch (argv[i][1]) {
 		case 'v':
-			fprintf(stdout, "%s", version);
+			fprintf(stdout, "%s",
+					"dwm-"VERSION", (C)opyright MMVI Anselm R. Garbe\n");
 			exit(0);
 			break;
 		default:
@@ -214,12 +213,12 @@ main(int argc, char *argv[])
 	xerrorxlib = XSetErrorHandler(xerror);
 
 	/* init atoms */
-	wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
-	wm_atom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-	net_atom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
-	net_atom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-	XChangeProperty(dpy, root, net_atom[NetSupported], XA_ATOM, 32,
-			PropModeReplace, (unsigned char *) net_atom, NetLast);
+	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
+	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
+	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
+			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);

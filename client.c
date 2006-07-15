@@ -178,7 +178,7 @@ killclient(Arg *arg)
 	if(!sel)
 		return;
 	if(sel->proto & WM_PROTOCOL_DELWIN)
-		sendevent(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]);
 	else
 		XKillClient(dpy, sel->win);
 }
@@ -353,7 +353,7 @@ settitle(Client *c)
 
 	name.nitems = 0;
 	c->name[0] = 0;
-	XGetTextProperty(dpy, c->win, &name, net_atom[NetWMName]);
+	XGetTextProperty(dpy, c->win, &name, netatom[NetWMName]);
 	if(!name.nitems)
 		XGetWMName(dpy, c->win, &name);
 	if(!name.nitems)

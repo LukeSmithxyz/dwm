@@ -89,7 +89,7 @@ struct Key {
 
 extern Display *dpy;
 extern Window root, barwin;
-extern Atom wm_atom[WMLast], net_atom[NetLast];
+extern Atom wmatom[WMLast], netatom[NetLast];
 extern Cursor cursor[CurLast];
 extern Bool running, issel;
 extern void (*handler[LASTEvent])(XEvent *);
@@ -124,11 +124,9 @@ extern void zoom(Arg *arg);
 /* draw.c */
 extern void drawall();
 extern void drawstatus();
-extern void drawtext(const char *text, Bool invert, Bool border);
 extern void drawtitle(Client *c);
 extern unsigned long getcolor(const char *colstr);
 extern void setfont(const char *fontstr);
-extern unsigned int textnw(char *text, unsigned int len);
 extern unsigned int textw(char *text);
 
 /* event.c */

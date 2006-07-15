@@ -51,8 +51,73 @@ Key key[] = {
 
 /* static functions */
 
-static void movemouse(Client *c);
-static void resizemouse(Client *c);
+static void
+movemouse(Client *c)
+{
+	XEvent ev;
+	int x1, y1, ocx, ocy, di;
+	unsigned int dui;
+	Window dummy;
+
+	ocx = c->x;
+	ocy = c->y;
+	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+				None, cursor[CurMove], CurrentTime) != GrabSuccess)
+		return;
+	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
+	for(;;) {
+		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
+		switch (ev.type) {
+		default: break;
+		case Expose:
+			handler[Expose](&ev);
+			break;
+		case MotionNotify:
+			XFlush(dpy);
+			c->x = ocx + (ev.xmotion.x - x1);
+			c->y = ocy + (ev.xmotion.y - y1);
+			resize(c, False);
+			break;
+		case ButtonRelease:
+			XUngrabPointer(dpy, CurrentTime);
+			return;
+		}
+	}
+}
+
+static void
+resizemouse(Client *c)
+{
+	XEvent ev;
+	int ocx, ocy;
+
+	ocx = c->x;
+	ocy = c->y;
+	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+				None, cursor[CurResize], CurrentTime) != GrabSuccess)
+		return;
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+	for(;;) {
+		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
+		switch(ev.type) {
+		default: break;
+		case Expose:
+			handler[Expose](&ev);
+			break;
+		case MotionNotify:
+			XFlush(dpy);
+			c->w = abs(ocx - ev.xmotion.x);
+			c->h = abs(ocy - ev.xmotion.y);
+			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
+			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
+			resize(c, True);
+			break;
+		case ButtonRelease:
+			XUngrabPointer(dpy, CurrentTime);
+			return;
+		}
+	}
+}
 
 static void
 buttonpress(XEvent *e)
@@ -214,40 +279,6 @@ maprequest(XEvent *e)
 }
 
 static void
-movemouse(Client *c)
-{
-	XEvent ev;
-	int x1, y1, ocx, ocy, di;
-	unsigned int dui;
-	Window dummy;
-
-	ocx = c->x;
-	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-				None, cursor[CurMove], CurrentTime) != GrabSuccess)
-		return;
-	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
-	for(;;) {
-		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
-		switch (ev.type) {
-		default: break;
-		case Expose:
-			handler[Expose](&ev);
-			break;
-		case MotionNotify:
-			XFlush(dpy);
-			c->x = ocx + (ev.xmotion.x - x1);
-			c->y = ocy + (ev.xmotion.y - y1);
-			resize(c, False);
-			break;
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
-		}
-	}
-}
-
-static void
 propertynotify(XEvent *e)
 {
 	XPropertyEvent *ev = &e->xproperty;
@@ -258,7 +289,7 @@ propertynotify(XEvent *e)
 		return; /* ignore */
 
 	if((c = getclient(ev->window))) {
-		if(ev->atom == wm_atom[WMProtocols]) {
+		if(ev->atom == wmatom[WMProtocols]) {
 			c->proto = getproto(c->win);
 			return;
 		}
@@ -273,43 +304,9 @@ propertynotify(XEvent *e)
 				setsize(c);
 				break;
 		}
-		if(ev->atom == XA_WM_NAME || ev->atom == net_atom[NetWMName]) {
+		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			settitle(c);
 			drawtitle(c);
-		}
-	}
-}
-
-static void
-resizemouse(Client *c)
-{
-	XEvent ev;
-	int ocx, ocy;
-
-	ocx = c->x;
-	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-				None, cursor[CurResize], CurrentTime) != GrabSuccess)
-		return;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
-	for(;;) {
-		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
-		switch(ev.type) {
-		default: break;
-		case Expose:
-			handler[Expose](&ev);
-			break;
-		case MotionNotify:
-			XFlush(dpy);
-			c->w = abs(ocx - ev.xmotion.x);
-			c->h = abs(ocy - ev.xmotion.y);
-			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
-			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
-			resize(c, True);
-			break;
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
 		}
 	}
 }
