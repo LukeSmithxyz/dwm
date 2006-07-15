@@ -8,9 +8,14 @@
 /********** CUSTOMIZE **********/
 
 #define FONT				"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
+#define BGCOLOR				"#0a2c2d"
+#define FGCOLOR				"#ddeeee"
+#define BORDERCOLOR			"#176164"
+/*
 #define BGCOLOR				"#666699"
 #define FGCOLOR				"#eeeeee"
 #define BORDERCOLOR			"#9999CC"
+*/
 #define MASTERW				52 /* percent */
 #define WM_PROTOCOL_DELWIN	1
 

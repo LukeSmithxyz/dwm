@@ -128,7 +128,7 @@ buttonpress(XEvent *e)
 	Client *c;
 
 	if(barwin == ev->window) {
-		x = (arrange == dofloat) ? textw("~") : 0;
+		x = 0;
 		for(a.i = 0; a.i < TLast; a.i++) {
 			x += textw(tags[a.i]);
 			if(ev->x < x) {

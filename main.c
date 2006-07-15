@@ -204,12 +204,12 @@ main(int argc, char *argv[])
 	XSetErrorHandler(xerrorstart);
 	/* this causes an error if some other WM is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
-	XFlush(dpy);
+	XSync(dpy, False);
 
 	if(otherwm)
 		eprint("dwm: another window manager is already running\n");
 
-	XSetErrorHandler(0);
+	XSetErrorHandler(NULL);
 	xerrorxlib = XSetErrorHandler(xerror);
 
 	/* init atoms */
