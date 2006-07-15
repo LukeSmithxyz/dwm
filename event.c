@@ -16,6 +16,44 @@
 #define ButtonMask      (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask       (ButtonMask | PointerMotionMask)
 
+/********** CUSTOMIZE **********/
+
+const char *term[] = { 
+	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
+	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
+};
+const char *browse[] = { "firefox", NULL };
+const char *xlock[] = { "xlock", NULL };
+
+Key key[] = {
+	/* modifier				key			function	arguments */
+	{ Mod1Mask,				XK_Return,	zoom,		{ 0 } },
+	{ Mod1Mask,				XK_k,		focusprev,		{ 0 } },
+	{ Mod1Mask,				XK_j,		focusnext,		{ 0 } }, 
+	{ Mod1Mask,				XK_m,		maximize,		{ 0 } }, 
+	{ Mod1Mask,				XK_0,		view,		{ .i = Tscratch } }, 
+	{ Mod1Mask,				XK_1,		view,		{ .i = Tdev } }, 
+	{ Mod1Mask,				XK_2,		view,		{ .i = Twww } }, 
+	{ Mod1Mask,				XK_3,		view,		{ .i = Twork } }, 
+	{ Mod1Mask,				XK_space,	dotile,		{ 0 } }, 
+	{ Mod1Mask|ShiftMask,	XK_space,	dofloat,	{ 0 } }, 
+	{ Mod1Mask|ShiftMask,	XK_0,		replacetag,		{ .i = Tscratch } }, 
+	{ Mod1Mask|ShiftMask,	XK_1,		replacetag,		{ .i = Tdev } }, 
+	{ Mod1Mask|ShiftMask,	XK_2,		replacetag,		{ .i = Twww } }, 
+	{ Mod1Mask|ShiftMask,	XK_3,		replacetag,		{ .i = Twork } }, 
+	{ Mod1Mask|ShiftMask,	XK_c,		killclient,		{ 0 } }, 
+	{ Mod1Mask|ShiftMask,	XK_q,		quit,		{ 0 } },
+	{ Mod1Mask|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
+	{ Mod1Mask|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
+	{ Mod1Mask|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
+	{ ControlMask,			XK_0,		appendtag,	{ .i = Tscratch } }, 
+	{ ControlMask,			XK_1,		appendtag,	{ .i = Tdev } }, 
+	{ ControlMask,			XK_2,		appendtag,	{ .i = Twww } }, 
+	{ ControlMask,			XK_3,		appendtag,	{ .i = Twork } }, 
+};
+
+/********** CUSTOMIZE **********/
+
 /* local functions */
 static void buttonpress(XEvent *e);
 static void configurerequest(XEvent *e);
@@ -23,6 +61,7 @@ static void destroynotify(XEvent *e);
 static void enternotify(XEvent *e);
 static void leavenotify(XEvent *e);
 static void expose(XEvent *e);
+static void keypress(XEvent *e);
 static void maprequest(XEvent *e);
 static void propertynotify(XEvent *e);
 static void unmapnotify(XEvent *e);
@@ -40,8 +79,40 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 
+void
+grabkeys()
+{
+	static unsigned int len = key ? sizeof(key) / sizeof(key[0]) : 0;
+	unsigned int i;
+	KeyCode code;
+
+	for(i = 0; i < len; i++) {
+		code = XKeysymToKeycode(dpy, key[i].keysym);
+		XUngrabKey(dpy, code, key[i].mod, root);
+		XGrabKey(dpy, code, key[i].mod, root, True,
+				GrabModeAsync, GrabModeAsync);
+	}
+}
+
 static void
-mresize(Client *c)
+keypress(XEvent *e)
+{
+	XKeyEvent *ev = &e->xkey;
+	static unsigned int len = key ? sizeof(key) / sizeof(key[0]) : 0;
+	unsigned int i;
+	KeySym keysym;
+
+	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
+	for(i = 0; i < len; i++)
+		if((keysym == key[i].keysym) && (key[i].mod == ev->state)) {
+			if(key[i].func)
+				key[i].func(&key[i].arg);
+			return;
+		}
+}
+
+static void
+resizemouse(Client *c)
 {
 	XEvent ev;
 	int ocx, ocy;
@@ -75,7 +146,7 @@ mresize(Client *c)
 }
 
 static void
-mmove(Client *c)
+movemouse(Client *c)
 {
 	XEvent ev;
 	int x1, y1, ocx, ocy, di;
@@ -117,7 +188,7 @@ buttonpress(XEvent *e)
 	Client *c;
 
 	if(barwin == ev->window) {
-		x = (arrange == floating) ? textw("~") : 0;
+		x = (arrange == dofloat) ? textw("~") : 0;
 		for(a.i = 0; a.i < TLast; a.i++) {
 			x += textw(tags[a.i]);
 			if(ev->x < x) {
@@ -127,20 +198,20 @@ buttonpress(XEvent *e)
 		}
 	}
 	else if((c = getclient(ev->window))) {
-		if(arrange == tiling && !c->floating)
+		if(arrange == dotile && !c->dofloat)
 			return;
 		higher(c);
 		switch(ev->button) {
 		default:
 			break;
 		case Button1:
-			mmove(c);
+			movemouse(c);
 			break;
 		case Button2:
 			lower(c);
 			break;
 		case Button3:
-			mresize(c);
+			resizemouse(c);
 			break;
 		}
 	}
@@ -226,7 +297,7 @@ expose(XEvent *e)
 	if(ev->count == 0) {
 		if(barwin == ev->window)
 			drawstatus();
-		else if((c = gettitle(ev->window)))
+		else if((c = getctitle(ev->window)))
 			drawtitle(c);
 	}
 }
@@ -262,14 +333,14 @@ propertynotify(XEvent *e)
 
 	if((c = getclient(ev->window))) {
 		if(ev->atom == wm_atom[WMProtocols]) {
-			c->proto = proto(c->win);
+			c->proto = getproto(c->win);
 			return;
 		}
 		switch (ev->atom) {
 			default: break;
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
-				if(!c->floating && (c->floating = (trans != 0)))
+				if(!c->dofloat && (c->dofloat = (trans != 0)))
 					arrange(NULL);
 				break;
 			case XA_WM_NORMAL_HINTS:

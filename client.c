@@ -11,18 +11,6 @@
 
 #include "dwm.h"
 
-static Rule rule[] = {
-	/* class			instance	tags						floating */
-	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
-};
-
-Client *
-getnext(Client *c)
-{
-	for(; c && !c->tags[tsel]; c = c->next);
-	return c;
-}
-
 void
 ban(Client *c)
 {
@@ -31,7 +19,7 @@ ban(Client *c)
 }
 
 static void
-resize_title(Client *c)
+resizetitle(Client *c)
 {
 	int i;
 
@@ -72,7 +60,7 @@ settitle(Client *c)
 		}
 	}
 	XFree(name.value);
-	resize_title(c);
+	resizetitle(c);
 }
 
 void
@@ -143,42 +131,6 @@ focus(Client *c)
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
-static void
-init_tags(Client *c)
-{
-	XClassHint ch;
-	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
-	unsigned int i, j;
-	Bool matched = False;
-
-	if(!len) {
-		c->tags[tsel] = tags[tsel];
-		return;
-	}
-
-	if(XGetClassHint(dpy, c->win, &ch)) {
-		if(ch.res_class && ch.res_name) {
-			for(i = 0; i < len; i++)
-				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
-					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
-				{
-					for(j = 0; j < TLast; j++)
-						c->tags[j] = rule[i].tags[j];
-					c->floating = rule[i].floating;
-					matched = True;
-					break;
-				}
-		}
-		if(ch.res_class)
-			XFree(ch.res_class);
-		if(ch.res_name)
-			XFree(ch.res_name);
-	}
-
-	if(!matched)
-		c->tags[tsel] = tags[tsel];
-}
-
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -196,7 +148,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->h = wa->height;
 	c->th = bh;
 	c->border = 1;
-	c->proto = proto(c->win);
+	c->proto = getproto(c->win);
 	setsize(c);
 	XSelectInput(dpy, c->win,
 			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
@@ -211,7 +163,7 @@ manage(Window w, XWindowAttributes *wa)
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
 	settitle(c);
-	init_tags(c);
+	settags(c);
 
 	for(l = &clients; *l; l = &(*l)->next);
 	c->next = *l; /* *l == nil */
@@ -224,8 +176,8 @@ manage(Window w, XWindowAttributes *wa)
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 
-	if(!c->floating)
-		c->floating = trans
+	if(!c->dofloat)
+		c->dofloat = trans
 			|| ((c->maxw == c->minw) && (c->maxh == c->minh));
 
 	arrange(NULL);
@@ -321,7 +273,7 @@ resize(Client *c, Bool inc)
 		c->w = c->maxw;
 	if(c->maxh && c->h > c->maxh)
 		c->h = c->maxh;
-	resize_title(c);
+	resizetitle(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 	e.type = ConfigureNotify;
@@ -339,7 +291,7 @@ resize(Client *c, Bool inc)
 }
 
 static int
-dummy_xerror(Display *dsply, XErrorEvent *err)
+xerrordummy(Display *dsply, XErrorEvent *ee)
 {
 	return 0;
 }
@@ -350,7 +302,7 @@ unmanage(Client *c)
 	Client **l;
 
 	XGrabServer(dpy);
-	XSetErrorHandler(dummy_xerror);
+	XSetErrorHandler(xerrordummy);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->title);
@@ -374,7 +326,7 @@ unmanage(Client *c)
 }
 
 Client *
-gettitle(Window w)
+getctitle(Window w)
 {
 	Client *c;
 	for(c = clients; c; c = c->next)
@@ -391,4 +343,81 @@ getclient(Window w)
 		if(c->win == w)
 			return c;
 	return NULL;
+}
+
+void
+zoom(Arg *arg)
+{
+	Client **l, *c;
+
+	if(!sel)
+		return;
+
+	if(sel == getnext(clients) && sel->next)  {
+		if((c = getnext(sel->next)))
+			sel = c;
+	}
+
+	for(l = &clients; *l && *l != sel; l = &(*l)->next);
+	*l = sel->next;
+
+	sel->next = clients; /* pop */
+	clients = sel;
+	arrange(NULL);
+	focus(sel);
+}
+
+void
+maximize(Arg *arg)
+{
+	if(!sel)
+		return;
+	sel->x = sx;
+	sel->y = sy + bh;
+	sel->w = sw - 2 * sel->border;
+	sel->h = sh - 2 * sel->border - bh;
+	higher(sel);
+	resize(sel, False);
+}
+
+void
+focusprev(Arg *arg)
+{
+	Client *c;
+
+	if(!sel)
+		return;
+
+	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
+		higher(c);
+		focus(c);
+	}
+}
+
+void
+focusnext(Arg *arg)
+{
+	Client *c;
+   
+	if(!sel)
+		return;
+
+	if(!(c = getnext(sel->next)))
+		c = getnext(clients);
+	if(c) {
+		higher(c);
+		c->revert = sel;
+		focus(c);
+	}
+}
+
+void
+killclient(Arg *arg)
+{
+	if(!sel)
+		return;
+	if(sel->proto & WM_PROTOCOL_DELWIN)
+		sendevent(sel->win, wm_atom[WMProtocols], wm_atom[WMDelete]);
+	else
+		XKillClient(dpy, sel->win);
 }

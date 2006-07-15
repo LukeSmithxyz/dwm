@@ -43,16 +43,16 @@ DC dc = {0};
 Client *clients = NULL;
 Client *sel = NULL;
 
-static Bool other_wm_running;
+static Bool otherwm;
 static const char version[] =
 	"dwm-" VERSION ", (C)opyright MMVI Anselm R. Garbe\n";
-static int (*x_xerror) (Display *, XErrorEvent *);
+static int (*xerrorxlib)(Display *, XErrorEvent *);
 
 static void
-usage() {	error("usage: dwm [-v]\n"); }
+usage() {	eprint("usage: dwm [-v]\n"); }
 
 static void
-scan_wins()
+scan()
 {
 	unsigned int i, num;
 	Window *wins;
@@ -71,6 +71,22 @@ scan_wins()
 	}
 	if(wins)
 		XFree(wins);
+}
+
+static void
+cleanup()
+{
+	while(sel) {
+		resize(sel, True);
+		unmanage(sel);
+	}
+	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+}
+
+void
+quit(Arg *arg)
+{
+	running = False;
 }
 
 static int
@@ -94,7 +110,7 @@ win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
 }
 
 int
-proto(Window w)
+getproto(Window w)
 {
 	unsigned char *protocols;
 	long res;
@@ -129,58 +145,42 @@ sendevent(Window w, Atom a, long value)
 }
 
 /*
+ * Startup Error handler to check if another window manager
+ * is already running.
+ */
+static int
+xerrorstart(Display *dsply, XErrorEvent *ee)
+{
+	otherwm = True;
+	return -1;
+}
+
+/*
  * There's no way to check accesses to destroyed windows, thus
  * those cases are ignored (especially on UnmapNotify's).
  * Other types of errors call Xlib's default error handler, which
  * calls exit().
  */
 int
-xerror(Display *dpy, XErrorEvent *error)
+xerror(Display *dpy, XErrorEvent *ee)
 {
-	if(error->error_code == BadWindow
-			|| (error->request_code == X_SetInputFocus
-				&& error->error_code == BadMatch)
-			|| (error->request_code == X_PolyText8
-				&& error->error_code == BadDrawable)
-			|| (error->request_code == X_PolyFillRectangle
-				&& error->error_code == BadDrawable)
-			|| (error->request_code == X_PolySegment
-				&& error->error_code == BadDrawable)
-			|| (error->request_code == X_ConfigureWindow
-				&& error->error_code == BadMatch)
-			|| (error->request_code == X_GrabKey
-				&& error->error_code == BadAccess))
+	if(ee->error_code == BadWindow
+			|| (ee->request_code == X_SetInputFocus
+				&& ee->error_code == BadMatch)
+			|| (ee->request_code == X_PolyText8
+				&& ee->error_code == BadDrawable)
+			|| (ee->request_code == X_PolyFillRectangle
+				&& ee->error_code == BadDrawable)
+			|| (ee->request_code == X_PolySegment
+				&& ee->error_code == BadDrawable)
+			|| (ee->request_code == X_ConfigureWindow
+				&& ee->error_code == BadMatch)
+			|| (ee->request_code == X_GrabKey
+				&& ee->error_code == BadAccess))
 		return 0;
 	fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
-			error->request_code, error->error_code);
-	return x_xerror(dpy, error); /* may call exit() */
-}
-
-/*
- * Startup Error handler to check if another window manager
- * is already running.
- */
-static int
-startup_xerror(Display *dpy, XErrorEvent *error)
-{
-	other_wm_running = True;
-	return -1;
-}
-
-static void
-cleanup()
-{
-	while(sel) {
-		resize(sel, True);
-		unmanage(sel);
-	}
-	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-}
-
-void
-quit(Arg *arg)
-{
-	running = False;
+			ee->request_code, ee->error_code);
+	return xerrorxlib(dpy, ee); /* may call exit() */
 }
 
 int
@@ -208,23 +208,23 @@ main(int argc, char *argv[])
 
 	dpy = XOpenDisplay(0);
 	if(!dpy)
-		error("dwm: cannot connect X server\n");
+		eprint("dwm: cannot connect X server\n");
 
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 
 	/* check if another WM is already running */
-	other_wm_running = False;
-	XSetErrorHandler(startup_xerror);
+	otherwm = False;
+	XSetErrorHandler(xerrorstart);
 	/* this causes an error if some other WM is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
 	XFlush(dpy);
 
-	if(other_wm_running)
-		error("dwm: another window manager is already running\n");
+	if(otherwm)
+		eprint("dwm: another window manager is already running\n");
 
 	XSetErrorHandler(0);
-	x_xerror = XSetErrorHandler(xerror);
+	xerrorxlib = XSetErrorHandler(xerror);
 
 	/* init atoms */
 	wm_atom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -278,7 +278,7 @@ main(int argc, char *argv[])
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
 	strcpy(stext, "dwm-"VERSION);
-	scan_wins();
+	scan();
 
 	/* main event loop, reads status text from stdin as well */
 Mainloop:
@@ -292,7 +292,7 @@ Mainloop:
 		if(i == -1 && errno == EINTR)
 			continue;
 		if(i < 0)
-			error("select failed\n");
+			eprint("select failed\n");
 		else if(i > 0) {
 			if(FD_ISSET(ConnectionNumber(dpy), &rd)) {
 				while(XPending(dpy)) {

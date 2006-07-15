@@ -11,33 +11,42 @@
 #include "dwm.h"
 
 void
+drawall()
+{
+	Client *c;
+
+	for(c = clients; c; c = getnext(c->next))
+		drawtitle(c);
+	drawstatus();
+}
+
+void
 drawstatus()
 {
 	int i;
+	Bool istile = arrange == dotile;
 
 	dc.x = dc.y = 0;
 	dc.w = bw;
-	drawtext(NULL, False, False);
+	drawtext(NULL, !istile, False);
 
-	if(arrange == floating) {
-		dc.w = textw("~");
-		drawtext("~", False, False);
-	}
-	else
-		dc.w = 0;
+	dc.w = 0;
 	for(i = 0; i < TLast; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
-		drawtext(tags[i], i == tsel, True);
+		if(istile)
+			drawtext(tags[i], (i == tsel), True);
+		else
+			drawtext(tags[i], (i != tsel), True);
 	}
 	if(sel) {
 		dc.x += dc.w;
 		dc.w = textw(sel->name);
-		drawtext(sel->name, True, True);
+		drawtext(sel->name, istile, True);
 	}
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
-	drawtext(stext, False, False);
+	drawtext(stext, !istile, False);
 
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XFlush(dpy);
@@ -47,6 +56,8 @@ void
 drawtitle(Client *c)
 {
 	int i;
+	Bool istile = arrange == dotile;
+
 	if(c == sel) {
 		drawstatus();
 		XUnmapWindow(dpy, c->title);
@@ -64,12 +75,12 @@ drawtitle(Client *c)
 		if(c->tags[i]) {
 			dc.x += dc.w;
 			dc.w = textw(c->tags[i]);
-			drawtext(c->tags[i], False, True);
+			drawtext(c->tags[i], !istile, True);
 		}
 	}
 	dc.x += dc.w;
 	dc.w = textw(c->name);
-	drawtext(c->name, False, True);
+	drawtext(c->name, !istile, True);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
 			0, 0, c->tw, c->th, 0, 0);
 	XFlush(dpy);
@@ -215,7 +226,7 @@ setfont(const char *fontstr)
 		if (!dc.font.xfont)
 			dc.font.xfont = XLoadQueryFont(dpy, "fixed");
 		if (!dc.font.xfont)
-			error("error, cannot init 'fixed' font\n");
+			eprint("error, cannot init 'fixed' font\n");
 		dc.font.ascent = dc.font.xfont->ascent;
 		dc.font.descent = dc.font.xfont->descent;
 	}

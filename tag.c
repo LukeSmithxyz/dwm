@@ -1,0 +1,171 @@
+/*
+ * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+ * See LICENSE file for license details.
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
+
+#include "dwm.h"
+
+static Rule rule[] = {
+	/* class			instance	tags						dofloat */
+	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
+};
+
+void (*arrange)(Arg *) = dotile;
+
+Client *
+getnext(Client *c)
+{
+	for(; c && !c->tags[tsel]; c = c->next);
+	return c;
+}
+
+void
+settags(Client *c)
+{
+	XClassHint ch;
+	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
+	unsigned int i, j;
+	Bool matched = False;
+
+	if(!len) {
+		c->tags[tsel] = tags[tsel];
+		return;
+	}
+
+	if(XGetClassHint(dpy, c->win, &ch)) {
+		if(ch.res_class && ch.res_name) {
+			for(i = 0; i < len; i++)
+				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
+					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
+				{
+					for(j = 0; j < TLast; j++)
+						c->tags[j] = rule[i].tags[j];
+					c->dofloat = rule[i].dofloat;
+					matched = True;
+					break;
+				}
+		}
+		if(ch.res_class)
+			XFree(ch.res_class);
+		if(ch.res_name)
+			XFree(ch.res_name);
+	}
+
+	if(!matched)
+		c->tags[tsel] = tags[tsel];
+}
+
+void
+view(Arg *arg)
+{
+	tsel = arg->i;
+	arrange(NULL);
+	drawall();
+}
+
+void
+dofloat(Arg *arg)
+{
+	Client *c;
+
+	arrange = dofloat;
+	for(c = clients; c; c = c->next) {
+		if(c->tags[tsel])
+			resize(c, True);
+		else
+			ban(c);
+	}
+	if(sel && !sel->tags[tsel]) {
+		if((sel = getnext(clients))) {
+			higher(sel);
+			focus(sel);
+		}
+	}
+	drawall();
+}
+
+void
+dotile(Arg *arg)
+{
+	Client *c;
+	int n, i, w, h;
+
+	w = sw - mw;
+	arrange = dotile;
+	for(n = 0, c = clients; c; c = c->next)
+		if(c->tags[tsel] && !c->dofloat)
+			n++;
+
+	if(n > 1)
+		h = (sh - bh) / (n - 1);
+	else
+		h = sh - bh;
+
+	for(i = 0, c = clients; c; c = c->next) {
+		if(c->tags[tsel]) {
+			if(c->dofloat) {
+				higher(c);
+				resize(c, True);
+				continue;
+			}
+			if(n == 1) {
+				c->x = sx;
+				c->y = sy + bh;
+				c->w = sw - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
+			}
+			else if(i == 0) {
+				c->x = sx;
+				c->y = sy + bh;
+				c->w = mw - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
+			}
+			else {
+				c->x = sx + mw;
+				c->y = sy + (i - 1) * h + bh;
+				c->w = w - 2 * c->border;
+				c->h = h - 2 * c->border;
+			}
+			resize(c, False);
+			i++;
+		}
+		else
+			ban(c);
+	}
+	if(!sel || (sel && !sel->tags[tsel])) {
+		if((sel = getnext(clients))) {
+			higher(sel);
+			focus(sel);
+		}
+	}
+	drawall();
+}
+
+void
+appendtag(Arg *arg)
+{
+	if(!sel)
+		return;
+
+	sel->tags[arg->i] = tags[arg->i];
+	arrange(NULL);
+}
+
+void
+replacetag(Arg *arg)
+{
+	int i;
+	if(!sel)
+		return;
+
+	for(i = 0; i < TLast; i++)
+		sel->tags[i] = NULL;
+	appendtag(arg);
+}
+
