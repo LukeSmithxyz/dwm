@@ -192,7 +192,7 @@ lower(Client *c)
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	Client *c, **l;
+	Client *c;
 	XSetWindowAttributes twa;
 	Window trans;
 
@@ -223,10 +223,11 @@ manage(Window w, XWindowAttributes *wa)
 	settitle(c);
 	settags(c);
 
-	for(l = &clients; *l; l = &(*l)->next);
-	c->next = *l; /* *l == nil */
-	*l = c;
+	c->next = clients;
+	clients = c;
 
+	XGrabButton(dpy, Button1, ControlMask, c->win, False, ButtonPressMask,
+			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button2, Mod1Mask, c->win, False, ButtonPressMask,
@@ -234,8 +235,8 @@ manage(Window w, XWindowAttributes *wa)
 	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 
-	if(!c->dofloat)
-		c->dofloat = trans
+	if(!c->isfloat)
+		c->isfloat = trans
 			|| ((c->maxw == c->minw) && (c->maxh == c->minh));
 
 	arrange(NULL);

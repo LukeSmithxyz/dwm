@@ -71,7 +71,7 @@ struct Client {
 	int grav;
 	unsigned int border;
 	long flags; 
-	Bool dofloat;
+	Bool isfloat;
 	Window win;
 	Window title;
 	Client *next;
@@ -82,7 +82,7 @@ struct Rule {
 	const char *class;
 	const char *instance;
 	char *tags[TLast];
-	Bool dofloat;
+	Bool isfloat;
 };
 
 struct Key {

@@ -17,7 +17,7 @@ char *tags[TLast] = {
 };
 
 static Rule rule[] = {
-	/* class			instance	tags						dofloat */
+	/* class			instance	tags						isfloat */
 	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
 };
 
@@ -67,7 +67,7 @@ dotile(Arg *arg)
 	w = sw - mw;
 	arrange = dotile;
 	for(n = 0, c = clients; c; c = c->next)
-		if(c->tags[tsel] && !c->dofloat)
+		if(c->tags[tsel] && !c->isfloat)
 			n++;
 
 	if(n > 1)
@@ -77,7 +77,7 @@ dotile(Arg *arg)
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(c->tags[tsel]) {
-			if(c->dofloat) {
+			if(c->isfloat) {
 				higher(c);
 				resize(c, True);
 				continue;
@@ -155,7 +155,7 @@ settags(Client *c)
 				{
 					for(j = 0; j < TLast; j++)
 						c->tags[j] = rule[i].tags[j];
-					c->dofloat = rule[i].dofloat;
+					c->isfloat = rule[i].isfloat;
 					matched = True;
 					break;
 				}

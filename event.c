@@ -14,8 +14,8 @@
 /********** CUSTOMIZE **********/
 
 const char *term[] = { 
-	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-fn",
-	"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*",NULL
+	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
+	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
 };
 const char *browse[] = { "firefox", NULL };
 const char *xlock[] = { "xlock", NULL };
@@ -128,18 +128,34 @@ buttonpress(XEvent *e)
 	Client *c;
 
 	if(barwin == ev->window) {
-		x = 0;
-		for(a.i = 0; a.i < TLast; a.i++) {
-			x += textw(tags[a.i]);
-			if(ev->x < x) {
-				view(&a);
-				break;
+		switch(ev->button) {
+		default:
+			x = 0;
+			for(a.i = 0; a.i < TLast; a.i++) {
+				x += textw(tags[a.i]);
+				if(ev->x < x) {
+					view(&a);
+					break;
+				}
 			}
+			break;
+		case Button4:
+			a.i = (tsel + 1 < TLast) ? tsel + 1 : 0;
+			view(&a);
+			break;
+		case Button5:
+			a.i = (tsel - 1 >= 0) ? tsel - 1 : TLast - 1;
+			view(&a);
+			break;
 		}
 	}
 	else if((c = getclient(ev->window))) {
-		if(arrange == dotile && !c->dofloat)
+		if(arrange == dotile && !c->isfloat) {
+			if((ev->state & ControlMask) && (ev->button == Button1))
+				zoom(NULL);
 			return;
+		}
+		/* floating windows */
 		higher(c);
 		switch(ev->button) {
 		default:
@@ -297,7 +313,7 @@ propertynotify(XEvent *e)
 			default: break;
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
-				if(!c->dofloat && (c->dofloat = (trans != 0)))
+				if(!c->isfloat && (c->isfloat = (trans != 0)))
 					arrange(NULL);
 				break;
 			case XA_WM_NORMAL_HINTS:
