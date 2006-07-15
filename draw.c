@@ -131,7 +131,7 @@ drawstatus()
 	drawtext(stext, !istile, False);
 
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
-	XFlush(dpy);
+	XSync(dpy, False);
 }
 
 void
@@ -163,9 +163,8 @@ drawtitle(Client *c)
 	dc.x += dc.w;
 	dc.w = textw(c->name);
 	drawtext(c->name, !istile, True);
-	XCopyArea(dpy, dc.drawable, c->title, dc.gc,
-			0, 0, c->tw, c->th, 0, 0);
-	XFlush(dpy);
+	XCopyArea(dpy, dc.drawable, c->title, dc.gc, 0, 0, c->tw, c->th, 0, 0);
+	XSync(dpy, False);
 }
 
 unsigned long

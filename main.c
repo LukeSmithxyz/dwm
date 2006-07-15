@@ -131,7 +131,7 @@ sendevent(Window w, Atom a, long value)
 	e.xclient.data.l[0] = value;
 	e.xclient.data.l[1] = CurrentTime;
 	XSendEvent(dpy, w, False, NoEventMask, &e);
-	XFlush(dpy);
+	XSync(dpy, False);
 }
 
 void

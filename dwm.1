@@ -7,14 +7,60 @@ dwm \- dynamic window manager
 .SH DESCRIPTION
 .SS Overview
 .B dwm
-is a dynamic window manager for X11.
+is a dynamic window manager for X11. It consists of a small status bar at the
+top of the screen and arranges windows in either a tiled or floating mode.
+.P
+If 
+.B dwm
+is in tiled mode, it consists of two columns. The left master column
+contains only one window per time, the right column contains all other windows 
+in a stack. In tiled mode
+.B dwm
+.B don't
+handles incremental resizals, some terminal programs like
+.B xterm
+may not work correctly with this in tiled mode.
+.P
+If
+.B dwm
+is in floating mode, it arranges all windows with the reqyested geometry and
+allows the user to move or resize them. Some windows, like
+dialog windows, are treated floating even if
+.B dwm
+is in tiled mode. In floating mode
+.B dwm
+handles incremental resizals.
+.P
+Windows are grouped by tags. You can view all windows with a specific tag per
+time.  However, each window is allowed to contain more than one tag, which
+allows to make windows visible in all views.
+.P
+.B dwm
+reads from
+.I stdin
+to display status text, if written.
+.P
+.B dwm
+draws 1-pixel borders around windows to indicate the focus state and save as
+much screen real estate as possible. Unfocused windows contain a small bar
+in front of the window indicating the tags and the window title.
 .SS Options
 .TP
 .B \-v
-prints version information to stdout, then exits.
-.SS Status text
+prints version information to
+.I stdout
+, then exits.
+.SS Customization
 .B dwm
-reads from stdin to display status text if provided.
+is customized through editing its source code. It is assumed that
+dwm users are high experienced users who know how a window manager works
+and who are able to patch
+.B dwm
+for their needs. This keeps
+.B dwm
+fast, secure and simple, because it does not process any input data, except
+window properties and the status text read from
+.I stdin .
 .SS Default Key Bindings
 .TP 16
 .I Key	
@@ -96,3 +142,7 @@ Lowers current
 Resizes current
 .B window
 while dragging
+.SH BUGS
+Some terminal programs do not behave correctly in tiled mode, because
+incremental resizals are ignored to use maximum screen real estate. You can
+patch the code to fix this.

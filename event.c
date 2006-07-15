@@ -73,7 +73,7 @@ movemouse(Client *c)
 			handler[Expose](&ev);
 			break;
 		case MotionNotify:
-			XFlush(dpy);
+			XSync(dpy, False);
 			c->x = ocx + (ev.xmotion.x - x1);
 			c->y = ocy + (ev.xmotion.y - y1);
 			resize(c, False);
@@ -105,7 +105,7 @@ resizemouse(Client *c)
 			handler[Expose](&ev);
 			break;
 		case MotionNotify:
-			XFlush(dpy);
+			XSync(dpy, False);
 			c->w = abs(ocx - ev.xmotion.x);
 			c->h = abs(ocy - ev.xmotion.y);
 			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
@@ -191,7 +191,7 @@ configurerequest(XEvent *e)
 	ev->value_mask &= ~CWStackMode;
 	ev->value_mask |= CWBorderWidth;
 	XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-	XFlush(dpy);
+	XSync(dpy, False);
 }
 
 static void

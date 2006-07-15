@@ -49,13 +49,12 @@ focus(Client *c)
 	Client *old = sel;
 	XEvent ev;
 
-	XFlush(dpy);
 	sel = c;
 	if(old && old != c)
 		drawtitle(old);
 	drawtitle(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	XFlush(dpy);
+	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
@@ -303,7 +302,7 @@ resize(Client *c, Bool inc)
 	e.above = None;
 	e.override_redirect = False;
 	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&e);
-	XFlush(dpy);
+	XSync(dpy, False);
 }
 
 void
@@ -393,7 +392,7 @@ unmanage(Client *c)
 
 	free(c);
 
-	XFlush(dpy);
+	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
 	arrange(NULL);
