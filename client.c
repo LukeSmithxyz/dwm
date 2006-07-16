@@ -250,6 +250,7 @@ manage(Window w, XWindowAttributes *wa)
 		ban(c);
 		XMapRaised(dpy, c->win);
 		XMapRaised(dpy, c->title);
+		XSync(dpy, False);
 	}
 }
 
