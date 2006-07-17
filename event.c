@@ -11,45 +11,44 @@
 #define ButtonMask      (ButtonPressMask | ButtonReleaseMask)
 #define MouseMask       (ButtonMask | PointerMotionMask)
 
-/********** CUSTOMIZE **********/
-
+/* CUSTOMIZE */
+const char *browse[] = { "firefox", NULL };
+const char *gimp[] = { "gimp", NULL };
 const char *term[] = { 
 	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
 	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
 };
-const char *browse[] = { "firefox", NULL };
 const char *xlock[] = { "xlock", NULL };
 
 Key key[] = {
 	/* modifier				key			function	arguments */
-	{ Mod1Mask,				XK_Return,	zoom,		{ 0 } },
-	{ Mod1Mask,				XK_k,		focusprev,		{ 0 } },
-	{ Mod1Mask,				XK_j,		focusnext,		{ 0 } }, 
-	{ Mod1Mask,				XK_m,		maximize,		{ 0 } }, 
+	{ ControlMask,			XK_0,		appendtag,	{ .i = Tscratch } }, 
+	{ ControlMask,			XK_1,		appendtag,	{ .i = Tdev } }, 
+	{ ControlMask,			XK_2,		appendtag,	{ .i = Twww } }, 
+	{ ControlMask,			XK_3,		appendtag,	{ .i = Twork } }, 
 	{ Mod1Mask,				XK_0,		view,		{ .i = Tscratch } }, 
 	{ Mod1Mask,				XK_1,		view,		{ .i = Tdev } }, 
 	{ Mod1Mask,				XK_2,		view,		{ .i = Twww } }, 
 	{ Mod1Mask,				XK_3,		view,		{ .i = Twork } }, 
+	{ Mod1Mask,				XK_j,		focusnext,		{ 0 } }, 
+	{ Mod1Mask,				XK_k,		focusprev,		{ 0 } },
+	{ Mod1Mask,				XK_m,		maximize,		{ 0 } }, 
 	{ Mod1Mask,				XK_space,	dotile,		{ 0 } }, 
-	{ Mod1Mask|ShiftMask,	XK_space,	dofloat,	{ 0 } }, 
+	{ Mod1Mask,				XK_Return,	zoom,		{ 0 } },
 	{ Mod1Mask|ShiftMask,	XK_0,		replacetag,		{ .i = Tscratch } }, 
 	{ Mod1Mask|ShiftMask,	XK_1,		replacetag,		{ .i = Tdev } }, 
 	{ Mod1Mask|ShiftMask,	XK_2,		replacetag,		{ .i = Twww } }, 
 	{ Mod1Mask|ShiftMask,	XK_3,		replacetag,		{ .i = Twork } }, 
 	{ Mod1Mask|ShiftMask,	XK_c,		killclient,		{ 0 } }, 
-	{ Mod1Mask|ShiftMask,	XK_q,		quit,		{ 0 } },
-	{ Mod1Mask|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
-	{ Mod1Mask|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
+	{ Mod1Mask|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } },
 	{ Mod1Mask|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
-	{ ControlMask,			XK_0,		appendtag,	{ .i = Tscratch } }, 
-	{ ControlMask,			XK_1,		appendtag,	{ .i = Tdev } }, 
-	{ ControlMask,			XK_2,		appendtag,	{ .i = Twww } }, 
-	{ ControlMask,			XK_3,		appendtag,	{ .i = Twork } }, 
+	{ Mod1Mask|ShiftMask,	XK_q,		quit,		{ 0 } },
+	{ Mod1Mask|ShiftMask,	XK_space,	dofloat,	{ 0 } }, 
+	{ Mod1Mask|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
+	{ Mod1Mask|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
 };
 
-/********** CUSTOMIZE **********/
-
-/* static functions */
+/* static */
 
 static void
 movemouse(Client *c)
@@ -337,7 +336,7 @@ unmapnotify(XEvent *e)
 		unmanage(c);
 }
 
-/* extern functions */
+/* extern */
 
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,

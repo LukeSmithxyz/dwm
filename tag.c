@@ -7,24 +7,23 @@
 #include <string.h>
 #include <X11/Xutil.h>
 
-/********** CUSTOMIZE **********/
+/* static */
 
+/* CUSTOMIZE */ 
+static Rule rule[] = {
+	/* class			instance	tags						isfloat */
+	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
+};
+
+/* extern */
+
+/* CUSTOMIZE */
 char *tags[TLast] = {
 	[Tscratch] = "scratch",
 	[Tdev] = "dev",
 	[Twww] = "www",
 	[Twork] = "work",
 };
-
-static Rule rule[] = {
-	/* class			instance	tags						isfloat */
-	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
-};
-
-/********** CUSTOMIZE **********/
-
-/* extern functions */
-
 void (*arrange)(Arg *) = dotile;
 
 void

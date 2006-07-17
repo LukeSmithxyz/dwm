@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-/* static functions */
+/* static */
 
 static void
 bad_malloc(unsigned int size)
@@ -20,7 +20,7 @@ bad_malloc(unsigned int size)
 	exit(1);
 }
 
-/* extern functions */
+/* extern */
 
 void *
 emallocz(unsigned int size)

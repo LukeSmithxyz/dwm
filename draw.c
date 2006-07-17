@@ -8,7 +8,7 @@
 #include <string.h>
 #include <X11/Xlocale.h>
 
-/* static functions */
+/* static */
 
 static void
 drawborder(void)
@@ -90,7 +90,7 @@ drawtext(const char *text, Bool invert, Bool border)
 	}
 }
 
-/* extern functions */
+/* extern */
 
 void
 drawall()

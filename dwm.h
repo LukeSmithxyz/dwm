@@ -37,28 +37,28 @@ union Arg {
 };
 
 /* atoms */
-enum { WMProtocols, WMDelete, WMLast };
 enum { NetSupported, NetWMName, NetLast };
+enum { WMProtocols, WMDelete, WMLast };
 
 /* cursor */
-enum { CurNormal, CurResize, CurMove, CurInput, CurLast };
+enum { CurNormal, CurResize, CurMove, CurLast };
 
 struct Fnt {
-	XFontStruct *xfont;
-	XFontSet set;
 	int ascent;
 	int descent;
 	int height;
+	XFontSet set;
+	XFontStruct *xfont;
 };
 
 struct DC { /* draw context */
-	GC gc;
-	Drawable drawable;
 	int x, y, w, h;
-	Fnt font;
 	unsigned long bg;
 	unsigned long fg;
 	unsigned long border;
+	Drawable drawable;
+	Fnt font;
+	GC gc;
 };
 
 struct Client {
@@ -72,10 +72,10 @@ struct Client {
 	unsigned int border;
 	long flags; 
 	Bool isfloat;
-	Window win;
-	Window title;
 	Client *next;
 	Client *revert;
+	Window win;
+	Window title;
 };
 
 struct Rule {
@@ -92,20 +92,18 @@ struct Key {
 	Arg arg;
 };
 
-extern Display *dpy;
-extern Window root, barwin;
-extern Atom wmatom[WMLast], netatom[NetLast];
-extern Cursor cursor[CurLast];
-extern Bool running, issel;
+extern char *tags[TLast], stext[1024];
+extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
-extern Key key[];
-
-extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-extern char *tags[TLast], stext[1024];
-
-extern DC dc;
+extern Atom wmatom[WMLast], netatom[NetLast];
+extern Bool running, issel;
 extern Client *clients, *sel;
+extern Cursor cursor[CurLast];
+extern DC dc;
+extern Display *dpy;
+extern Key key[];
+extern Window root, barwin;
 
 /* client.c */
 extern void ban(Client *c);

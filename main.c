@@ -14,25 +14,11 @@
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
-Display *dpy;
-Window root, barwin;
-Atom wmatom[WMLast], netatom[NetLast];
-Cursor cursor[CurLast];
-Bool running = True;
-Bool issel = True;
 
-int tsel = Tdev; /* default tag */
-int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-char stext[1024];
-
-DC dc = {0};
-Client *clients = NULL;
-Client *sel = NULL;
+/* static */
 
 static Bool otherwm;
 static int (*xerrorxlib)(Display *, XErrorEvent *);
-
-/* static functions */
 
 static void
 cleanup()
@@ -97,7 +83,20 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 	return -1;
 }
 
-/* extern functions */
+/* extern */
+
+char stext[1024];
+int tsel = Tdev; /* default tag */
+int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+Atom wmatom[WMLast], netatom[NetLast];
+Bool running = True;
+Bool issel = True;
+Client *clients = NULL;
+Client *sel = NULL;
+Cursor cursor[CurLast];
+Display *dpy;
+DC dc = {0};
+Window root, barwin;
 
 int
 getproto(Window w)
@@ -141,10 +140,9 @@ quit(Arg *arg)
 }
 
 /*
- * There's no way to check accesses to destroyed windows, thus
- * those cases are ignored (especially on UnmapNotify's).
- * Other types of errors call Xlib's default error handler, which
- * calls exit().
+ * There's no way to check accesses to destroyed windows, thus those cases are
+ * ignored (especially on UnmapNotify's).  Other types of errors call Xlibs
+ * default error handler, which calls exit().
  */
 int
 xerror(Display *dpy, XErrorEvent *ee)
