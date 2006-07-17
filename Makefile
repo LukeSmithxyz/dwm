@@ -8,10 +8,10 @@ OBJ = ${SRC:.c=.o}
 MAN1 = dwm.1 
 BIN = dwm
 
-all: config dwm
+all: options dwm
 	@echo finished
 
-config:
+options:
 	@echo dwm build options:
 	@echo "LIBS     = ${LIBS}"
 	@echo "CFLAGS   = ${CFLAGS}"
