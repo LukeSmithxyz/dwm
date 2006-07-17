@@ -36,5 +36,5 @@ This will start dwm on display :1 of the host foo.bar.
 
 Configuration
 -------------
-The configuration of dwm is done by customizing the wm.h source file. To
-customize the key bindings edit dev.c.
+The configuration of dwm is done by customizing source code,
+grep for CUSTOMIZE keyword.
