@@ -12,7 +12,7 @@
 /* CUSTOMIZE */ 
 static Rule rule[] = {
 	/* class			instance	tags						isfloat */
-	{ "Firefox-bin",	"Gecko",	{ [Twww] = "www" },			False },
+	{ "Firefox-bin",	"firefox-bin",	{ [Twww] = "www" },			False },
 };
 
 /* extern */
