@@ -136,7 +136,7 @@ heretag(Arg *arg)
 	for(i = 0; i < TLast; i++)
 		c->tags[i] = NULL;
 	c->tags[tsel] = tags[tsel];
-	arrange(NULL);
+	pop(c);
 	focus(c);
 }
 

@@ -268,6 +268,18 @@ maximize(Arg *arg)
 }
 
 void
+pop(Client *c)
+{
+	Client **l;
+	for(l = &clients; *l && *l != c; l = &(*l)->next);
+	*l = c->next;
+
+	c->next = clients; /* pop */
+	clients = c;
+	arrange(NULL);
+}
+
+void
 resize(Client *c, Bool inc)
 {
 	XConfigureEvent e;
@@ -405,7 +417,7 @@ unmanage(Client *c)
 void
 zoom(Arg *arg)
 {
-	Client **l, *c;
+	Client *c;
 
 	if(!sel)
 		return;
@@ -415,11 +427,6 @@ zoom(Arg *arg)
 			sel = c;
 	}
 
-	for(l = &clients; *l && *l != sel; l = &(*l)->next);
-	*l = sel->next;
-
-	sel->next = clients; /* pop */
-	clients = sel;
-	arrange(NULL);
+	pop(sel);
 	focus(sel);
 }

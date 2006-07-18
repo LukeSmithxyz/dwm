@@ -118,6 +118,7 @@ extern void killclient(Arg *arg);
 extern void lower(Client *c);
 extern void manage(Window w, XWindowAttributes *wa);
 extern void maximize(Arg *arg);
+extern void pop(Client *c);
 extern void resize(Client *c, Bool inc);
 extern void setsize(Client *c);
 extern void settitle(Client *c);
