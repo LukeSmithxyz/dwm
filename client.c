@@ -66,8 +66,8 @@ focusnext(Arg *arg)
 	if(!sel)
 		return;
 
-	if(!(c = getnext(sel->next)))
-		c = getnext(clients);
+	if(!(c = getnext(sel->next, tsel)))
+		c = getnext(clients, tsel);
 	if(c) {
 		higher(c);
 		c->revert = sel;
@@ -410,8 +410,8 @@ zoom(Arg *arg)
 	if(!sel)
 		return;
 
-	if(sel == getnext(clients) && sel->next)  {
-		if((c = getnext(sel->next)))
+	if(sel == getnext(clients, tsel) && sel->next)  {
+		if((c = getnext(sel->next, tsel)))
 			sel = c;
 	}
 

@@ -49,7 +49,7 @@ dofloat(Arg *arg)
 			ban(c);
 	}
 	if(sel && !sel->tags[tsel]) {
-		if((sel = getnext(clients))) {
+		if((sel = getnext(clients, tsel))) {
 			higher(sel);
 			focus(sel);
 		}
@@ -106,7 +106,7 @@ dotile(Arg *arg)
 			ban(c);
 	}
 	if(!sel || (sel && !sel->tags[tsel])) {
-		if((sel = getnext(clients))) {
+		if((sel = getnext(clients, tsel))) {
 			higher(sel);
 			focus(sel);
 		}
@@ -115,10 +115,29 @@ dotile(Arg *arg)
 }
 
 Client *
-getnext(Client *c)
+getnext(Client *c, unsigned int t)
 {
-	for(; c && !c->tags[tsel]; c = c->next);
+	for(; c && !c->tags[t]; c = c->next);
 	return c;
+}
+
+void
+heretag(Arg *arg)
+{
+	int i;
+	Client *c;
+
+	if(arg->i == tsel)
+		return;
+
+	if(!(c = getnext(clients, arg->i)))
+		return;
+
+	for(i = 0; i < TLast; i++)
+		c->tags[i] = NULL;
+	c->tags[tsel] = tags[tsel];
+	arrange(NULL);
+	focus(c);
 }
 
 void

@@ -97,7 +97,7 @@ drawall()
 {
 	Client *c;
 
-	for(c = clients; c; c = getnext(c->next))
+	for(c = clients; c; c = getnext(c->next, tsel))
 		drawtitle(c);
 	drawstatus();
 }
