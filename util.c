@@ -17,7 +17,7 @@ bad_malloc(unsigned int size)
 {
 	fprintf(stderr, "fatal: could not malloc() %d bytes\n",
 			(int) size);
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 /* extern */
@@ -37,7 +37,7 @@ eprint(const char *errstr, ...) {
 	va_start(ap, errstr);
 	vfprintf(stderr, errstr, ap);
 	va_end(ap);
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 void
@@ -55,7 +55,7 @@ spawn(Arg *arg)
 			fprintf(stderr, "dwm: execvp %s", argv[0]);
 			perror(" failed");
 		}
-		exit (0);
+		exit(EXIT_FAILURE);
 	}
 	wait(0);
 }

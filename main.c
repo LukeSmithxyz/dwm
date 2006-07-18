@@ -179,13 +179,12 @@ main(int argc, char *argv[])
 
 	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
 		switch (argv[i][1]) {
-		case 'v':
-			fprintf(stdout, "%s",
-					"dwm-"VERSION", (C)opyright MMVI Anselm R. Garbe\n");
-			exit(0);
-			break;
 		default:
 			eprint("usage: dwm [-v]\n");
+			break;
+		case 'v':
+			fputs("dwm-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
+			exit(EXIT_SUCCESS);
 			break;
 		}
 	}
