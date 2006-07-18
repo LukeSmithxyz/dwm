@@ -261,6 +261,7 @@ main(int argc, char *argv[])
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
 	strcpy(stext, "dwm-"VERSION);
+
 	scan();
 
 	/* main event loop, reads status text from stdin as well */

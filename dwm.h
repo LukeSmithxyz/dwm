@@ -65,8 +65,10 @@ struct Client {
 	char name[256];
 	char *tags[TLast];
 	int proto;
-	int x, y, w, h;
-	int tx, ty, tw, th;
+	int *x, *y, *w, *h; /* current geom */
+	int bx, by, bw, bh; /* title bar */
+	int fx, fy, fw, fh; /* floating geom */
+	int tx, ty, tw, th; /* tiled geom */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	unsigned int border;
@@ -120,6 +122,7 @@ extern void manage(Window w, XWindowAttributes *wa);
 extern void maximize(Arg *arg);
 extern void pop(Client *c);
 extern void resize(Client *c, Bool inc);
+extern void setgeom(Client *c);
 extern void setsize(Client *c);
 extern void settitle(Client *c);
 extern void unmanage(Client *c);
