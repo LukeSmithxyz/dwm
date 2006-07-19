@@ -12,7 +12,13 @@
 #define MouseMask       (ButtonMask | PointerMotionMask)
 
 /* CUSTOMIZE */
-const char *term[] = { "xterm", NULL };
+const char *browse[] = { "firefox", NULL };
+const char *gimp[] = { "gimp", NULL };
+const char *term[] = { 
+	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
+	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
+};
+const char *xlock[] = { "xlock", NULL };
 
 Key key[] = {
 	/* modifier				key			function	arguments */
@@ -38,8 +44,11 @@ Key key[] = {
 	{ Mod1Mask|ShiftMask,	XK_2,		replacetag,		{ .i = Twww } }, 
 	{ Mod1Mask|ShiftMask,	XK_3,		replacetag,		{ .i = Twork } }, 
 	{ Mod1Mask|ShiftMask,	XK_c,		killclient,		{ 0 } }, 
+	{ Mod1Mask|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } },
+	{ Mod1Mask|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
 	{ Mod1Mask|ShiftMask,	XK_q,		quit,		{ 0 } },
 	{ Mod1Mask|ShiftMask,	XK_space,	dofloat,	{ 0 } }, 
+	{ Mod1Mask|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
 	{ Mod1Mask|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
 };
 
