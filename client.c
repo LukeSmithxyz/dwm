@@ -208,9 +208,9 @@ manage(Window w, XWindowAttributes *wa)
 	c->bh = bh;
 
 	diff = sw - c->fw;
-	c->fx = sx + (random() % diff ? diff : 1);
+	c->fx = random() % (diff ? diff : 1);
 	diff = sh - c->fh;
-	c->fy = sy + (random() % diff ? diff : 1);
+	c->fy = random() % (diff ? diff : 1);
 
 	c->border = 1;
 	c->proto = getproto(c->win);
