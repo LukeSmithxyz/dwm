@@ -315,9 +315,9 @@ resize(Client *c, Bool inc, Corner sticky)
 		*c->w = c->maxw;
 	if(c->maxh && *c->h > c->maxh)
 		*c->h = c->maxh;
-	if(sticky == TopRight || sticky == BottomRight)
+	if(sticky == TopRight || sticky == BotRight)
 		*c->x = right - *c->w;
-	if(sticky == BottomLeft || sticky == BottomRight)
+	if(sticky == BotLeft || sticky == BotRight)
 		*c->y = bottom - *c->h;
 	resizetitle(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);

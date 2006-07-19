@@ -25,9 +25,9 @@ enum { Tscratch, Tdev, Twww, Twork, TLast };
 /********** CUSTOMIZE **********/
 
 typedef union Arg Arg;
+typedef struct Client Client;
 typedef enum Corner Corner;
 typedef struct DC DC;
-typedef struct Client Client;
 typedef struct Fnt Fnt;
 typedef struct Key Key;
 typedef struct Rule Rule;
@@ -44,7 +44,7 @@ enum { WMProtocols, WMDelete, WMLast };
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurLast };
 
-enum Corner { TopLeft, TopRight, BottomLeft, BottomRight };
+enum Corner { TopLeft, TopRight, BotLeft, BotRight };
 
 struct Fnt {
 	int ascent;

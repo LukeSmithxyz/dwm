@@ -114,17 +114,10 @@ resizemouse(Client *c)
 			*c->h = abs(ocy - ev.xmotion.y);
 			*c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - *c->w;
 			*c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - *c->h;
-			if(ocx <= ev.xmotion.x) {
-				if(ocy <= ev.xmotion.y)
-					sticky = TopLeft;
-				else
-					sticky = BottomLeft;
-			} else {
-				if(ocy <= ev.xmotion.y)
-					sticky = TopRight;
-				else
-					sticky = BottomRight;
-			}
+			if(ocx <= ev.xmotion.x)
+				sticky = (ocy <= ev.xmotion.y) ? TopLeft : BotLeft;
+			else
+				sticky = (ocy <= ev.xmotion.y) ? TopRight : BotRight;
 			resize(c, True, sticky);
 			break;
 		case ButtonRelease:
