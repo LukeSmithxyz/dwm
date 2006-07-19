@@ -25,7 +25,11 @@ resizetitle(Client *c)
 		c->bw = *c->w + 2;
 	c->bx = *c->x + *c->w - c->bw + 2;
 	c->by = *c->y;
-	XMoveResizeWindow(dpy, c->title, c->bx, c->by, c->bw, c->bh);
+	if(c->tags[tsel])
+		XMoveResizeWindow(dpy, c->title, c->bx, c->by, c->bw, c->bh);
+	else
+		XMoveResizeWindow(dpy, c->title, c->bx + 2 * sw, c->by, c->bw, c->bh);
+
 }
 
 static int
@@ -258,10 +262,8 @@ manage(Window w, XWindowAttributes *wa)
 		focus(c);
 	}
 	else {
-		ban(c);
 		XMapRaised(dpy, c->win);
 		XMapRaised(dpy, c->title);
-		XSync(dpy, False);
 	}
 }
 
@@ -319,9 +321,11 @@ resize(Client *c, Bool inc, Corner sticky)
 		*c->x = right - *c->w;
 	if(sticky == BotLeft || sticky == BotRight)
 		*c->y = bottom - *c->h;
+
 	resizetitle(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMoveResizeWindow(dpy, c->win, *c->x, *c->y, *c->w, *c->h);
+
 	e.type = ConfigureNotify;
 	e.event = c->win;
 	e.window = c->win;
