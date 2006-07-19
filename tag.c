@@ -4,15 +4,25 @@
  */
 #include "dwm.h"
 
+#include <regex.h>
+#include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
 #include <X11/Xutil.h>
 
 /* static */
 
+typedef struct {
+	const char *pattern;
+	char *tags[TLast];
+	Bool isfloat;
+} Rule;
+
 /* CUSTOMIZE */ 
 static Rule rule[] = {
-	/* class			instance	tags						isfloat */
-	{ "Firefox-bin",	"firefox-bin",	{ [Twww] = "www" },			False },
+	/* class			instance	tags		isfloat */
+	{ "Firefox.*",	{ [Twww] = "www" },			False },
+	{ "Gimp.*",		{ 0 },						True},
 };
 
 /* extern */
@@ -164,10 +174,13 @@ replacetag(Arg *arg)
 void
 settags(Client *c)
 {
-	XClassHint ch;
+	char classinst[256];
 	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
 	unsigned int i, j;
+	regex_t regex;
+	regmatch_t tmp;
 	Bool matched = False;
+	XClassHint ch;
 
 	if(!len) {
 		c->tags[tsel] = tags[tsel];
@@ -175,24 +188,27 @@ settags(Client *c)
 	}
 
 	if(XGetClassHint(dpy, c->win, &ch)) {
-		if(ch.res_class && ch.res_name) {
-			for(i = 0; i < len; i++)
-				if(!strncmp(rule[i].class, ch.res_class, sizeof(rule[i].class))
-					&& !strncmp(rule[i].instance, ch.res_name, sizeof(rule[i].instance)))
-				{
-					for(j = 0; j < TLast; j++)
+		snprintf(classinst, sizeof(classinst), "%s:%s",
+				ch.res_class ? ch.res_class : "",
+				ch.res_name ? ch.res_name : "");
+		for(i = 0; !matched && i < len; i++) {
+			if(!regcomp(&regex, rule[i].pattern, 0)) {
+				if(!regexec(&regex, classinst, 1, &tmp, 0)) {
+					for(j = 0; j < TLast; j++) {
+						if(rule[i].tags[j])
+							matched = True;
 						c->tags[j] = rule[i].tags[j];
+					}
 					c->isfloat = rule[i].isfloat;
-					matched = True;
-					break;
 				}
+				regfree(&regex);
+			}
 		}
 		if(ch.res_class)
 			XFree(ch.res_class);
 		if(ch.res_name)
 			XFree(ch.res_name);
 	}
-
 	if(!matched)
 		c->tags[tsel] = tags[tsel];
 }

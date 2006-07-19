@@ -30,8 +30,6 @@ typedef struct Client Client;
 typedef enum Corner Corner;
 typedef struct DC DC;
 typedef struct Fnt Fnt;
-typedef struct Key Key;
-typedef struct Rule Rule;
 
 union Arg {
 	const char **argv;
@@ -84,20 +82,6 @@ struct Client {
 	Window title;
 };
 
-struct Rule {
-	const char *class;
-	const char *instance;
-	char *tags[TLast];
-	Bool isfloat;
-};
-
-struct Key {
-	unsigned long mod;
-	KeySym keysym;
-	void (*func)(Arg *arg);
-	Arg arg;
-};
-
 extern char *tags[TLast], stext[1024];
 extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
 extern void (*handler[LASTEvent])(XEvent *);
@@ -108,7 +92,6 @@ extern Client *clients, *sel;
 extern Cursor cursor[CurLast];
 extern DC dc;
 extern Display *dpy;
-extern Key key[];
 extern Window root, barwin;
 
 /* client.c */

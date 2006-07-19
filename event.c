@@ -12,6 +12,14 @@
 #define MouseMask       (ButtonMask | PointerMotionMask)
 
 /* CUSTOMIZE */
+
+typedef struct {
+	unsigned long mod;
+	KeySym keysym;
+	void (*func)(Arg *arg);
+	Arg arg;
+} Key;
+
 const char *browse[] = { "firefox", NULL };
 const char *gimp[] = { "gimp", NULL };
 const char *term[] = { 
@@ -20,7 +28,7 @@ const char *term[] = {
 };
 const char *xlock[] = { "xlock", NULL };
 
-Key key[] = {
+static Key key[] = {
 	/* modifier				key			function	arguments */
 	{ ControlMask,			XK_0,		appendtag,	{ .i = Tscratch } }, 
 	{ ControlMask,			XK_1,		appendtag,	{ .i = Tdev } }, 

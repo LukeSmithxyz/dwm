@@ -247,8 +247,9 @@ manage(Window w, XWindowAttributes *wa)
 			GrabModeAsync, GrabModeSync, None, None);
 
 	if(!c->isfloat)
-		c->isfloat = trans
-			|| ((c->maxw == c->minw) && (c->maxh == c->minh));
+		c->isfloat = trans || (c->maxw && c->minw &&
+				(c->maxw == c->minw) && (c->maxh == c->minh));
+
 
 	setgeom(c);
 	settitle(c);
