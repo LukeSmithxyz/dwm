@@ -11,6 +11,7 @@
 #define BGCOLOR				"#0a2c2d"
 #define FGCOLOR				"#ddeeee"
 #define BORDERCOLOR			"#176164"
+#define MODKEY				 Mod1Mask /* Mod4Mask */
 /*
 #define BGCOLOR				"#666699"
 #define FGCOLOR				"#eeeeee"

@@ -239,11 +239,11 @@ manage(Window w, XWindowAttributes *wa)
 
 	XGrabButton(dpy, Button1, ControlMask, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button1, Mod1Mask, c->win, False, ButtonPressMask,
+	XGrabButton(dpy, Button1, MODKEY, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, Mod1Mask, c->win, False, ButtonPressMask,
+	XGrabButton(dpy, Button2, MODKEY, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, Mod1Mask, c->win, False, ButtonPressMask,
+	XGrabButton(dpy, Button3, MODKEY, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 
 	if(!c->isfloat)
