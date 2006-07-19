@@ -192,6 +192,7 @@ lower(Client *c)
 void
 manage(Window w, XWindowAttributes *wa)
 {
+	int diff;
 	Client *c;
 	XSetWindowAttributes twa;
 	Window trans;
@@ -205,6 +206,12 @@ manage(Window w, XWindowAttributes *wa)
 	c->bw = c->fw = c->tw = wa->width;
 	c->fh = c->th = wa->height;
 	c->bh = bh;
+
+	diff = sw - c->fw;
+	c->fx = sx + (random() % diff ? diff : 1);
+	diff = sh - c->fh;
+	c->fy = sx + (random() % diff ? diff : 1);
+
 	c->border = 1;
 	c->proto = getproto(c->win);
 	setsize(c);
