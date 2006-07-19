@@ -201,8 +201,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->win = w;
 	c->bx = c->fx = c->tx = wa->x;
 	c->by = c->fy = c->ty = wa->y;
-	if(c->fy < bh)
-		c->by = c->fy = c->ty += bh;
 	c->bw = c->fw = c->tw = wa->width;
 	c->fh = c->th = wa->height;
 	c->bh = bh;
@@ -211,6 +209,9 @@ manage(Window w, XWindowAttributes *wa)
 	c->fx = random() % (diff ? diff : 1);
 	diff = sh - c->fh - bh;
 	c->fy = random() % (diff ? diff : 1);
+
+	if(c->fy < bh)
+		c->by = c->fy = c->ty = bh;
 
 	c->border = 1;
 	c->proto = getproto(c->win);

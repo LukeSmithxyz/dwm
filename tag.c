@@ -96,11 +96,17 @@ dotile(Arg *arg)
 				*c->w = mw - 2 * c->border;
 				*c->h = sh - 2 * c->border - bh;
 			}
-			else {
+			else if(h > bh) {
 				*c->x = sx + mw;
 				*c->y = sy + (i - 1) * h + bh;
 				*c->w = w - 2 * c->border;
 				*c->h = h - 2 * c->border;
+			}
+			else { /* fallback if h < bh */
+				*c->x = sx + mw;
+				*c->y = sy + bh;
+				*c->w = w - 2 * c->border;
+				*c->h = sh - 2 * c->border - bh;
 			}
 			resize(c, False, TopLeft);
 			i++;
