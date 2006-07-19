@@ -267,7 +267,7 @@ maximize(Arg *arg)
 	*sel->w = sw - 2 * sel->border;
 	*sel->h = sh - 2 * sel->border - bh;
 	higher(sel);
-	resize(sel, False);
+	resize(sel, False, TopLeft);
 }
 
 void
@@ -283,9 +283,11 @@ pop(Client *c)
 }
 
 void
-resize(Client *c, Bool inc)
+resize(Client *c, Bool inc, Corner sticky)
 {
 	XConfigureEvent e;
+	int right = *c->x + *c->w;
+	int bottom = *c->y + *c->h;
 
 	if(inc) {
 		if(c->incw)
@@ -305,6 +307,10 @@ resize(Client *c, Bool inc)
 		*c->w = c->maxw;
 	if(c->maxh && *c->h > c->maxh)
 		*c->h = c->maxh;
+	if(sticky == TopRight || sticky == BottomRight)
+		*c->x = right - *c->w;
+	if(sticky == BottomLeft || sticky == BottomRight)
+		*c->y = bottom - *c->h;
 	resizetitle(c);
 	XSetWindowBorderWidth(dpy, c->win, 1);
 	XMoveResizeWindow(dpy, c->win, *c->x, *c->y, *c->w, *c->h);

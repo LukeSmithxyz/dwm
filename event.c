@@ -79,7 +79,7 @@ movemouse(Client *c)
 			XSync(dpy, False);
 			*c->x = ocx + (ev.xmotion.x - x1);
 			*c->y = ocy + (ev.xmotion.y - y1);
-			resize(c, False);
+			resize(c, False, TopLeft);
 			break;
 		case ButtonRelease:
 			XUngrabPointer(dpy, CurrentTime);
@@ -93,6 +93,7 @@ resizemouse(Client *c)
 {
 	XEvent ev;
 	int ocx, ocy;
+	Corner sticky;
 
 	ocx = *c->x;
 	ocy = *c->y;
@@ -113,7 +114,18 @@ resizemouse(Client *c)
 			*c->h = abs(ocy - ev.xmotion.y);
 			*c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - *c->w;
 			*c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - *c->h;
-			resize(c, True);
+			if(ocx <= ev.xmotion.x) {
+				if(ocy <= ev.xmotion.y)
+					sticky = TopLeft;
+				else
+					sticky = BottomLeft;
+			} else {
+				if(ocy <= ev.xmotion.y)
+					sticky = TopRight;
+				else
+					sticky = BottomRight;
+			}
+			resize(c, True, sticky);
 			break;
 		case ButtonRelease:
 			XUngrabPointer(dpy, CurrentTime);
@@ -153,24 +165,27 @@ buttonpress(XEvent *e)
 		}
 	}
 	else if((c = getclient(ev->window))) {
-		if(arrange == dotile && !c->isfloat) {
-			if((ev->state & ControlMask) && (ev->button == Button1))
-				zoom(NULL);
-			return;
-		}
-		/* floating windows */
-		higher(c);
 		switch(ev->button) {
 		default:
 			break;
 		case Button1:
-			movemouse(c);
+			if(arrange == dotile && !c->isfloat) {
+				if((ev->state & ControlMask) && (ev->button == Button1))
+					zoom(NULL);
+			}
+			else {
+				higher(c);
+				movemouse(c);
+			}
 			break;
 		case Button2:
 			lower(c);
 			break;
 		case Button3:
-			resizemouse(c);
+			if(arrange == dofloat || c->isfloat) {
+				higher(c);
+				resizemouse(c);
+			}
 			break;
 		}
 	}
@@ -197,7 +212,7 @@ configurerequest(XEvent *e)
 		if(ev->value_mask & CWBorderWidth)
 			c->border = 1;
 		gravitate(c, False);
-		resize(c, True);
+		resize(c, True, TopLeft);
 	}
 
 	wc.x = ev->x;

@@ -25,6 +25,7 @@ enum { Tscratch, Tdev, Twww, Twork, TLast };
 /********** CUSTOMIZE **********/
 
 typedef union Arg Arg;
+typedef enum Corner Corner;
 typedef struct DC DC;
 typedef struct Client Client;
 typedef struct Fnt Fnt;
@@ -42,6 +43,8 @@ enum { WMProtocols, WMDelete, WMLast };
 
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurLast };
+
+enum Corner { TopLeft, TopRight, BottomLeft, BottomRight };
 
 struct Fnt {
 	int ascent;
@@ -121,7 +124,7 @@ extern void lower(Client *c);
 extern void manage(Window w, XWindowAttributes *wa);
 extern void maximize(Arg *arg);
 extern void pop(Client *c);
-extern void resize(Client *c, Bool inc);
+extern void resize(Client *c, Bool inc, Corner sticky);
 extern void setgeom(Client *c);
 extern void setsize(Client *c);
 extern void settitle(Client *c);

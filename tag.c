@@ -45,7 +45,7 @@ dofloat(Arg *arg)
 	for(c = clients; c; c = c->next) {
 		setgeom(c);
 		if(c->tags[tsel]) {
-			resize(c, True);
+			resize(c, True, TopLeft);
 		}
 		else
 			ban(c);
@@ -81,7 +81,7 @@ dotile(Arg *arg)
 		if(c->tags[tsel]) {
 			if(c->isfloat) {
 				higher(c);
-				resize(c, True);
+				resize(c, True, TopLeft);
 				continue;
 			}
 			if(n == 1) {
@@ -102,7 +102,7 @@ dotile(Arg *arg)
 				*c->w = w - 2 * c->border;
 				*c->h = h - 2 * c->border;
 			}
-			resize(c, False);
+			resize(c, False, TopLeft);
 			i++;
 		}
 		else
