@@ -209,7 +209,7 @@ manage(Window w, XWindowAttributes *wa)
 
 	diff = sw - c->fw;
 	c->fx = random() % (diff ? diff : 1);
-	diff = sh - c->fh;
+	diff = sh - c->fh - bh;
 	c->fy = random() % (diff ? diff : 1);
 
 	c->border = 1;
