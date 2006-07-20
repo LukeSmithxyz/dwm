@@ -293,30 +293,30 @@ pop(Client *c)
 }
 
 void
-resize(Client *c, Bool inc, Corner sticky)
+resize(Client *c, Bool sizehints, Corner sticky)
 {
 	int bottom = c->y + c->h;
 	int right = c->x + c->w;
 	XConfigureEvent e;
 
-	if(inc) {
+	if(sizehints) {
 		if(c->incw)
 			c->w -= (c->w - c->basew) % c->incw;
 		if(c->inch)
 			c->h -= (c->h - c->baseh) % c->inch;
+		if(c->minw && c->w < c->minw)
+			c->w = c->minw;
+		if(c->minh && c->h < c->minh)
+			c->h = c->minh;
+		if(c->maxw && c->w > c->maxw)
+			c->w = c->maxw;
+		if(c->maxh && c->h > c->maxh)
+			c->h = c->maxh;
 	}
 	if(c->x > sw) /* might happen on restart */
 		c->x = sw - c->w;
 	if(c->y > sh)
 		c->y = sh - c->h;
-	if(c->minw && c->w < c->minw)
-		c->w = c->minw;
-	if(c->minh && c->h < c->minh)
-		c->h = c->minh;
-	if(c->maxw && c->w > c->maxw)
-		c->w = c->maxw;
-	if(c->maxh && c->h > c->maxh)
-		c->h = c->maxh;
 	if(sticky == TopRight || sticky == BotRight)
 		c->x = right - c->w;
 	if(sticky == BotLeft || sticky == BotRight)

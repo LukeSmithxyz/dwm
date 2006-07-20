@@ -106,7 +106,7 @@ extern void killclient(Arg *arg);
 extern void lower(Client *c);
 extern void manage(Window w, XWindowAttributes *wa);
 extern void pop(Client *c);
-extern void resize(Client *c, Bool inc, Corner sticky);
+extern void resize(Client *c, Bool sizehints, Corner sticky);
 extern void setsize(Client *c);
 extern void settitle(Client *c);
 extern void togglemax(Arg *arg);
