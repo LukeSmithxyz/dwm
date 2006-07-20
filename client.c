@@ -97,6 +97,7 @@ Client *
 getclient(Window w)
 {
 	Client *c;
+
 	for(c = clients; c; c = c->next)
 		if(c->win == w)
 			return c;
@@ -107,6 +108,7 @@ Client *
 getctitle(Window w)
 {
 	Client *c;
+
 	for(c = clients; c; c = c->next)
 		if(c->title == w)
 			return c;
@@ -198,8 +200,8 @@ manage(Window w, XWindowAttributes *wa)
 {
 	int diff;
 	Client *c;
-	XSetWindowAttributes twa;
 	Window trans;
+	XSetWindowAttributes twa;
 
 	c = emallocz(sizeof(Client));
 	c->win = w;
@@ -278,6 +280,7 @@ void
 pop(Client *c)
 {
 	Client **l;
+
 	for(l = &clients; *l && *l != c; l = &(*l)->next);
 	*l = c->next;
 
@@ -289,9 +292,9 @@ pop(Client *c)
 void
 resize(Client *c, Bool inc, Corner sticky)
 {
-	XConfigureEvent e;
-	int right = c->x + c->w;
 	int bottom = c->y + c->h;
+	int right = c->x + c->w;
+	XConfigureEvent e;
 
 	if(inc) {
 		if(c->incw)
@@ -337,8 +340,9 @@ resize(Client *c, Bool inc, Corner sticky)
 void
 setsize(Client *c)
 {
-	XSizeHints size;
 	long msize;
+	XSizeHints size;
+
 	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
 		size.flags = PSize;
 	c->flags = size.flags;
@@ -375,9 +379,9 @@ setsize(Client *c)
 void
 settitle(Client *c)
 {
-	XTextProperty name;
-	int n;
 	char **list = NULL;
+	int n;
+	XTextProperty name;
 
 	name.nitems = 0;
 	c->name[0] = 0;

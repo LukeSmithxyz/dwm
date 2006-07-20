@@ -20,50 +20,44 @@ typedef struct {
 	Arg arg;
 } Key;
 
-/*
 const char *browse[] = { "firefox", NULL };
 const char *gimp[] = { "gimp", NULL };
-*/
-const char *term[] = { "xterm", NULL };
-/*
+const char *term[] = { 
 	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
 	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
 };
-coonst char *xlock[] = { "xlock", NULL };
-*/
+const char *xlock[] = { "xlock", NULL };
 
 static Key key[] = {
-	/* modifier				key			function	arguments */
-	{ ControlMask,			XK_0,		appendtag,	{ .i = Tscratch } }, 
-	{ ControlMask,			XK_1,		appendtag,	{ .i = Tdev } }, 
-	{ ControlMask,			XK_2,		appendtag,	{ .i = Twww } }, 
-	{ ControlMask,			XK_3,		appendtag,	{ .i = Twork } }, 
-	{ MODKEY,				XK_0,		view,		{ .i = Tscratch } }, 
-	{ MODKEY,				XK_1,		view,		{ .i = Tdev } }, 
-	{ MODKEY,				XK_2,		view,		{ .i = Twww } }, 
-	{ MODKEY,				XK_3,		view,		{ .i = Twork } }, 
-	{ MODKEY,				XK_j,		focusnext,		{ 0 } }, 
-	{ MODKEY,				XK_k,		focusprev,		{ 0 } },
-	{ MODKEY,				XK_m,		maximize,		{ 0 } }, 
-	{ MODKEY,				XK_space,	dotile,		{ 0 } }, 
-	{ MODKEY,				XK_Return,	zoom,		{ 0 } },
+	/* modifier		key		function	arguments */
+	{ ControlMask,		XK_0,		appendtag,	{ .i = Tscratch } }, 
+	{ ControlMask,		XK_1,		appendtag,	{ .i = Tdev } }, 
+	{ ControlMask,		XK_2,		appendtag,	{ .i = Twww } }, 
+	{ ControlMask,		XK_3,		appendtag,	{ .i = Twork } }, 
+	{ MODKEY,		XK_0,		view,		{ .i = Tscratch } }, 
+	{ MODKEY,		XK_1,		view,		{ .i = Tdev } }, 
+	{ MODKEY,		XK_2,		view,		{ .i = Twww } }, 
+	{ MODKEY,		XK_3,		view,		{ .i = Twork } }, 
+	{ MODKEY,		XK_j,		focusnext,	{ 0 } }, 
+	{ MODKEY,		XK_k,		focusprev,	{ 0 } },
+	{ MODKEY,		XK_m,		maximize,	{ 0 } }, 
+	{ MODKEY,		XK_space,	dotile,		{ 0 } }, 
+	{ MODKEY,		XK_Return,	zoom,		{ 0 } },
 	{ ControlMask|ShiftMask,XK_0,		heretag,	{ .i = Tscratch } }, 
 	{ ControlMask|ShiftMask,XK_1,		heretag,	{ .i = Tdev } }, 
 	{ ControlMask|ShiftMask,XK_2,		heretag,	{ .i = Twww } }, 
 	{ ControlMask|ShiftMask,XK_3,		heretag,	{ .i = Twork } }, 
-	{ MODKEY|ShiftMask,		XK_0,		replacetag,		{ .i = Tscratch } }, 
-	{ MODKEY|ShiftMask,		XK_1,		replacetag,		{ .i = Tdev } }, 
-	{ MODKEY|ShiftMask,		XK_2,		replacetag,		{ .i = Twww } }, 
-	{ MODKEY|ShiftMask,		XK_3,		replacetag,		{ .i = Twork } }, 
-	{ MODKEY|ShiftMask,		XK_c,		killclient,		{ 0 } }, 
-	/*
-	{ MODKEY|ShiftMask,		XK_g,		spawn,		{ .argv = gimp } },
-	{ MODKEY|ShiftMask,		XK_l,		spawn,		{ .argv = xlock } },
-	*/
-	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } },
-	{ MODKEY|ShiftMask,		XK_space,	dofloat,	{ 0 } }, 
-	/*{ MODKEY|ShiftMask,		XK_w,		spawn,		{ .argv = browse } },*/
-	{ MODKEY|ShiftMask,		XK_Return,	spawn,		{ .argv = term } },
+	{ MODKEY|ShiftMask,	XK_0,		replacetag,	{ .i = Tscratch } }, 
+	{ MODKEY|ShiftMask,	XK_1,		replacetag,	{ .i = Tdev } }, 
+	{ MODKEY|ShiftMask,	XK_2,		replacetag,	{ .i = Twww } }, 
+	{ MODKEY|ShiftMask,	XK_3,		replacetag,	{ .i = Twork } }, 
+	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, 
+	{ MODKEY|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } },
+	{ MODKEY|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
+	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } },
+	{ MODKEY|ShiftMask,	XK_space,	dofloat,	{ 0 } }, 
+	{ MODKEY|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
+	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
 };
 
 /* static */
@@ -71,15 +65,15 @@ static Key key[] = {
 static void
 movemouse(Client *c)
 {
-	XEvent ev;
 	int x1, y1, ocx, ocy, di;
 	unsigned int dui;
 	Window dummy;
+	XEvent ev;
 
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
-				None, cursor[CurMove], CurrentTime) != GrabSuccess)
+			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
@@ -105,9 +99,9 @@ movemouse(Client *c)
 static void
 resizemouse(Client *c)
 {
-	XEvent ev;
 	int ocx, ocy;
 	Corner sticky;
+	XEvent ev;
 
 	ocx = c->x;
 	ocy = c->y;
@@ -146,8 +140,8 @@ buttonpress(XEvent *e)
 {
 	int x;
 	Arg a;
-	XButtonPressedEvent *ev = &e->xbutton;
 	Client *c;
+	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(barwin == ev->window) {
 		switch(ev->button) {
@@ -201,9 +195,9 @@ buttonpress(XEvent *e)
 static void
 configurerequest(XEvent *e)
 {
+	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
-	Client *c;
 
 	ev->value_mask &= ~CWSibling;
 	if((c = getclient(ev->window))) {
@@ -248,8 +242,8 @@ destroynotify(XEvent *e)
 static void
 enternotify(XEvent *e)
 {
-	XCrossingEvent *ev = &e->xcrossing;
 	Client *c;
+	XCrossingEvent *ev = &e->xcrossing;
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
@@ -263,8 +257,8 @@ enternotify(XEvent *e)
 static void
 expose(XEvent *e)
 {
-	XExposeEvent *ev = &e->xexpose;
 	Client *c;
+	XExposeEvent *ev = &e->xexpose;
 
 	if(ev->count == 0) {
 		if(barwin == ev->window)
@@ -277,10 +271,10 @@ expose(XEvent *e)
 static void
 keypress(XEvent *e)
 {
-	XKeyEvent *ev = &e->xkey;
 	static unsigned int len = key ? sizeof(key) / sizeof(key[0]) : 0;
 	unsigned int i;
 	KeySym keysym;
+	XKeyEvent *ev = &e->xkey;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++)
@@ -303,8 +297,8 @@ leavenotify(XEvent *e)
 static void
 maprequest(XEvent *e)
 {
-	XMapRequestEvent *ev = &e->xmaprequest;
 	static XWindowAttributes wa;
+	XMapRequestEvent *ev = &e->xmaprequest;
 
 	if(!XGetWindowAttributes(dpy, ev->window, &wa))
 		return;
@@ -322,9 +316,9 @@ maprequest(XEvent *e)
 static void
 propertynotify(XEvent *e)
 {
-	XPropertyEvent *ev = &e->xproperty;
-	Window trans;
 	Client *c;
+	Window trans;
+	XPropertyEvent *ev = &e->xproperty;
 
 	if(ev->state == PropertyDelete)
 		return; /* ignore */

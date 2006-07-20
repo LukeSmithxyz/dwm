@@ -26,6 +26,7 @@ void *
 emallocz(unsigned int size)
 {
 	void *res = calloc(1, size);
+
 	if(!res)
 		bad_malloc(size);
 	return res;
@@ -34,6 +35,7 @@ emallocz(unsigned int size)
 void
 eprint(const char *errstr, ...) {
 	va_list ap;
+
 	va_start(ap, errstr);
 	vfprintf(stderr, errstr, ap);
 	va_end(ap);
@@ -44,6 +46,7 @@ void
 spawn(Arg *arg)
 {
 	char **argv = (char **)arg->argv;
+
 	if(!argv || !argv[0])
 		return;
 	if(fork() == 0) {

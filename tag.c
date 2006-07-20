@@ -20,9 +20,9 @@ typedef struct {
 
 /* CUSTOMIZE */ 
 static Rule rule[] = {
-	/* class			instance	tags		isfloat */
-	{ "Firefox.*",	{ [Twww] = "www" },			False },
-	{ "Gimp.*",		{ 0 },						True},
+	/* class:instance	tags				isfloat */
+	{ "Firefox.*",		{ [Twww] = "www" },		False },
+	{ "Gimp.*",		{ 0 },				True},
 };
 
 /* extern */
@@ -71,8 +71,8 @@ dofloat(Arg *arg)
 void
 dotile(Arg *arg)
 {
-	Client *c;
 	int n, i, w, h;
+	Client *c;
 
 	w = sw - mw;
 	arrange = dotile;
@@ -161,6 +161,7 @@ void
 replacetag(Arg *arg)
 {
 	int i;
+
 	if(!sel)
 		return;
 

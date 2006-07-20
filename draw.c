@@ -14,6 +14,7 @@ static void
 drawborder(void)
 {
 	XPoint points[5];
+
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
 	XSetForeground(dpy, dc.gc, dc.border);
 	points[0].x = dc.x;
@@ -33,6 +34,7 @@ static unsigned int
 textnw(char *text, unsigned int len)
 {
 	XRectangle r;
+
 	if(dc.font.set) {
 		XmbTextExtents(dc.font.set, text, len, NULL, &r);
 		return r.width;
@@ -44,8 +46,8 @@ static void
 drawtext(const char *text, Bool invert, Bool border)
 {
 	int x, y, w, h;
-	unsigned int len;
 	static char buf[256];
+	unsigned int len;
 	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
@@ -170,8 +172,8 @@ drawtitle(Client *c)
 unsigned long
 getcolor(const char *colstr)
 {
-	XColor color;
 	Colormap cmap = DefaultColormap(dpy, screen);
+	XColor color;
 
 	XAllocNamedColor(dpy, cmap, colstr, &color, &color);
 	return color.pixel;
