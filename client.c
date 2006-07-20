@@ -284,6 +284,7 @@ pop(Client *c)
 		c->next->prev = c->prev;
 	*l = c->next;
 
+	c->prev = NULL;
 	if(clients)
 		clients->prev = c;
 	c->next = clients;
