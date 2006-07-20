@@ -53,7 +53,6 @@ dofloat(Arg *arg)
 
 	arrange = dofloat;
 	for(c = clients; c; c = c->next) {
-		setgeom(c);
 		if(c->tags[tsel]) {
 			resize(c, True, TopLeft);
 		}
@@ -87,7 +86,6 @@ dotile(Arg *arg)
 		h = sh - bh;
 
 	for(i = 0, c = clients; c; c = c->next) {
-		setgeom(c);
 		if(c->tags[tsel]) {
 			if(c->isfloat) {
 				higher(c);
@@ -95,28 +93,28 @@ dotile(Arg *arg)
 				continue;
 			}
 			if(n == 1) {
-				*c->x = sx;
-				*c->y = sy + bh;
-				*c->w = sw - 2 * c->border;
-				*c->h = sh - 2 * c->border - bh;
+				c->x = sx;
+				c->y = sy + bh;
+				c->w = sw - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
 			}
 			else if(i == 0) {
-				*c->x = sx;
-				*c->y = sy + bh;
-				*c->w = mw - 2 * c->border;
-				*c->h = sh - 2 * c->border - bh;
+				c->x = sx;
+				c->y = sy + bh;
+				c->w = mw - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
 			}
 			else if(h > bh) {
-				*c->x = sx + mw;
-				*c->y = sy + (i - 1) * h + bh;
-				*c->w = w - 2 * c->border;
-				*c->h = h - 2 * c->border;
+				c->x = sx + mw;
+				c->y = sy + (i - 1) * h + bh;
+				c->w = w - 2 * c->border;
+				c->h = h - 2 * c->border;
 			}
 			else { /* fallback if h < bh */
-				*c->x = sx + mw;
-				*c->y = sy + bh;
-				*c->w = w - 2 * c->border;
-				*c->h = sh - 2 * c->border - bh;
+				c->x = sx + mw;
+				c->y = sy + bh;
+				c->w = w - 2 * c->border;
+				c->h = sh - 2 * c->border - bh;
 			}
 			resize(c, False, TopLeft);
 			i++;

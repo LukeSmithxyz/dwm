@@ -70,8 +70,8 @@ movemouse(Client *c)
 	unsigned int dui;
 	Window dummy;
 
-	ocx = *c->x;
-	ocy = *c->y;
+	ocx = c->x;
+	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
@@ -85,8 +85,8 @@ movemouse(Client *c)
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			*c->x = ocx + (ev.xmotion.x - x1);
-			*c->y = ocy + (ev.xmotion.y - y1);
+			c->x = ocx + (ev.xmotion.x - x1);
+			c->y = ocy + (ev.xmotion.y - y1);
 			resize(c, False, TopLeft);
 			break;
 		case ButtonRelease:
@@ -103,12 +103,12 @@ resizemouse(Client *c)
 	int ocx, ocy;
 	Corner sticky;
 
-	ocx = *c->x;
-	ocy = *c->y;
+	ocx = c->x;
+	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, *c->w, *c->h);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 	for(;;) {
 		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
 		switch(ev.type) {
@@ -118,10 +118,10 @@ resizemouse(Client *c)
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			*c->w = abs(ocx - ev.xmotion.x);
-			*c->h = abs(ocy - ev.xmotion.y);
-			*c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - *c->w;
-			*c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - *c->h;
+			c->w = abs(ocx - ev.xmotion.x);
+			c->h = abs(ocy - ev.xmotion.y);
+			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
+			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
 			if(ocx <= ev.xmotion.x)
 				sticky = (ocy <= ev.xmotion.y) ? TopLeft : BotLeft;
 			else
@@ -203,13 +203,13 @@ configurerequest(XEvent *e)
 	if((c = getclient(ev->window))) {
 		gravitate(c, True);
 		if(ev->value_mask & CWX)
-			*c->x = ev->x;
+			c->x = ev->x;
 		if(ev->value_mask & CWY)
-			*c->y = ev->y;
+			c->y = ev->y;
 		if(ev->value_mask & CWWidth)
-			*c->w = ev->width;
+			c->w = ev->width;
 		if(ev->value_mask & CWHeight)
-			*c->h = ev->height;
+			c->h = ev->height;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = 1;
 		gravitate(c, False);
