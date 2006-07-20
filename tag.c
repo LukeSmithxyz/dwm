@@ -25,16 +25,18 @@ static Rule rule[] = {
 	{ "Gimp.*",		{ 0 },				True},
 };
 
-/* extern */
-
-/* CUSTOMIZE */
 char *tags[TLast] = {
 	[Tscratch] = "scratch",
 	[Tdev] = "dev",
 	[Twww] = "www",
 	[Twork] = "work",
 };
+
 void (*arrange)(Arg *) = dotile;
+
+/* END CUSTOMIZE */
+
+/* extern */
 
 void
 appendtag(Arg *arg)

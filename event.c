@@ -59,6 +59,8 @@ static Key key[] = {
 	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
 };
 
+/* END CUSTOMIZE */
+
 /* static */
 
 static void

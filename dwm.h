@@ -5,7 +5,7 @@
 
 #include <X11/Xlib.h>
 
-/********** CUSTOMIZE **********/
+/* CUSTOMIZE */
 
 #define FONT				"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
 #define BGCOLOR				"#0a2c2d"
@@ -23,7 +23,7 @@
 /* tags */
 enum { Tscratch, Tdev, Twww, Twork, TLast };
 
-/********** CUSTOMIZE **********/
+/* END CUSTOMIZE */
 
 typedef union Arg Arg;
 typedef struct Client Client;
