@@ -41,9 +41,15 @@ dist: clean
 install: all
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@cp -f ${BIN} ${DESTDIR}${PREFIX}/bin
+	@for i in ${BIN}; do \
+		chmod 755 ${DESTDIR}${PREFIX}/bin/`basename $$i`; \
+	done
 	@echo installed executable files to ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@cp -f ${MAN1} ${DESTDIR}${MANPREFIX}/man1
+	@for i in ${MAN1}; do \
+		chmod 444 ${DESTDIR}${MANPREFIX}/man1/`basename $$i`; \
+	done
 	@echo installed manual pages to ${DESTDIR}${MANPREFIX}/man1
 
 uninstall:
