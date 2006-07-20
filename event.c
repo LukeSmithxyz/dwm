@@ -40,8 +40,8 @@ static Key key[] = {
 	{ MODKEY,		XK_3,		view,		{ .i = Twork } }, 
 	{ MODKEY,		XK_j,		focusnext,	{ 0 } }, 
 	{ MODKEY,		XK_k,		focusprev,	{ 0 } },
-	{ MODKEY,		XK_m,		maximize,	{ 0 } }, 
-	{ MODKEY,		XK_space,	dotile,		{ 0 } }, 
+	{ MODKEY,		XK_m,		togglemax,	{ 0 } }, 
+	{ MODKEY,		XK_space,	togglemode,	{ 0 } }, 
 	{ MODKEY,		XK_Return,	zoom,		{ 0 } },
 	{ ControlMask|ShiftMask,XK_0,		heretag,	{ .i = Tscratch } }, 
 	{ ControlMask|ShiftMask,XK_1,		heretag,	{ .i = Tdev } }, 
@@ -55,7 +55,6 @@ static Key key[] = {
 	{ MODKEY|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } },
-	{ MODKEY|ShiftMask,	XK_space,	dofloat,	{ 0 } }, 
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
 	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
 };
@@ -170,11 +169,7 @@ buttonpress(XEvent *e)
 		default:
 			break;
 		case Button1:
-			if(arrange == dotile && !c->isfloat) {
-				if((ev->state & ControlMask) && (ev->button == Button1))
-					zoom(NULL);
-			}
-			else {
+			if(arrange == dofloat || c->isfloat) {
 				higher(c);
 				movemouse(c);
 			}

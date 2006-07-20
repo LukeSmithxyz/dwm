@@ -74,6 +74,7 @@ struct Client {
 	unsigned int border;
 	long flags; 
 	Bool isfloat;
+	Bool ismax;
 	Client *next;
 	Client *revert;
 	Window win;
@@ -104,11 +105,11 @@ extern void higher(Client *c);
 extern void killclient(Arg *arg);
 extern void lower(Client *c);
 extern void manage(Window w, XWindowAttributes *wa);
-extern void maximize(Arg *arg);
 extern void pop(Client *c);
 extern void resize(Client *c, Bool inc, Corner sticky);
 extern void setsize(Client *c);
 extern void settitle(Client *c);
+extern void togglemax(Arg *arg);
 extern void unmanage(Client *c);
 extern void zoom(Arg *arg);
 
@@ -137,6 +138,7 @@ extern Client *getnext(Client *c, unsigned int t);
 extern void heretag(Arg *arg);
 extern void replacetag(Arg *arg);
 extern void settags(Client *c);
+extern void togglemode(Arg *arg);
 extern void view(Arg *arg);
 
 /* util.c */

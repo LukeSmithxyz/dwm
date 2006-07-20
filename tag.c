@@ -51,8 +51,8 @@ dofloat(Arg *arg)
 {
 	Client *c;
 
-	arrange = dofloat;
 	for(c = clients; c; c = c->next) {
+		c->ismax = False;
 		if(c->tags[tsel]) {
 			resize(c, True, TopLeft);
 		}
@@ -75,7 +75,6 @@ dotile(Arg *arg)
 	Client *c;
 
 	w = sw - mw;
-	arrange = dotile;
 	for(n = 0, c = clients; c; c = c->next)
 		if(c->tags[tsel] && !c->isfloat)
 			n++;
@@ -86,6 +85,7 @@ dotile(Arg *arg)
 		h = sh - bh;
 
 	for(i = 0, c = clients; c; c = c->next) {
+		c->ismax = False;
 		if(c->tags[tsel]) {
 			if(c->isfloat) {
 				higher(c);
@@ -210,6 +210,13 @@ settags(Client *c)
 	}
 	if(!matched)
 		c->tags[tsel] = tags[tsel];
+}
+
+void
+togglemode(Arg *arg)
+{
+	arrange = arrange == dofloat ? dotile : dofloat;
+	arrange(NULL);
 }
 
 void

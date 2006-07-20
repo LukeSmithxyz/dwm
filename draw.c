@@ -107,7 +107,7 @@ drawall()
 void
 drawstatus()
 {
-	int i;
+	int i, x;
 	Bool istile = arrange == dotile;
 
 	dc.x = dc.y = 0;
@@ -123,15 +123,14 @@ drawstatus()
 		else
 			drawtext(tags[i], (i != tsel), True);
 	}
-	if(sel) {
-		dc.x += dc.w;
-		dc.w = textw(sel->name);
-		drawtext(sel->name, istile, True);
-	}
+	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
 	drawtext(stext, !istile, False);
-
+	if(sel && ((dc.w = dc.x - x) >= bh)) {
+		dc.x = x;
+		drawtext(sel->name, istile, True);
+	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
 }

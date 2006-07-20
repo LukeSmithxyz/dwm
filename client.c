@@ -70,6 +70,9 @@ focusnext(Arg *arg)
 	if(!sel)
 		return;
 
+	if(sel->ismax)
+		togglemax(NULL);
+
 	if(!(c = getnext(sel->next, tsel)))
 		c = getnext(clients, tsel);
 	if(c) {
@@ -86,6 +89,9 @@ focusprev(Arg *arg)
 
 	if(!sel)
 		return;
+
+	if(sel->ismax)
+		togglemax(NULL);
 
 	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
 		higher(c);
@@ -234,8 +240,6 @@ manage(Window w, XWindowAttributes *wa)
 	c->next = clients;
 	clients = c;
 
-	XGrabButton(dpy, Button1, ControlMask, c->win, False, ButtonPressMask,
-			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button1, MODKEY, c->win, False, ButtonPressMask,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button2, MODKEY, c->win, False, ButtonPressMask,
@@ -261,19 +265,6 @@ manage(Window w, XWindowAttributes *wa)
 		XMapRaised(dpy, c->win);
 		XMapRaised(dpy, c->title);
 	}
-}
-
-void
-maximize(Arg *arg)
-{
-	if(!sel)
-		return;
-	sel->x = sx;
-	sel->y = sy + bh;
-	sel->w = sw - 2 * sel->border;
-	sel->h = sh - 2 * sel->border - bh;
-	higher(sel);
-	resize(sel, False, TopLeft);
 }
 
 void
@@ -402,6 +393,38 @@ settitle(Client *c)
 	}
 	XFree(name.value);
 	resizetitle(c);
+}
+
+void
+togglemax(Arg *arg)
+{
+	int ox, oy, ow, oh;
+	XEvent ev;
+
+	if(!sel)
+		return;
+
+	if((sel->ismax = !sel->ismax)) {
+		ox = sel->x;
+		oy = sel->y;
+		ow = sel->w;
+		oh = sel->h;
+		sel->x = sx;
+		sel->y = sy + bh;
+		sel->w = sw - 2 * sel->border;
+		sel->h = sh - 2 * sel->border - bh;
+
+		higher(sel);
+		resize(sel, False, TopLeft);
+
+		sel->x = ox;
+		sel->y = oy;
+		sel->w = ow;
+		sel->h = oh;
+	}
+	else
+		resize(sel, False, TopLeft);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
