@@ -77,7 +77,6 @@ focusnext(Arg *arg)
 		c = getnext(clients, tsel);
 	if(c) {
 		higher(c);
-		c->revert = sel;
 		focus(c);
 	}
 }
@@ -93,7 +92,11 @@ focusprev(Arg *arg)
 	if(sel->ismax)
 		togglemax(NULL);
 
-	if((c = sel->revert && sel->revert->tags[tsel] ? sel->revert : NULL)) {
+	if(!(c = getprev(sel->prev))) {
+		for(c = clients; c && c->next; c = c->next);
+		c = getprev(c);
+	}
+	if(c) {
 		higher(c);
 		focus(c);
 	}
@@ -127,6 +130,8 @@ gravitate(Client *c, Bool invert)
 	int dx = 0, dy = 0;
 
 	switch(c->grav) {
+	default:
+		break;
 	case StaticGravity:
 	case NorthWestGravity:
 	case NorthGravity:
@@ -143,11 +148,11 @@ gravitate(Client *c, Bool invert)
 	case SouthWestGravity:
 		dy = -(c->h);
 		break;
-	default:
-		break;
 	}
 
 	switch (c->grav) {
+	default:
+		break;
 	case StaticGravity:
 	case NorthWestGravity:
 	case WestGravity:
@@ -163,8 +168,6 @@ gravitate(Client *c, Bool invert)
 	case EastGravity:
 	case SouthEastGravity:
 		dx = -(c->w + c->border);
-		break;
-	default:
 		break;
 	}
 
@@ -204,7 +207,6 @@ lower(Client *c)
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	int diff;
 	Client *c;
 	Window trans;
 	XSetWindowAttributes twa;
@@ -224,7 +226,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->proto = getproto(c->win);
 	setsize(c);
 	XSelectInput(dpy, c->win,
-			StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
+		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
@@ -237,6 +239,8 @@ manage(Window w, XWindowAttributes *wa)
 
 	settags(c);
 
+	if(clients)
+		clients->prev = c;
 	c->next = clients;
 	clients = c;
 
@@ -264,6 +268,7 @@ manage(Window w, XWindowAttributes *wa)
 	else {
 		XMapRaised(dpy, c->win);
 		XMapRaised(dpy, c->title);
+
 	}
 }
 
@@ -273,9 +278,15 @@ pop(Client *c)
 	Client **l;
 
 	for(l = &clients; *l && *l != c; l = &(*l)->next);
+	if(c->prev)
+		c->prev->next = c->next;
+	if(c->next)
+		c->next->prev = c->prev;
 	*l = c->next;
 
-	c->next = clients; /* pop */
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
 	clients = c;
 	arrange(NULL);
 }
@@ -439,13 +450,18 @@ unmanage(Client *c)
 	XDestroyWindow(dpy, c->title);
 
 	for(l = &clients; *l && *l != c; l = &(*l)->next);
+	if(c->prev)
+		c->prev->next = c->next;
+	if(c->next)
+		c->next->prev = c->prev;
 	*l = c->next;
-	for(l = &clients; *l; l = &(*l)->next)
-		if((*l)->revert == c)
-			(*l)->revert = NULL;
-	if(sel == c)
-		sel = sel->revert ? sel->revert : clients;
-
+	if(sel == c) {
+		sel = getnext(c->next, tsel);
+		if(!sel)
+			sel = getprev(c->prev);
+		if(!sel)
+			sel = clients;
+	}
 	free(c);
 
 	XSync(dpy, False);

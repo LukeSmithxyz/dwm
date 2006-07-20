@@ -140,6 +140,13 @@ getnext(Client *c, unsigned int t)
 	return c;
 }
 
+Client *
+getprev(Client *c)
+{
+	for(; c && !c->tags[tsel]; c = c->prev);
+	return c;
+}
+
 void
 heretag(Arg *arg)
 {

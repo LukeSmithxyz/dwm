@@ -76,7 +76,7 @@ struct Client {
 	Bool isfloat;
 	Bool ismax;
 	Client *next;
-	Client *revert;
+	Client *prev;
 	Window win;
 	Window title;
 };
@@ -135,6 +135,7 @@ extern void appendtag(Arg *arg);
 extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
 extern Client *getnext(Client *c, unsigned int t);
+extern Client *getprev(Client *c);
 extern void heretag(Arg *arg);
 extern void replacetag(Arg *arg);
 extern void settags(Client *c);
