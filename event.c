@@ -170,7 +170,7 @@ buttonpress(XEvent *e)
 		default:
 			break;
 		case Button1:
-			if(arrange == dofloat || c->isfloat) {
+			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
 				higher(c);
 				movemouse(c);
 			}
@@ -179,7 +179,7 @@ buttonpress(XEvent *e)
 			lower(c);
 			break;
 		case Button3:
-			if(arrange == dofloat || c->isfloat) {
+			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
 				higher(c);
 				resizemouse(c);
 			}
