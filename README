@@ -1,6 +1,5 @@
 dwm - dynamic window manager
 ----------------------------
-
 dwm is an extremly fast, small, and dynamic X11 window manager.
 
 
@@ -32,6 +31,23 @@ the DISPLAY environment variable is set correctly, e.g.:
     DISPLAY=foo.bar:1 exec dwm
 
 This will start dwm on display :1 of the host foo.bar.
+
+
+Displaying status info
+----------------------
+In order to display status info in the bar, you can do following
+in .xinitrc:
+
+    $HOME/.dwm/status | dwm
+
+Assumed $HOME/.dwm/status is an executable script like:
+
+    #!/bin/sh
+    while true
+    do
+        echo `date` `uptime | sed 's/.*://; s/,//g'`
+        sleep 5
+    done
 
 
 Configuration
