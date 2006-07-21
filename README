@@ -38,17 +38,11 @@ Displaying status info
 In order to display status info in the bar, you can do following
 in .xinitrc:
 
-    $HOME/.dwm/status | dwm
-
-Assumed $HOME/.dwm/status is an executable script like:
-
-    #!/bin/sh
     while true
     do
         echo `date` `uptime | sed 's/.*://; s/,//g'`
         sleep 5
-    done
-
+    done | dwm
 
 Configuration
 -------------
