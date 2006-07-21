@@ -15,9 +15,7 @@
 static void
 bad_malloc(unsigned int size)
 {
-	fprintf(stderr, "fatal: could not malloc() %d bytes\n",
-			(int) size);
-	exit(EXIT_FAILURE);
+	eprint("fatal: could not malloc() %u bytes\n", size);
 }
 
 /* extern */
@@ -58,7 +56,7 @@ spawn(Arg *arg)
 			fprintf(stderr, "dwm: execvp %s", argv[0]);
 			perror(" failed");
 		}
-		exit(EXIT_FAILURE);
+		exit(0);
 	}
 	wait(0);
 }

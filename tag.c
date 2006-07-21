@@ -165,17 +165,12 @@ void
 settags(Client *c)
 {
 	char classinst[256];
-	static unsigned int len = rule ? sizeof(rule) / sizeof(rule[0]) : 0;
+	static unsigned int len = sizeof(rule) / sizeof(rule[0]);
 	unsigned int i, j;
 	regex_t regex;
 	regmatch_t tmp;
 	Bool matched = False;
 	XClassHint ch;
-
-	if(!len) {
-		c->tags[tsel] = tags[tsel];
-		return;
-	}
 
 	if(XGetClassHint(dpy, c->win, &ch)) {
 		snprintf(classinst, sizeof(classinst), "%s:%s",

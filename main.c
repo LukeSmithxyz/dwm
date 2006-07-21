@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/select.h>
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
@@ -163,7 +164,7 @@ xerror(Display *dpy, XErrorEvent *ee)
 int
 main(int argc, char *argv[])
 {
-	int i, n;
+	int i;
 	unsigned int mask;
 	fd_set rd;
 	Bool readin = True;
