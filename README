@@ -41,7 +41,7 @@ in .xinitrc:
     while true
     do
         echo `date` `uptime | sed 's/.*://; s/,//g'`
-        sleep 5
+        sleep 2
     done | dwm
 
 Configuration
