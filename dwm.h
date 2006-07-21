@@ -7,21 +7,21 @@
 
 /* CUSTOMIZE */
 
-#define FONT				"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
-#define BGCOLOR				"#0a2c2d"
-#define FGCOLOR				"#ddeeee"
-#define BORDERCOLOR			"#176164"
-#define MODKEY				 Mod1Mask /* Mod4Mask */
+#define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
+#define BGCOLOR			"#0a2c2d"
+#define FGCOLOR			"#ddeeee"
+#define BORDERCOLOR		"#176164"
+#define MODKEY			Mod1Mask /* Mod4Mask */
 /*
-#define BGCOLOR				"#666699"
-#define FGCOLOR				"#eeeeee"
-#define BORDERCOLOR			"#9999CC"
+#define BGCOLOR			"#666699"
+#define FGCOLOR			"#eeeeee"
+#define BORDERCOLOR		"#9999CC"
 */
-#define MASTERW				52 /* percent */
+#define MASTERW			52 /* percent */
 #define WM_PROTOCOL_DELWIN	1
 
 /* tags */
-enum { Tscratch, Tdev, Twww, Twork, TLast };
+enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 
 /* END CUSTOMIZE */
 
@@ -105,7 +105,6 @@ extern void higher(Client *c);
 extern void killclient(Arg *arg);
 extern void lower(Client *c);
 extern void manage(Window w, XWindowAttributes *wa);
-extern void pop(Client *c);
 extern void resize(Client *c, Bool sizehints, Corner sticky);
 extern void setsize(Client *c);
 extern void settitle(Client *c);
@@ -136,7 +135,6 @@ extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
 extern Client *getnext(Client *c, unsigned int t);
 extern Client *getprev(Client *c);
-extern void heretag(Arg *arg);
 extern void replacetag(Arg *arg);
 extern void settags(Client *c);
 extern void togglemode(Arg *arg);

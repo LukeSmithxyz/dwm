@@ -476,7 +476,7 @@ unmanage(Client *c)
 void
 zoom(Arg *arg)
 {
-	Client *c;
+	Client *c, **l;
 
 	if(!sel)
 		return;
@@ -486,6 +486,19 @@ zoom(Arg *arg)
 			sel = c;
 	}
 
-	pop(sel);
+	/* pop */
+	for(l = &clients; *l && *l != sel; l = &(*l)->next);
+	if(sel->prev)
+		sel->prev->next = sel->next;
+	if(sel->next)
+		sel->next->prev = sel->prev;
+	*l = sel->next;
+
+	sel->prev = NULL;
+	if(clients)
+		clients->prev = sel;
+	sel->next = clients;
+	clients = sel;
+	arrange(NULL);
 	focus(sel);
 }

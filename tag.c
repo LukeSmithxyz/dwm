@@ -21,15 +21,16 @@ typedef struct {
 /* CUSTOMIZE */ 
 static Rule rule[] = {
 	/* class:instance	tags				isfloat */
-	{ "Firefox.*",		{ [Twww] = "www" },		False },
+	{ "Firefox.*",		{ [Tnet] = "net" },		False },
 	{ "Gimp.*",		{ 0 },				True},
 };
 
 char *tags[TLast] = {
-	[Tscratch] = "scratch",
+	[Tfnord] = "fnord",
 	[Tdev] = "dev",
-	[Twww] = "www",
+	[Tnet] = "net",
 	[Twork] = "work",
+	[Tmisc] = "misc",
 };
 
 void (*arrange)(Arg *) = dotile;
@@ -145,25 +146,6 @@ getprev(Client *c)
 {
 	for(; c && !c->tags[tsel]; c = c->prev);
 	return c;
-}
-
-void
-heretag(Arg *arg)
-{
-	int i;
-	Client *c;
-
-	if(arg->i == tsel)
-		return;
-
-	if(!(c = getnext(clients, arg->i)))
-		return;
-
-	for(i = 0; i < TLast; i++)
-		c->tags[i] = NULL;
-	c->tags[tsel] = tags[tsel];
-	pop(c);
-	focus(c);
 }
 
 void
