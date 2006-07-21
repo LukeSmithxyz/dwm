@@ -23,7 +23,7 @@ typedef struct {
 const char *browse[] = { "firefox", NULL };
 const char *gimp[] = { "gimp", NULL };
 const char *term[] = { 
-	"urxvtc", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
+	"urxvt", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
 	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
 };
 const char *xlock[] = { "xlock", NULL };

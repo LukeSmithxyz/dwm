@@ -166,22 +166,17 @@ main(int argc, char *argv[])
 	int i, n;
 	unsigned int mask;
 	fd_set rd;
-	Bool readstdin = True;
+	Bool readin = True;
 	Window w;
 	XEvent ev;
 	XSetWindowAttributes wa;
 
-	for(i = 1; (i < argc) && (argv[i][0] == '-'); i++) {
-		switch (argv[i][1]) {
-		default:
-			eprint("usage: dwm [-v]\n");
-			break;
-		case 'v':
-			fputs("dwm-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
-			exit(EXIT_SUCCESS);
-			break;
-		}
+	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
+		fputs("dwm-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
+		exit(EXIT_SUCCESS);
 	}
+	else if(argc != 1)
+		eprint("usage: dwm [-v]\n");
 
 	dpy = XOpenDisplay(0);
 	if(!dpy)
@@ -256,10 +251,9 @@ main(int argc, char *argv[])
 	scan();
 
 	/* main event loop, reads status text from stdin as well */
-Mainloop:
 	while(running) {
 		FD_ZERO(&rd);
-		if(readstdin)
+		if(readin)
 			FD_SET(STDIN_FILENO, &rd);
 		FD_SET(ConnectionNumber(dpy), &rd);
 
@@ -276,20 +270,12 @@ Mainloop:
 						(handler[ev.type])(&ev); /* call handler */
 				}
 			}
-			if(readstdin && FD_ISSET(STDIN_FILENO, &rd)) {
-				i = n = 0;
-				for(;;) {
-					if((i = getchar()) == EOF) {
-						/* broken pipe/end of producer */
-						readstdin = False;
-						strcpy(stext, "broken pipe");
-						goto Mainloop;
-					}
-					if(i == '\n' || n >= sizeof(stext) - 1)
-						break;
-					stext[n++] = i;
-				}
-				stext[n] = 0;
+			if(readin && FD_ISSET(STDIN_FILENO, &rd)) {
+				readin = NULL != fgets(stext, sizeof(stext), stdin);
+				if(readin)
+					stext[strlen(stext) - 1] = 0;
+				else 
+					strcpy(stext, "broken pipe");
 				drawstatus();
 			}
 		}
