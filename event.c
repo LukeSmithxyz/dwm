@@ -116,12 +116,10 @@ buttonpress(XEvent *e)
 			}
 			break;
 		case Button4:
-			a.i = (tsel + 1 < TLast) ? tsel + 1 : 0;
-			view(&a);
+			viewnext(&a);
 			break;
 		case Button5:
-			a.i = (tsel - 1 >= 0) ? tsel - 1 : TLast - 1;
-			view(&a);
+			viewprev(&a);
 			break;
 		}
 	}
