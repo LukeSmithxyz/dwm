@@ -3,6 +3,7 @@
  * See LICENSE file for license details.
  */
 
+#define ARRANGE			dotile
 #define FONT			"fixed"
 #define BGCOLOR			"#666699"
 #define FGCOLOR			"#eeeeee"
@@ -63,5 +64,3 @@ static Rule rule[] = { \
 	{ "Firefox.*",		{ [Tnet] = "net" },		False }, \
 	{ "Gimp.*",		{ 0 },				True}, \
 };
-
-#define ARRANGE dotile
