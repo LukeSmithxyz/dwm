@@ -9,7 +9,7 @@
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
-#define WM_PROTOCOL_DELWIN	1
+#define PROTODELWIN		1
 
 typedef union Arg Arg;
 typedef struct Client Client;

@@ -111,7 +111,7 @@ getproto(Window w)
 	}
 	for(i = 0; i < res; i++) {
 		if(protocols[i] == wmatom[WMDelete])
-			protos |= WM_PROTOCOL_DELWIN;
+			protos |= PROTODELWIN;
 	}
 	free((char *) protocols);
 	return protos;

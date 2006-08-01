@@ -191,7 +191,7 @@ killclient(Arg *arg)
 {
 	if(!sel)
 		return;
-	if(sel->proto & WM_PROTOCOL_DELWIN)
+	if(sel->proto & PROTODELWIN)
 		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]);
 	else
 		XKillClient(dpy, sel->win);
