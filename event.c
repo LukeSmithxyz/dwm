@@ -57,6 +57,9 @@ static Key key[] = {
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
 };
 
+#define NumLockMask Mod2Mask
+unsigned int valid_mask =  255 &  ~( NumLockMask | LockMask);
+
 /* END CUSTOMIZE */
 
 /* static */
@@ -271,10 +274,11 @@ keypress(XEvent *e)
 	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
+	ev->state &= valid_mask;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++)
-		if((keysym == key[i].keysym) && (key[i].mod == ev->state)) {
+		if((keysym == key[i].keysym) && ((key[i].mod & valid_mask) == ev->state)) {
 			if(key[i].func)
 				key[i].func(&key[i].arg);
 			return;
@@ -377,7 +381,19 @@ grabkeys()
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
 		XUngrabKey(dpy, code, key[i].mod, root);
+		if (NumLockMask)
+		{
+			XUngrabKey(dpy, code, key[i].mod | NumLockMask, root);
+			XUngrabKey(dpy, code, key[i].mod | NumLockMask | LockMask, root);
+		}
 		XGrabKey(dpy, code, key[i].mod, root, True,
 				GrabModeAsync, GrabModeAsync);
+		if (NumLockMask)
+		{
+			XGrabKey(dpy, code, key[i].mod | NumLockMask, root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, key[i].mod | NumLockMask | LockMask, root, True,
+					GrabModeAsync, GrabModeAsync);
+		}
 	}
 }
