@@ -8,7 +8,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
-/* CUSTOMIZE */
+/* static */
 
 typedef struct {
 	unsigned long mod;
@@ -17,52 +17,10 @@ typedef struct {
 	Arg arg;
 } Key;
 
-const char *browse[] = { "firefox", NULL };
-const char *gimp[] = { "gimp", NULL };
-const char *term[] = { /*"xterm", NULL };*/
-	"urxvt", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
-	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
-};
-const char *xlock[] = { "xlock", NULL };
+CMDS
+KEYS
 
-static Key key[] = {
-	/* modifier		key		function	arguments */
-	{ MODKEY,		XK_0,		view,		{ .i = Tfnord } }, 
-	{ MODKEY,		XK_1,		view,		{ .i = Tdev } }, 
-	{ MODKEY,		XK_2,		view,		{ .i = Tnet } }, 
-	{ MODKEY,		XK_3,		view,		{ .i = Twork } }, 
-	{ MODKEY,		XK_4,		view,		{ .i = Tmisc} }, 
-	{ MODKEY,		XK_h,		viewprev,	{ 0 } },
-	{ MODKEY,		XK_j,		focusnext,	{ 0 } }, 
-	{ MODKEY,		XK_k,		focusprev,	{ 0 } },
-	{ MODKEY,		XK_l,		viewnext,	{ 0 } },
-	{ MODKEY,		XK_m,		togglemax,	{ 0 } }, 
-	{ MODKEY,		XK_space,	togglemode,	{ 0 } }, 
-	{ MODKEY,		XK_Return,	zoom,		{ 0 } },
-	{ MODKEY|ControlMask,	XK_0,		appendtag,	{ .i = Tfnord } }, 
-	{ MODKEY|ControlMask,	XK_1,		appendtag,	{ .i = Tdev } }, 
-	{ MODKEY|ControlMask,	XK_2,		appendtag,	{ .i = Tnet } }, 
-	{ MODKEY|ControlMask,	XK_3,		appendtag,	{ .i = Twork } }, 
-	{ MODKEY|ControlMask,	XK_4,		appendtag,	{ .i = Tmisc } }, 
-	{ MODKEY|ShiftMask,	XK_0,		replacetag,	{ .i = Tfnord } }, 
-	{ MODKEY|ShiftMask,	XK_1,		replacetag,	{ .i = Tdev } }, 
-	{ MODKEY|ShiftMask,	XK_2,		replacetag,	{ .i = Tnet } }, 
-	{ MODKEY|ShiftMask,	XK_3,		replacetag,	{ .i = Twork } }, 
-	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = Tmisc } }, 
-	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, 
-	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } },
-	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
-	{ MODKEY|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } },
-	{ MODKEY|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
-	{ MODKEY|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
-};
-
-#define NumLockMask Mod2Mask
-unsigned int valid_mask =  255 &  ~( NumLockMask | LockMask);
-
-/* END CUSTOMIZE */
-
-/* static */
+static unsigned int valid_mask =  255 &  ~(NUMLOCKMASK | LockMask);
 
 static void
 movemouse(Client *c)
@@ -381,19 +339,13 @@ grabkeys()
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
 		XUngrabKey(dpy, code, key[i].mod, root);
-		if (NumLockMask)
-		{
-			XUngrabKey(dpy, code, key[i].mod | NumLockMask, root);
-			XUngrabKey(dpy, code, key[i].mod | NumLockMask | LockMask, root);
-		}
+		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root);
+		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root);
 		XGrabKey(dpy, code, key[i].mod, root, True,
 				GrabModeAsync, GrabModeAsync);
-		if (NumLockMask)
-		{
-			XGrabKey(dpy, code, key[i].mod | NumLockMask, root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, key[i].mod | NumLockMask | LockMask, root, True,
-					GrabModeAsync, GrabModeAsync);
-		}
+		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root, True,
+				GrabModeAsync, GrabModeAsync);
 	}
 }

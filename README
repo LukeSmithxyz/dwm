@@ -18,6 +18,11 @@ necessary as root):
 
     make clean install
 
+If you want to use a customized config.h, you can use the following
+command for installing dwm:
+
+    make CONFIG=<your-config>.h clean install
+
 
 Running dwm
 -----------
@@ -47,5 +52,4 @@ like this in your .xinitrc:
 
 Configuration
 -------------
-The configuration of dwm is done by customizing its source code
-(grep for the CUSTOMIZE keyword).
+The configuration of dwm is done by editing config.h.

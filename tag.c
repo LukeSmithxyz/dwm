@@ -18,24 +18,10 @@ typedef struct {
 	Bool isfloat;
 } Rule;
 
-/* CUSTOMIZE */ 
-static Rule rule[] = {
-	/* class:instance	tags				isfloat */
-	{ "Firefox.*",		{ [Tnet] = "net" },		False },
-	{ "Gimp.*",		{ 0 },				True},
-};
+TAGS
+RULES
 
-char *tags[TLast] = {
-	[Tfnord] = "fnord",
-	[Tdev] = "dev",
-	[Tnet] = "net",
-	[Twork] = "work",
-	[Tmisc] = "misc",
-};
-
-void (*arrange)(Arg *) = dotile;
-
-/* END CUSTOMIZE */
+void (*arrange)(Arg *) = ARRANGE;
 
 /* extern */
 

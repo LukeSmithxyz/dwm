@@ -85,9 +85,7 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 /* extern */
 
 char stext[1024];
-/* CUSTOMIZE */
-int tsel = Tdev; /* default tag */
-/* END CUSTOMIZE */
+int tsel = DEFTAG;
 int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
