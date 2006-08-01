@@ -21,7 +21,7 @@ typedef struct {
 TAGS
 RULES
 
-void (*arrange)(Arg *) = ARRANGE;
+void (*arrange)(Arg *) = DEFMODE;
 
 /* extern */
 

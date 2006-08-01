@@ -4,8 +4,8 @@
  */
 
 enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
+#define DEFMODE			dotile /* dofloat */
 #define DEFTAG			Tdev
-#define ARRANGE			dotile /* dofloat */
 #define FONT			"fixed"
 #define BGCOLOR			"#666699"
 #define FGCOLOR			"#eeeeee"
