@@ -416,20 +416,18 @@ togglemax(Arg *arg)
 void
 unmanage(Client *c)
 {
-	Client **l;
-
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->title);
 
-	for(l = &clients; *l && *l != c; l = &(*l)->next);
 	if(c->prev)
 		c->prev->next = c->next;
 	if(c->next)
 		c->next->prev = c->prev;
-	*l = c->next;
+	if(c == clients)
+		clients = c->next;
 	if(sel == c) {
 		sel = getnext(c->next);
 		if(!sel)
@@ -450,7 +448,7 @@ unmanage(Client *c)
 void
 zoom(Arg *arg)
 {
-	Client *c, **l;
+	Client *c;
 
 	if(!sel)
 		return;
@@ -461,13 +459,10 @@ zoom(Arg *arg)
 	}
 
 	/* pop */
-	for(l = &clients; *l && *l != sel; l = &(*l)->next);
 	if(sel->prev)
 		sel->prev->next = sel->next;
 	if(sel->next)
 		sel->next->prev = sel->prev;
-	*l = sel->next;
-
 	sel->prev = NULL;
 	if(clients)
 		clients->prev = sel;
