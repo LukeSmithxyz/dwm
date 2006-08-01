@@ -244,11 +244,11 @@ manage(Window w, XWindowAttributes *wa)
 	c->next = clients;
 	clients = c;
 
-	XGrabButton(dpy, Button1, MODKEY, c->win, False, ButtonMask,
+	XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, MODKEY, c->win, False, ButtonMask,
+	XGrabButton(dpy, Button2, MODKEY, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, MODKEY, c->win, False, ButtonMask,
+	XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 
 	if(!c->isfloat)

@@ -7,8 +7,8 @@
 #include CONFIG
 
 /* mask shorthands, used in event.c and client.c */
-#define ButtonMask	(ButtonPressMask | ButtonReleaseMask)
-#define MouseMask	(ButtonMask | PointerMotionMask)
+#define BUTTONMASK	(ButtonPressMask | ButtonReleaseMask)
+#define MOUSEMASK	(BUTTONMASK | PointerMotionMask)
 
 typedef union Arg Arg;
 typedef struct Client Client;

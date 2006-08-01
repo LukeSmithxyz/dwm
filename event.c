@@ -32,12 +32,12 @@ movemouse(Client *c)
 
 	ocx = c->x;
 	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
-		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
+		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch (ev.type) {
 		default: break;
 		case Expose:
@@ -65,12 +65,12 @@ resizemouse(Client *c)
 
 	ocx = c->x;
 	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MouseMask, GrabModeAsync, GrabModeAsync,
+	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 				None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 	for(;;) {
-		XMaskEvent(dpy, MouseMask | ExposureMask, &ev);
+		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch(ev.type) {
 		default: break;
 		case Expose:
