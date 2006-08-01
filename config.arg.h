@@ -3,7 +3,10 @@
  * See LICENSE file for license details.
  */
 
-#define ARRANGE 		dotile /* dofloat */
+enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
+
+#define ARRANGE			dotile /* dofloat */
+#define DEFTAG			Tdev
 #define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
 #define BGCOLOR			"#0a2c2d"
 #define FGCOLOR			"#ddeeee"
@@ -12,7 +15,6 @@
 #define NUMLOCKMASK		Mod2Mask
 #define MASTERW			52 /* percent */
 
-enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
 char *tags[TLast] = { \
 	[Tfnord] = "fnord", \
@@ -21,19 +23,15 @@ char *tags[TLast] = { \
 	[Twork] = "work", \
 	[Tmisc] = "misc", \
 };
-#define DEFTAG Tdev
 
-
-#define CMDS \
+#define KEYS \
 	const char *browse[] = { "firefox", NULL }; \
 	const char *gimp[] = { "gimp", NULL }; \
 	const char *term[] = { \
 		"urxvt", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white", \
 		"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL \
 	}; \
-	const char *xlock[] = { "xlock", NULL };
-
-#define KEYS \
+	const char *xlock[] = { "xlock", NULL }; \
 static Key key[] = { \
 	/* modifier		key		function	arguments */ \
 	{ MODKEY,		XK_0,		view,		{ .i = Tfnord } }, \

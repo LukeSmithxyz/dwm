@@ -3,7 +3,9 @@
  * See LICENSE file for license details.
  */
 
-#define ARRANGE 		dotile /* dofloat */
+enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
+#define DEFTAG			Tdev
+#define ARRANGE			dotile /* dofloat */
 #define FONT			"fixed"
 #define BGCOLOR			"#666699"
 #define FGCOLOR			"#eeeeee"
@@ -12,7 +14,6 @@
 #define NUMLOCKMASK		Mod2Mask
 #define MASTERW			52 /* percent */
 
-enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
 char *tags[TLast] = { \
 	[Tfnord] = "fnord", \
@@ -21,13 +22,9 @@ char *tags[TLast] = { \
 	[Twork] = "work", \
 	[Tmisc] = "misc", \
 };
-#define DEFTAG Tdev
-
-
-#define CMDS \
-	const char *term[] = { "xterm", NULL };
 
 #define KEYS \
+	const char *term[] = { "xterm", NULL }; \
 static Key key[] = { \
 	/* modifier		key		function	arguments */ \
 	{ MODKEY,		XK_0,		view,		{ .i = Tfnord } }, \
