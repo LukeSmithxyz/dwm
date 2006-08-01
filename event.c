@@ -17,7 +17,6 @@ typedef struct {
 	Arg arg;
 } Key;
 
-CMDS
 KEYS
 
 static unsigned int valid_mask =  255 &  ~(NUMLOCKMASK | LockMask);
