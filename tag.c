@@ -216,3 +216,17 @@ view(Arg *arg)
 	arrange(NULL);
 	drawall();
 }
+
+void
+viewnext(Arg *arg)
+{
+	arg->i = (tsel < TLast-1) ? tsel+1 : 0;
+	view(arg);
+}
+
+void
+viewprev(Arg *arg)
+{
+	arg->i = (tsel > 0) ? tsel-1 : TLast-1;
+	view(arg);
+}
