@@ -3,7 +3,7 @@
  * See LICENSE file for license details.
  */
 
-#define ARRANGE			dotile
+#define ARRANGE 		dotile /* dofloat */
 #define FONT			"fixed"
 #define BGCOLOR			"#666699"
 #define FGCOLOR			"#eeeeee"
@@ -11,7 +11,6 @@
 #define MODKEY			Mod1Mask
 #define NUMLOCKMASK		Mod2Mask
 #define MASTERW			52 /* percent */
-#define WM_PROTOCOL_DELWIN	1
 
 enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
