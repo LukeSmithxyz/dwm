@@ -73,8 +73,8 @@ focusnext(Arg *arg)
 	if(sel->ismax)
 		togglemax(NULL);
 
-	if(!(c = getnext(sel->next, tsel)))
-		c = getnext(clients, tsel);
+	if(!(c = getnext(sel->next)))
+		c = getnext(clients);
 	if(c) {
 		higher(c);
 		focus(c);
@@ -260,36 +260,10 @@ manage(Window w, XWindowAttributes *wa)
 	arrange(NULL);
 
 	/* mapping the window now prevents flicker */
-	if(c->tags[tsel]) {
-		XMapRaised(dpy, c->win);
-		XMapRaised(dpy, c->title);
+	XMapRaised(dpy, c->win);
+	XMapRaised(dpy, c->title);
+	if(c->tags[tsel])
 		focus(c);
-	}
-	else {
-		XMapRaised(dpy, c->win);
-		XMapRaised(dpy, c->title);
-
-	}
-}
-
-void
-pop(Client *c)
-{
-	Client **l;
-
-	for(l = &clients; *l && *l != c; l = &(*l)->next);
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	*l = c->next;
-
-	c->prev = NULL;
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
-	arrange(NULL);
 }
 
 void
@@ -457,7 +431,7 @@ unmanage(Client *c)
 		c->next->prev = c->prev;
 	*l = c->next;
 	if(sel == c) {
-		sel = getnext(c->next, tsel);
+		sel = getnext(c->next);
 		if(!sel)
 			sel = getprev(c->prev);
 		if(!sel)
@@ -481,8 +455,8 @@ zoom(Arg *arg)
 	if(!sel)
 		return;
 
-	if(sel == getnext(clients, tsel) && sel->next)  {
-		if((c = getnext(sel->next, tsel)))
+	if(sel == getnext(clients) && sel->next)  {
+		if((c = getnext(sel->next)))
 			sel = c;
 	}
 

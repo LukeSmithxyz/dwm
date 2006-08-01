@@ -99,7 +99,7 @@ drawall()
 {
 	Client *c;
 
-	for(c = clients; c; c = getnext(c->next, tsel))
+	for(c = clients; c; c = getnext(c->next))
 		drawtitle(c);
 	drawstatus();
 }
