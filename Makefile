@@ -13,7 +13,6 @@ all: options dwm
 
 options:
 	@echo dwm build options:
-	@echo "LIBS     = ${LIBS}"
 	@echo "CFLAGS   = ${CFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
@@ -29,7 +28,7 @@ dwm: ${OBJ}
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
-	rm -f dwm *.o core dwm-${VERSION}.tar.gz
+	rm -f dwm *.o dwm-${VERSION}.tar.gz
 
 dist: clean
 	mkdir -p dwm-${VERSION}

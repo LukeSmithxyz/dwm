@@ -8,9 +8,6 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
-#define ButtonMask      (ButtonPressMask | ButtonReleaseMask)
-#define MouseMask       (ButtonMask | PointerMotionMask)
-
 /* CUSTOMIZE */
 
 typedef struct {
@@ -20,17 +17,13 @@ typedef struct {
 	Arg arg;
 } Key;
 
-/*
 const char *browse[] = { "firefox", NULL };
 const char *gimp[] = { "gimp", NULL };
-*/
-const char *term[] = { "xterm", NULL };
-/*
+const char *term[] = { /*"xterm", NULL };*/
 	"urxvt", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white",
 	"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL
 };
 const char *xlock[] = { "xlock", NULL };
-*/
 
 static Key key[] = {
 	/* modifier		key		function	arguments */
@@ -57,11 +50,9 @@ static Key key[] = {
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, 
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } },
 	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } },
-	/*
 	{ MODKEY|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } },
 	{ MODKEY|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } },
 	{ MODKEY|ShiftMask,	XK_w,		spawn,		{ .argv = browse } },
-	*/
 };
 
 /* END CUSTOMIZE */
@@ -172,6 +163,7 @@ buttonpress(XEvent *e)
 		}
 	}
 	else if((c = getclient(ev->window))) {
+		focus(c);
 		switch(ev->button) {
 		default:
 			break;
@@ -247,7 +239,7 @@ enternotify(XEvent *e)
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
+	if(ev->detail == NotifyInferior)
 		return;
 
 	if((c = getclient(ev->window)))

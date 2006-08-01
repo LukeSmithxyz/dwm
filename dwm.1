@@ -21,7 +21,7 @@ time. But each window may contain more than one tag, which makes it visible in
 several views.
 .P
 .B dwm
-consists of a small status bar which reads the text displayed from standard
+has a small status bar which reads the text displayed from standard
 input, if written. It draws 1-pixel borders around windows to indicate the
 focus state. Unfocused windows contain a small bar in front of the window
 displaying the tags and the window title.
@@ -56,14 +56,12 @@ Focus
 tag
 .TP
 .B Mod1-space
-(Re-)arrange
-.B all
-windows tiled
-.TP
-.B Mod1-Shift-space
-(Re-)arrange
-.B all
-windows floating
+Toggle between
+.B tiled
+and
+.B floating
+mode (affects
+.BR "all windows" )
 .TP
 .B Mod1-Shift-[0..n]
 Apply
@@ -78,14 +76,6 @@ Quit
 .B Mod1-Shift-Return
 Start
 .B terminal
-.TP
-.B Mod1-Shift-w
-Start
-.B web browser
-.TP
-.B Mod1-Shift-l
-Lock
-.B screen
 .TP
 .B Mod1-Control-[0..n]
 Append

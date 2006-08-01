@@ -25,9 +25,12 @@ enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 
 /* END CUSTOMIZE */
 
+/* mask shorthands, used in event.c and client.c */
+#define ButtonMask	(ButtonPressMask | ButtonReleaseMask)
+#define MouseMask	(ButtonMask | PointerMotionMask)
+
 typedef union Arg Arg;
 typedef struct Client Client;
-typedef enum Corner Corner;
 typedef struct DC DC;
 typedef struct Fnt Fnt;
 
@@ -43,7 +46,8 @@ enum { WMProtocols, WMDelete, WMLast };
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurLast };
 
-enum Corner { TopLeft, TopRight, BotLeft, BotRight };
+/* windowcorners */
+typedef enum { TopLeft, TopRight, BotLeft, BotRight } Corner;
 
 struct Fnt {
 	int ascent;

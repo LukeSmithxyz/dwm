@@ -67,6 +67,8 @@ dofloat(Arg *arg)
 			higher(sel);
 			focus(sel);
 		}
+		else
+			XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	}
 	drawall();
 }
@@ -130,6 +132,8 @@ dotile(Arg *arg)
 			higher(sel);
 			focus(sel);
 		}
+		else
+			XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	}
 	drawall();
 }
