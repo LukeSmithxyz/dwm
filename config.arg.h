@@ -21,7 +21,7 @@ char *tags[TLast] = { \
 #define BORDERCOLOR		"#176164"
 #define MODKEY			Mod1Mask
 #define NUMLOCKMASK		Mod2Mask
-#define MASTERW			52 /* percent */
+#define MASTERW			60 /* percent */
 
 #define KEYS \
 	const char *browse[] = { "firefox", NULL }; \

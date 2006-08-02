@@ -21,7 +21,7 @@ char *tags[TLast] = { \
 #define BORDERCOLOR		"#9999CC"
 #define MODKEY			Mod1Mask
 #define NUMLOCKMASK		Mod2Mask
-#define MASTERW			52 /* percent */
+#define MASTERW			60 /* percent */
 
 #define KEYS \
 	const char *term[] = { "xterm", NULL }; \
