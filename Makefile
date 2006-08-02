@@ -21,7 +21,10 @@ options:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${OBJ}: dwm.h
+${OBJ}: dwm.h config.h
+
+config.h:
+	cp config.default.h config.h
 
 dwm: ${OBJ}
 	@echo LD $@
