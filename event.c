@@ -153,7 +153,6 @@ configurerequest(XEvent *e)
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
 
-	ev->value_mask &= ~CWSibling;
 	if((c = getclient(ev->window))) {
 		gravitate(c, True);
 		if(ev->value_mask & CWX)
@@ -169,18 +168,16 @@ configurerequest(XEvent *e)
 		gravitate(c, False);
 		resize(c, True, TopLeft);
 	}
-
-	wc.x = ev->x;
-	wc.y = ev->y;
-	wc.width = ev->width;
-	wc.height = ev->height;
-	wc.border_width = 1;
-	wc.sibling = None;
-	wc.stack_mode = Above;
-	ev->value_mask &= ~CWStackMode;
-	ev->value_mask |= CWBorderWidth;
-	XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-	XSync(dpy, False);
+	else {
+		wc.x = ev->x;
+		wc.y = ev->y;
+		wc.width = ev->width;
+		wc.height = ev->height;
+		wc.border_width = 1;
+		XConfigureWindow(dpy, ev->window,
+				CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
+		XSync(dpy, False);
+	}
 }
 
 static void
