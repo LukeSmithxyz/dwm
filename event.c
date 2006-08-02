@@ -3,7 +3,6 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
-
 #include <stdlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -151,32 +150,60 @@ configurerequest(XEvent *e)
 {
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
+	XEvent synev;
 	XWindowChanges wc;
+	unsigned long newmask;
 
-	ev->value_mask &= ~CWSibling;
 	if((c = getclient(ev->window))) {
 		gravitate(c, True);
-		if(ev->value_mask & CWX)
-			c->x = ev->x;
-		if(ev->value_mask & CWY)
-			c->y = ev->y;
-		if(ev->value_mask & CWWidth)
-			c->w = ev->width;
-		if(ev->value_mask & CWHeight)
-			c->h = ev->height;
+		if(c->isfloat) {
+			if(ev->value_mask & CWX)
+				c->x = ev->x;
+			if(ev->value_mask & CWY)
+				c->y = ev->y;
+			if(ev->value_mask & CWWidth)
+				c->w = ev->width;
+			if(ev->value_mask & CWHeight)
+				c->h = ev->height;
+		}
 		if(ev->value_mask & CWBorderWidth)
-			c->border = 1;
+			c->border = ev->border_width;
 		gravitate(c, False);
-		resize(c, True, TopLeft);
-	}
 
-	wc.x = ev->x;
-	wc.y = ev->y;
-	wc.width = ev->width;
-	wc.height = ev->height;
-	wc.border_width = 1;
-	XConfigureWindow(dpy, ev->window,
-			CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
+		resize(c, True, TopLeft);
+
+		wc.x = c->x;
+		wc.y = c->y;
+		wc.width = c->w;
+		wc.height = c->h;
+		newmask = ev->value_mask & (~(CWSibling | CWStackMode | CWBorderWidth));
+		if(newmask)
+			XConfigureWindow(dpy, c->win, newmask, &wc);
+		else {
+			synev.type = ConfigureNotify;
+			synev.xconfigure.display = dpy;
+			synev.xconfigure.event = c->win;
+			synev.xconfigure.window = c->win;
+			synev.xconfigure.x = c->x;
+			synev.xconfigure.y = c->y;
+			synev.xconfigure.width = c->w;
+			synev.xconfigure.height = c->h;
+			synev.xconfigure.border_width = c->border;
+			synev.xconfigure.above = None;
+			/* Send synthetic ConfigureNotify */
+			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+		}
+	}
+	else {
+		wc.x = ev->x;
+		wc.y = ev->y;
+		wc.width = ev->width;
+		wc.height = ev->height;
+		wc.border_width = ev->border_width;
+		wc.sibling = ev->above;
+		wc.stack_mode = ev->detail;
+		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+	}
 	XSync(dpy, False);
 }
 

@@ -3,15 +3,6 @@
  * See LICENSE file for license details.
  */
 
-#define DEFMODE			dotile /* dofloat */
-#define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
-#define BGCOLOR			"#0a2c2d"
-#define FGCOLOR			"#ddeeee"
-#define BORDERCOLOR		"#176164"
-#define MODKEY			Mod1Mask
-#define NUMLOCKMASK		Mod2Mask
-#define MASTERW			52 /* percent */
-
 enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
 char *tags[TLast] = { \
@@ -21,7 +12,16 @@ char *tags[TLast] = { \
 	[Twork] = "work", \
 	[Tmisc] = "misc", \
 };
+
+#define DEFMODE			dotile /* dofloat */
 #define DEFTAG			Tdev
+#define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
+#define BGCOLOR			"#0a2c2d"
+#define FGCOLOR			"#ddeeee"
+#define BORDERCOLOR		"#176164"
+#define MODKEY			Mod1Mask
+#define NUMLOCKMASK		Mod2Mask
+#define MASTERW			52 /* percent */
 
 #define KEYS \
 	const char *browse[] = { "firefox", NULL }; \

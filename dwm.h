@@ -3,8 +3,8 @@
  * See LICENSE file for license details.
  */
 
-#include <X11/Xlib.h>
 #include CONFIG
+#include <X11/Xlib.h>
 
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
@@ -57,8 +57,8 @@ struct Client {
 	int tx, ty, tw, th; /* title */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
-	unsigned int border;
 	long flags; 
+	unsigned int border;
 	Bool isfloat;
 	Bool ismax;
 	Client *next;

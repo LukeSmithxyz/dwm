@@ -3,7 +3,6 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
-
 #include <regex.h>
 #include <stdio.h>
 #include <string.h>
@@ -86,26 +85,26 @@ dotile(Arg *arg)
 			if(n == 1) {
 				c->x = sx;
 				c->y = sy + bh;
-				c->w = sw - 2 * c->border;
-				c->h = sh - 2 * c->border - bh;
+				c->w = sw - 2;
+				c->h = sh - 2 - bh;
 			}
 			else if(i == 0) {
 				c->x = sx;
 				c->y = sy + bh;
-				c->w = mw - 2 * c->border;
-				c->h = sh - 2 * c->border - bh;
+				c->w = mw - 2;
+				c->h = sh - 2 - bh;
 			}
 			else if(h > bh) {
 				c->x = sx + mw;
 				c->y = sy + (i - 1) * h + bh;
-				c->w = w - 2 * c->border;
-				c->h = h - 2 * c->border;
+				c->w = w - 2;
+				c->h = h - 2;
 			}
 			else { /* fallback if h < bh */
 				c->x = sx + mw;
 				c->y = sy + bh;
-				c->w = w - 2 * c->border;
-				c->h = sh - 2 * c->border - bh;
+				c->w = w - 2;
+				c->h = sh - 2 - bh;
 			}
 			resize(c, False, TopLeft);
 			i++;

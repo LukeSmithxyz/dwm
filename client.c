@@ -3,7 +3,6 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xatom.h>
@@ -219,7 +218,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->h = wa->height;
 	c->th = bh;
 
-	c->border = 1;
+	c->border = 0;
 	setsize(c);
 
 	if(c->h != sh && c->y < bh)
@@ -254,8 +253,7 @@ manage(Window w, XWindowAttributes *wa)
 	if(!c->isfloat)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
-				c->maxw == c->minw && c->maxh == c->minh)
-			|| (c->w == sw && c->h == sh);
+				c->maxw == c->minw && c->maxh == c->minh);
 	settitle(c);
 	arrange(NULL);
 
@@ -271,7 +269,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 {
 	int bottom = c->y + c->h;
 	int right = c->x + c->w;
-	XConfigureEvent e;
+	/*XConfigureEvent e;*/
 	XWindowChanges wc;
 
 	if(sizehints) {
@@ -302,21 +300,11 @@ resize(Client *c, Bool sizehints, Corner sticky)
 	wc.y = c->y;
 	wc.width = c->w;
 	wc.height = c->h;
-	wc.border_width = 1;
-	XConfigureWindow(dpy, c->win,
-			CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
-
-	e.type = ConfigureNotify;
-	e.event = c->win;
-	e.window = c->win;
-	e.x = c->x;
-	e.y = c->y;
-	e.width = c->w;
-	e.height = c->h;
-	e.border_width = c->border;
-	e.above = None;
-	e.override_redirect = False;
-	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&e);
+	if(c->w == sw && c->h == sh)
+		wc.border_width = 0;
+	else
+		wc.border_width = 1;
+	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 	XSync(dpy, False);
 }
 
@@ -403,8 +391,8 @@ togglemax(Arg *arg)
 		oh = sel->h;
 		sel->x = sx;
 		sel->y = sy + bh;
-		sel->w = sw - 2 * sel->border;
-		sel->h = sh - 2 * sel->border - bh;
+		sel->w = sw - 2;
+		sel->h = sh - 2 - bh;
 
 		higher(sel);
 		resize(sel, False, TopLeft);
