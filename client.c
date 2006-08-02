@@ -271,7 +271,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 {
 	int bottom = c->y + c->h;
 	int right = c->x + c->w;
-	XWindowChanges wc;
+	XConfigureEvent e;
 
 	if(sizehints) {
 		if(c->incw)
@@ -287,22 +287,30 @@ resize(Client *c, Bool sizehints, Corner sticky)
 		if(c->maxh && c->h > c->maxh)
 			c->h = c->maxh;
 	}
+	if(c->x > sw) /* might happen on restart */
+		c->x = sw - c->w;
+	if(c->y > sh)
+		c->y = sh - c->h;
 	if(sticky == TopRight || sticky == BotRight)
 		c->x = right - c->w;
 	if(sticky == BotLeft || sticky == BotRight)
 		c->y = bottom - c->h;
 
 	resizetitle(c);
+	XSetWindowBorderWidth(dpy, c->win, 1);
+	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 
-	if(c->tags[tsel])
-		wc.x = c->x;
-	else
-		wc.x = c->x + 2 * sw;
-	wc.y = c->y;
-	wc.width = c->w;
-	wc.height = c->h;
-	wc.border_width = 1;
-	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
+	e.type = ConfigureNotify;
+	e.event = c->win;
+	e.window = c->win;
+	e.x = c->x;
+	e.y = c->y;
+	e.width = c->w;
+	e.height = c->h;
+	e.border_width = c->border;
+	e.above = None;
+	e.override_redirect = False;
+	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&e);
 	XSync(dpy, False);
 }
 
