@@ -16,12 +16,8 @@ the /usr/local namespace by default).
 Afterwards enter the following command to build and install dwm (if
 necessary as root):
 
+    cp config.default.h config.h
     make clean install
-
-If you want to use a customized config.h, you can use the following
-command for installing dwm:
-
-    make CONFIG=<your-config>.h clean install
 
 
 Running dwm

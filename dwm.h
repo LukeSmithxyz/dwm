@@ -3,7 +3,7 @@
  * See LICENSE file for license details.
  */
 
-#include CONFIG
+#include "config.h"
 #include <X11/Xlib.h>
 
 /* mask shorthands, used in event.c and client.c */
