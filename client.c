@@ -219,12 +219,13 @@ manage(Window w, XWindowAttributes *wa)
 	c->h = wa->height;
 	c->th = bh;
 
-	if(c->y < bh)
+	c->border = 1;
+	setsize(c);
+
+	if(c->h != sh && c->y < bh)
 		c->y = c->ty = bh;
 
-	c->border = 1;
 	c->proto = getproto(c->win);
-	setsize(c);
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
@@ -236,8 +237,6 @@ manage(Window w, XWindowAttributes *wa)
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
-
-	settags(c);
 
 	if(clients)
 		clients->prev = c;
@@ -251,11 +250,12 @@ manage(Window w, XWindowAttributes *wa)
 	XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 
+	settags(c);
 	if(!c->isfloat)
-		c->isfloat = trans || (c->maxw && c->minw &&
-				(c->maxw == c->minw) && (c->maxh == c->minh));
-
-
+		c->isfloat = trans
+			|| (c->maxw && c->minw &&
+				c->maxw == c->minw && c->maxh == c->minh)
+			|| (c->w == sw && c->h == sh);
 	settitle(c);
 	arrange(NULL);
 
@@ -272,6 +272,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 	int bottom = c->y + c->h;
 	int right = c->x + c->w;
 	XConfigureEvent e;
+	XWindowChanges wc;
 
 	if(sizehints) {
 		if(c->incw)
@@ -287,18 +288,23 @@ resize(Client *c, Bool sizehints, Corner sticky)
 		if(c->maxh && c->h > c->maxh)
 			c->h = c->maxh;
 	}
-	if(c->x > sw) /* might happen on restart */
-		c->x = sw - c->w;
-	if(c->y > sh)
-		c->y = sh - c->h;
+	if(c->x > right) /* might happen on restart */
+		c->x = right - c->w;
+	if(c->y > bottom)
+		c->y = bottom - c->h;
 	if(sticky == TopRight || sticky == BotRight)
 		c->x = right - c->w;
 	if(sticky == BotLeft || sticky == BotRight)
 		c->y = bottom - c->h;
 
 	resizetitle(c);
-	XSetWindowBorderWidth(dpy, c->win, 1);
-	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+	wc.x = c->x;
+	wc.y = c->y;
+	wc.width = c->w;
+	wc.height = c->h;
+	wc.border_width = 1;
+	XConfigureWindow(dpy, c->win,
+			CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 
 	e.type = ConfigureNotify;
 	e.event = c->win;

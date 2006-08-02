@@ -175,11 +175,8 @@ configurerequest(XEvent *e)
 	wc.width = ev->width;
 	wc.height = ev->height;
 	wc.border_width = 1;
-	wc.sibling = None;
-	wc.stack_mode = Above;
-	ev->value_mask &= ~CWStackMode;
-	ev->value_mask |= CWBorderWidth;
-	XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+	XConfigureWindow(dpy, ev->window,
+			CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 	XSync(dpy, False);
 }
 
