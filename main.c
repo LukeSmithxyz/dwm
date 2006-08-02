@@ -165,7 +165,6 @@ main(int argc, char *argv[])
 	int i;
 	unsigned int mask;
 	fd_set rd;
-	Bool readin = True;
 	Window w;
 	XEvent ev;
 	XSetWindowAttributes wa;
@@ -252,8 +251,7 @@ main(int argc, char *argv[])
 	/* main event loop, reads status text from stdin as well */
 	while(running) {
 		FD_ZERO(&rd);
-		if(readin)
-			FD_SET(STDIN_FILENO, &rd);
+		FD_SET(STDIN_FILENO, &rd);
 		FD_SET(ConnectionNumber(dpy), &rd);
 
 		i = select(ConnectionNumber(dpy) + 1, &rd, 0, 0, 0);
@@ -269,12 +267,11 @@ main(int argc, char *argv[])
 						(handler[ev.type])(&ev); /* call handler */
 				}
 			}
-			if(readin && FD_ISSET(STDIN_FILENO, &rd)) {
-				readin = NULL != fgets(stext, sizeof(stext), stdin);
-				if(readin)
-					stext[strlen(stext) - 1] = 0;
+			if(FD_ISSET(STDIN_FILENO, &rd)) {
+				if(!fgets(stext, sizeof(stext), stdin))
+					break;
 				else 
-					strcpy(stext, "broken pipe");
+					stext[strlen(stext) - 1] = 0;
 				drawstatus();
 			}
 		}
