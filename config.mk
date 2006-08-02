@@ -1,4 +1,10 @@
-# Customize to fit your system
+# dwm version
+VERSION = 0.6
+
+# Customize below to fit your system
+
+# configheader
+CONFIG = config.h
 
 # paths
 PREFIX = /usr/local
@@ -10,12 +16,6 @@ X11LIB = /usr/X11R6/lib
 # includes and libs
 INCS = -I/usr/lib -I${X11INC}
 LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
-
-# dwm version
-VERSION = 0.6
-
-# default config.h
-CONFIG = config.h
 
 # flags
 CFLAGS = -O3 ${INCS} -DVERSION=\"${VERSION}\" -DCONFIG=\"${CONFIG}\"

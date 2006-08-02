@@ -3,9 +3,7 @@
  * See LICENSE file for license details.
  */
 
-enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define DEFMODE			dotile /* dofloat */
-#define DEFTAG			Tdev
 #define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
 #define BGCOLOR			"#0a2c2d"
 #define FGCOLOR			"#ddeeee"
@@ -14,6 +12,7 @@ enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define NUMLOCKMASK		Mod2Mask
 #define MASTERW			52 /* percent */
 
+enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
 char *tags[TLast] = { \
 	[Tfnord] = "fnord", \
@@ -22,6 +21,7 @@ char *tags[TLast] = { \
 	[Twork] = "work", \
 	[Tmisc] = "misc", \
 };
+#define DEFTAG			Tdev
 
 #define KEYS \
 	const char *browse[] = { "firefox", NULL }; \

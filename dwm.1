@@ -38,13 +38,21 @@ to the
 .B master
 column
 .TP
-.B Mod1-k
+.B Mod1-h
 Focus previous
-.B window
+.B tag
 .TP
 .B Mod1-j
 Focus next
 .B window
+.TP
+.B Mod1-k
+Focus previous
+.B window
+.TP
+.B Mod1-l
+Focus next
+.B tag
 .TP
 .B Mod1-m
 Maximize current
@@ -52,8 +60,7 @@ Maximize current
 .TP
 .B Mod1-[0..n]
 Focus
-.B nth
-tag
+.B nth tag
 .TP
 .B Mod1-space
 Toggle between
@@ -65,8 +72,8 @@ mode (affects
 .TP
 .B Mod1-Shift-[0..n]
 Apply
-.B nth
-tag to current
+.B nth tag
+to current
 .B window
 .TP
 .B Mod1-Shift-q
@@ -79,8 +86,8 @@ Start
 .TP
 .B Mod1-Control-[0..n]
 Append
-.B nth
-tag to current
+.B nth tag
+to current
 .B window
 .TP
 .B Mod1-Button1
@@ -98,5 +105,5 @@ Resizes current
 while dragging
 .SH CUSTOMIZATION
 .B dwm
-is customized through editing config.h of the source code.  This keeps it fast,
-secure and simple.
+is customized by editing the file config.h of the source code.
+This keeps it fast, secure and simple.

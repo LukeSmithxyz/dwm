@@ -19,7 +19,7 @@ typedef struct {
 
 KEYS
 
-static unsigned int valid_mask =  255 &  ~(NUMLOCKMASK | LockMask);
+#define CLEANMASK(mask) (mask & ~(NUMLOCKMASK | LockMask))
 
 static void
 movemouse(Client *c)
@@ -229,11 +229,11 @@ keypress(XEvent *e)
 	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
-	ev->state &= valid_mask;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++)
-		if((keysym == key[i].keysym) && ((key[i].mod & valid_mask) == ev->state)) {
+		if(keysym == key[i].keysym &&
+				CLEANMASK(key[i].mod) == CLEANMASK(ev->state)) {
 			if(key[i].func)
 				key[i].func(&key[i].arg);
 			return;
@@ -335,13 +335,20 @@ grabkeys()
 
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
+		/* normal */
 		XUngrabKey(dpy, code, key[i].mod, root);
-		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root);
-		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root);
 		XGrabKey(dpy, code, key[i].mod, root, True,
 				GrabModeAsync, GrabModeAsync);
+		/* capslock */
+		XUngrabKey(dpy, code, key[i].mod | LockMask, root);
+		XGrabKey(dpy, code, key[i].mod | LockMask, root, True,
+				GrabModeAsync, GrabModeAsync);
+		/* numlock */
+		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root);
 		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root, True,
 				GrabModeAsync, GrabModeAsync);
+		/* capslock & numlock */
+		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root);
 		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
 	}
