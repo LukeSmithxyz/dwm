@@ -68,4 +68,6 @@ static Rule rule[] = { \
 	/* class:instance	tags				isfloat */ \
 	{ "Firefox.*",		{ [Tnet] = "net" },		False }, \
 	{ "Gimp.*",		{ 0 },				True}, \
+	{ "MPlayer.*",		{ 0 },				True}, \
+	{ "Acroread.*",		{ 0 },				True}, \
 };
