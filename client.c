@@ -230,7 +230,7 @@ manage(Window w, XWindowAttributes *wa)
 	XGetTransientForHint(dpy, c->win, &trans);
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
-	twa.event_mask = ExposureMask;
+	twa.event_mask = ExposureMask | EnterWindowMask;
 
 	c->title = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,

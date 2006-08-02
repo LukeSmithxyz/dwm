@@ -202,7 +202,7 @@ enternotify(XEvent *e)
 	if(ev->detail == NotifyInferior)
 		return;
 
-	if((c = getclient(ev->window)))
+	if((c = getclient(ev->window)) || (c = getctitle(ev->window)))
 		focus(c);
 	else if(ev->window == root)
 		issel = True;
