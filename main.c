@@ -85,6 +85,7 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 char stext[1024];
 int tsel = DEFTAG;
 int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+unsigned int ntags;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool issel = True;
@@ -209,6 +210,8 @@ main(int argc, char *argv[])
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
 	grabkeys();
+
+	for(ntags = 0; tags[ntags]; ntags++);
 
 	/* style */
 	dc.bg = getcolor(BGCOLOR);

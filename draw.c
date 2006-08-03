@@ -114,7 +114,7 @@ drawstatus()
 	drawtext(NULL, !istile, False);
 
 	dc.w = 0;
-	for(i = 0; i < TLast; i++) {
+	for(i = 0; i < ntags; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
 		if(istile)
@@ -153,7 +153,7 @@ drawtitle(Client *c)
 	dc.x = dc.y = 0;
 
 	dc.w = 0;
-	for(i = 0; i < TLast; i++) {
+	for(i = 0; i < ntags; i++) {
 		if(c->tags[i]) {
 			dc.x += dc.w;
 			dc.w = textw(tags[i]);

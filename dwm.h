@@ -60,16 +60,17 @@ struct Client {
 	unsigned int border;
 	Bool isfloat;
 	Bool ismax;
-	Bool tags[TLast];
+	Bool *tags;
 	Client *next;
 	Client *prev;
 	Window win;
 	Window title;
 };
 
-extern const char *tags[TLast];
+extern const char *tags[];
 extern char stext[1024];
 extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+extern unsigned int ntags;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];

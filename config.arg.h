@@ -3,18 +3,11 @@
  * See LICENSE file for license details.
  */
 
-enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
-const char *tags[TLast] = { \
-	[Tfnord] = "fnord", \
-	[Tdev] = "dev", \
-	[Tnet] = "net", \
-	[Twork] = "work", \
-	[Tmisc] = "misc", \
-};
+const char *tags[] = { "fnord", "dev", "net", "work", "misc", NULL };
 
 #define DEFMODE			dotile /* dofloat */
-#define DEFTAG			Tdev
+#define DEFTAG			1 /* index */
 #define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
 #define BGCOLOR			"#0a2c2d"
 #define FGCOLOR			"#ddeeee"
@@ -33,11 +26,11 @@ const char *tags[TLast] = { \
 	const char *xlock[] = { "xlock", NULL }; \
 static Key key[] = { \
 	/* modifier		key		function	arguments */ \
-	{ MODKEY,		XK_0,		view,		{ .i = Tfnord } }, \
-	{ MODKEY,		XK_1,		view,		{ .i = Tdev } }, \
-	{ MODKEY,		XK_2,		view,		{ .i = Tnet } }, \
-	{ MODKEY,		XK_3,		view,		{ .i = Twork } }, \
-	{ MODKEY,		XK_4,		view,		{ .i = Tmisc} }, \
+	{ MODKEY,		XK_0,		view,		{ .i = 0 } }, \
+	{ MODKEY,		XK_1,		view,		{ .i = 1 } }, \
+	{ MODKEY,		XK_2,		view,		{ .i = 2 } }, \
+	{ MODKEY,		XK_3,		view,		{ .i = 3 } }, \
+	{ MODKEY,		XK_4,		view,		{ .i = 4 } }, \
 	{ MODKEY,		XK_h,		viewprev,	{ 0 } }, \
 	{ MODKEY,		XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,		XK_k,		focusprev,	{ 0 } }, \
@@ -45,16 +38,16 @@ static Key key[] = { \
 	{ MODKEY,		XK_m,		togglemax,	{ 0 } }, \
 	{ MODKEY,		XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY,		XK_Return,	zoom,		{ 0 } }, \
-	{ MODKEY|ControlMask,	XK_0,		appendtag,	{ .i = Tfnord } }, \
-	{ MODKEY|ControlMask,	XK_1,		appendtag,	{ .i = Tdev } }, \
-	{ MODKEY|ControlMask,	XK_2,		appendtag,	{ .i = Tnet } }, \
-	{ MODKEY|ControlMask,	XK_3,		appendtag,	{ .i = Twork } }, \
-	{ MODKEY|ControlMask,	XK_4,		appendtag,	{ .i = Tmisc } }, \
-	{ MODKEY|ShiftMask,	XK_0,		replacetag,	{ .i = Tfnord } }, \
-	{ MODKEY|ShiftMask,	XK_1,		replacetag,	{ .i = Tdev } }, \
-	{ MODKEY|ShiftMask,	XK_2,		replacetag,	{ .i = Tnet } }, \
-	{ MODKEY|ShiftMask,	XK_3,		replacetag,	{ .i = Twork } }, \
-	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = Tmisc } }, \
+	{ MODKEY|ControlMask,	XK_0,		appendtag,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask,	XK_1,		appendtag,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask,	XK_2,		appendtag,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask,	XK_3,		appendtag,	{ .i = 3 } }, \
+	{ MODKEY|ControlMask,	XK_4,		appendtag,	{ .i = 4 } }, \
+	{ MODKEY|ShiftMask,	XK_0,		replacetag,	{ .i = 0 } }, \
+	{ MODKEY|ShiftMask,	XK_1,		replacetag,	{ .i = 1 } }, \
+	{ MODKEY|ShiftMask,	XK_2,		replacetag,	{ .i = 2 } }, \
+	{ MODKEY|ShiftMask,	XK_3,		replacetag,	{ .i = 3 } }, \
+	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = 5 } }, \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } }, \
@@ -64,10 +57,11 @@ static Key key[] = { \
 };
 
 #define RULES \
+	const unsigned int firefox[] = { 2 }; \
 static Rule rule[] = { \
-	/* class:instance	tags				isfloat */ \
-	{ "Firefox.*",		{ [Tnet] = True },		False }, \
-	{ "Gimp.*",		{ 0 },				True}, \
-	{ "MPlayer.*",		{ 0 },				True}, \
-	{ "Acroread.*",		{ 0 },				True}, \
+	/* class:instance	tags		isfloat */ \
+	{ "Firefox.*",		firefox,	False }, \
+	{ "Gimp.*",		NULL,		True}, \
+	{ "MPlayer.*",		NULL,		True}, \
+	{ "Acroread.*",		NULL,		True}, \
 };

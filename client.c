@@ -16,7 +16,7 @@ resizetitle(Client *c)
 	int i;
 
 	c->tw = 0;
-	for(i = 0; i < TLast; i++)
+	for(i = 0; i < ntags; i++)
 		if(c->tags[i])
 			c->tw += textw(tags[i]);
 	c->tw += textw(c->name);
@@ -211,6 +211,7 @@ manage(Window w, XWindowAttributes *wa)
 	XSetWindowAttributes twa;
 
 	c = emallocz(sizeof(Client));
+	c->tags = emallocz(ntags * sizeof(Bool));
 	c->win = w;
 	c->x = c->tx = wa->x;
 	c->y = c->ty = wa->y;
@@ -429,6 +430,7 @@ unmanage(Client *c)
 		if(!sel)
 			sel = clients;
 	}
+	free(c->tags);
 	free(c);
 
 	XSync(dpy, False);

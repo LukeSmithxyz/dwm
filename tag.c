@@ -13,7 +13,7 @@
 
 typedef struct {
 	const char *pattern;
-	Bool tags[TLast];
+	const unsigned int *tags;
 	Bool isfloat;
 } Rule;
 
@@ -145,7 +145,7 @@ replacetag(Arg *arg)
 	if(!sel)
 		return;
 
-	for(i = 0; i < TLast; i++)
+	for(i = 0; i < ntags; i++)
 		sel->tags[i] = False;
 	appendtag(arg);
 }
@@ -155,7 +155,7 @@ settags(Client *c)
 {
 	char classinst[256];
 	static unsigned int len = sizeof(rule) / sizeof(rule[0]);
-	unsigned int i, j;
+	unsigned int i, j, n;
 	regex_t regex;
 	regmatch_t tmp;
 	Bool matched = False;
@@ -168,10 +168,11 @@ settags(Client *c)
 		for(i = 0; !matched && i < len; i++) {
 			if(!regcomp(&regex, rule[i].pattern, 0)) {
 				if(!regexec(&regex, classinst, 1, &tmp, 0)) {
-					for(j = 0; j < TLast; j++) {
-						if((c->tags[j] = rule[i].tags[j]))
-							matched = True;
-					}
+					n = rule[i].tags ?
+						sizeof(rule[i].tags) / sizeof(rule[i].tags[0]) : 0;
+					matched = n != 0;
+					for(j = 0; j < n; j++)
+						c->tags[rule[i].tags[j]] = True;
 					c->isfloat = rule[i].isfloat;
 				}
 				regfree(&regex);
@@ -204,13 +205,13 @@ view(Arg *arg)
 void
 viewnext(Arg *arg)
 {
-	arg->i = (tsel < TLast-1) ? tsel+1 : 0;
+	arg->i = (tsel < ntags-1) ? tsel+1 : 0;
 	view(arg);
 }
 
 void
 viewprev(Arg *arg)
 {
-	arg->i = (tsel > 0) ? tsel-1 : TLast-1;
+	arg->i = (tsel > 0) ? tsel-1 : ntags-1;
 	view(arg);
 }
