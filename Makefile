@@ -22,7 +22,7 @@ options:
 
 ${OBJ}: dwm.h config.h
 
-config.h: ${CONFIG}
+config.h:
 	@echo creating $@ from ${CONFIG}
 	@cp ${CONFIG} $@
 
