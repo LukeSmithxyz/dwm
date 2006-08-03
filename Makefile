@@ -5,7 +5,6 @@ include config.mk
 
 SRC = client.c draw.c event.c main.c tag.c util.c
 OBJ = ${SRC:.c=.o}
-CONFIG ?= config.default.h
 
 all: options dwm
 	@echo finished
@@ -23,8 +22,8 @@ options:
 ${OBJ}: dwm.h config.h
 
 config.h:
-	@echo creating $@ from ${CONFIG}
-	@cp ${CONFIG} $@
+	@echo creating $@ from config.default.h
+	@cp config.default.h $@
 
 dwm: ${OBJ}
 	@echo LD $@
