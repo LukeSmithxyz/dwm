@@ -13,7 +13,7 @@
 
 typedef struct {
 	const char *pattern;
-	char *tags[TLast];
+	Bool tags[TLast];
 	Bool isfloat;
 } Rule;
 
@@ -30,7 +30,7 @@ appendtag(Arg *arg)
 	if(!sel)
 		return;
 
-	sel->tags[arg->i] = tags[arg->i];
+	sel->tags[arg->i] = True;
 	arrange(NULL);
 }
 
@@ -146,7 +146,7 @@ replacetag(Arg *arg)
 		return;
 
 	for(i = 0; i < TLast; i++)
-		sel->tags[i] = NULL;
+		sel->tags[i] = False;
 	appendtag(arg);
 }
 
@@ -171,7 +171,7 @@ settags(Client *c)
 					for(j = 0; j < TLast; j++) {
 						if(rule[i].tags[j])
 							matched = True;
-						c->tags[j] = rule[i].tags[j];
+						c->tags[j] = True;
 					}
 					c->isfloat = rule[i].isfloat;
 				}
@@ -184,7 +184,7 @@ settags(Client *c)
 			XFree(ch.res_name);
 	}
 	if(!matched)
-		c->tags[tsel] = tags[tsel];
+		c->tags[tsel] = True;
 }
 
 void

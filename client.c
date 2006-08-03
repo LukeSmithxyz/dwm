@@ -18,7 +18,7 @@ resizetitle(Client *c)
 	c->tw = 0;
 	for(i = 0; i < TLast; i++)
 		if(c->tags[i])
-			c->tw += textw(c->tags[i]);
+			c->tw += textw(tags[i]);
 	c->tw += textw(c->name);
 	if(c->tw > c->w)
 		c->tw = c->w + 2;

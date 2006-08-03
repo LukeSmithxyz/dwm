@@ -51,7 +51,6 @@ struct DC { /* draw context */
 
 struct Client {
 	char name[256];
-	char *tags[TLast];
 	int proto;
 	int x, y, w, h;
 	int tx, ty, tw, th; /* title */
@@ -61,13 +60,15 @@ struct Client {
 	unsigned int border;
 	Bool isfloat;
 	Bool ismax;
+	Bool tags[TLast];
 	Client *next;
 	Client *prev;
 	Window win;
 	Window title;
 };
 
-extern char *tags[TLast], stext[1024];
+extern const char *tags[TLast];
+extern char stext[1024];
 extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
@@ -104,7 +105,7 @@ extern void drawstatus();
 extern void drawtitle(Client *c);
 extern unsigned long getcolor(const char *colstr);
 extern void setfont(const char *fontstr);
-extern unsigned int textw(char *text);
+extern unsigned int textw(const char *text);
 
 /* event.c */
 extern void grabkeys();

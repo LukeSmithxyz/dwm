@@ -30,7 +30,7 @@ drawborder(void)
 }
 
 static unsigned int
-textnw(char *text, unsigned int len)
+textnw(const char *text, unsigned int len)
 {
 	XRectangle r;
 
@@ -156,8 +156,8 @@ drawtitle(Client *c)
 	for(i = 0; i < TLast; i++) {
 		if(c->tags[i]) {
 			dc.x += dc.w;
-			dc.w = textw(c->tags[i]);
-			drawtext(c->tags[i], !istile, True);
+			dc.w = textw(tags[i]);
+			drawtext(tags[i], !istile, True);
 		}
 	}
 	dc.x += dc.w;
@@ -229,7 +229,7 @@ setfont(const char *fontstr)
 }
 
 unsigned int
-textw(char *text)
+textw(const char *text)
 {
 	return textnw(text, strlen(text)) + dc.font.height;
 }

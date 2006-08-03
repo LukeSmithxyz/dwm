@@ -5,7 +5,7 @@
 
 enum { Tfnord, Tdev, Tnet, Twork, Tmisc, TLast };
 #define TAGS \
-char *tags[TLast] = { \
+const char *tags[TLast] = { \
 	[Tfnord] = "fnord", \
 	[Tdev] = "dev", \
 	[Tnet] = "net", \
@@ -66,7 +66,7 @@ static Key key[] = { \
 #define RULES \
 static Rule rule[] = { \
 	/* class:instance	tags				isfloat */ \
-	{ "Firefox.*",		{ [Tnet] = "net" },		False }, \
+	{ "Firefox.*",		{ [Tnet] = True },		False }, \
 	{ "Gimp.*",		{ 0 },				True}, \
 	{ "MPlayer.*",		{ 0 },				True}, \
 	{ "Acroread.*",		{ 0 },				True}, \
