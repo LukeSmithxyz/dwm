@@ -169,9 +169,8 @@ settags(Client *c)
 			if(!regcomp(&regex, rule[i].pattern, 0)) {
 				if(!regexec(&regex, classinst, 1, &tmp, 0)) {
 					for(j = 0; j < TLast; j++) {
-						if(rule[i].tags[j])
+						if((c->tags[j] = rule[i].tags[j]))
 							matched = True;
-						c->tags[j] = True;
 					}
 					c->isfloat = rule[i].isfloat;
 				}
