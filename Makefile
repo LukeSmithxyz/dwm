@@ -5,6 +5,7 @@ include config.mk
 
 SRC = client.c draw.c event.c main.c tag.c util.c
 OBJ = ${SRC:.c=.o}
+CONFIG ?= config.default.h
 
 all: options dwm
 	@echo finished
@@ -21,9 +22,9 @@ options:
 
 ${OBJ}: dwm.h config.h
 
-config.h:
-	@echo creating default $@
-	@cp config.default.h $@
+config.h: ${CONFIG}
+	@echo creating $@ from $>
+	@cp $> $@
 
 dwm: ${OBJ}
 	@echo LD $@
@@ -31,7 +32,7 @@ dwm: ${OBJ}
 
 clean:
 	@echo cleaning
-	@rm -f dwm ${OBJ} dwm-${VERSION}.tar.gz
+	@rm -f dwm ${OBJ} config.h dwm-${VERSION}.tar.gz
 
 dist: clean
 	@echo creating dist tarball
