@@ -23,8 +23,8 @@ options:
 ${OBJ}: dwm.h config.h
 
 config.h: ${CONFIG}
-	@echo creating $@ from $>
-	@cp $> $@
+	@echo creating $@ from ${CONFIG}
+	@cp ${CONFIG} $@
 
 dwm: ${OBJ}
 	@echo LD $@
