@@ -44,4 +44,5 @@ like this in your .xinitrc:
 
 Configuration
 -------------
-The configuration of dwm is done by editing config.h.
+The configuration of dwm is done by creating a custom config.h
+and (re)compiling the source code.

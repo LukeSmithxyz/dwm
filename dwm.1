@@ -7,24 +7,25 @@ dwm \- dynamic window manager
 .SH DESCRIPTION
 .B dwm
 is a dynamic window manager for X11. It manages windows in tiling and floating
-modes. Either mode can be applied dynamically, depending on the application in
-use and the task performed.
+modes. Either mode can be applied dynamically, optimizing the environment for
+the application in use and the task performed.
 .P
 In tiling mode windows are managed in a master and stacking column. The master
-column contains the window which needs most attention at a time, whereas the
-stacking column contains all other windows in a stack.  Dialog windows are
-managed floating, however. In floating mode windows can be resized and moved
-freely.
+column contains the window which currently needs most attention, whereas the
+stacking column contains all other windows. In floating mode windows can be
+resized and moved freely. Dialog windows are always managed floating,
+regardless of the mode selected.
 .P
-Windows are grouped by tags. All windows with a specific tag can be viewed at a
-time. But each window may contain more than one tag, which makes it visible in
-several views.
+Windows are grouped by tags. Each window can be tagged with one or multiple
+tags. Selecting a certain tag for viewing will display all windows with that
+tag.
 .P
 .B dwm
-has a small status bar which reads the text displayed from standard
-input, if written. It draws 1-pixel borders around windows to indicate the
-focus state. Unfocused windows contain a small bar in front of the window
-displaying the tags and the window title.
+has a small status bar which displays the text read from standard
+input, if written. Besides that, it displays all available tags, and the title
+of the focused window. It draws a 1-pixel border around windows to
+indicate the focus state. Unfocused windows contain a small bar in front of
+them displaying their tags and title.
 .SH OPTIONS
 .TP
 .B \-v
@@ -105,5 +106,5 @@ Resizes current
 while dragging
 .SH CUSTOMIZATION
 .B dwm
-is customized by editing the file config.h of the source code.
-This keeps it fast, secure and simple.
+is customized by creating a custom config.h and (re)compiling the source
+code. This keeps it fast, secure and simple.

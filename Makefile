@@ -24,7 +24,8 @@ options:
 ${OBJ}: dwm.h config.h
 
 config.h:
-	cp config.default.h config.h
+	@echo missing config.h created
+	@cp config.default.h $@
 
 dwm: ${OBJ}
 	@echo LD $@
@@ -61,3 +62,5 @@ uninstall:
 	for i in ${MAN1}; do \
 		rm -f ${DESTDIR}${MANPREFIX}/man1/`basename $$i`; \
 	done
+
+.PHONY: all options clean dist install uninstall
