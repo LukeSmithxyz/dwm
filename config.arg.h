@@ -57,10 +57,10 @@ static Key key[] = { \
 };
 
 #define RULES \
-	const unsigned int firefox[] = { 2 }; \
+	const unsigned int tag2[] = { 2 }; \
 static Rule rule[] = { \
 	/* class:instance	tags		isfloat */ \
-	{ "Firefox.*",		firefox,	False }, \
+	{ "Firefox.*",		tag2,		False }, \
 	{ "Gimp.*",		NULL,		True}, \
 	{ "MPlayer.*",		NULL,		True}, \
 	{ "Acroread.*",		NULL,		True}, \
