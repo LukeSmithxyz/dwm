@@ -37,7 +37,7 @@ clean:
 dist: clean
 	mkdir -p dwm-${VERSION}
 	cp -R Makefile README LICENSE config.mk dwm.h config.*.h \
-		*.c ${MAN1} dwm-${VERSION}
+		${SRC} ${MAN1} dwm-${VERSION}
 	tar -cf dwm-${VERSION}.tar dwm-${VERSION}
 	gzip dwm-${VERSION}.tar
 	rm -rf dwm-${VERSION}
