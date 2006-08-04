@@ -30,7 +30,8 @@ emallocz(unsigned int size)
 }
 
 void
-eprint(const char *errstr, ...) {
+eprint(const char *errstr, ...)
+{
 	va_list ap;
 
 	va_start(ap, errstr);
