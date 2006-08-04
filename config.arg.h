@@ -17,13 +17,6 @@ const char *tags[] = { "fnord", "dev", "net", "work", "misc", NULL };
 #define MASTERW			60 /* percent */
 
 #define KEYS \
-	const char *browse[] = { "firefox", NULL }; \
-	const char *gimp[] = { "gimp", NULL }; \
-	const char *term[] = { \
-		"urxvt", "-tr", "+sb", "-bg", "black", "-fg", "white", "-cr", "white", \
-		"-fn", "-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*", NULL \
-	}; \
-	const char *xlock[] = { "xlock", NULL }; \
 static Key key[] = { \
 	/* modifier		key		function	arguments */ \
 	{ MODKEY,		XK_0,		view,		{ .i = 0 } }, \
@@ -50,10 +43,12 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = 5 } }, \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
-	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } }, \
-	{ MODKEY|ShiftMask,	XK_g,		spawn,		{ .argv = gimp } }, \
-	{ MODKEY|ShiftMask,	XK_l,		spawn,		{ .argv = xlock } }, \
-	{ MODKEY|ShiftMask,	XK_w,		spawn,		{ .argv = browse } }, \
+	{ MODKEY|ShiftMask,	XK_x,		spawn, \
+		{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null |" \
+		" awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, \
+	{ MODKEY|ShiftMask,	XK_Return,	spawn, \
+		{ .cmd = "exec urxvt -tr +sb -bg black -fg white -cr white " \
+			"-fn '-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*'" } }, \
 };
 
 #define RULES \

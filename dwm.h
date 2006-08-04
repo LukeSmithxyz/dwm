@@ -17,7 +17,7 @@ typedef struct DC DC;
 typedef struct Fnt Fnt;
 
 union Arg {
-	const char **argv;
+	const char *cmd;
 	int i;
 };
 

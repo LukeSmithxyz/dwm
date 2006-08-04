@@ -17,7 +17,6 @@ const char *tags[] = { "0", "1", "2", "3", "4", NULL };
 #define MASTERW			60 /* percent */
 
 #define KEYS \
-	const char *term[] = { "xterm", NULL }; \
 static Key key[] = { \
 	/* modifier		key		function	arguments */ \
 	{ MODKEY,		XK_0,		view,		{ .i = 0 } }, \
@@ -44,7 +43,10 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = 4 } }, \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
-	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .argv = term } }, \
+	/* { MODKEY|ShiftMask,	XK_x,		spawn, */ \
+	/*	{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null |" */ \
+	/*	" awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, */ \
+	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .cmd = "exec xterm" } }, \
 };
 
 #define RULES \

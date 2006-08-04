@@ -43,17 +43,20 @@ eprint(const char *errstr, ...)
 void
 spawn(Arg *arg)
 {
-	char **argv = (char **)arg->argv;
+	static char *shell = NULL;
 
-	if(!argv || !argv[0])
+	if(!shell && !(shell = getenv("SHELL")))
+		shell = "/bin/sh";
+
+	if(!arg->cmd)
 		return;
 	if(fork() == 0) {
 		if(fork() == 0) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
-			execvp(argv[0], argv);
-			fprintf(stderr, "dwm: execvp %s", argv[0]);
+			execl(shell, shell, "-c", arg->cmd, NULL);
+			fprintf(stderr, "dwm: execl '%s'", arg->cmd);
 			perror(" failed");
 		}
 		exit(0);
