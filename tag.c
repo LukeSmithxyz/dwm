@@ -57,14 +57,12 @@ dofloat(Arg *arg)
 		else
 			ban(c);
 	}
-	if(sel && !sel->tags[tsel]) {
-		if((sel = getnext(clients))) {
-			higher(sel);
-			focus(sel);
-		}
-		else
-			XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	if((sel = getnext(clients))) {
+		higher(sel);
+		focus(sel);
 	}
+	else
+		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	drawall();
 }
 
@@ -122,14 +120,12 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!sel || (sel && !sel->tags[tsel])) {
-		if((sel = getnext(clients))) {
-			higher(sel);
-			focus(sel);
-		}
-		else
-			XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	if((sel = getnext(clients))) {
+		higher(sel);
+		focus(sel);
 	}
+	else
+		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	drawall();
 }
 
