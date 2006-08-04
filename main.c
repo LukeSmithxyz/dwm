@@ -210,6 +210,7 @@ main(int argc, char *argv[])
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
 	grabkeys();
+	initrregs();
 
 	for(ntags = 0; tags[ntags]; ntags++);
 

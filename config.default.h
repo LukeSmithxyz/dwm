@@ -47,9 +47,8 @@ static Key key[] = { \
 };
 
 #define RULES \
-	const unsigned int two[] = { 2 }; \
 static Rule rule[] = { \
-	/* class:instance	tags		isfloat */ \
-	{ "Firefox.*",		two,	False }, \
-	{ "Gimp.*",		NULL,		True}, \
+	/* class:instance regex		tags regex	isfloat */ \
+	{ "Firefox.*",			"2",		False }, \
+	{ "Gimp.*",			NULL,		True}, \
 };

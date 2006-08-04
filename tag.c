@@ -5,20 +5,30 @@
 #include "dwm.h"
 #include <regex.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <X11/Xutil.h>
 
-/* static */
 
 typedef struct {
-	const char *pattern;
-	const unsigned int *tags;
+	const char *clpattern;
+	const char *tpattern;
 	Bool isfloat;
 } Rule;
 
+typedef struct {
+	regex_t *clregex;
+	regex_t *tregex;
+} RReg;
+
+/* static */
+
 TAGS
 RULES
+
+static RReg *rreg = NULL;
+static unsigned int len = 0;
 
 void (*arrange)(Arg *) = DEFMODE;
 
@@ -138,6 +148,35 @@ getprev(Client *c)
 }
 
 void
+initrregs()
+{
+	unsigned int i;
+	regex_t *reg;
+
+	if(rreg)
+		return;
+	len = sizeof(rule) / sizeof(rule[0]);
+	rreg = emallocz(len * sizeof(RReg));
+
+	for(i = 0; i < len; i++) {
+		if(rule[i].clpattern) {
+			reg = emallocz(sizeof(regex_t));
+			if(regcomp(reg, rule[i].clpattern, 0))
+				free(reg);
+			else
+				rreg[i].clregex = reg;
+		}
+		if(rule[i].tpattern) {
+			reg = emallocz(sizeof(regex_t));
+			if(regcomp(reg, rule[i].tpattern, 0))
+				free(reg);
+			else
+				rreg[i].tregex = reg;
+		}
+	}
+}
+
+void
 replacetag(Arg *arg)
 {
 	int i;
@@ -154,9 +193,7 @@ void
 settags(Client *c)
 {
 	char classinst[256];
-	static unsigned int len = sizeof(rule) / sizeof(rule[0]);
-	unsigned int i, j, n;
-	regex_t regex;
+	unsigned int i, j;
 	regmatch_t tmp;
 	Bool matched = False;
 	XClassHint ch;
@@ -165,19 +202,16 @@ settags(Client *c)
 		snprintf(classinst, sizeof(classinst), "%s:%s",
 				ch.res_class ? ch.res_class : "",
 				ch.res_name ? ch.res_name : "");
-		for(i = 0; !matched && i < len; i++) {
-			if(!regcomp(&regex, rule[i].pattern, 0)) {
-				if(!regexec(&regex, classinst, 1, &tmp, 0)) {
-					n = rule[i].tags ?
-						sizeof(rule[i].tags) / sizeof(rule[i].tags[0]) : 0;
-					matched = n != 0;
-					for(j = 0; j < n; j++)
-						c->tags[rule[i].tags[j]] = True;
-					c->isfloat = rule[i].isfloat;
+		for(i = 0; !matched && i < len; i++)
+			if(rreg[i].clregex && !regexec(rreg[i].clregex, classinst, 1, &tmp, 0)) {
+				c->isfloat = rule[i].isfloat;
+				for(j = 0; rreg[i].tregex && j < ntags; j++) {
+					if(!regexec(rreg[i].tregex, tags[j], 1, &tmp, 0)) {
+						matched = True;
+						c->tags[j] = True;
+					}
 				}
-				regfree(&regex);
 			}
-		}
 		if(ch.res_class)
 			XFree(ch.res_class);
 		if(ch.res_name)

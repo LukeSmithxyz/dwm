@@ -121,6 +121,7 @@ extern int xerror(Display *dsply, XErrorEvent *ee);
 extern void appendtag(Arg *arg);
 extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
+extern void initrregs();
 extern Client *getnext(Client *c);
 extern Client *getprev(Client *c);
 extern void replacetag(Arg *arg);
