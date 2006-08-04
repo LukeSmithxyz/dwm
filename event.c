@@ -156,22 +156,17 @@ configurerequest(XEvent *e)
 
 	if((c = getclient(ev->window))) {
 		gravitate(c, True);
-		if(c->isfloat) {
-			if(ev->value_mask & CWX)
-				c->x = ev->x;
-			if(ev->value_mask & CWY)
-				c->y = ev->y;
-			if(ev->value_mask & CWWidth)
-				c->w = ev->width;
-			if(ev->value_mask & CWHeight)
-				c->h = ev->height;
-		}
+		if(ev->value_mask & CWX)
+			c->x = ev->x;
+		if(ev->value_mask & CWY)
+			c->y = ev->y;
+		if(ev->value_mask & CWWidth)
+			c->w = ev->width;
+		if(ev->value_mask & CWHeight)
+			c->h = ev->height;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
 		gravitate(c, False);
-
-		resize(c, True, TopLeft);
-
 		wc.x = c->x;
 		wc.y = c->y;
 		wc.width = c->w;
@@ -193,6 +188,9 @@ configurerequest(XEvent *e)
 			/* Send synthetic ConfigureNotify */
 			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
 		}
+		XSync(dpy, False);
+		arrange(NULL);
+		drawall();
 	}
 	else {
 		wc.x = ev->x;
@@ -203,8 +201,8 @@ configurerequest(XEvent *e)
 		wc.sibling = ev->above;
 		wc.stack_mode = ev->detail;
 		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+		XSync(dpy, False);
 	}
-	XSync(dpy, False);
 }
 
 static void
