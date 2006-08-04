@@ -189,8 +189,10 @@ configurerequest(XEvent *e)
 			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
 		}
 		XSync(dpy, False);
-		arrange(NULL);
-		drawall();
+		if(c->isfloat)
+			resize(c, False, TopLeft);
+		else
+			arrange(NULL);
 	}
 	else {
 		wc.x = ev->x;
