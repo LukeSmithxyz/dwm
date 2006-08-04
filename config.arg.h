@@ -29,6 +29,9 @@ static Key key[] = { \
 	{ MODKEY,		XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,		XK_l,		viewnext,	{ 0 } }, \
 	{ MODKEY,		XK_m,		togglemax,	{ 0 } }, \
+	{ MODKEY,		XK_p,		spawn, \
+		{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null |" \
+		" awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, \
 	{ MODKEY,		XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY,		XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY|ControlMask,	XK_0,		appendtag,	{ .i = 0 } }, \
@@ -43,9 +46,6 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = 5 } }, \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
-	{ MODKEY|ShiftMask,	XK_x,		spawn, \
-		{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null |" \
-		" awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn, \
 		{ .cmd = "exec urxvt -tr +sb -bg black -fg white -cr white " \
 			"-fn '-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*'" } }, \

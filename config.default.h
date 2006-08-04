@@ -43,9 +43,6 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_4,		replacetag,	{ .i = 4 } }, \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
-	/* { MODKEY|ShiftMask,	XK_x,		spawn, */ \
-	/*	{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null |" */ \
-	/*	" awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, */ \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn,		{ .cmd = "exec xterm" } }, \
 };
 
