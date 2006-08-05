@@ -466,7 +466,7 @@ zoom(Arg *arg)
 {
 	Client *c;
 
-	if(!sel)
+	if(!sel || arrange != dotile)
 		return;
 
 	if(sel == getnext(clients) && sel->next)  {
