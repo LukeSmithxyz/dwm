@@ -178,15 +178,14 @@ main(int argc, char *argv[])
 
 	dpy = XOpenDisplay(0);
 	if(!dpy)
-		eprint("dwm: cannot connect X server\n");
+		eprint("dwm: cannot open display\n");
 
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 
-	/* check if another WM is already running */
 	otherwm = False;
 	XSetErrorHandler(xerrorstart);
-	/* this causes an error if some other WM is running */
+	/* this causes an error if some other window manager is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
 	XSync(dpy, False);
 
