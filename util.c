@@ -56,7 +56,7 @@ spawn(Arg *arg)
 				close(ConnectionNumber(dpy));
 			setsid();
 			execl(shell, shell, "-c", arg->cmd, NULL);
-			fprintf(stderr, "dwm: execl '%s'", arg->cmd);
+			fprintf(stderr, "dwm: execl '%s -c %s'", shell, arg->cmd);
 			perror(" failed");
 		}
 		exit(0);

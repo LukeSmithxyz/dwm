@@ -359,20 +359,12 @@ grabkeys()
 
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
-		/* normal */
-		XUngrabKey(dpy, code, key[i].mod, root);
 		XGrabKey(dpy, code, key[i].mod, root, True,
 				GrabModeAsync, GrabModeAsync);
-		/* capslock */
-		XUngrabKey(dpy, code, key[i].mod | LockMask, root);
 		XGrabKey(dpy, code, key[i].mod | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
-		/* numlock */
-		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root);
 		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root, True,
 				GrabModeAsync, GrabModeAsync);
-		/* capslock & numlock */
-		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root);
 		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
 	}
