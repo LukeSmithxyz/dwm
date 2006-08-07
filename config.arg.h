@@ -8,7 +8,7 @@ const char *tags[] = { "fnord", "dev", "net", "work", "misc", NULL };
 
 #define DEFMODE			dotile /* dofloat */
 #define DEFTAG			1 /* index */
-#define FONT			"-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*"
+#define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
 #define BGCOLOR			"#444444"
 #define FGCOLOR			"#ffffff"
 #define BORDERCOLOR		"#222222"
@@ -48,7 +48,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn, \
 		{ .cmd = "exec urxvt -bg '#ffffea' +sb " \
-			"-fn '-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*'" } }, \
+			"-fn '-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*'" } }, \
 };
 
 #define RULES \
