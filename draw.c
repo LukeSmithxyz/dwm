@@ -42,7 +42,7 @@ textnw(const char *text, unsigned int len)
 }
 
 static void
-drawtext(const char *text, Bool invert, Bool border)
+drawtext(const char *text, Bool invert)
 {
 	int x, y, w, h;
 	static char buf[256];
@@ -52,14 +52,12 @@ drawtext(const char *text, Bool invert, Bool border)
 
 	XSetForeground(dpy, dc.gc, invert ? dc.fg : dc.bg);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
-
-	w = 0;
-	if(border)
-		drawborder();
+	drawborder();
 
 	if(!text)
 		return;
 
+	w = 0;
 	len = strlen(text);
 	if(len >= sizeof(buf))
 		len = sizeof(buf) - 1;
@@ -111,24 +109,24 @@ drawstatus()
 
 	dc.x = dc.y = 0;
 	dc.w = bw;
-	drawtext(NULL, !istile, False);
+	drawtext(NULL, !istile);
 
 	dc.w = 0;
 	for(i = 0; i < ntags; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
 		if(istile)
-			drawtext(tags[i], (i == tsel), True);
+			drawtext(tags[i], (i == tsel));
 		else
-			drawtext(tags[i], (i != tsel), True);
+			drawtext(tags[i], (i != tsel));
 	}
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
-	drawtext(stext, !istile, True);
+	drawtext(stext, !istile);
 	if(sel && ((dc.w = dc.x - x) >= bh)) {
 		dc.x = x;
-		drawtext(sel->name, istile, True);
+		drawtext(sel->name, istile);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
@@ -157,12 +155,12 @@ drawtitle(Client *c)
 		if(c->tags[i]) {
 			dc.x += dc.w;
 			dc.w = textw(tags[i]);
-			drawtext(tags[i], !istile, True);
+			drawtext(tags[i], !istile);
 		}
 	}
 	dc.x += dc.w;
 	dc.w = textw(c->name);
-	drawtext(c->name, !istile, True);
+	drawtext(c->name, !istile);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
 }
