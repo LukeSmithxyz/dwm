@@ -47,7 +47,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn, \
-		{ .cmd = "exec urxvt -bg '#ffffea' " \
+		{ .cmd = "exec urxvt -bg '#ffffea' +sb " \
 			"-fn '-*-terminus-medium-*-*-*-13-*-*-*-*-*-iso10646-*'" } }, \
 };
 

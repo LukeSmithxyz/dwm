@@ -125,7 +125,7 @@ drawstatus()
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
-	drawtext(stext, !istile, False);
+	drawtext(stext, !istile, True);
 	if(sel && ((dc.w = dc.x - x) >= bh)) {
 		dc.x = x;
 		drawtext(sel->name, istile, True);
