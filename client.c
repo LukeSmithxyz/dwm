@@ -469,9 +469,11 @@ zoom(Arg *arg)
 	if(!sel || (arrange != dotile) || sel->isfloat)
 		return;
 
-	if(sel == getnext(clients) && sel->next)  {
+	if(sel == getnext(clients))  {
 		if((c = getnext(sel->next)))
 			sel = c;
+		else
+			return;
 	}
 
 	/* pop */
