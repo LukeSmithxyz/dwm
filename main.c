@@ -251,7 +251,7 @@ main(int argc, char *argv[])
 	strcpy(stext, "dwm-"VERSION);
 	scan();
 
-	/* main event loop, reads status text from stdin as well */
+	/* main event loop, also reads status text from stdin */
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
