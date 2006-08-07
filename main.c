@@ -102,9 +102,10 @@ getproto(Window w)
 	int protos = 0;
 	int i;
 	long res;
-	unsigned char *protocols;
+	Atom *protocols;
 
-	res = win_property(w, wmatom[WMProtocols], XA_ATOM, 20L, &protocols);
+	res = win_property(w, wmatom[WMProtocols], XA_ATOM, 20L,
+			((unsigned char **)&protocols));
 	if(res <= 0) {
 		return protos;
 	}
