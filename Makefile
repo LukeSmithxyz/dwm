@@ -28,6 +28,7 @@ config.h:
 dwm: ${OBJ}
 	@echo LD $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+	@strip $@
 
 clean:
 	@echo cleaning
