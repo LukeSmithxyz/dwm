@@ -10,7 +10,7 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define DEFTAG			0 /* index */
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
 #define BGCOLOR			"#444444"
-#define FGCOLOR			"#ffffff"
+#define FGCOLOR			"#ffffaa"
 #define BORDERCOLOR		"#222222"
 #define MODKEY			Mod1Mask
 #define NUMLOCKMASK		Mod2Mask
@@ -41,7 +41,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn, \
-		{ .cmd = "exec urxvt -bg '#ffffea' +sb " \
+		{ .cmd = "exec uxterm -bg '#ffffaa' -fg '#000000' -cr '#000000' +sb " \
 			"-fn '-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*'" } }, \
 };
 
