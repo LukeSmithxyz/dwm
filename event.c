@@ -146,6 +146,18 @@ buttonpress(XEvent *e)
 }
 
 static void
+clientmessage(XEvent *e)
+{
+	Client *c;
+	XClientMessageEvent *ev = &e->xclient;
+
+	if(ev->message_type == netatom[NetActiveWindow]) {
+		if((c = getclient(ev->window)) && c->tags[tsel])
+			focus(c);
+	}
+}
+
+static void
 configurerequest(XEvent *e)
 {
 	Client *c;
@@ -339,6 +351,7 @@ unmapnotify(XEvent *e)
 
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
+	[ClientMessage] = clientmessage,
 	[ConfigureRequest] = configurerequest,
 	[DestroyNotify] = destroynotify,
 	[EnterNotify] = enternotify,
