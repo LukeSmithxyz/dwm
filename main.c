@@ -240,6 +240,8 @@ main(int argc, char *argv[])
 
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
+
+	strcpy(stext, "dwm-"VERSION);
 	drawstatus();
 
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
@@ -248,7 +250,6 @@ main(int argc, char *argv[])
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
-	strcpy(stext, "dwm-"VERSION);
 	scan();
 
 	/* main event loop, also reads status text from stdin */

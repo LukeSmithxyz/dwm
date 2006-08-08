@@ -19,7 +19,7 @@ options:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${OBJ}: dwm.h config.h
+${OBJ}: dwm.h config.h config.mk
 
 config.h:
 	@echo creating $@ from config.default.h
