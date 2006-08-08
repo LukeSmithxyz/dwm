@@ -58,8 +58,6 @@ focus(Client *c)
 	drawtitle(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
-	XChangeProperty(dpy, root, netatom[NetActiveWindow], XA_WINDOW, 32,
-			PropModeReplace, (unsigned char *)&c->win, 1);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
@@ -461,9 +459,6 @@ unmanage(Client *c)
 	arrange(NULL);
 	if(sel)
 		focus(sel);
-	else
-		XChangeProperty(dpy, root, netatom[NetActiveWindow], XA_WINDOW, 32,
-				PropModeReplace, (unsigned char *)NULL, 1);
 }
 
 void

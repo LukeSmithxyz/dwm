@@ -22,7 +22,7 @@ union Arg {
 };
 
 /* atoms */
-enum { NetSupported, NetWMName, NetActiveWindow, NetLast };
+enum { NetSupported, NetWMName, NetLast };
 enum { WMProtocols, WMDelete, WMLast };
 
 /* cursor */
