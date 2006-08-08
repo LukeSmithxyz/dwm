@@ -41,7 +41,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,	XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,	XK_Return,	spawn, \
-		{ .cmd = "exec uxterm -bg '#ffffaa' -fg '#000000' -cr '#000000' +sb " \
+		{ .cmd = "exec uxterm -bg '#dddddd' -fg '#000000' -cr '#000000' +sb " \
 			"-fn '-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*'" } }, \
 };
 
