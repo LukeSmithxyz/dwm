@@ -131,6 +131,8 @@ buttonpress(XEvent *e)
 				higher(c);
 				movemouse(c);
 			}
+			else
+				zoom(NULL);
 			break;
 		case Button2:
 			lower(c);
