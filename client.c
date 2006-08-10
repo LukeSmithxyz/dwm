@@ -197,13 +197,6 @@ killclient(Arg *arg)
 }
 
 void
-lower(Client *c)
-{
-	XLowerWindow(dpy, c->title);
-	XLowerWindow(dpy, c->win);
-}
-
-void
 manage(Window w, XWindowAttributes *wa)
 {
 	Client *c;

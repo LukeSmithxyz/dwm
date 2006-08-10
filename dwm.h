@@ -91,7 +91,6 @@ extern Client *getctitle(Window w);
 extern void gravitate(Client *c, Bool invert);
 extern void higher(Client *c);
 extern void killclient(Arg *arg);
-extern void lower(Client *c);
 extern void manage(Window w, XWindowAttributes *wa);
 extern void resize(Client *c, Bool sizehints, Corner sticky);
 extern void setsize(Client *c);

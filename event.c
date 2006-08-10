@@ -127,15 +127,14 @@ buttonpress(XEvent *e)
 		default:
 			break;
 		case Button1:
-			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
-				higher(c);
-				movemouse(c);
+			if(!c->ismax) {
+				if(arrange == dofloat || c->isfloat) {
+					higher(c);
+					movemouse(c);
+				}
+				else
+					zoom(NULL);
 			}
-			else
-				zoom(NULL);
-			break;
-		case Button2:
-			lower(c);
 			break;
 		case Button3:
 			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
@@ -225,7 +224,7 @@ enternotify(XEvent *e)
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if(ev->detail == NotifyInferior)
+	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
 
 	if((c = getclient(ev->window)) || (c = getctitle(ev->window)))
