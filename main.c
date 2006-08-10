@@ -253,6 +253,7 @@ main(int argc, char *argv[])
 	scan();
 
 	/* main event loop, also reads status text from stdin */
+	XSync(dpy, False);
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
