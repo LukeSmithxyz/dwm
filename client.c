@@ -411,7 +411,7 @@ togglemax(Arg *arg)
 		sel->h = sh - 2 - bh;
 
 		higher(sel);
-		resize(sel, False, TopLeft);
+		resize(sel, arrange == dofloat, TopLeft);
 
 		sel->x = ox;
 		sel->y = oy;
