@@ -49,6 +49,8 @@ ban(Client *c)
 void
 focus(Client *c)
 {
+	if (!issel)
+		return;
 	Client *old = sel;
 	XEvent ev;
 

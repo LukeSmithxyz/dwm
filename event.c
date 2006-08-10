@@ -114,10 +114,10 @@ buttonpress(XEvent *e)
 			}
 			break;
 		case Button4:
-			viewnext(&a);
+			viewprev(&a);
 			break;
 		case Button5:
-			viewprev(&a);
+			viewnext(&a);
 			break;
 		}
 	}
@@ -226,8 +226,11 @@ enternotify(XEvent *e)
 
 	if((c = getclient(ev->window)) || (c = getctitle(ev->window)))
 		focus(c);
-	else if(ev->window == root)
+	else if(ev->window == root) {
 		issel = True;
+		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+		drawall();
+	}
 }
 
 static void
@@ -267,8 +270,10 @@ leavenotify(XEvent *e)
 {
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if((ev->window == root) && !ev->same_screen)
-		issel = True;
+	if((ev->window == root) && !ev->same_screen) {
+		issel = False;
+		drawall();
+	}
 }
 
 static void

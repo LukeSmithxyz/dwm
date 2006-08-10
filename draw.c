@@ -138,7 +138,7 @@ drawtitle(Client *c)
 	int i;
 	Bool istile = arrange == dotile;
 
-	if(c == sel) {
+	if(c == sel && issel) {
 		drawstatus();
 		XUnmapWindow(dpy, c->title);
 		XSetWindowBorder(dpy, c->win, dc.fg);
