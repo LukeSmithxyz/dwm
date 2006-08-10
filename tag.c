@@ -106,7 +106,10 @@ dotile(Arg *arg)
 				c->x = sx + mw;
 				c->y = sy + (i - 1) * h + bh;
 				c->w = w - 2;
-				c->h = h - 2;
+				if(i + 1 == n)
+					c->h = sh - c->y - 2;
+				else
+					c->h = h - 2;
 			}
 			else { /* fallback if h < bh */
 				c->x = sx + mw;
