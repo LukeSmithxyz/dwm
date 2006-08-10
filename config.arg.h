@@ -9,8 +9,8 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define DEFMODE			dotile /* dofloat */
 #define DEFTAG			0 /* index */
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
-#define BGCOLOR			"#666699"
-#define FGCOLOR			"#eeeeee"
+#define BGCOLOR			"#eeeeee"
+#define FGCOLOR			"#666699"
 #define BORDERCOLOR		"#9999CC"
 #define MODKEY			Mod1Mask
 #define NUMLOCKMASK		Mod2Mask
