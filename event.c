@@ -122,25 +122,22 @@ buttonpress(XEvent *e)
 		}
 	}
 	else if((c = getclient(ev->window))) {
+		higher(c);
 		focus(c);
 		switch(ev->button) {
 		default:
 			break;
 		case Button1:
-			if(!c->ismax) {
-				if(arrange == dofloat || c->isfloat) {
-					higher(c);
-					movemouse(c);
-				}
-				else
-					zoom(NULL);
-			}
+			if(!c->ismax && (arrange == dofloat || c->isfloat))
+				movemouse(c);
+			break;
+		case Button2:
+			if(!c->ismax && arrange != dofloat && !c->isfloat)
+				zoom(NULL);
 			break;
 		case Button3:
-			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
-				higher(c);
+			if(!c->ismax && (arrange == dofloat || c->isfloat))
 				resizemouse(c);
-			}
 			break;
 		}
 	}
