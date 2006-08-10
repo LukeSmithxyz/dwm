@@ -132,8 +132,7 @@ buttonpress(XEvent *e)
 				movemouse(c);
 			break;
 		case Button2:
-			if(!c->ismax && arrange != dofloat && !c->isfloat)
-				zoom(NULL);
+			zoom(NULL);
 			break;
 		case Button3:
 			if(!c->ismax && (arrange == dofloat || c->isfloat))

@@ -461,7 +461,7 @@ zoom(Arg *arg)
 {
 	Client *c;
 
-	if(!sel || (arrange != dotile) || sel->isfloat)
+	if(!sel || (arrange != dotile) || sel->isfloat || sel->ismax)
 		return;
 
 	if(sel == getnext(clients))  {
