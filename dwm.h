@@ -43,7 +43,6 @@ struct DC { /* draw context */
 	int x, y, w, h;
 	unsigned long bg;
 	unsigned long fg;
-	unsigned long border;
 	Drawable drawable;
 	Fnt font;
 	GC gc;

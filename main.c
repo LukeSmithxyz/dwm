@@ -217,7 +217,6 @@ main(int argc, char *argv[])
 	/* style */
 	dc.bg = getcolor(BGCOLOR);
 	dc.fg = getcolor(FGCOLOR);
-	dc.border = getcolor(BORDERCOLOR);
 	setfont(FONT);
 
 	sx = sy = 0;
