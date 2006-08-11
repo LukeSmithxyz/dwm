@@ -477,8 +477,7 @@ zoom(Arg *arg)
 	if(sel->next)
 		sel->next->prev = sel->prev;
 	sel->prev = NULL;
-	if(clients)
-		clients->prev = sel;
+	clients->prev = sel;
 	sel->next = clients;
 	clients = sel;
 	arrange(NULL);
