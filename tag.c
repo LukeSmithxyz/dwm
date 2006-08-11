@@ -51,7 +51,7 @@ dofloat(Arg *arg)
 
 	for(c = clients; c; c = c->next) {
 		c->ismax = False;
-		if(c->tags[tsel]) {
+		if(isvisible(c)) {
 			resize(c, True, TopLeft);
 		}
 		else
@@ -74,7 +74,7 @@ dotile(Arg *arg)
 
 	w = sw - mw;
 	for(n = 0, c = clients; c; c = c->next)
-		if(c->tags[tsel] && !c->isfloat)
+		if(isvisible(c) && !c->isfloat)
 			n++;
 
 	if(n > 1)
@@ -84,7 +84,7 @@ dotile(Arg *arg)
 
 	for(i = 0, c = clients; c; c = c->next) {
 		c->ismax = False;
-		if(c->tags[tsel]) {
+		if(isvisible(c)) {
 			if(c->isfloat) {
 				higher(c);
 				resize(c, True, TopLeft);
@@ -135,14 +135,14 @@ dotile(Arg *arg)
 Client *
 getnext(Client *c)
 {
-	for(; c && !c->tags[tsel]; c = c->next);
+	for(; c && !isvisible(c); c = c->next);
 	return c;
 }
 
 Client *
 getprev(Client *c)
 {
-	for(; c && !c->tags[tsel]; c = c->prev);
+	for(; c && !isvisible(c); c = c->prev);
 	return c;
 }
 
@@ -173,6 +173,17 @@ initrregs()
 				rreg[i].tregex = reg;
 		}
 	}
+}
+
+Bool
+isvisible(Client *c)
+{
+	unsigned int i;
+
+	for(i = 0; i < ntags; i++)
+		if(c->tags[i] && tsel[i])
+			return True;
+	return False;
 }
 
 void
@@ -217,7 +228,8 @@ settags(Client *c)
 			XFree(ch.res_name);
 	}
 	if(!matched)
-		c->tags[tsel] = True;
+		for(i = 0; i < ntags; i++)
+			c->tags[i] = tsel[i];
 }
 
 void
@@ -230,7 +242,11 @@ togglemode(Arg *arg)
 void
 view(Arg *arg)
 {
-	tsel = arg->i;
+	unsigned int i;
+
+	for(i = 0; i < ntags; i++)
+		tsel[i] = False;
+	tsel[arg->i] = True;
 	arrange(NULL);
 	drawall();
 }
@@ -238,13 +254,19 @@ view(Arg *arg)
 void
 viewnext(Arg *arg)
 {
-	arg->i = (tsel < ntags-1) ? tsel+1 : 0;
+	unsigned int i;
+
+	for(i = 0; !tsel[i]; i++);
+	arg->i = (i < ntags-1) ? i+1 : 0;
 	view(arg);
 }
 
 void
 viewprev(Arg *arg)
 {
-	arg->i = (tsel > 0) ? tsel-1 : ntags-1;
+	unsigned int i;
+
+	for(i = 0; !tsel[i]; i++);
+	arg->i = (i > 0) ? i-1 : ntags-1;
 	view(arg);
 }

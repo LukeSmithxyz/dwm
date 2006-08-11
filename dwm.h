@@ -69,12 +69,12 @@ struct Client {
 
 extern const char *tags[];
 extern char stext[1024];
-extern int tsel, screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+extern int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
 extern unsigned int ntags;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, issel;
+extern Bool running, issel, *tsel;
 extern Client *clients, *sel;
 extern Cursor cursor[CurLast];
 extern DC dc;
@@ -121,6 +121,7 @@ extern void appendtag(Arg *arg);
 extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
 extern void initrregs();
+extern Bool isvisible(Client *c);
 extern Client *getnext(Client *c);
 extern Client *getprev(Client *c);
 extern void replacetag(Arg *arg);

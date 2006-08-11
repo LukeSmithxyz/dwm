@@ -24,7 +24,7 @@ resizetitle(Client *c)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
 	c->ty = c->y;
-	if(c->tags[tsel])
+	if(isvisible(c))
 		XMoveResizeWindow(dpy, c->title, c->tx, c->ty, c->tw, c->th);
 	else
 		XMoveResizeWindow(dpy, c->title, c->tx + 2 * sw, c->ty, c->tw, c->th);
@@ -276,7 +276,7 @@ manage(Window w, XWindowAttributes *wa)
 	/* mapping the window now prevents flicker */
 	XMapRaised(dpy, c->win);
 	XMapRaised(dpy, c->title);
-	if(c->tags[tsel])
+	if(isvisible(c))
 		focus(c);
 }
 
