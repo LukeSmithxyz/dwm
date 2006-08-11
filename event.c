@@ -103,15 +103,19 @@ buttonpress(XEvent *e)
 
 	if(barwin == ev->window) {
 		switch(ev->button) {
-		default:
+		case Button1:
 			x = 0;
 			for(a.i = 0; a.i < ntags; a.i++) {
 				x += textw(tags[a.i]);
 				if(ev->x < x) {
 					view(&a);
-					break;
+					return;
 				}
 			}
+			focusprev(NULL);
+			break;
+		case Button3:
+			focusnext(NULL);
 			break;
 		case Button4:
 			viewprev(&a);
