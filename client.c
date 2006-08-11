@@ -467,8 +467,7 @@ zoom(Arg *arg)
 	}
 
 	/* pop */
-	if(sel->prev)
-		sel->prev->next = sel->next;
+	sel->prev->next = sel->next;
 	if(sel->next)
 		sel->next->prev = sel->prev;
 	sel->prev = NULL;
