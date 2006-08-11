@@ -438,13 +438,8 @@ unmanage(Client *c)
 		c->next->prev = c->prev;
 	if(c == clients)
 		clients = c->next;
-	if(sel == c) {
-		sel = getnext(c->next);
-		if(!sel)
-			sel = getprev(c->prev);
-		if(!sel)
-			sel = clients;
-	}
+	if(sel == c)
+		sel = getnext(clients);
 	free(c->tags);
 	free(c);
 
