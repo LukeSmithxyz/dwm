@@ -108,11 +108,8 @@ buttonpress(XEvent *e)
 			for(a.i = 0; a.i < ntags; a.i++) {
 				x += textw(tags[a.i]);
 				if(ev->x < x) {
-					if(ev->button == Button3) {
-						tsel[a.i] = True;
-						arrange(NULL);
-						drawall();
-					}
+					if(ev->button == Button3)
+						viewextend(&a);
 					else
 						view(&a);
 					return;

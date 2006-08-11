@@ -74,7 +74,7 @@ extern unsigned int ntags;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, issel, *tsel;
+extern Bool running, issel, *seltag;
 extern Client *clients, *sel;
 extern Cursor cursor[CurLast];
 extern DC dc;
@@ -128,6 +128,7 @@ extern void replacetag(Arg *arg);
 extern void settags(Client *c);
 extern void togglemode(Arg *arg);
 extern void view(Arg *arg);
+extern void viewextend(Arg *arg);
 extern void viewnext(Arg *arg);
 extern void viewprev(Arg *arg);
 

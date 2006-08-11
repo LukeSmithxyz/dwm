@@ -109,9 +109,9 @@ drawstatus()
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
 		if(istile)
-			drawtext(tags[i], tsel[i]);
+			drawtext(tags[i], seltag[i]);
 		else
-			drawtext(tags[i], !tsel[i]);
+			drawtext(tags[i], !seltag[i]);
 	}
 	x = dc.x + dc.w;
 	dc.w = textw(stext);

@@ -181,7 +181,7 @@ isvisible(Client *c)
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
-		if(c->tags[i] && tsel[i])
+		if(c->tags[i] && seltag[i])
 			return True;
 	return False;
 }
@@ -229,7 +229,7 @@ settags(Client *c)
 	}
 	if(!matched)
 		for(i = 0; i < ntags; i++)
-			c->tags[i] = tsel[i];
+			c->tags[i] = seltag[i];
 }
 
 void
@@ -245,8 +245,21 @@ view(Arg *arg)
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
-		tsel[i] = False;
-	tsel[arg->i] = True;
+		seltag[i] = False;
+	seltag[arg->i] = True;
+	arrange(NULL);
+	drawall();
+}
+
+void
+viewextend(Arg *arg)
+{
+	unsigned int i;
+
+	seltag[arg->i] = !seltag[arg->i];
+	for(i = 0; !seltag[i] && i < ntags; i++);
+	if(i == ntags)
+		seltag[arg->i] = True; /* cannot toggle last view */
 	arrange(NULL);
 	drawall();
 }
@@ -256,7 +269,7 @@ viewnext(Arg *arg)
 {
 	unsigned int i;
 
-	for(i = 0; !tsel[i]; i++);
+	for(i = 0; !seltag[i]; i++);
 	arg->i = (i < ntags-1) ? i+1 : 0;
 	view(arg);
 }
@@ -266,7 +279,7 @@ viewprev(Arg *arg)
 {
 	unsigned int i;
 
-	for(i = 0; !tsel[i]; i++);
+	for(i = 0; !seltag[i]; i++);
 	arg->i = (i > 0) ? i-1 : ntags-1;
 	view(arg);
 }

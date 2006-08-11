@@ -83,7 +83,7 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 /* extern */
 
 char stext[1024];
-Bool *tsel;
+Bool *seltag;
 int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
 unsigned int ntags;
 Atom wmatom[WMLast], netatom[NetLast];
@@ -213,8 +213,8 @@ main(int argc, char *argv[])
 	initrregs();
 
 	for(ntags = 0; tags[ntags]; ntags++);
-	tsel = emallocz(sizeof(Bool) * ntags);
-	tsel[DEFTAG] = True;
+	seltag = emallocz(sizeof(Bool) * ntags);
+	seltag[DEFTAG] = True;
 
 	/* style */
 	dc.bg = getcolor(BGCOLOR);
