@@ -41,7 +41,7 @@ click on a tag label focuses that
 .B tag.
 .TP
 .B Button2
-click on a tag label (un)extends the current
+click on a tag label toggles that
 .B tag.
 .TP
 .B Button[1,4]
@@ -111,16 +111,14 @@ Start
 .B terminal.
 .TP
 .B Mod1-Control-[0..n]
+Toggle
+.B nth tag.
+.TP
+.B Mod1-Control-Shift-[0..n]
 Append
 .B nth tag
 to current
 .B window.
-.TP
-.B Mod1-Control-Shift-[0..n]
-(Un)extends
-.B nth tag
-with current
-.B tag.
 .SS Mouse commands
 .TP
 .B Mod1-Button1
@@ -143,5 +141,14 @@ while dragging.
 .B dwm
 is customized by creating a custom config.h and (re)compiling the source
 code. This keeps it fast, secure and simple.
+.SH CAVEATS
+The status bar displays
+.BR "broken pipe"
+when
+.B dwm
+has been started by
+.BR xdm (1),
+because it closes standard output before executing
+.B dwm.
 .SH SEE ALSO
 .BR dmenu (1)
