@@ -31,11 +31,11 @@ static Key key[] = { \
 	{ MODKEY,			XK_m,		togglemax,	{ 0 } }, \
 	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
-	{ MODKEY|ControlMask,		XK_0,		appendtag,	{ .i = 0 } }, \
-	{ MODKEY|ControlMask,		XK_1,		appendtag,	{ .i = 1 } }, \
-	{ MODKEY|ControlMask,		XK_2,		appendtag,	{ .i = 2 } }, \
-	{ MODKEY|ControlMask,		XK_3,		appendtag,	{ .i = 3 } }, \
-	{ MODKEY|ControlMask,		XK_4,		appendtag,	{ .i = 4 } }, \
+	{ MODKEY|ControlMask,		XK_0,		toggleview,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask,		XK_1,		toggleview,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 3 } }, \
+	{ MODKEY|ControlMask,		XK_4,		toggleview,	{ .i = 4 } }, \
 	{ MODKEY|ShiftMask,		XK_0,		replacetag,	{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		replacetag,	{ .i = 1 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		replacetag,	{ .i = 2 } }, \
@@ -44,11 +44,11 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn,		{ .cmd = "exec xterm" } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_0,		viewextend,	{ .i = 0 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_1,		viewextend,	{ .i = 1 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_2,		viewextend,	{ .i = 2 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_3,		viewextend,	{ .i = 3 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_4,		viewextend,	{ .i = 4 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_0,		appendtag,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_1,		appendtag,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_2,		appendtag,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_3,		appendtag,	{ .i = 3 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_4,		appendtag,	{ .i = 4 } }, \
 };
 
 #define RULES \

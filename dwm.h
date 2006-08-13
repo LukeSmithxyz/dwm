@@ -128,7 +128,7 @@ extern void replacetag(Arg *arg);
 extern void settags(Client *c);
 extern void togglemode(Arg *arg);
 extern void view(Arg *arg);
-extern void viewextend(Arg *arg);
+extern void toggleview(Arg *arg);
 extern void viewnext(Arg *arg);
 extern void viewprev(Arg *arg);
 

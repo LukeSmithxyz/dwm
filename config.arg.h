@@ -32,9 +32,9 @@ static Key key[] = { \
 			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, \
 	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
-	{ MODKEY|ControlMask,		XK_1,		appendtag,	{ .i = 0 } }, \
-	{ MODKEY|ControlMask,		XK_2,		appendtag,	{ .i = 1 } }, \
-	{ MODKEY|ControlMask,		XK_3,		appendtag,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask,		XK_1,		toggleview,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 2 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		replacetag,	{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		replacetag,	{ .i = 1 } }, \
 	{ MODKEY|ShiftMask,		XK_3,		replacetag,	{ .i = 2 } }, \
@@ -43,9 +43,9 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		{ .cmd = "exec urxvt +sb -tr -bg black -fg '#eeeeee' -cr '#eeeeee' +sb " \
 			"-fn '-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*'" } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_1,		viewextend,	{ .i = 0 } }, \
-	{ MODKEY|ShiftMask,		XK_2,		viewextend,	{ .i = 1 } }, \
-	{ MODKEY|ShiftMask,		XK_3,		viewextend,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_1,		appendtag,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_2,		appendtag,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_3,		appendtag,	{ .i = 2 } }, \
 };
 
 #define RULES \

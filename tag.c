@@ -252,7 +252,7 @@ view(Arg *arg)
 }
 
 void
-viewextend(Arg *arg)
+toggleview(Arg *arg)
 {
 	unsigned int i;
 

@@ -109,7 +109,7 @@ buttonpress(XEvent *e)
 				x += textw(tags[a.i]);
 				if(ev->x < x) {
 					if(ev->button == Button3)
-						viewextend(&a);
+						toggleview(&a);
 					else
 						view(&a);
 					return;
