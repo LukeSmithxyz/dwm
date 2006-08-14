@@ -196,6 +196,7 @@ main(int argc, char *argv[])
 
 	XSetErrorHandler(NULL);
 	xerrorxlib = XSetErrorHandler(xerror);
+	XSync(dpy, False);
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -269,13 +270,6 @@ main(int argc, char *argv[])
 		if(i < 0)
 			eprint("select failed\n");
 		else if(i > 0) {
-			if(FD_ISSET(xfd, &rd)) {
-				while(XPending(dpy)) {
-					XNextEvent(dpy, &ev);
-					if(handler[ev.type])
-						(handler[ev.type])(&ev); /* call handler */
-				}
-			}
 			if(readin && FD_ISSET(STDIN_FILENO, &rd)) {
 				readin = NULL != fgets(stext, sizeof(stext), stdin);
 				if(readin)
@@ -284,9 +278,15 @@ main(int argc, char *argv[])
 					strcpy(stext, "broken pipe");
 				drawstatus();
 			}
+			if(FD_ISSET(xfd, &rd)) {
+				while(XPending(dpy)) {
+					XNextEvent(dpy, &ev);
+					if(handler[ev.type])
+						(handler[ev.type])(&ev); /* call handler */
+				}
+			}
 		}
 	}
-
 	cleanup();
 	XCloseDisplay(dpy);
 

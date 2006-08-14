@@ -254,13 +254,15 @@ keypress(XEvent *e)
 	XKeyEvent *ev = &e->xkey;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	for(i = 0; i < len; i++)
+	for(i = 0; i < len; i++) {
 		if(keysym == key[i].keysym &&
-				CLEANMASK(key[i].mod) == CLEANMASK(ev->state)) {
+				CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
+		{
 			if(key[i].func)
 				key[i].func(&key[i].arg);
 			return;
 		}
+	}
 }
 
 static void
