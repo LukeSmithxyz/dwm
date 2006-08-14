@@ -36,13 +36,14 @@ prints version information to standard output, then exits.
 .B Standard input
 is read and displayed in the status text area.
 .TP
-.B Button[1,2]
-click on a tag label focuses that
-.B tag.
+.B Button1
+click on a tag label views all windows with that
+.BR tag .
 .TP
 .B Button3
-click on a tag label toggles that
-.B tag.
+click on a tag label adds/removes all windows with that
+.B tag
+to/from the view.
 .SS Keyboard commands
 .TP
 .B Mod1-Return
@@ -54,19 +55,19 @@ column.
 .TP
 .B Mod1-j
 Focus next
-.B window.
+.BR window .
 .TP
 .B Mod1-k
 Focus previous
-.B window.
+.BR window .
 .TP
 .B Mod1-m
 Maximize current
-.B window.
+.BR window .
 .TP
 .B Mod1-[0..n]
-Focus
-.B nth tag.
+View all windows with
+.BR "tag n" .
 .TP
 .B Mod1-space
 Toggle between
@@ -80,7 +81,7 @@ mode (affects
 Apply
 .B nth tag
 to current
-.B window.
+.BR window .
 .TP
 .B Mod1-Shift-c
 Close focused
@@ -92,17 +93,18 @@ Quit
 .TP
 .B Mod1-Shift-Return
 Start
-.B terminal.
+.BR terminal .
 .TP
 .B Mod1-Control-[0..n]
-Toggle
-.B nth tag.
+Add/remove all windows with
+.B tag n
+to/from the view.
 .TP
 .B Mod1-Control-Shift-[0..n]
-Append
+Add/remove
 .B nth tag
-to current
-.B window.
+to/from current
+.BR window .
 .SS Mouse commands
 .TP
 .B Mod1-Button1
@@ -127,12 +129,12 @@ is customized by creating a custom config.h and (re)compiling the source
 code. This keeps it fast, secure and simple.
 .SH CAVEATS
 The status bar displays
-.BR "broken pipe"
+.B broken pipe
 when
 .B dwm
 has been started by
 .BR xdm (1),
 because it closes standard output before executing
-.B dwm.
+.BR dwm .
 .SH SEE ALSO
 .BR dmenu (1)
