@@ -47,7 +47,9 @@ dofloat(Arg *arg)
 		else
 			ban(c);
 	}
-	if((sel = getnext(clients))) {
+	if(!sel || !isvisible(sel))
+		sel = getnext(clients);
+	if(sel) {
 		focus(sel);
 		restack();
 	}
@@ -111,7 +113,9 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if((sel = getnext(clients)))
+	if(!sel || !isvisible(sel))
+		sel = getnext(clients);
+	if(sel)
 		focus(sel);
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
