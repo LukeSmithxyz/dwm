@@ -262,11 +262,13 @@ manage(Window w, XWindowAttributes *wa)
 				c->maxw == c->minw && c->maxh == c->minh);
 	settitle(c);
 
+	if(isvisible(c))
+		sel = c;
+	arrange(NULL);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->title);
 	if(isvisible(c))
 		focus(c);
-	arrange(NULL);
 }
 
 void
