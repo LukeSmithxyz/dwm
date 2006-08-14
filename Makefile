@@ -14,6 +14,7 @@ options:
 	@echo "CFLAGS   = ${CFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
+	@echo "LD       = ${LD}"
 
 .c.o:
 	@echo CC $<
@@ -27,7 +28,7 @@ config.h:
 
 dwm: ${OBJ}
 	@echo LD $@
-	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+	@${LD} -o $@ ${OBJ} ${LDFLAGS}
 	@strip $@
 
 clean:

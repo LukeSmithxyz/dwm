@@ -58,6 +58,7 @@ static void
 resizemouse(Client *c)
 {
 	int ocx, ocy;
+	int nw, nh;
 	Corner sticky;
 	XEvent ev;
 
@@ -76,8 +77,10 @@ resizemouse(Client *c)
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			c->w = abs(ocx - ev.xmotion.x);
-			c->h = abs(ocy - ev.xmotion.y);
+			if((nw = abs(ocx - ev.xmotion.x)))
+				c->w = abs(ocx - ev.xmotion.x);
+			if((nh = abs(ocy - ev.xmotion.y)))
+				c->h = abs(ocy - ev.xmotion.y);
 			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
 			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
 			if(ocx <= ev.xmotion.x)

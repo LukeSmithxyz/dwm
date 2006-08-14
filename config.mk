@@ -20,5 +20,6 @@ LDFLAGS = ${LIBS}
 #CFLAGS = -g -Wall -O2 ${INCS} -DVERSION=\"${VERSION}\"
 #LDFLAGS = -g ${LIBS}
 
-# compiler
+# compiler and linker
 CC = cc
+LD = ${CC}
