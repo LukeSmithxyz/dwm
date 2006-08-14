@@ -34,19 +34,19 @@ static Key key[] = { \
 	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 2 } }, \
 	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 3 } }, \
 	{ MODKEY|ControlMask,		XK_4,		toggleview,	{ .i = 4 } }, \
-	{ MODKEY|ShiftMask,		XK_0,		replacetag,	{ .i = 0 } }, \
-	{ MODKEY|ShiftMask,		XK_1,		replacetag,	{ .i = 1 } }, \
-	{ MODKEY|ShiftMask,		XK_2,		replacetag,	{ .i = 2 } }, \
-	{ MODKEY|ShiftMask,		XK_3,		replacetag,	{ .i = 3 } }, \
-	{ MODKEY|ShiftMask,		XK_4,		replacetag,	{ .i = 4 } }, \
+	{ MODKEY|ShiftMask,		XK_0,		tag,		{ .i = 0 } }, \
+	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 1 } }, \
+	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 2 } }, \
+	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 3 } }, \
+	{ MODKEY|ShiftMask,		XK_4,		tag,		{ .i = 4 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn,		{ .cmd = "exec xterm" } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_0,		appendtag,	{ .i = 0 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_1,		appendtag,	{ .i = 1 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_2,		appendtag,	{ .i = 2 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_3,		appendtag,	{ .i = 3 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_4,		appendtag,	{ .i = 4 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_0,		toggletag,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_1,		toggletag,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_2,		toggletag,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_3,		toggletag,	{ .i = 3 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_4,		toggletag,	{ .i = 4 } }, \
 };
 
 #define RULES \

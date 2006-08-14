@@ -33,17 +33,17 @@ static Key key[] = { \
 	{ MODKEY|ControlMask,		XK_1,		toggleview,	{ .i = 0 } }, \
 	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 1 } }, \
 	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 2 } }, \
-	{ MODKEY|ShiftMask,		XK_1,		replacetag,	{ .i = 0 } }, \
-	{ MODKEY|ShiftMask,		XK_2,		replacetag,	{ .i = 1 } }, \
-	{ MODKEY|ShiftMask,		XK_3,		replacetag,	{ .i = 2 } }, \
+	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
+	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
+	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 2 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		{ .cmd = "exec urxvt +sb -tr -bg black -fg '#eeeeee' -cr '#eeeeee' +sb " \
 			"-fn '-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*'" } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_1,		appendtag,	{ .i = 0 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_2,		appendtag,	{ .i = 1 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_3,		appendtag,	{ .i = 2 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_1,		toggletag,	{ .i = 0 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_2,		toggletag,	{ .i = 1 } }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_3,		toggletag,	{ .i = 2 } }, \
 };
 
 #define RULES \

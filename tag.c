@@ -35,16 +35,6 @@ void (*arrange)(Arg *) = DEFMODE;
 /* extern */
 
 void
-appendtag(Arg *arg)
-{
-	if(!sel)
-		return;
-
-	sel->tags[arg->i] = True;
-	settitle(sel);
-}
-
-void
 dofloat(Arg *arg)
 {
 	Client *c;
@@ -183,19 +173,6 @@ isvisible(Client *c)
 }
 
 void
-replacetag(Arg *arg)
-{
-	int i;
-
-	if(!sel)
-		return;
-
-	for(i = 0; i < ntags; i++)
-		sel->tags[i] = False;
-	appendtag(arg);
-}
-
-void
 restack()
 {
 	static unsigned int nwins = 0;
@@ -281,9 +258,51 @@ settags(Client *c)
 }
 
 void
+tag(Arg *arg)
+{
+	unsigned int i;
+
+	if(!sel)
+		return;
+
+	for(i = 0; i < ntags; i++)
+		sel->tags[i] = False;
+	sel->tags[arg->i] = True;
+	settitle(sel);
+}
+
+void
 togglemode(Arg *arg)
 {
 	arrange = arrange == dofloat ? dotile : dofloat;
+	arrange(NULL);
+}
+
+void
+toggletag(Arg *arg)
+{
+	unsigned int i;
+
+	if(!sel)
+		return;
+
+	sel->tags[arg->i] = !sel->tags[arg->i];
+	for(i = 0; i < ntags && !sel->tags[i]; i++);
+	if(i == ntags)
+		sel->tags[arg->i] = True;
+	settitle(sel);
+}
+
+
+void
+toggleview(Arg *arg)
+{
+	unsigned int i;
+
+	seltag[arg->i] = !seltag[arg->i];
+	for(i = 0; i < ntags && !seltag[i]; i++);
+	if(i == ntags)
+		seltag[arg->i] = True; /* cannot toggle last view */
 	arrange(NULL);
 }
 
@@ -295,17 +314,5 @@ view(Arg *arg)
 	for(i = 0; i < ntags; i++)
 		seltag[i] = False;
 	seltag[arg->i] = True;
-	arrange(NULL);
-}
-
-void
-toggleview(Arg *arg)
-{
-	unsigned int i;
-
-	seltag[arg->i] = !seltag[arg->i];
-	for(i = 0; !seltag[i] && i < ntags; i++);
-	if(i == ntags)
-		seltag[arg->i] = True; /* cannot toggle last view */
 	arrange(NULL);
 }
