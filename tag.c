@@ -37,11 +37,15 @@ void (*arrange)(Arg *) = DEFMODE;
 void
 appendtag(Arg *arg)
 {
-	if(!sel)
+	Client *c = sel;
+
+	if(!c)
 		return;
 
-	sel->tags[arg->i] = True;
+	c->tags[arg->i] = True;
 	arrange(NULL);
+	focus(c);
+	restack();
 }
 
 void
