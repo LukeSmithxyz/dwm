@@ -263,7 +263,7 @@ main(int argc, char *argv[])
 			FD_SET(STDIN_FILENO, &rd);
 		FD_SET(xfd, &rd);
 
-		i = select(xfd + 1, &rd, 0, 0, 0);
+		i = select(xfd + 1, &rd, NULL, NULL, NULL);
 		if(i == -1 && errno == EINTR)
 			continue;
 		if(i < 0)
