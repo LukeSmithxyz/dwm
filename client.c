@@ -49,10 +49,12 @@ ban(Client *c)
 void
 focus(Client *c)
 {
-	if (!issel)
-		return;
 	Client *old = sel;
 
+	if (!issel)
+		return;
+	if(sel && sel->ismax)
+		togglemax(NULL);
 	sel = c;
 	if(old && old != c)
 		drawtitle(old);
@@ -67,9 +69,6 @@ focusnext(Arg *arg)
    
 	if(!sel)
 		return;
-
-	if(sel->ismax)
-		togglemax(NULL);
 
 	if(!(c = getnext(sel->next)))
 		c = getnext(clients);
@@ -86,9 +85,6 @@ focusprev(Arg *arg)
 
 	if(!sel)
 		return;
-
-	if(sel->ismax)
-		togglemax(NULL);
 
 	if(!(c = getprev(sel->prev))) {
 		for(c = clients; c && c->next; c = c->next);

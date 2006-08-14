@@ -144,11 +144,11 @@ buttonpress(XEvent *e)
 static void
 configurerequest(XEvent *e)
 {
+	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XEvent synev;
 	XWindowChanges wc;
-	unsigned long newmask;
 
 	if((c = getclient(ev->window))) {
 		gravitate(c, True);
