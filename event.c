@@ -370,19 +370,3 @@ grabkeys()
 				GrabModeAsync, GrabModeAsync);
 	}
 }
-
-void
-ungrabkeys()
-{
-	static unsigned int len = sizeof(key) / sizeof(key[0]);
-	unsigned int i;
-	KeyCode code;
-
-	for(i = 0; i < len; i++) {
-		code = XKeysymToKeycode(dpy, key[i].keysym);
-		XUngrabKey(dpy, code, key[i].mod, root);
-		XUngrabKey(dpy, code, key[i].mod | LockMask, root);
-		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root);
-		XUngrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root);
-	}
-}
