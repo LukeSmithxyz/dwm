@@ -162,7 +162,7 @@ xerror(Display *dpy, XErrorEvent *ee)
 int
 main(int argc, char *argv[])
 {
-	int i;
+	int i, xfd;
 	unsigned int mask;
 	fd_set rd;
 	Bool readin = True;
@@ -181,6 +181,7 @@ main(int argc, char *argv[])
 	if(!dpy)
 		eprint("dwm: cannot open display\n");
 
+	xfd = ConnectionNumber(dpy);
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 
@@ -260,15 +261,15 @@ main(int argc, char *argv[])
 		FD_ZERO(&rd);
 		if(readin)
 			FD_SET(STDIN_FILENO, &rd);
-		FD_SET(ConnectionNumber(dpy), &rd);
+		FD_SET(xfd, &rd);
 
-		i = select(ConnectionNumber(dpy) + 1, &rd, 0, 0, 0);
+		i = select(xfd + 1, &rd, 0, 0, 0);
 		if(i == -1 && errno == EINTR)
 			continue;
 		if(i < 0)
 			eprint("select failed\n");
 		else if(i > 0) {
-			if(FD_ISSET(ConnectionNumber(dpy), &rd)) {
+			if(FD_ISSET(xfd, &rd)) {
 				while(XPending(dpy)) {
 					XNextEvent(dpy, &ev);
 					if(handler[ev.type])
