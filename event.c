@@ -4,7 +4,6 @@
  */
 #include "dwm.h"
 #include <stdlib.h>
-#include <unistd.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
@@ -361,11 +360,6 @@ grabkeys()
 	unsigned int i;
 	KeyCode code;
 
-	while(XGrabKeyboard(dpy, root, True, GrabModeAsync,
-			 GrabModeAsync, CurrentTime) != GrabSuccess)
-		usleep(1000);
-	XUngrabKeyboard(dpy, CurrentTime);
-
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
 		XGrabKey(dpy, code, key[i].mod, root, True,
@@ -376,5 +370,6 @@ grabkeys()
 				GrabModeAsync, GrabModeAsync);
 		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
+		XSync(dpy, False);
 	}
 }
