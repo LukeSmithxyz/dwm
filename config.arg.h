@@ -22,10 +22,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \
 	{ MODKEY,			XK_2,		view,		{ .i = 1 } }, \
 	{ MODKEY,			XK_3,		view,		{ .i = 2 } }, \
-	{ MODKEY,			XK_h,		viewprev,	{ 0 } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
-	{ MODKEY,			XK_l,		viewnext,	{ 0 } }, \
 	{ MODKEY,			XK_m,		togglemax,	{ 0 } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null | " \

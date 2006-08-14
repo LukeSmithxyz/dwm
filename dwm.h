@@ -129,8 +129,6 @@ extern void settags(Client *c);
 extern void togglemode(Arg *arg);
 extern void view(Arg *arg);
 extern void toggleview(Arg *arg);
-extern void viewnext(Arg *arg);
-extern void viewprev(Arg *arg);
 
 /* util.c */
 extern void *emallocz(unsigned int size);

@@ -102,30 +102,16 @@ buttonpress(XEvent *e)
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(barwin == ev->window) {
-		switch(ev->button) {
-		default:
-			x = 0;
-			for(a.i = 0; a.i < ntags; a.i++) {
-				x += textw(tags[a.i]);
-				if(ev->x < x) {
-					if(ev->button == Button3)
-						toggleview(&a);
-					else
-						view(&a);
-					return;
-				}
+		x = 0;
+		for(a.i = 0; a.i < ntags; a.i++) {
+			x += textw(tags[a.i]);
+			if(ev->x < x) {
+				if(ev->button == Button3)
+					toggleview(&a);
+				else
+					view(&a);
+				return;
 			}
-			if(ev->button == Button1)
-				viewprev(&a);
-			else if(ev->button == Button3)
-				viewnext(&a);
-			break;
-		case Button4:
-			viewprev(&a);
-			break;
-		case Button5:
-			viewnext(&a);
-			break;
 		}
 	}
 	else if((c = getclient(ev->window))) {

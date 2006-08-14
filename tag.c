@@ -263,23 +263,3 @@ toggleview(Arg *arg)
 	arrange(NULL);
 	drawall();
 }
-
-void
-viewnext(Arg *arg)
-{
-	unsigned int i;
-
-	for(i = 0; !seltag[i]; i++);
-	arg->i = (i < ntags-1) ? i+1 : 0;
-	view(arg);
-}
-
-void
-viewprev(Arg *arg)
-{
-	unsigned int i;
-
-	for(i = 0; !seltag[i]; i++);
-	arg->i = (i > 0) ? i-1 : ntags-1;
-	view(arg);
-}

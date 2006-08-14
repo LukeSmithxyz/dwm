@@ -24,10 +24,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_2,		view,		{ .i = 2 } }, \
 	{ MODKEY,			XK_3,		view,		{ .i = 3 } }, \
 	{ MODKEY,			XK_4,		view,		{ .i = 4 } }, \
-	{ MODKEY,			XK_h,		viewprev,	{ 0 } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
-	{ MODKEY,			XK_l,		viewnext,	{ 0 } }, \
 	{ MODKEY,			XK_m,		togglemax,	{ 0 } }, \
 	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
