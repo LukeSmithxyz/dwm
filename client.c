@@ -52,7 +52,6 @@ focus(Client *c)
 	if (!issel)
 		return;
 	Client *old = sel;
-	XEvent ev;
 
 	sel = c;
 	if(old && old != c)

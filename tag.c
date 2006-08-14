@@ -211,8 +211,10 @@ restack()
 			else
 				m++;
 		}
-
-	n = 2 * (f + m);
+	if(!(n = 2 * (f + m))) {
+		drawstatus();
+		return;
+	}
 	if(nwins < n) {
 		nwins = n;
 		wins = erealloc(wins, nwins * sizeof(Window));
