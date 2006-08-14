@@ -22,6 +22,7 @@ static Bool otherwm;
 static void
 cleanup()
 {
+	ungrabkeys();
 	while(sel) {
 		resize(sel, True, TopLeft);
 		unmanage(sel);
