@@ -7,7 +7,6 @@ SRC = client.c draw.c event.c main.c tag.c util.c
 OBJ = ${SRC:.c=.o}
 
 all: options dwm
-	@echo finished
 
 options:
 	@echo dwm build options:
