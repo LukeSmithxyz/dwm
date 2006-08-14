@@ -277,6 +277,16 @@ leavenotify(XEvent *e)
 }
 
 static void
+mappingnotify(XEvent *e)
+{
+	XMappingEvent *ev = &e->xmapping;
+
+	XRefreshKeyboardMapping(ev);
+	if(ev->request == MappingKeyboard)
+		grabkeys();
+}
+
+static void
 maprequest(XEvent *e)
 {
 	static XWindowAttributes wa;
@@ -348,6 +358,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[LeaveNotify] = leavenotify,
 	[Expose] = expose,
 	[KeyPress] = keypress,
+	[MappingNotify] = mappingnotify,
 	[MapRequest] = maprequest,
 	[PropertyNotify] = propertynotify,
 	[UnmapNotify] = unmapnotify
@@ -360,6 +371,7 @@ grabkeys()
 	unsigned int i;
 	KeyCode code;
 
+	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
 		XGrabKey(dpy, code, key[i].mod, root, True,
