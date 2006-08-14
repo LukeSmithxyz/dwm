@@ -269,6 +269,7 @@ tag(Arg *arg)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
 	settitle(sel);
+	arrange(NULL);
 }
 
 void
