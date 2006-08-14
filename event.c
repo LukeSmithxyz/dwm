@@ -382,6 +382,5 @@ grabkeys()
 				GrabModeAsync, GrabModeAsync);
 		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
-		XSync(dpy, False);
 	}
 }
