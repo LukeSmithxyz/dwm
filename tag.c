@@ -269,7 +269,8 @@ tag(Arg *arg)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
 	settitle(sel);
-	arrange(NULL);
+	if(!isvisible(sel))
+		arrange(NULL);
 }
 
 void
@@ -292,6 +293,8 @@ toggletag(Arg *arg)
 	if(i == ntags)
 		sel->tags[arg->i] = True;
 	settitle(sel);
+	if(!isvisible(sel))
+		arrange(NULL);
 }
 
 
