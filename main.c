@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <X11/cursorfont.h>
+#include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
@@ -85,7 +86,7 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 char stext[1024];
 Bool *seltag;
 int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-unsigned int ntags;
+unsigned int ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool issel = True;
@@ -162,12 +163,13 @@ xerror(Display *dpy, XErrorEvent *ee)
 int
 main(int argc, char *argv[])
 {
-	int i, xfd;
+	int i, j, xfd;
 	unsigned int mask;
 	fd_set rd;
 	Bool readin = True;
 	Window w;
 	XEvent ev;
+	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
@@ -211,7 +213,16 @@ main(int argc, char *argv[])
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
-	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
+	modmap = XGetModifierMapping(dpy);
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < modmap->max_keypermod; j++) {
+			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+				numlockmask = (1 << i);
+		}
+	}
+	XFree(modmap);
+
+	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask | LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
@@ -233,13 +244,12 @@ main(int argc, char *argv[])
 	sh = DisplayHeight(dpy, screen);
 	mw = (sw * MASTERW) / 100;
 
-	wa.override_redirect = 1;
-	wa.background_pixmap = ParentRelative;
-	wa.event_mask = ButtonPressMask | ExposureMask;
-
 	bx = by = 0;
 	bw = sw;
 	dc.h = bh = dc.font.height + 4;
+	wa.override_redirect = 1;
+	wa.background_pixmap = ParentRelative;
+	wa.event_mask = ButtonPressMask | ExposureMask;
 	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
 			CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
@@ -258,6 +268,7 @@ main(int argc, char *argv[])
 
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
+	goto XLoop;
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
@@ -278,6 +289,7 @@ main(int argc, char *argv[])
 				drawstatus();
 			}
 			if(FD_ISSET(xfd, &rd)) {
+XLoop:
 				while(XPending(dpy)) {
 					XNextEvent(dpy, &ev);
 					if(handler[ev.type])

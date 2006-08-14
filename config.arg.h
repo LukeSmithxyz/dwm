@@ -13,7 +13,6 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define FGCOLOR			"#eeeeee"
 #define BORDERCOLOR		"#3f484d"
 #define MODKEY			Mod1Mask
-#define NUMLOCKMASK		Mod2Mask
 #define MASTERW			60 /* percent */
 
 #define KEYS \

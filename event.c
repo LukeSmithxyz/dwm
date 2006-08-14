@@ -18,7 +18,7 @@ typedef struct {
 
 KEYS
 
-#define CLEANMASK(mask) (mask & ~(NUMLOCKMASK | LockMask))
+#define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
 
 static void
 movemouse(Client *c)
@@ -378,9 +378,9 @@ grabkeys()
 				GrabModeAsync, GrabModeAsync);
 		XGrabKey(dpy, code, key[i].mod | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK, root, True,
+		XGrabKey(dpy, code, key[i].mod | numlockmask, root, True,
 				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, key[i].mod | NUMLOCKMASK | LockMask, root, True,
+		XGrabKey(dpy, code, key[i].mod | numlockmask | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
 	}
 }

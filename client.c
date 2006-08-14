@@ -228,27 +228,27 @@ manage(Window w, XWindowAttributes *wa)
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button1, MODKEY | LockMask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button1, MODKEY | NUMLOCKMASK, c->win, False, BUTTONMASK,
+	XGrabButton(dpy, Button1, MODKEY | numlockmask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button1, MODKEY | NUMLOCKMASK | LockMask, c->win, False, BUTTONMASK,
+	XGrabButton(dpy, Button1, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 
 	XGrabButton(dpy, Button2, MODKEY, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button2, MODKEY | LockMask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, MODKEY | NUMLOCKMASK, c->win, False, BUTTONMASK,
+	XGrabButton(dpy, Button2, MODKEY | numlockmask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, MODKEY | NUMLOCKMASK | LockMask, c->win, False, BUTTONMASK,
+	XGrabButton(dpy, Button2, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 
 	XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 	XGrabButton(dpy, Button3, MODKEY | LockMask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, MODKEY | NUMLOCKMASK, c->win, False, BUTTONMASK,
+	XGrabButton(dpy, Button3, MODKEY | numlockmask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, MODKEY | NUMLOCKMASK | LockMask, c->win, False, BUTTONMASK,
+	XGrabButton(dpy, Button3, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
 			GrabModeAsync, GrabModeSync, None, None);
 
 	settags(c);
