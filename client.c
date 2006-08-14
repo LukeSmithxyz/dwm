@@ -59,8 +59,6 @@ focus(Client *c)
 		drawtitle(old);
 	drawtitle(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	XSync(dpy, False);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
@@ -77,8 +75,8 @@ focusnext(Arg *arg)
 	if(!(c = getnext(sel->next)))
 		c = getnext(clients);
 	if(c) {
-		higher(c);
 		focus(c);
+		restack();
 	}
 }
 
@@ -98,8 +96,8 @@ focusprev(Arg *arg)
 		c = getprev(c);
 	}
 	if(c) {
-		higher(c);
 		focus(c);
+		restack();
 	}
 }
 
@@ -178,13 +176,6 @@ gravitate(Client *c, Bool invert)
 	}
 	c->x += dx;
 	c->y += dy;
-}
-
-void
-higher(Client *c)
-{
-	XRaiseWindow(dpy, c->win);
-	XRaiseWindow(dpy, c->title);
 }
 
 void
@@ -271,13 +262,12 @@ manage(Window w, XWindowAttributes *wa)
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
 	settitle(c);
-	arrange(NULL);
 
-	/* mapping the window now prevents flicker */
-	XMapRaised(dpy, c->win);
-	XMapRaised(dpy, c->title);
+	XMapWindow(dpy, c->win);
+	XMapWindow(dpy, c->title);
 	if(isvisible(c))
 		focus(c);
+	arrange(NULL);
 }
 
 void
@@ -410,7 +400,7 @@ togglemax(Arg *arg)
 		sel->w = sw - 2;
 		sel->h = sh - 2 - bh;
 
-		higher(sel);
+		restack();
 		resize(sel, arrange == dofloat, TopLeft);
 
 		sel->x = ox;
@@ -446,9 +436,9 @@ unmanage(Client *c)
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	arrange(NULL);
 	if(sel)
 		focus(sel);
+	arrange(NULL);
 }
 
 void
@@ -474,6 +464,6 @@ zoom(Arg *arg)
 	clients->prev = sel;
 	sel->next = clients;
 	clients = sel;
-	arrange(NULL);
 	focus(sel);
+	arrange(NULL);
 }

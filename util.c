@@ -40,6 +40,15 @@ eprint(const char *errstr, ...)
 	exit(EXIT_FAILURE);
 }
 
+void *
+erealloc(void *ptr, unsigned int size)
+{
+	void *res = realloc(ptr, size);
+	if(!res)
+		bad_malloc(size);
+	return res;
+}
+
 void
 spawn(Arg *arg)
 {

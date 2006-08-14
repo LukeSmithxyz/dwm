@@ -58,18 +58,17 @@ dofloat(Arg *arg)
 			ban(c);
 	}
 	if((sel = getnext(clients))) {
-		higher(sel);
 		focus(sel);
+		restack();
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-	drawall();
 }
 
 void
 dotile(Arg *arg)
 {
-	int n, i, w, h;
+	int h, i, n, w;
 	Client *c;
 
 	w = sw - mw;
@@ -86,7 +85,6 @@ dotile(Arg *arg)
 		c->ismax = False;
 		if(isvisible(c)) {
 			if(c->isfloat) {
-				higher(c);
 				resize(c, True, TopLeft);
 				continue;
 			}
@@ -123,13 +121,11 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if((sel = getnext(clients))) {
-		higher(sel);
+	if((sel = getnext(clients)))
 		focus(sel);
-	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-	drawall();
+	restack();
 }
 
 Client *
@@ -200,6 +196,56 @@ replacetag(Arg *arg)
 }
 
 void
+restack()
+{
+	static unsigned int nwins = 0;
+	static Window *wins = NULL;
+	unsigned int f, fi, m, mi, n;
+	Client *c;
+	XEvent ev;
+
+	for(f = 0, m = 0, c = clients; c; c = c->next)
+		if(isvisible(c)) {
+			if(c->isfloat || arrange == dofloat)
+				f++;
+			else
+				m++;
+		}
+
+	n = 2 * (f + m);
+	if(nwins < n) {
+		nwins = n;
+		wins = erealloc(wins, nwins * sizeof(Window));
+	}
+
+	fi = 0;
+	mi = 2 * f;
+	if(sel->isfloat || arrange == dofloat) {
+		wins[fi++] = sel->title;
+		wins[fi++] = sel->win;
+	}
+	else {
+		wins[mi++] = sel->title;
+		wins[mi++] = sel->win;
+	}
+	for(c = clients; c; c = c->next)
+		if(isvisible(c) && c != sel) {
+			if(c->isfloat || arrange == dofloat) {
+				wins[fi++] = c->title;
+				wins[fi++] = c->win;
+			}
+			else {
+				wins[mi++] = c->title;
+				wins[mi++] = c->win;
+			}
+		}
+	XRestackWindows(dpy, wins, n);
+	drawall();
+	XSync(dpy, False);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+}
+
+void
 settags(Client *c)
 {
 	char classinst[256];
@@ -248,7 +294,6 @@ view(Arg *arg)
 		seltag[i] = False;
 	seltag[arg->i] = True;
 	arrange(NULL);
-	drawall();
 }
 
 void
@@ -261,5 +306,4 @@ toggleview(Arg *arg)
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
 	arrange(NULL);
-	drawall();
 }
