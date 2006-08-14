@@ -211,6 +211,10 @@ main(int argc, char *argv[])
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
+	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
+	wa.cursor = cursor[CurNormal];
+	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+
 	grabkeys();
 	initrregs();
 
@@ -249,10 +253,6 @@ main(int argc, char *argv[])
 	drawstatus();
 
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
-
-	wa.event_mask = SubstructureRedirectMask | EnterWindowMask | LeaveWindowMask;
-	wa.cursor = cursor[CurNormal];
-	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
 	scan();
 
