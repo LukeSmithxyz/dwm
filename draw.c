@@ -65,12 +65,12 @@ drawtext(const char *text, Bool invert)
 	while(len && (w = textnw(buf, len)) > dc.w - h)
 		buf[--len] = 0;
 	if(len < olen) {
+		if(len > 1)
+			buf[len - 1] = '.';
+		if(len > 2)
+			buf[len - 2] = '.';
 		if(len > 3)
-			memcpy(buf + len - 4, "...\0", 4);
-		else if(len > 2)
-			memcpy(buf + len - 3, "..\0", 3);
-		else if(len > 1)
-			memcpy(buf + len - 2, ".\0", 2);
+			buf[len - 3] = '.';
 	}
 
 	if(w > dc.w)
@@ -160,7 +160,7 @@ drawtitle(Client *c)
 		}
 	}
 	dc.x += dc.w;
-	dc.w = textw(c->name);
+	dc.w = c->tw - dc.x;
 	drawtext(c->name, !istile);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
