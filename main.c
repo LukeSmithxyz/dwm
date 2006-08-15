@@ -291,9 +291,8 @@ main(int argc, char *argv[])
 					strcpy(stext, "broken pipe");
 				drawstatus();
 			}
-			if(FD_ISSET(xfd, &rd))
-				procevent();
 		}
+		procevent();
 	}
 	cleanup();
 	XCloseDisplay(dpy);

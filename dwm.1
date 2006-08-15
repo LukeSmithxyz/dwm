@@ -46,28 +46,46 @@ click on a tag label adds/removes all windows with that
 to/from the view.
 .SS Keyboard commands
 .TP
+.B Mod1-Shift-Return
+Start
+.BR xterm (1).
+.TP
+.B Mod1-Tab
+Focus next
+.BR window .
+.TP
+.B Mod1-Shift-Tab
+Focus previous
+.BR window .
+.TP
 .B Mod1-Return
 Zoom current
 .B window
 to the 
 .B master
-column.
-.TP
-.B Mod1-j
-Focus next
-.BR window .
-.TP
-.B Mod1-k
-Focus previous
-.BR window .
+column
+.RB ( tiling
+mode only).
 .TP
 .B Mod1-m
 Maximize current
 .BR window .
 .TP
-.B Mod1-[0..n]
-View all windows with
-.BR "tag n" .
+.B Mod1-Shift-[0..n]
+Apply
+.B nth tag
+to current
+.BR window .
+.TP
+.B Mod1-Control-Shift-[0..n]
+Add/remove
+.B nth tag
+to/from current
+.BR window .
+.TP
+.B Mod1-Shift-c
+Close focused
+.B window.
 .TP
 .B Mod1-space
 Toggle between
@@ -77,52 +95,42 @@ and
 mode (affects
 .BR "all windows" ).
 .TP
-.B Mod1-Shift-[0..n]
-Apply
-.B nth tag
-to current
-.BR window .
-.TP
-.B Mod1-Shift-c
-Close focused
-.B window.
-.TP
-.B Mod1-Shift-q
-Quit
-.B dwm.
-.TP
-.B Mod1-Shift-Return
-Start
-.BR terminal .
+.B Mod1-[0..n]
+View all windows with
+.BR "tag n" .
 .TP
 .B Mod1-Control-[0..n]
 Add/remove all windows with
 .B tag n
 to/from the view.
 .TP
-.B Mod1-Control-Shift-[0..n]
-Add/remove
-.B nth tag
-to/from current
-.BR window .
+.B Mod1-Shift-q
+Quit
+.B dwm.
 .SS Mouse commands
 .TP
 .B Mod1-Button1
 Move current
 .B window
-while dragging.
+while dragging
+.RB ( floating
+mode only).
 .TP
 .B Mod1-Button2
 Zoom current
 .B window
 to the 
 .B master
-column.
+column
+.RB ( tiling
+mode only).
 .TP
 .B Mod1-Button3
 Resize current
 .B window
-while dragging.
+while dragging
+.RB ( floating
+mode only).
 .SH CUSTOMIZATION
 .B dwm
 is customized by creating a custom config.h and (re)compiling the source
