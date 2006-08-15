@@ -27,7 +27,14 @@ cleanup()
 		resize(sel, True, TopLeft);
 		unmanage(sel);
 	}
+	if(dc.font.set)
+		XFreeFontSet(dpy, dc.font.set);
+	else
+		XFreeFont(dpy, dc.font.xfont);
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	XDestroyWindow(dpy, barwin);
+	XFreePixmap(dpy, dc.drawable);
+	XFreeGC(dpy, dc.gc);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
 }
