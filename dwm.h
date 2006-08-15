@@ -108,6 +108,7 @@ extern unsigned int textw(const char *text);
 
 /* event.c */
 extern void grabkeys();
+extern void procevent();
 
 /* main.c */
 extern int getproto(Window w);

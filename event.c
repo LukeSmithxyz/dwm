@@ -384,3 +384,16 @@ grabkeys()
 				GrabModeAsync, GrabModeAsync);
 	}
 }
+
+void
+procevent()
+{
+	XEvent ev;
+
+	while(XPending(dpy)) {
+		XNextEvent(dpy, &ev);
+		if(handler[ev.type])
+			(handler[ev.type])(&ev); /* call handler */
+	}
+}
+

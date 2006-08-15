@@ -27,7 +27,9 @@ cleanup()
 		resize(sel, True, TopLeft);
 		unmanage(sel);
 	}
+	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+	XSync(dpy, False);
 }
 
 static void
@@ -37,6 +39,7 @@ scan()
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
+	wins = NULL;
 	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
 		for(i = 0; i < num; i++) {
 			if(!XGetWindowAttributes(dpy, wins[i], &wa))
@@ -168,7 +171,6 @@ main(int argc, char *argv[])
 	fd_set rd;
 	Bool readin = True;
 	Window w;
-	XEvent ev;
 	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
 
@@ -196,6 +198,7 @@ main(int argc, char *argv[])
 	if(otherwm)
 		eprint("dwm: another window manager is already running\n");
 
+	XSync(dpy, False);
 	XSetErrorHandler(NULL);
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
@@ -268,7 +271,7 @@ main(int argc, char *argv[])
 
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
-	goto XLoop;
+	procevent();
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
@@ -288,14 +291,8 @@ main(int argc, char *argv[])
 					strcpy(stext, "broken pipe");
 				drawstatus();
 			}
-			if(FD_ISSET(xfd, &rd)) {
-XLoop:
-				while(XPending(dpy)) {
-					XNextEvent(dpy, &ev);
-					if(handler[ev.type])
-						(handler[ev.type])(&ev); /* call handler */
-				}
-			}
+			if(FD_ISSET(xfd, &rd))
+				procevent();
 		}
 	}
 	cleanup();
