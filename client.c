@@ -261,9 +261,9 @@ manage(Window w, XWindowAttributes *wa)
 	if(trans && (tc = getclient(trans))) {
 		c->x = (tc->x + tc->w / 2) - (c->w / 2);
 		c->y = (tc->y + tc->h / 2) - (c->h / 2);
-		if(c->x < 0 || c->x >= sw)
+		if((c->x + c->w < 0) || (c->x >= sw))
 			c->x = (sw / 2) - (c->w / 2);
-		if(c->y < 0 || c->y >= sh)
+		if((c->y + c->h < 0) || (c->y >= sh))
 			c->y = ((sh - bh) / 2) - (c->h / 2) + bh;
 	}
 	else {
