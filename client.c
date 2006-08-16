@@ -187,7 +187,7 @@ killclient(Arg *arg)
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	Client *c;
+	Client *c, *tc;
 	Window trans;
 	XSetWindowAttributes twa;
 
@@ -257,6 +257,15 @@ manage(Window w, XWindowAttributes *wa)
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
 	settitle(c);
+
+	if(trans && (tc = getclient(trans))) {
+		c->x = (tc->x + tc->w / 2) - (c->w / 2);
+		c->y = (tc->y + tc->h / 2) - (c->h / 2);
+	}
+	else {
+		c->x = (sw / 2) - (c->w / 2);
+		c->y = ((sh - bh) / 2) - (c->h / 2) + bh;
+	}
 
 	if(isvisible(c))
 		sel = c;

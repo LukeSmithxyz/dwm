@@ -281,7 +281,10 @@ void
 togglemode(Arg *arg)
 {
 	arrange = arrange == dofloat ? dotile : dofloat;
-	arrange(NULL);
+	if(sel)
+		arrange(NULL);
+	else
+		drawstatus();
 }
 
 void
