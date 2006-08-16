@@ -49,12 +49,11 @@ dofloat(Arg *arg)
 	}
 	if(!sel || !isvisible(sel))
 		sel = getnext(clients);
-	if(sel) {
+	if(sel)
 		focus(sel);
-		restack();
-	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	restack();
 }
 
 void
