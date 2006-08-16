@@ -33,9 +33,9 @@ cleanup()
 	else
 		XFreeFont(dpy, dc.font.xfont);
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
-	XDestroyWindow(dpy, barwin);
 	XFreePixmap(dpy, dc.drawable);
 	XFreeGC(dpy, dc.gc);
+	XDestroyWindow(dpy, barwin);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
 }
