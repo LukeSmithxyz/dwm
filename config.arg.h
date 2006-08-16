@@ -22,7 +22,7 @@ static Key key[] = { \
 		{ .cmd = "exec urxvt +sb -tr -bg black -fg '#eeeeee' -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null | " \
-			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort | uniq | dmenu`" } }, \
+			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort -u | dmenu`" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
