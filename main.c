@@ -18,11 +18,12 @@
 /* static */
 
 static int (*xerrorxlib)(Display *, XErrorEvent *);
-static Bool otherwm;
+static Bool otherwm, readin;
 
 static void
 cleanup()
 {
+	close(STDIN_FILENO);
 	while(sel) {
 		resize(sel, True, TopLeft);
 		unmanage(sel);
@@ -146,7 +147,7 @@ sendevent(Window w, Atom a, long value)
 void
 quit(Arg *arg)
 {
-	running = False;
+	readin = running = False;
 }
 
 /*
@@ -176,7 +177,6 @@ main(int argc, char *argv[])
 	int i, j, xfd;
 	unsigned int mask;
 	fd_set rd;
-	Bool readin = True;
 	Window w;
 	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
@@ -279,6 +279,7 @@ main(int argc, char *argv[])
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
 	procevent();
+	readin = True;
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
