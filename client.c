@@ -258,15 +258,7 @@ manage(Window w, XWindowAttributes *wa)
 				c->maxw == c->minw && c->maxh == c->minh);
 	settitle(c);
 
-	if(trans && (tc = getclient(trans))) {
-		c->x = (tc->x + tc->w / 2) - (c->w / 2);
-		c->y = (tc->y + tc->h / 2) - (c->h / 2);
-		if((c->x + c->w < 0) || (c->x >= sw))
-			c->x = (sw / 2) - (c->w / 2);
-		if((c->y + c->h < 0) || (c->y >= sh))
-			c->y = ((sh - bh) / 2) - (c->h / 2) + bh;
-	}
-	else {
+	if(!trans) {
 		c->x = (sw / 2) - (c->w / 2);
 		c->y = ((sh - bh) / 2) - (c->h / 2) + bh;
 	}
