@@ -49,7 +49,7 @@ static Key key[] = { \
 };
 
 /* Query class:instance for regex matching info with following command:
- * xprop | grep WM_CLASS | sed 's/"//g;s/,//g' | awk '{ printf("%s:%s", $4, $3) }' */
+ * xprop | awk -F'"' '/^WM_CLASS/ { printf "%s:%s\n", $4, $2 }'*/
 #define RULES \
 static Rule rule[] = { \
 	/* class:instance regex		tags regex	isfloat */ \
