@@ -296,7 +296,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 	if(c->x > sw) /* might happen on restart */
 		c->x = sw - c->w;
 	if(c->y > sh)
-		c->y = bottom - c->h;
+		c->y = sh - c->h;
 	if(sticky == TopRight || sticky == BotRight)
 		c->x = right - c->w;
 	if(sticky == BotLeft || sticky == BotRight)
