@@ -203,8 +203,14 @@ manage(Window w, XWindowAttributes *wa)
 	c->border = 0;
 	setsize(c);
 
+	if(c->x + c->w > sw)
+		c->x = sw - c->w - 2;
+	if(c->x < 0)
+		c->x = 0;
+	if(c->y + c->h > sh)
+		c->y = sh - c->h - 2;
 	if(c->h != sh && c->y < bh)
-		c->y = c->ty = bh;
+		c->y = bh;
 
 	c->proto = getproto(c->win);
 	XSelectInput(dpy, c->win,
@@ -257,12 +263,6 @@ manage(Window w, XWindowAttributes *wa)
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
 	settitle(c);
-
-	if(!trans) {
-		c->x = (sw / 2) - (c->w / 2);
-		c->y = ((sh - bh) / 2) - (c->h / 2) + bh;
-	}
-
 	if(isvisible(c))
 		sel = c;
 	arrange(NULL);
