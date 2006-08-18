@@ -203,11 +203,11 @@ manage(Window w, XWindowAttributes *wa)
 	c->border = 0;
 	setsize(c);
 
-	if(c->x + c->w > sw)
+	if(c->x + c->w + 2 > sw)
 		c->x = sw - c->w - 2;
 	if(c->x < 0)
 		c->x = 0;
-	if(c->y + c->h > sh)
+	if(c->y + c->h + 2 > sh)
 		c->y = sh - c->h - 2;
 	if(c->h != sh && c->y < bh)
 		c->y = bh;
@@ -293,10 +293,6 @@ resize(Client *c, Bool sizehints, Corner sticky)
 		if(c->maxh && c->h > c->maxh)
 			c->h = c->maxh;
 	}
-	if(c->x > sw) /* might happen on restart */
-		c->x = sw - c->w;
-	if(c->y > sh)
-		c->y = sh - c->h;
 	if(sticky == TopRight || sticky == BotRight)
 		c->x = right - c->w;
 	if(sticky == BotLeft || sticky == BotRight)
