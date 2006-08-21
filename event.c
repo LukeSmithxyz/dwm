@@ -119,6 +119,8 @@ buttonpress(XEvent *e)
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
+		if(CLEANMASK(ev->state) == 0)
+			return;
 		switch(ev->button) {
 		default:
 			break;

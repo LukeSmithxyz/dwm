@@ -11,6 +11,19 @@
 /* static functions */
 
 static void
+grabbutton(Client *c, unsigned int button, unsigned int modifier)
+{
+	XGrabButton(dpy, button, modifier, c->win, False, BUTTONMASK,
+			GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(dpy, button, modifier | LockMask, c->win, False, BUTTONMASK,
+			GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(dpy, button, modifier | numlockmask, c->win, False, BUTTONMASK,
+			GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(dpy, button, modifier | numlockmask | LockMask, c->win, False, BUTTONMASK,
+			GrabModeAsync, GrabModeSync, None, None);
+}
+
+static void
 resizetitle(Client *c)
 {
 	int i;
@@ -29,6 +42,15 @@ resizetitle(Client *c)
 	else
 		XMoveResizeWindow(dpy, c->title, c->tx + 2 * sw, c->ty, c->tw, c->th);
 
+}
+
+static void
+ungrabbutton(Client *c, unsigned int button, unsigned int modifier)
+{
+	XUngrabButton(dpy, button, modifier, c->win);
+	XUngrabButton(dpy, button, modifier | LockMask, c->win);
+	XUngrabButton(dpy, button, modifier | numlockmask, c->win);
+	XUngrabButton(dpy, button, modifier | numlockmask | LockMask, c->win);
 }
 
 static int
@@ -53,11 +75,14 @@ focus(Client *c)
 
 	if (!issel)
 		return;
-	if(sel && sel->ismax)
+	if(sel && sel->ismax && sel != c)
 		togglemax(NULL);
 	sel = c;
-	if(old && old != c)
+	if(old && old != c) {
+		grabbutton(old, AnyButton, 0);
 		drawtitle(old);
+	}
+	ungrabbutton(c, AnyButton, 0);
 	drawtitle(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 }
@@ -230,32 +255,9 @@ manage(Window w, XWindowAttributes *wa)
 	c->next = clients;
 	clients = c;
 
-	XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button1, MODKEY | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button1, MODKEY | numlockmask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button1, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-
-	XGrabButton(dpy, Button2, MODKEY, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, MODKEY | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, MODKEY | numlockmask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button2, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-
-	XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, MODKEY | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, MODKEY | numlockmask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, Button3, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
+	grabbutton(c, Button1, MODKEY);
+	grabbutton(c, Button2, MODKEY);
+	grabbutton(c, Button3, MODKEY);
 
 	settags(c);
 	if(!c->isfloat)
