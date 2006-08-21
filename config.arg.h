@@ -21,7 +21,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		{ .cmd = "exec uxterm -bg '#dddddd' -fg '#000000' -cr '#000000' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
-		{ .cmd = "exec `ls -lL /usr/bin /usr/local/bin 2>/dev/null | " \
+		{ .cmd = "exec `ls -lL /usr/bin /usr/X11R6/bin /usr/local/bin 2>/dev/null | " \
 			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort -u | dmenu`" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \

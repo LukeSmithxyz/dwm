@@ -214,6 +214,7 @@ killclient(Arg *arg)
 void
 manage(Window w, XWindowAttributes *wa)
 {
+	unsigned int i;
 	Client *c, *tc;
 	Window trans;
 	XSetWindowAttributes twa;
@@ -261,7 +262,11 @@ manage(Window w, XWindowAttributes *wa)
 	grabbutton(c, Button2, MODKEY);
 	grabbutton(c, Button3, MODKEY);
 
-	settags(c);
+	if((tc = getclient(trans))) /* inherit tags */
+		for(i = 0; i < ntags; i++)
+			c->tags[i] = tc->tags[i];
+	else
+		settags(c);
 	if(!c->isfloat)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
