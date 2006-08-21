@@ -63,7 +63,7 @@ scan()
 }
 
 static int
-win_property(Window w, Atom a, Atom t, long l, unsigned char **prop)
+winprop(Window w, Atom a, Atom t, long l, unsigned char **prop)
 {
 	int status, format;
 	unsigned long res, extra;
@@ -116,7 +116,7 @@ getproto(Window w)
 	long res;
 	Atom *protocols;
 
-	res = win_property(w, wmatom[WMProtocols], XA_ATOM, 20L,
+	res = winprop(w, wmatom[WMProtocols], XA_ATOM, 20L,
 			((unsigned char **)&protocols));
 	if(res <= 0) {
 		return protos;

@@ -12,7 +12,7 @@
 /* static */
 
 static void
-bad_malloc(unsigned int size)
+badmalloc(unsigned int size)
 {
 	eprint("fatal: could not malloc() %u bytes\n", size);
 }
@@ -25,7 +25,7 @@ emallocz(unsigned int size)
 	void *res = calloc(1, size);
 
 	if(!res)
-		bad_malloc(size);
+		badmalloc(size);
 	return res;
 }
 
@@ -45,7 +45,7 @@ erealloc(void *ptr, unsigned int size)
 {
 	void *res = realloc(ptr, size);
 	if(!res)
-		bad_malloc(size);
+		badmalloc(size);
 	return res;
 }
 
