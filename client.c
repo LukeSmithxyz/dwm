@@ -73,12 +73,14 @@ focus(Client *c)
 {
 	Client *old = sel;
 
-	if (!issel)
+	if(!issel)
 		return;
-	if(sel && sel->ismax && sel != c)
-		togglemax(NULL);
-	sel = c;
-	if(old && old != c) {
+	if(!sel)
+		sel = c;
+	else if(sel != c) {
+		if(sel->ismax)
+			togglemax(NULL);
+		sel = c;
 		grabbutton(old, AnyButton, 0);
 		drawtitle(old);
 	}
