@@ -286,11 +286,9 @@ main(int argc, char *argv[])
 			FD_SET(STDIN_FILENO, &rd);
 		FD_SET(xfd, &rd);
 		i = select(xfd + 1, &rd, NULL, NULL, NULL);
-		if(i == -1 && errno == EINTR)
+		if((i == -1) && (errno == EINTR))
 			continue;
-		if(i < 0)
-			eprint("select failed\n");
-		else if(i > 0) {
+		if(i > 0) {
 			if(readin && FD_ISSET(STDIN_FILENO, &rd)) {
 				readin = NULL != fgets(stext, sizeof(stext), stdin);
 				if(readin)
@@ -300,6 +298,8 @@ main(int argc, char *argv[])
 				drawstatus();
 			}
 		}
+		else if(i < 0)
+			eprint("select failed\n");
 		procevent();
 	}
 	cleanup();
