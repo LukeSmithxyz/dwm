@@ -92,19 +92,18 @@ Window root, barwin;
 int
 getproto(Window w)
 {
-	int status, format, protos = 0;
-	int i;
+	int i, format, protos, status;
 	unsigned long extra, res;
 	Atom *protocols, real;
 
-	status = XGetWindowProperty(dpy, w, wmatom[WMProtocols], 0L, 20L,
-			False, XA_ATOM, &real, &format, &res, &extra, (unsigned char **)&protocols);
+	protos = 0;
+	status = XGetWindowProperty(dpy, w, wmatom[WMProtocols], 0L, 20L, False,
+			XA_ATOM, &real, &format, &res, &extra, (unsigned char **)&protocols);
 	if(status != Success || protocols == 0)
 		return protos;
-	for(i = 0; i < res; i++) {
+	for(i = 0; i < res; i++)
 		if(protocols[i] == wmatom[WMDelete])
 			protos |= PROTODELWIN;
-	}
 	free(protocols);
 	return protos;
 }
