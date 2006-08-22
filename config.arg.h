@@ -8,7 +8,8 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 
 #define DEFMODE			dotile /* dofloat */
 #define DEFTAG			0 /* index */
-#define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
+#define TFONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
+#define FONT			"-*-snap-*-*-*-*-*-*-*-*-*-*-*-*"
 #define BGCOLOR			"#0d121d"
 #define FGCOLOR			"#eeeeee"
 #define BORDERCOLOR		"#3f484d"
@@ -19,7 +20,7 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 static Key key[] = { \
 	/* modifier			key		function	arguments */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec rxvt +sb -tr -bg black -fg '#eeeeee' -fn '"FONT"'" } }, \
+		{ .cmd = "exec rxvt +sb -tr -bg black -fg '#eeeeee' -fn '"TFONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exec `ls -lL /usr/bin /usr/X11R6/bin /usr/local/bin 2>/dev/null | " \
 			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort -u | dmenu`" } }, \
