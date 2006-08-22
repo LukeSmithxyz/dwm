@@ -9,14 +9,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-/* static */
-
-static void
-badmalloc(unsigned int size)
-{
-	eprint("fatal: could not malloc() %u bytes\n", size);
-}
-
 /* extern */
 
 void *
@@ -25,7 +17,7 @@ emallocz(unsigned int size)
 	void *res = calloc(1, size);
 
 	if(!res)
-		badmalloc(size);
+		eprint("fatal: could not malloc() %u bytes\n", size);
 	return res;
 }
 
@@ -45,7 +37,7 @@ erealloc(void *ptr, unsigned int size)
 {
 	void *res = realloc(ptr, size);
 	if(!res)
-		badmalloc(size);
+		eprint("fatal: could not malloc() %u bytes\n", size);
 	return res;
 }
 
