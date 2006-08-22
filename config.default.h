@@ -4,10 +4,9 @@
  */
 
 #define TAGS \
-const char *tags[] = { "0", "1", "2", "3", "4", NULL };
+const char *tags[] = { "1", "2", "3", "4", "0", NULL };
 
 #define DEFMODE			dotile /* dofloat */
-#define DEFTAG			1 /* index */
 #define FONT			"fixed"
 #define BGCOLOR			"#666699"
 #define FGCOLOR			"#eeeeee"

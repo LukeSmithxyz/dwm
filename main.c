@@ -241,7 +241,7 @@ main(int argc, char *argv[])
 
 	for(ntags = 0; tags[ntags]; ntags++);
 	seltag = emallocz(sizeof(Bool) * ntags);
-	seltag[DEFTAG] = True;
+	seltag[0] = True;
 
 	/* style */
 	dc.bg = getcolor(BGCOLOR);

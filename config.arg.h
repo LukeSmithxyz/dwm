@@ -7,7 +7,6 @@
 const char *tags[] = { "work", "net", "fnord", NULL };
 
 #define DEFMODE			dotile /* dofloat */
-#define DEFTAG			0 /* index */
 #define TFONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
 #define FONT			"-*-snap-*-*-*-*-*-*-*-*-*-*-*-*"
 #define BGCOLOR			"#0d121d"
