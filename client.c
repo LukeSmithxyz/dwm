@@ -89,40 +89,6 @@ focus(Client *c)
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 }
 
-void
-focusnext(Arg *arg)
-{
-	Client *c;
-   
-	if(!sel)
-		return;
-
-	if(!(c = getnext(sel->next)))
-		c = getnext(clients);
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
-void
-focusprev(Arg *arg)
-{
-	Client *c;
-
-	if(!sel)
-		return;
-
-	if(!(c = getprev(sel->prev))) {
-		for(c = clients; c && c->next; c = c->next);
-		c = getprev(c);
-	}
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
 Client *
 getclient(Window w)
 {
@@ -444,32 +410,5 @@ unmanage(Client *c)
 	XUngrabServer(dpy);
 	if(sel)
 		focus(sel);
-	arrange(NULL);
-}
-
-void
-zoom(Arg *arg)
-{
-	Client *c;
-
-	if(!sel || (arrange != dotile) || sel->isfloat || sel->ismax)
-		return;
-
-	if(sel == getnext(clients))  {
-		if((c = getnext(sel->next)))
-			sel = c;
-		else
-			return;
-	}
-
-	/* pop */
-	sel->prev->next = sel->next;
-	if(sel->next)
-		sel->next->prev = sel->prev;
-	sel->prev = NULL;
-	clients->prev = sel;
-	sel->next = clients;
-	clients = sel;
-	focus(sel);
 	arrange(NULL);
 }

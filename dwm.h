@@ -84,8 +84,6 @@ extern Window root, barwin;
 /* client.c */
 extern void ban(Client *c);
 extern void focus(Client *c);
-extern void focusnext(Arg *arg);
-extern void focusprev(Arg *arg);
 extern Client *getclient(Window w);
 extern Client *getctitle(Window w);
 extern void gravitate(Client *c, Bool invert);
@@ -96,7 +94,6 @@ extern void setsize(Client *c);
 extern void settitle(Client *c);
 extern void togglemax(Arg *arg);
 extern void unmanage(Client *c);
-extern void zoom(Arg *arg);
 
 /* draw.c */
 extern void drawall();
@@ -117,22 +114,27 @@ extern void sendevent(Window w, Atom a, long value);
 extern int xerror(Display *dsply, XErrorEvent *ee);
 
 /* tag.c */
-extern void dofloat(Arg *arg);
-extern void dotile(Arg *arg);
 extern void initrregs();
-extern Bool isvisible(Client *c);
 extern Client *getnext(Client *c);
 extern Client *getprev(Client *c);
-extern void restack();
 extern void settags(Client *c);
 extern void tag(Arg *arg);
-extern void togglemode(Arg *arg);
 extern void toggletag(Arg *arg);
-extern void toggleview(Arg *arg);
-extern void view(Arg *arg);
 
 /* util.c */
 extern void *emallocz(unsigned int size);
 extern void eprint(const char *errstr, ...);
 extern void *erealloc(void *ptr, unsigned int size);
 extern void spawn(Arg *arg);
+
+/* view.c */
+extern void dofloat(Arg *arg);
+extern void dotile(Arg *arg);
+extern void focusnext(Arg *arg);
+extern void focusprev(Arg *arg);
+extern Bool isvisible(Client *c);
+extern void restack();
+extern void togglemode(Arg *arg);
+extern void toggleview(Arg *arg);
+extern void view(Arg *arg);
+extern void zoom(Arg *arg);
