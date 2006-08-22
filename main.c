@@ -62,25 +62,6 @@ scan()
 		XFree(wins);
 }
 
-static int
-winprop(Window w, Atom a, Atom t, long l, unsigned char **prop)
-{
-	int status, format;
-	unsigned long res, extra;
-	Atom real;
-
-	status = XGetWindowProperty(dpy, w, a, 0L, l, False, t, &real, &format,
-			&res, &extra, prop);
-
-	if(status != Success || *prop == 0) {
-		return 0;
-	}
-	if(res == 0) {
-		free((void *) *prop);
-	}
-	return res;
-}
-
 /*
  * Startup Error handler to check if another window manager
  * is already running.
@@ -111,21 +92,20 @@ Window root, barwin;
 int
 getproto(Window w)
 {
-	int protos = 0;
+	int status, format, protos = 0;
 	int i;
-	long res;
-	Atom *protocols;
+	unsigned long extra, res;
+	Atom *protocols, real;
 
-	res = winprop(w, wmatom[WMProtocols], XA_ATOM, 20L,
-			((unsigned char **)&protocols));
-	if(res <= 0) {
+	status = XGetWindowProperty(dpy, w, wmatom[WMProtocols], 0L, 20L,
+			False, XA_ATOM, &real, &format, &res, &extra, (unsigned char **)&protocols);
+	if(status != Success || protocols == 0)
 		return protos;
-	}
 	for(i = 0; i < res; i++) {
 		if(protocols[i] == wmatom[WMDelete])
 			protos |= PROTODELWIN;
 	}
-	free((char *) protocols);
+	free(protocols);
 	return protos;
 }
 
