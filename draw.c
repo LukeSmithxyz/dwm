@@ -149,18 +149,17 @@ drawtitle(Client *c)
 	XSetWindowBorder(dpy, c->win, dc.bg);
 	XMapWindow(dpy, c->title);
 
-	dc.x = dc.y = 0;
-
-	dc.w = 0;
+	dc.y = dc.w = 0;
+	dc.x = c->tw;
 	for(i = 0; i < ntags; i++) {
 		if(c->tags[i]) {
-			dc.x += dc.w;
 			dc.w = textw(tags[i]);
+			dc.x -= dc.w;
 			drawtext(tags[i], !istile);
 		}
 	}
-	dc.x += dc.w;
-	dc.w = c->tw - dc.x;
+	dc.w = dc.x;
+	dc.x = 0;
 	drawtext(c->name, !istile);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
