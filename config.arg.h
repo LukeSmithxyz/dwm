@@ -8,9 +8,9 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 
 #define DEFMODE			dotile /* dofloat */
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
-#define BGCOLOR			"#0d121d"
+#define BGCOLOR			"#666699"
 #define FGCOLOR			"#eeeeee"
-#define BORDERCOLOR		"#3f484d"
+#define BORDERCOLOR		"#9999CC"
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
 
@@ -18,7 +18,7 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 static Key key[] = { \
 	/* modifier			key		function	arguments */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec uxterm +sb -bg black -fg '#eeeeee' -fn '"FONT"'" } }, \
+		{ .cmd = "exec uxterm -bg '#e0e0e0' -fg '#000000' -cr '#000000' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exec `ls -lL /usr/bin /usr/X11R6/bin /usr/local/bin 2>/dev/null | " \
 			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort -u | dmenu`" } }, \
