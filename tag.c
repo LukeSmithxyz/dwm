@@ -78,18 +78,18 @@ initrregs()
 void
 settags(Client *c)
 {
-	char classinst[256];
+	char prop[512];
 	unsigned int i, j;
 	regmatch_t tmp;
 	Bool matched = False;
 	XClassHint ch;
 
 	if(XGetClassHint(dpy, c->win, &ch)) {
-		snprintf(classinst, sizeof(classinst), "%s:%s",
+		snprintf(prop, sizeof(prop), "%s:%s:%s",
 				ch.res_class ? ch.res_class : "",
-				ch.res_name ? ch.res_name : "");
+				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; !matched && i < len; i++)
-			if(rreg[i].clregex && !regexec(rreg[i].clregex, classinst, 1, &tmp, 0)) {
+			if(rreg[i].clregex && !regexec(rreg[i].clregex, prop, 1, &tmp, 0)) {
 				c->isfloat = rule[i].isfloat;
 				for(j = 0; rreg[i].tregex && j < ntags; j++) {
 					if(!regexec(rreg[i].tregex, tags[j], 1, &tmp, 0)) {

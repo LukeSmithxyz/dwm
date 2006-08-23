@@ -47,11 +47,11 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
 };
 
-/* Query class:instance for regex matching info with following command:
- * xprop | awk -F'"' '/^WM_CLASS/ { printf "%s:%s\n", $4, $2 }'*/
+/* Query class:instance:title for regex matching info with following command:
+ * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/{ printf("%s\n",$2) }' */
 #define RULES \
 static Rule rule[] = { \
-	/* class:instance regex		tags regex	isfloat */ \
+	/* class:instance:title regex	tags regex	isfloat */ \
 	{ "Firefox.*",			"2",		False }, \
 	{ "Gimp.*",			NULL,		True}, \
 };
