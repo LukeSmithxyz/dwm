@@ -147,7 +147,6 @@ setup()
 	dc.gc = XCreateGC(dpy, root, 0, 0);
 
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
-
 	strcpy(stext, "dwm-"VERSION);
 }
 
