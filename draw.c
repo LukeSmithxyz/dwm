@@ -125,9 +125,21 @@ drawstatus()
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
 	drawtext(stext, !istile);
-	if(sel && ((dc.w = dc.x - x) >= bh)) {
-		dc.x = x;
-		drawtext(sel->name, istile);
+
+	if(sel) {
+		for(i = 0; i < ntags; i++)
+			if(sel->tags[i]) {
+				dc.w = textw(tags[i]);
+				dc.x -= dc.w;
+				if(dc.x < x)
+					break;
+				drawtext(tags[i], istile);
+			}
+		if(dc.x > x && (dc.x - x) > bh) {
+			dc.w = dc.x - x;
+			dc.x = x;
+			drawtext(sel->name, istile);
+		}
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
@@ -149,17 +161,16 @@ drawtitle(Client *c)
 	XSetWindowBorder(dpy, c->win, dc.bg);
 	XMapWindow(dpy, c->title);
 
-	dc.x = dc.y = 0;
-	dc.w = 0;
-	for(i = 0; i < ntags; i++) {
+	dc.y = dc.w = 0;
+	dc.x = c->tw;
+	for(i = 0; i < ntags; i++)
 		if(c->tags[i]) {
-			dc.x += dc.w;
 			dc.w = textw(tags[i]);
+			dc.x -= dc.w;
 			drawtext(tags[i], !istile);
 		}
-	}
-	dc.x += dc.w;
-	dc.w = c->tw - dc.x;
+	dc.w = dc.x;
+	dc.x = 0;
 	drawtext(c->name, !istile);
 	XCopyArea(dpy, dc.drawable, c->title, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
