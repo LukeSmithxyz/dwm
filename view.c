@@ -195,7 +195,7 @@ restack()
 void
 togglemode(Arg *arg)
 {
-	arrange = arrange == dofloat ? dotile : dofloat;
+	arrange = (arrange == dofloat) ? dotile : dofloat;
 	if(sel)
 		arrange(NULL);
 	else

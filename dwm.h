@@ -11,15 +11,10 @@
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 #define PROTODELWIN		1
 
-typedef union Arg Arg;
-typedef struct Client Client;
-typedef struct DC DC;
-typedef struct Fnt Fnt;
-
-union Arg {
+typedef union {
 	const char *cmd;
 	int i;
-};
+} Arg;
 
 /* atoms */
 enum { NetSupported, NetWMName, NetLast };
@@ -28,18 +23,18 @@ enum { WMProtocols, WMDelete, WMLast };
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurLast };
 
-/* windowcorners */
+/* window corners */
 typedef enum { TopLeft, TopRight, BotLeft, BotRight } Corner;
 
-struct Fnt {
+typedef struct {
 	int ascent;
 	int descent;
 	int height;
 	XFontSet set;
 	XFontStruct *xfont;
-};
+} Fnt;
 
-struct DC { /* draw context */
+typedef struct { /* draw context */
 	int x, y, w, h;
 	unsigned long bg;
 	unsigned long fg;
@@ -47,8 +42,9 @@ struct DC { /* draw context */
 	Drawable drawable;
 	Fnt font;
 	GC gc;
-};
+} DC;
 
+typedef struct Client Client;
 struct Client {
 	char name[256];
 	int proto;

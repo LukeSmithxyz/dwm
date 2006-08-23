@@ -15,6 +15,22 @@
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
+/* extern */
+
+char stext[1024];
+Bool *seltag;
+int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
+unsigned int ntags, numlockmask;
+Atom wmatom[WMLast], netatom[NetLast];
+Bool running = True;
+Bool issel = True;
+Client *clients = NULL;
+Client *sel = NULL;
+Cursor cursor[CurLast];
+Display *dpy;
+DC dc = {0};
+Window root, barwin;
+
 /* static */
 
 static int (*xerrorxlib)(Display *, XErrorEvent *);
@@ -62,6 +78,79 @@ scan()
 		XFree(wins);
 }
 
+static void
+setup()
+{
+	int i, j;
+	unsigned int mask;
+	Window w;
+	XModifierKeymap *modmap;
+	XSetWindowAttributes wa;
+
+	/* init atoms */
+	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
+	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
+	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
+			PropModeReplace, (unsigned char *) netatom, NetLast);
+
+	/* init cursors */
+	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
+	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
+	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
+
+	modmap = XGetModifierMapping(dpy);
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < modmap->max_keypermod; j++) {
+			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+				numlockmask = (1 << i);
+		}
+	}
+	XFree(modmap);
+
+	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask | LeaveWindowMask;
+	wa.cursor = cursor[CurNormal];
+	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+
+	grabkeys();
+	initrregs();
+
+	for(ntags = 0; tags[ntags]; ntags++);
+	seltag = emallocz(sizeof(Bool) * ntags);
+	seltag[0] = True;
+
+	/* style */
+	dc.bg = getcolor(BGCOLOR);
+	dc.fg = getcolor(FGCOLOR);
+	dc.border = getcolor(BORDERCOLOR);
+	setfont(FONT);
+
+	sx = sy = 0;
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
+	mw = (sw * MASTERW) / 100;
+
+	bx = by = 0;
+	bw = sw;
+	dc.h = bh = dc.font.height + 4;
+	wa.override_redirect = 1;
+	wa.background_pixmap = ParentRelative;
+	wa.event_mask = ButtonPressMask | ExposureMask;
+	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
+			CopyFromParent, DefaultVisual(dpy, screen),
+			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
+	XDefineCursor(dpy, barwin, cursor[CurNormal]);
+	XMapRaised(dpy, barwin);
+
+	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
+	dc.gc = XCreateGC(dpy, root, 0, 0);
+
+	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
+
+	strcpy(stext, "dwm-"VERSION);
+}
+
 /*
  * Startup Error handler to check if another window manager
  * is already running.
@@ -74,20 +163,6 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 }
 
 /* extern */
-
-char stext[1024];
-Bool *seltag;
-int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-unsigned int ntags, numlockmask;
-Atom wmatom[WMLast], netatom[NetLast];
-Bool running = True;
-Bool issel = True;
-Client *clients = NULL;
-Client *sel = NULL;
-Cursor cursor[CurLast];
-Display *dpy;
-DC dc = {0};
-Window root, barwin;
 
 int
 getproto(Window w)
@@ -153,12 +228,8 @@ xerror(Display *dpy, XErrorEvent *ee)
 int
 main(int argc, char *argv[])
 {
-	int i, j, xfd;
-	unsigned int mask;
+	int r, xfd;
 	fd_set rd;
-	Window w;
-	XModifierKeymap *modmap;
-	XSetWindowAttributes wa;
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
 		fputs("dwm-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
@@ -189,70 +260,8 @@ main(int argc, char *argv[])
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
 
-	/* init atoms */
-	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
-	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
-	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
-			PropModeReplace, (unsigned char *) netatom, NetLast);
-
-	/* init cursors */
-	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
-	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
-	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
-
-	modmap = XGetModifierMapping(dpy);
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < modmap->max_keypermod; j++) {
-			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
-				numlockmask = (1 << i);
-		}
-	}
-	XFree(modmap);
-
-	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask | LeaveWindowMask;
-	wa.cursor = cursor[CurNormal];
-	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
-
-	grabkeys();
-	initrregs();
-
-	for(ntags = 0; tags[ntags]; ntags++);
-	seltag = emallocz(sizeof(Bool) * ntags);
-	seltag[0] = True;
-
-	/* style */
-	dc.bg = getcolor(BGCOLOR);
-	dc.fg = getcolor(FGCOLOR);
-	dc.border = getcolor(BORDERCOLOR);
-	setfont(FONT);
-
-	sx = sy = 0;
-	sw = DisplayWidth(dpy, screen);
-	sh = DisplayHeight(dpy, screen);
-	mw = (sw * MASTERW) / 100;
-
-	bx = by = 0;
-	bw = sw;
-	dc.h = bh = dc.font.height + 4;
-	wa.override_redirect = 1;
-	wa.background_pixmap = ParentRelative;
-	wa.event_mask = ButtonPressMask | ExposureMask;
-	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
-			CopyFromParent, DefaultVisual(dpy, screen),
-			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
-	XDefineCursor(dpy, barwin, cursor[CurNormal]);
-	XMapRaised(dpy, barwin);
-
-	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
-	dc.gc = XCreateGC(dpy, root, 0, 0);
-
-	strcpy(stext, "dwm-"VERSION);
+	setup();
 	drawstatus();
-
-	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
-
 	scan();
 
 	/* main event loop, also reads status text from stdin */
@@ -264,10 +273,10 @@ main(int argc, char *argv[])
 		if(readin)
 			FD_SET(STDIN_FILENO, &rd);
 		FD_SET(xfd, &rd);
-		i = select(xfd + 1, &rd, NULL, NULL, NULL);
-		if((i == -1) && (errno == EINTR))
+		r = select(xfd + 1, &rd, NULL, NULL, NULL);
+		if((r == -1) && (errno == EINTR))
 			continue;
-		if(i > 0) {
+		if(r > 0) {
 			if(readin && FD_ISSET(STDIN_FILENO, &rd)) {
 				readin = NULL != fgets(stext, sizeof(stext), stdin);
 				if(readin)
@@ -277,7 +286,7 @@ main(int argc, char *argv[])
 				drawstatus();
 			}
 		}
-		else if(i < 0)
+		else if(r < 0)
 			eprint("select failed\n");
 		procevent();
 	}
