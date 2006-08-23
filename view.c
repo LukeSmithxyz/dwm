@@ -168,21 +168,21 @@ restack()
 	fi = 0;
 	mi = 2 * f;
 	if(sel->isfloat || arrange == dofloat) {
-		wins[fi++] = sel->title;
+		wins[fi++] = sel->twin;
 		wins[fi++] = sel->win;
 	}
 	else {
-		wins[mi++] = sel->title;
+		wins[mi++] = sel->twin;
 		wins[mi++] = sel->win;
 	}
 	for(c = clients; c; c = c->next)
 		if(isvisible(c) && c != sel) {
 			if(c->isfloat || arrange == dofloat) {
-				wins[fi++] = c->title;
+				wins[fi++] = c->twin;
 				wins[fi++] = c->win;
 			}
 			else {
-				wins[mi++] = c->title;
+				wins[mi++] = c->twin;
 				wins[mi++] = c->win;
 			}
 		}

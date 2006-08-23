@@ -141,4 +141,6 @@ toggletag(Arg *arg)
 	settitle(sel);
 	if(!isvisible(sel))
 		arrange(NULL);
+	else
+		drawstatus();
 }

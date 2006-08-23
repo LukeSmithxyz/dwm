@@ -28,19 +28,15 @@ resizetitle(Client *c)
 {
 	int i;
 
-	c->tw = 0;
-	for(i = 0; i < ntags; i++)
-		if(c->tags[i])
-			c->tw += textw(tags[i]);
-	c->tw += textw(c->name);
+	c->tw = textw(c->name);
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
 	c->tx = c->x + c->w - c->tw + 2;
 	c->ty = c->y;
 	if(isvisible(c))
-		XMoveResizeWindow(dpy, c->title, c->tx, c->ty, c->tw, c->th);
+		XMoveResizeWindow(dpy, c->twin, c->tx, c->ty, c->tw, c->th);
 	else
-		XMoveResizeWindow(dpy, c->title, c->tx + 2 * sw, c->ty, c->tw, c->th);
+		XMoveResizeWindow(dpy, c->twin, c->tx + 2 * sw, c->ty, c->tw, c->th);
 
 }
 
@@ -65,7 +61,7 @@ void
 ban(Client *c)
 {
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-	XMoveWindow(dpy, c->title, c->tx + 2 * sw, c->ty);
+	XMoveWindow(dpy, c->twin, c->tx + 2 * sw, c->ty);
 }
 
 void
@@ -106,7 +102,7 @@ getctitle(Window w)
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(c->title == w)
+		if(c->twin == w)
 			return c;
 	return NULL;
 }
@@ -214,7 +210,7 @@ manage(Window w, XWindowAttributes *wa)
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask | EnterWindowMask;
 
-	c->title = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
+	c->twin = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
@@ -242,7 +238,7 @@ manage(Window w, XWindowAttributes *wa)
 		sel = c;
 	arrange(NULL);
 	XMapWindow(dpy, c->win);
-	XMapWindow(dpy, c->title);
+	XMapWindow(dpy, c->twin);
 	if(isvisible(c))
 		focus(c);
 }
@@ -329,7 +325,7 @@ void
 settitle(Client *c)
 {
 	char **list = NULL;
-	int n;
+	int i, n;
 	XTextProperty name;
 
 	name.nitems = 0;
@@ -392,7 +388,7 @@ unmanage(Client *c)
 	XSetErrorHandler(xerrordummy);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	XDestroyWindow(dpy, c->title);
+	XDestroyWindow(dpy, c->twin);
 
 	if(c->prev)
 		c->prev->next = c->next;

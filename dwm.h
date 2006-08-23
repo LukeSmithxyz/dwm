@@ -60,7 +60,7 @@ struct Client {
 	Client *next;
 	Client *prev;
 	Window win;
-	Window title;
+	Window twin;
 };
 
 extern const char *tags[];
