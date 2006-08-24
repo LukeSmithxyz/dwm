@@ -145,6 +145,7 @@ setup()
 
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
+	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
 
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 	strcpy(stext, "dwm-"VERSION);

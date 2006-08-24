@@ -22,9 +22,17 @@ textnw(const char *text, unsigned int len)
 }
 
 static void
-drawborder()
+drawtext(const char *text, Bool invert, Bool underline)
 {
+	int x, y, w, h;
+	static char buf[256];
+	unsigned int len, olen;
+	XGCValues gcv;
 	XPoint points[5];
+	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
+
+	XSetForeground(dpy, dc.gc, invert ? dc.fg : dc.bg);
+	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	points[0].x = dc.x;
 	points[0].y = dc.y;
 	points[1].x = dc.w - 1;
@@ -35,24 +43,8 @@ drawborder()
 	points[3].y = 0;
 	points[4].x = 0;
 	points[4].y = -(dc.h - 1);
-	XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
-}
-
-static void
-drawtext(const char *text, Bool invert, Bool highlight)
-{
-	int x, y, w, h;
-	static char buf[256];
-	unsigned int len, olen;
-	DC tmp;
-	XGCValues gcv;
-	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
-
-	XSetForeground(dpy, dc.gc, invert ? dc.fg : dc.bg);
-	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
-	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
 	XSetForeground(dpy, dc.gc, dc.border);
-	drawborder();
+	XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
 
 	if(!text)
 		return;
@@ -93,14 +85,12 @@ drawtext(const char *text, Bool invert, Bool highlight)
 		XChangeGC(dpy, dc.gc, GCForeground | GCBackground | GCFont, &gcv);
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
-	if(highlight) {
-		tmp = dc;
-		dc.x += 2;
-		dc.y += 2;
-		dc.w -= 4;
-		dc.h -= 4;
-		drawborder();
-		dc = tmp;
+	if(underline) {
+		points[0].x = dc.x + (h / 2) - 1;
+		points[0].y = dc.y + dc.h - 3;
+		points[1].x = dc.w - h + 2;
+		points[1].y = 0;
+		XDrawLines(dpy, dc.drawable, dc.gc, points, 2, CoordModePrevious);
 	}
 }
 
