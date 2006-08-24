@@ -22,7 +22,7 @@ textnw(const char *text, unsigned int len)
 }
 
 static void
-drawtext(const char *text, Bool invert, Bool underline)
+drawtext(const char *text, Bool invert, Bool highlight)
 {
 	int x, y, w, h;
 	static char buf[256];
@@ -85,12 +85,18 @@ drawtext(const char *text, Bool invert, Bool underline)
 		XChangeGC(dpy, dc.gc, GCForeground | GCBackground | GCFont, &gcv);
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
-	if(underline) {
-		points[0].x = dc.x + (h / 2) - 1;
-		points[0].y = dc.y + dc.h - 3;
-		points[1].x = dc.w - h + 2;
+	if(highlight) {
+		points[0].x = dc.x + 1;
+		points[0].y = dc.y + 1;
+		points[1].x = dc.w - 3;
 		points[1].y = 0;
-		XDrawLines(dpy, dc.drawable, dc.gc, points, 2, CoordModePrevious);
+		points[2].x = 0;
+		points[2].y = dc.h - 3;
+		points[3].x = -(dc.w - 3);
+		points[3].y = 0;
+		points[4].x = 0;
+		points[4].y = -(dc.h - 3);
+		XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
 	}
 }
 
