@@ -114,16 +114,16 @@ drawstatus()
 
 	dc.x = dc.y = 0;
 	dc.w = bw;
-	drawtext(NULL, !istile, False);
+	drawtext(NULL, istile ? 1 : 0, False);
 
 	dc.w = 0;
 	for(i = 0; i < ntags; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
 		if(istile)
-			drawtext(tags[i], seltag[i], sel && sel->tags[i]);
+			drawtext(tags[i], seltag[i] ? 0 : 1, sel && sel->tags[i]);
 		else
-			drawtext(tags[i], !seltag[i], sel && sel->tags[i]);
+			drawtext(tags[i], seltag[i] ? 1 : 0, sel && sel->tags[i]);
 	}
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
@@ -132,11 +132,11 @@ drawstatus()
 		dc.x = x;
 		dc.w = bw - x;
 	}
-	drawtext(stext, !istile, False);
+	drawtext(stext, istile ? 1 : 0, False);
 
 	if(sel && ((dc.w = dc.x - x) > bh)) {
 		dc.x = x;
-		drawtext(sel->name, istile, False);
+		drawtext(sel->name, istile ? 0 : 1, False);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
@@ -159,7 +159,7 @@ drawtitle(Client *c)
 	XMapWindow(dpy, c->twin);
 	dc.x = dc.y = 0;
 	dc.w = c->tw;
-	drawtext(c->name, !istile, False);
+	drawtext(c->name, istile ? 1 : 0, False);
 	XCopyArea(dpy, dc.drawable, c->twin, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
 }
