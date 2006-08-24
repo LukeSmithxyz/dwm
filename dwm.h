@@ -36,9 +36,8 @@ typedef struct {
 
 typedef struct { /* draw context */
 	int x, y, w, h;
-	unsigned long bg;
-	unsigned long fg;
-	unsigned long border;
+	unsigned long bg[2];
+	unsigned long fg[2];
 	Drawable drawable;
 	Fnt font;
 	GC gc;

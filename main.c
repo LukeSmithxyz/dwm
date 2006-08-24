@@ -121,9 +121,10 @@ setup()
 	seltag[0] = True;
 
 	/* style */
-	dc.bg = getcolor(BGCOLOR);
-	dc.fg = getcolor(FGCOLOR);
-	dc.border = getcolor(BORDERCOLOR);
+	dc.bg[0] = getcolor(NORMBGCOLOR);
+	dc.fg[0] = getcolor(NORMFGCOLOR);
+	dc.bg[1] = getcolor(SELBGCOLOR);
+	dc.fg[1] = getcolor(SELFGCOLOR);
 	setfont(FONT);
 
 	sx = sy = 0;
