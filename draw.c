@@ -22,15 +22,16 @@ textnw(const char *text, unsigned int len)
 }
 
 static void
-drawtext(const char *text, unsigned int colidx, Bool highlight)
+drawtext(const char *text, Bool invert, Bool highlight)
 {
 	int x, y, w, h;
 	static char buf[256];
 	unsigned int len, olen;
+	XGCValues gcv;
 	XPoint points[5];
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
-	XSetForeground(dpy, dc.gc, dc.bg[colidx]);
+	XSetForeground(dpy, dc.gc, invert ? dc.fg : dc.bg);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	points[0].x = dc.x;
 	points[0].y = dc.y;
@@ -42,7 +43,7 @@ drawtext(const char *text, unsigned int colidx, Bool highlight)
 	points[3].y = 0;
 	points[4].x = 0;
 	points[4].y = -(dc.h - 1);
-	XSetForeground(dpy, dc.gc, dc.fg[colidx]);
+	XSetForeground(dpy, dc.gc, dc.border);
 	XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
 
 	if(!text)
@@ -73,24 +74,22 @@ drawtext(const char *text, unsigned int colidx, Bool highlight)
 
 	if(w > dc.w)
 		return; /* too long */
-	if(dc.font.set)
+	gcv.foreground = invert ? dc.bg : dc.fg;
+	gcv.background = invert ? dc.fg : dc.bg;
+	if(dc.font.set) {
+		XChangeGC(dpy, dc.gc, GCForeground | GCBackground, &gcv);
 		XmbDrawString(dpy, dc.drawable, dc.font.set, dc.gc, x, y, buf, len);
+	}
 	else {
-		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
+		gcv.font = dc.font.xfont->fid;
+		XChangeGC(dpy, dc.gc, GCForeground | GCBackground | GCFont, &gcv);
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
 	if(highlight) {
-		points[0].x = dc.x + 1;
-		points[0].y = dc.y + 1;
-		points[1].x = dc.w - 3;
-		points[1].y = 0;
-		points[2].x = 0;
-		points[2].y = dc.h - 3;
-		points[3].x = -(dc.w - 3);
-		points[3].y = 0;
-		points[4].x = 0;
-		points[4].y = -(dc.h - 3);
-		XDrawLines(dpy, dc.drawable, dc.gc, points, 5, CoordModePrevious);
+		r.x = dc.x + 2;
+		r.y = dc.y + 2;
+		r.width = r.height = 3;
+		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 }
 
@@ -114,16 +113,16 @@ drawstatus()
 
 	dc.x = dc.y = 0;
 	dc.w = bw;
-	drawtext(NULL, istile ? 1 : 0, False);
+	drawtext(NULL, !istile, False);
 
 	dc.w = 0;
 	for(i = 0; i < ntags; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
 		if(istile)
-			drawtext(tags[i], seltag[i] ? 0 : 1, sel && sel->tags[i]);
+			drawtext(tags[i], seltag[i], sel && sel->tags[i]);
 		else
-			drawtext(tags[i], seltag[i] ? 1 : 0, sel && sel->tags[i]);
+			drawtext(tags[i], !seltag[i], sel && sel->tags[i]);
 	}
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
@@ -132,11 +131,11 @@ drawstatus()
 		dc.x = x;
 		dc.w = bw - x;
 	}
-	drawtext(stext, istile ? 1 : 0, False);
+	drawtext(stext, !istile, False);
 
 	if(sel && ((dc.w = dc.x - x) > bh)) {
 		dc.x = x;
-		drawtext(sel->name, istile ? 0 : 1, False);
+		drawtext(sel->name, istile, False);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
@@ -151,15 +150,15 @@ drawtitle(Client *c)
 	if(c == sel && issel) {
 		drawstatus();
 		XUnmapWindow(dpy, c->twin);
-		XSetWindowBorder(dpy, c->win, dc.fg[1]);
+		XSetWindowBorder(dpy, c->win, dc.fg);
 		return;
 	}
 
-	XSetWindowBorder(dpy, c->win, dc.bg[0]);
+	XSetWindowBorder(dpy, c->win, dc.bg);
 	XMapWindow(dpy, c->twin);
 	dc.x = dc.y = 0;
 	dc.w = c->tw;
-	drawtext(c->name, istile ? 1 : 0, False);
+	drawtext(c->name, !istile, False);
 	XCopyArea(dpy, dc.drawable, c->twin, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
 }

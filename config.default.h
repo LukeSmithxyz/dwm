@@ -8,10 +8,9 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 
 #define DEFMODE			dotile /* dofloat */
 #define FONT			"fixed"
-#define NORMBGCOLOR		"#666699"
-#define NORMFGCOLOR		"#eeeeee"
-#define SELBGCOLOR		"#eeeeee"
-#define SELFGCOLOR		"#666699"
+#define BGCOLOR			"#666699"
+#define FGCOLOR			"#eeeeee"
+#define BORDERCOLOR		"#9999CC"
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
 
