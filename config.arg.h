@@ -10,13 +10,13 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define FLOATSYMBOL		"><>"
 #define TILESYMBOL		"[]="
 
-#define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
-#define SELBGCOLOR		"#0055bb"
-#define SELFGCOLOR		"#ffffff"
-#define NORMBGCOLOR		"#444444"
-#define NORMFGCOLOR		"#cccccc"
-#define STATUSBGCOLOR		"#000000"
-#define STATUSFGCOLOR		"#0088ff"
+#define FONT			"-*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-*"
+#define SELBGCOLOR		"#333366"
+#define SELFGCOLOR		"#eeeeee"
+#define NORMBGCOLOR		"#333333"
+#define NORMFGCOLOR		"#dddddd"
+#define STATUSBGCOLOR		"#222222"
+#define STATUSFGCOLOR		"#9999cc"
 
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
