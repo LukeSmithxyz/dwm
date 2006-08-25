@@ -7,6 +7,8 @@
 const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 
 #define DEFMODE			dotile /* dofloat */
+#define FLOATSYMBOL		"~"
+#define TILESYMBOL		"#"
 
 #define FONT			"fixed"
 #define SELBGCOLOR		"#666699"
@@ -15,8 +17,6 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 #define NORMFGCOLOR		"#cccccc"
 #define STATUSBGCOLOR		"#dddddd"
 #define STATUSFGCOLOR		"#222222"
-#define FLOATSYMBOL		"~"
-#define TILESYMBOL		"#"
 
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
