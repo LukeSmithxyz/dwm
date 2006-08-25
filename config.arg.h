@@ -11,12 +11,12 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define TILESYMBOL		"[]="
 
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
-#define SELBGCOLOR		"#666699"
-#define SELFGCOLOR		"#eeeeee"
-#define NORMBGCOLOR		"#333366"
+#define SELBGCOLOR		"#004499"
+#define SELFGCOLOR		"#ffffff"
+#define NORMBGCOLOR		"#222222"
 #define NORMFGCOLOR		"#cccccc"
-#define STATUSBGCOLOR		"#dddddd"
-#define STATUSFGCOLOR		"#222222"
+#define STATUSBGCOLOR		"#000000"
+#define STATUSFGCOLOR		"#0088ff"
 
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
@@ -25,7 +25,7 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 static Key key[] = { \
 	/* modifier			key		function	arguments */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec uxterm -bg '#e0e0e0' -fg '#000000' -cr '#000000' +sb -fn '"FONT"'" } }, \
+		{ .cmd = "exec uxterm -bg black -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exec `ls -lL /usr/bin /usr/X11R6/bin /usr/local/bin 2>/dev/null | " \
 			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort -u | dmenu`" } }, \
