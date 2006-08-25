@@ -20,7 +20,7 @@
 char stext[1024];
 Bool *seltag;
 int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-unsigned int ntags, numlockmask;
+unsigned int ntags, numlockmask, modew;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool issel = True;
@@ -121,11 +121,15 @@ setup()
 	seltag[0] = True;
 
 	/* style */
-	dc.bg = getcolor(BGCOLOR);
-	dc.fg = getcolor(FGCOLOR);
-	dc.border = getcolor(BORDERCOLOR);
+	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
+	dc.norm[ColFG] = getcolor(NORMFGCOLOR);
+	dc.sel[ColBG] = getcolor(SELBGCOLOR);
+	dc.sel[ColFG] = getcolor(SELFGCOLOR);
+	dc.status[ColBG] = getcolor(STATUSBGCOLOR);
+	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
 
+	modew = 0;
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
@@ -133,7 +137,7 @@ setup()
 
 	bx = by = 0;
 	bw = sw;
-	dc.h = bh = dc.font.height + 4;
+	dc.h = bh = dc.font.height + 2;
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask | ExposureMask;

@@ -105,7 +105,9 @@ buttonpress(XEvent *e)
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(barwin == ev->window) {
-		x = 0;
+		if(ev->x < modew)
+			return;
+		x = modew;
 		for(a.i = 0; a.i < ntags; a.i++) {
 			x += textw(tags[a.i]);
 			if(ev->x < x) {

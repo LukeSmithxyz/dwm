@@ -23,6 +23,9 @@ enum { WMProtocols, WMDelete, WMLast };
 /* cursor */
 enum { CurNormal, CurResize, CurMove, CurLast };
 
+/* color */
+enum { ColFG, ColBG, ColLast };
+
 /* window corners */
 typedef enum { TopLeft, TopRight, BotLeft, BotRight } Corner;
 
@@ -36,9 +39,9 @@ typedef struct {
 
 typedef struct { /* draw context */
 	int x, y, w, h;
-	unsigned long bg;
-	unsigned long fg;
-	unsigned long border;
+	unsigned long norm[ColLast];
+	unsigned long sel[ColLast];
+	unsigned long status[ColLast];
 	Drawable drawable;
 	Fnt font;
 	GC gc;
@@ -66,7 +69,7 @@ struct Client {
 extern const char *tags[];
 extern char stext[1024];
 extern int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-extern unsigned int ntags, numlockmask;
+extern unsigned int ntags, numlockmask, modew;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];
