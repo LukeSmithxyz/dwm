@@ -94,7 +94,7 @@ drawall()
 void
 drawstatus()
 {
-	static const char *mode[] = { "~", "=" };
+	static const char *mode[] = { "~", "|" };
 	int i, x;
 
 	dc.x = dc.y = 0;
@@ -114,7 +114,7 @@ drawstatus()
 		else
 			drawtext(tags[i], dc.norm, sel && sel->tags[i]);
 	}
-	x = dc.x + dc.w;
+	x = dc.x + dc.w + 1;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
 	if(dc.x < x) {
