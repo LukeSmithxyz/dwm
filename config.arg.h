@@ -25,7 +25,7 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 static Key key[] = { \
 	/* modifier			key		function	arguments */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec uxterm -bg black -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
+		{ .cmd = "exec uxterm -bg '#111111' -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exec `ls -lL /usr/bin /usr/X11R6/bin /usr/local/bin 2>/dev/null | " \
 			"awk 'NF>2 && $1 ~ /^[^d].*x/ {print $NF}' | sort -u | dmenu`" } }, \
