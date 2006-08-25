@@ -19,8 +19,8 @@
 
 char stext[1024];
 Bool *seltag;
-int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-unsigned int ntags, numlockmask, modew;
+int bx, by, bw, bh, bmw, mw, screen, sx, sy, sw, sh;
+unsigned int ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool issel = True;
@@ -129,7 +129,7 @@ setup()
 	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
 
-	modew = textw(FLOATSYMBOL) > textw(TILESYMBOL) ? textw(FLOATSYMBOL) : textw(TILESYMBOL);
+	bmw = textw(FLOATSYMBOL) > textw(TILESYMBOL) ? textw(FLOATSYMBOL) : textw(TILESYMBOL);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);

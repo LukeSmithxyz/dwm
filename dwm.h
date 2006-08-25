@@ -68,8 +68,8 @@ struct Client {
 
 extern const char *tags[];
 extern char stext[1024];
-extern int screen, sx, sy, sw, sh, bx, by, bw, bh, mw;
-extern unsigned int ntags, numlockmask, modew;
+extern int bx, by, bw, bh, bmw, mw, screen, sx, sy, sw, sh;
+extern unsigned int ntags, numlockmask;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];

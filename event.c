@@ -105,21 +105,19 @@ buttonpress(XEvent *e)
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(barwin == ev->window) {
-		if(ev->x < modew)
-			togglemode(NULL);
-		else {
-			x = modew;
-			for(a.i = 0; a.i < ntags; a.i++) {
-				x += textw(tags[a.i]);
-				if(ev->x < x) {
-					if(ev->button == Button1)
-						view(&a);
-					else if(ev->button == Button3)
-						toggleview(&a);
-					return;
-				}
+		x = 0;
+		for(a.i = 0; a.i < ntags; a.i++) {
+			x += textw(tags[a.i]);
+			if(ev->x < x) {
+				if(ev->button == Button1)
+					view(&a);
+				else if(ev->button == Button3)
+					toggleview(&a);
+				return;
 			}
 		}
+		if(ev->x < x + bmw)
+			togglemode(NULL);
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);

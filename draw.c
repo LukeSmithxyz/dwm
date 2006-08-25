@@ -99,16 +99,19 @@ drawstatus()
 	dc.x = dc.y = 0;
 	dc.w = bw;
 
-	drawtext(arrange == dotile ? TILESYMBOL : FLOATSYMBOL, dc.status, False);
-	dc.w = modew;
+	drawtext(NULL, dc.status, False);
 	for(i = 0; i < ntags; i++) {
-		dc.x += dc.w;
 		dc.w = textw(tags[i]);
 		if(seltag[i])
 			drawtext(tags[i], dc.sel, sel && sel->tags[i]);
 		else
 			drawtext(tags[i], dc.norm, sel && sel->tags[i]);
+		dc.x += dc.w;
 	}
+
+	dc.w = bmw;
+	drawtext(arrange == dotile ? TILESYMBOL : FLOATSYMBOL, dc.status, False);
+
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
