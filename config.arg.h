@@ -15,6 +15,8 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define NORMFGCOLOR		"#cccccc"
 #define STATUSBGCOLOR		"#dddddd"
 #define STATUSFGCOLOR		"#222222"
+#define FLOATSYMBOL		"><"
+#define TILEDSYMBOL		"|="
 
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */

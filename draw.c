@@ -94,18 +94,13 @@ drawall()
 void
 drawstatus()
 {
-	static const char *mode[] = { "><", "|=" };
 	int i, x;
 
 	dc.x = dc.y = 0;
 	dc.w = bw;
 
-	if(!modew)
-		modew = textw(mode[0]) > textw(mode[1]) ? textw(mode[0]) : textw(mode[1]);
-	drawtext(mode[arrange == dotile ? 1 : 0], dc.status, False);
-
-	dc.w = 0;
-	dc.x = modew;
+	drawtext(arrange == dotile ? TILEDSYMBOL : FLOATSYMBOL, dc.status, False);
+	dc.w = modew;
 	for(i = 0; i < ntags; i++) {
 		dc.x += dc.w;
 		dc.w = textw(tags[i]);
