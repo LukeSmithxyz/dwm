@@ -16,7 +16,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 #define STATUSBGCOLOR		"#dddddd"
 #define STATUSFGCOLOR		"#222222"
 #define FLOATSYMBOL		"~"
-#define TILEDSYMBOL		"#"
+#define TILESYMBOL		"#"
 
 #define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */

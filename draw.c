@@ -99,7 +99,7 @@ drawstatus()
 	dc.x = dc.y = 0;
 	dc.w = bw;
 
-	drawtext(arrange == dotile ? TILEDSYMBOL : FLOATSYMBOL, dc.status, False);
+	drawtext(arrange == dotile ? TILESYMBOL : FLOATSYMBOL, dc.status, False);
 	dc.w = modew;
 	for(i = 0; i < ntags; i++) {
 		dc.x += dc.w;
