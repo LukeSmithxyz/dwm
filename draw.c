@@ -94,7 +94,7 @@ drawall()
 void
 drawstatus()
 {
-	static const char *mode[] = { "~", "|" };
+	static const char *mode[] = { "><", "|=" };
 	int i, x;
 
 	dc.x = dc.y = 0;
