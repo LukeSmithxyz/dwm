@@ -11,7 +11,7 @@ const char *tags[] = { "work", "net", "fnord", NULL };
 #define TILESYMBOL		"[]="
 
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
-#define SELBGCOLOR		"#004499"
+#define SELBGCOLOR		"#0055bb"
 #define SELFGCOLOR		"#ffffff"
 #define NORMBGCOLOR		"#444444"
 #define NORMFGCOLOR		"#cccccc"
