@@ -109,7 +109,7 @@ drawstatus()
 		else
 			drawtext(tags[i], dc.norm, sel && sel->tags[i]);
 	}
-	x = dc.x + dc.w + 1;
+	x = dc.x + dc.w + 2;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
 	if(dc.x < x) {

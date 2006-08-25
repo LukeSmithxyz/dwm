@@ -129,7 +129,7 @@ setup()
 	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
 
-	modew = textw(FLOATSYMBOL) > textw(TILEDSYMBOL) ? textw(FLOATSYMBOL) : textw(TILEDSYMBOL);
+	modew = textw(FLOATSYMBOL) > textw(TILESYMBOL) ? textw(FLOATSYMBOL) : textw(TILESYMBOL);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
