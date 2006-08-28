@@ -11,16 +11,42 @@
 /* static functions */
 
 static void
-grabbutton(Client *c, unsigned int button, unsigned int modifier)
+grabbuttons(Client *c, Bool focus)
 {
-	XGrabButton(dpy, button, modifier, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, button, modifier | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, button, modifier | numlockmask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
-	XGrabButton(dpy, button, modifier | numlockmask | LockMask, c->win, False, BUTTONMASK,
-			GrabModeAsync, GrabModeSync, None, None);
+	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+
+	if(focus) {
+		XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button1, MODKEY | LockMask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button1, MODKEY | numlockmask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button1, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+
+		XGrabButton(dpy, Button2, MODKEY, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button2, MODKEY | LockMask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button2, MODKEY | numlockmask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button2, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+
+		XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button3, MODKEY | LockMask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button3, MODKEY | numlockmask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button3, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+	}
+	else
+		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+
 }
 
 static void
@@ -38,15 +64,6 @@ resizetitle(Client *c)
 	else
 		XMoveResizeWindow(dpy, c->twin, c->tx + 2 * sw, c->ty, c->tw, c->th);
 
-}
-
-static void
-ungrabbutton(Client *c, unsigned int button, unsigned int modifier)
-{
-	XUngrabButton(dpy, button, modifier, c->win);
-	XUngrabButton(dpy, button, modifier | LockMask, c->win);
-	XUngrabButton(dpy, button, modifier | numlockmask, c->win);
-	XUngrabButton(dpy, button, modifier | numlockmask | LockMask, c->win);
 }
 
 static int
@@ -77,10 +94,10 @@ focus(Client *c)
 		if(sel->ismax)
 			togglemax(NULL);
 		sel = c;
-		grabbutton(old, AnyButton, 0);
+		grabbuttons(old, False);
 		drawtitle(old);
 	}
-	ungrabbutton(c, AnyButton, 0);
+	grabbuttons(c, True);
 	drawtitle(c);
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 }
@@ -220,9 +237,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->next = clients;
 	clients = c;
 
-	grabbutton(c, Button1, MODKEY);
-	grabbutton(c, Button2, MODKEY);
-	grabbutton(c, Button3, MODKEY);
+	grabbuttons(c, False);
 
 	if((tc = getclient(trans))) /* inherit tags */
 		for(i = 0; i < ntags; i++)
@@ -384,8 +399,12 @@ togglemax(Arg *arg)
 void
 unmanage(Client *c)
 {
+	Client *tc;
+	Window trans;
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
+
+	XGetTransientForHint(dpy, c->win, &trans);
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->twin);
@@ -396,8 +415,12 @@ unmanage(Client *c)
 		c->next->prev = c->prev;
 	if(c == clients)
 		clients = c->next;
-	if(sel == c)
-		sel = getnext(clients);
+	if(sel == c) {
+		if(trans && (tc = getclient(trans)) && isvisible(tc))
+			sel = tc;
+		else
+			sel = getnext(clients);
+	}
 	free(c->tags);
 	free(c);
 
