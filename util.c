@@ -51,6 +51,7 @@ spawn(Arg *arg)
 
 	if(!arg->cmd)
 		return;
+	/* the double-fork construct avoids zombie processes */
 	if(fork() == 0) {
 		if(fork() == 0) {
 			if(dpy)
