@@ -97,9 +97,7 @@ drawstatus()
 	int i, x;
 
 	dc.x = dc.y = 0;
-	dc.w = bw;
 
-	drawtext(NULL, dc.status, False);
 	for(i = 0; i < ntags; i++) {
 		dc.w = textw(tags[i]);
 		if(seltag[i])
@@ -121,9 +119,12 @@ drawstatus()
 	}
 	drawtext(stext, dc.status, False);
 
-	if(sel && ((dc.w = dc.x - x) > bh)) {
+	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
-		drawtext(sel->name, dc.sel, False);
+		if(sel)
+			drawtext(sel->name, dc.sel, False);
+		else
+			drawtext(NULL, dc.norm, False);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);

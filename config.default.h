@@ -55,7 +55,7 @@ static Key key[] = { \
 };
 
 /* Query class:instance:title for regex matching info with following command:
- * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/{ printf("%s\n",$2) }' */
+ * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
 #define RULES \
 static Rule rule[] = { \
 	/* class:instance:title regex	tags regex	isfloat */ \
