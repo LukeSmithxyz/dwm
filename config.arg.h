@@ -4,7 +4,7 @@
  */
 
 #define TAGS \
-const char *tags[] = { "work", "net", "fnord", NULL };
+const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 
 #define DEFMODE			dotile /* dofloat */
 #define FLOATSYMBOL		"><>"
