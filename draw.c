@@ -133,8 +133,6 @@ drawstatus()
 void
 drawtitle(Client *c)
 {
-	int i;
-
 	if(c == sel && issel) {
 		drawstatus();
 		XUnmapWindow(dpy, c->twin);

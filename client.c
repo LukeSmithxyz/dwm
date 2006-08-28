@@ -52,8 +52,6 @@ grabbuttons(Client *c, Bool focus)
 static void
 resizetitle(Client *c)
 {
-	int i;
-
 	c->tw = textw(c->name);
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
@@ -340,7 +338,7 @@ void
 settitle(Client *c)
 {
 	char **list = NULL;
-	int i, n;
+	int n;
 	XTextProperty name;
 
 	name.nitems = 0;
