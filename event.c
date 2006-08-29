@@ -148,27 +148,35 @@ buttonpress(XEvent *e)
 }
 
 static void
+synconfig(Client *c, int x, int y, int w, int h, unsigned int border)
+{
+	XEvent synev;
+
+	synev.type = ConfigureNotify;
+	synev.xconfigure.display = dpy;
+	synev.xconfigure.event = c->win;
+	synev.xconfigure.window = c->win;
+	synev.xconfigure.x = x;
+	synev.xconfigure.y = y;
+	synev.xconfigure.width = w;
+	synev.xconfigure.height = h;
+	synev.xconfigure.border_width = border;
+	synev.xconfigure.above = None;
+	XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+}
+
+static void
 configurerequest(XEvent *e)
 {
 	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
-	XEvent synev;
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
 		if(!c->isfloat && (arrange != dofloat) && c->ismax) {
-			synev.type = ConfigureNotify;
-			synev.xconfigure.display = dpy;
-			synev.xconfigure.event = c->win;
-			synev.xconfigure.window = c->win;
-			synev.xconfigure.x = sx;
-			synev.xconfigure.y = sy + bh;
-			synev.xconfigure.width = sw - 2;
-			synev.xconfigure.height = sw - 2 - bh;
-			synev.xconfigure.border_width = ev->border_width;
-			synev.xconfigure.above = None;
-			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+			synconfig(c, sx, sy + bh, sw - 2, sh - 2 - bh, ev->border_width);
+			XSync(dpy, False);
 			return;
 		}
 		gravitate(c, True);
@@ -190,19 +198,8 @@ configurerequest(XEvent *e)
 		newmask = ev->value_mask & (~(CWSibling | CWStackMode | CWBorderWidth));
 		if(newmask)
 			XConfigureWindow(dpy, c->win, newmask, &wc);
-		else {
-			synev.type = ConfigureNotify;
-			synev.xconfigure.display = dpy;
-			synev.xconfigure.event = c->win;
-			synev.xconfigure.window = c->win;
-			synev.xconfigure.x = c->x;
-			synev.xconfigure.y = c->y;
-			synev.xconfigure.width = c->w;
-			synev.xconfigure.height = c->h;
-			synev.xconfigure.border_width = c->border;
-			synev.xconfigure.above = None;
-			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
-		}
+		else
+			synconfig(c, c->x, c->y, c->w, c->h, c->border);
 		XSync(dpy, False);
 		if(c->isfloat)
 			resize(c, False, TopLeft);
