@@ -9,6 +9,45 @@
 void (*arrange)(Arg *) = DEFMODE;
 
 void
+attach(Client *c)
+{
+	Client *first = getnext(clients);
+
+	if(!first) {
+		if(clients) {
+			for(first = clients; first->next; first = first->next);
+			first->next = c;
+			c->prev = first;
+		}
+		else
+			clients = c;
+	}
+	else if(first == clients) {
+		c->next = clients;
+		clients->prev = c;
+		clients = c;
+	}
+	else {
+		first->prev->next = c;
+		c->prev = first->prev;
+		first->prev = c;
+		c->next = first;
+	}
+}
+
+void
+detach(Client *c)
+{
+	if(c->prev)
+		c->prev->next = c->next;
+	if(c->next)
+		c->next->prev = c->prev;
+	if(c == clients)
+		clients = c->next;
+	c->next = c->prev = NULL;
+}
+
+void
 dofloat(Arg *arg)
 {
 	Client *c;
@@ -228,26 +267,16 @@ view(Arg *arg)
 void
 zoom(Arg *arg)
 {
-	Client *c;
+	Client *c = sel;
 
-	if(!sel || (arrange != dotile) || sel->isfloat || sel->ismax)
+	if(!c || (arrange != dotile) || c->isfloat || c->ismax)
 		return;
 
-	if(sel == getnext(clients))  {
-		if((c = getnext(sel->next)))
-			sel = c;
-		else
+	if(c == getnext(clients))
+		if(!(c = getnext(c->next)))
 			return;
-	}
-
-	/* pop */
-	sel->prev->next = sel->next;
-	if(sel->next)
-		sel->next->prev = sel->prev;
-	sel->prev = NULL;
-	clients->prev = sel;
-	sel->next = clients;
-	clients = sel;
-	focus(sel);
+	detach(c);
+	attach(c);
+	focus(c);
 	arrange(NULL);
 }

@@ -127,6 +127,8 @@ extern void *erealloc(void *ptr, unsigned int size);
 extern void spawn(Arg *arg);
 
 /* view.c */
+extern void attach(Client *c);
+extern void detach(Client *c);
 extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
 extern void focusnext(Arg *arg);

@@ -230,13 +230,7 @@ manage(Window w, XWindowAttributes *wa)
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
-
 	grabbuttons(c, False);
-
 	if((tc = getclient(trans))) /* inherit tags */
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = tc->tags[i];
@@ -246,6 +240,9 @@ manage(Window w, XWindowAttributes *wa)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
+
+	attach(c);
+
 	settitle(c);
 	if(isvisible(c))
 		sel = c;
@@ -407,12 +404,7 @@ unmanage(Client *c)
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->twin);
 
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	if(c == clients)
-		clients = c->next;
+	detach(c);
 	if(sel == c) {
 		if(trans && (tc = getclient(trans)) && isvisible(tc))
 			sel = tc;
