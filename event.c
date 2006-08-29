@@ -196,7 +196,9 @@ configurerequest(XEvent *e)
 			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
 		}
 		XSync(dpy, False);
-		if(c->isfloat || c->ismax) {
+		if(c->isfloat)
+			resize(c, False, TopLeft);
+		else if(c->ismax) {
 			resize(c, False, TopLeft);
 			c->x = ox;
 			c->y = oy;
