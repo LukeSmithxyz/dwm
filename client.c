@@ -241,7 +241,10 @@ manage(Window w, XWindowAttributes *wa)
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
 
-	attach(c);
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
 
 	settitle(c);
 	if(isvisible(c))

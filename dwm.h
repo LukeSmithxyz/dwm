@@ -56,7 +56,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	long flags; 
-	unsigned int border;
+	unsigned int border, weight;
 	Bool isfloat;
 	Bool ismax;
 	Bool *tags;
@@ -127,7 +127,6 @@ extern void *erealloc(void *ptr, unsigned int size);
 extern void spawn(Arg *arg);
 
 /* view.c */
-extern void attach(Client *c);
 extern void detach(Client *c);
 extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);

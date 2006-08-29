@@ -6,61 +6,33 @@
 
 /* static */
 
-static Client *
-getslot(Client *c)
+static void
+reorder()
 {
-	unsigned int i, tic;
-	Client *p;
+	Client *c, *orig, *p;
 
-	for(tic = 0; tic < ntags && !c->tags[tic]; tic++);
-	for(p = clients; p; p = p->next) {
-		for(i = 0; i < ntags && !p->tags[i]; i++);
-		if(tic < i)
-			return p;
+	orig = clients;
+	clients = NULL;
+
+	while((c = orig)) {
+		orig = orig->next;
+		detach(c);
+
+		for(p = clients; p && p->next && p->weight <= c->weight; p = p->next);
+		c->prev = p;
+		if(p) {
+			if((c->next = p->next))
+				c->next->prev = c;
+			p->next = c;
+		}
+		else
+			clients = c;
 	}
-	return p;
-}
-
-static Client *
-tail()
-{
-	Client *c;
-	for(c = clients; c && c->next; c = c->next);
-	return c;
 }
 
 /* extern */
 
 void (*arrange)(Arg *) = DEFMODE;
-
-void
-attach(Client *c)
-{
-	Client *p;
-
-	if(!clients) {
-		clients = c;
-		return;
-	}
-	if(!(p = getnext(clients)) && !(p = getslot(c))) {
-		p = tail();
-		c->prev = p;
-		p->next = c;
-		return;
-	}
-
-	if(p == clients) {
-		c->next = clients;
-		clients->prev = c;
-		clients = c;
-	}
-	else {
-		p->prev->next = c;
-		c->prev = p->prev;
-		p->prev = c;
-		c->next = p;
-	}
-}
 
 void
 detach(Client *c)
@@ -277,6 +249,7 @@ toggleview(Arg *arg)
 	for(i = 0; i < ntags && !seltag[i]; i++);
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
+	reorder();
 	arrange(NULL);
 }
 
@@ -284,10 +257,12 @@ void
 view(Arg *arg)
 {
 	unsigned int i;
+	Client *c;
 
 	for(i = 0; i < ntags; i++)
 		seltag[i] = False;
 	seltag[arg->i] = True;
+	reorder();
 	arrange(NULL);
 }
 
@@ -303,7 +278,9 @@ zoom(Arg *arg)
 		if(!(c = getnext(c->next)))
 			return;
 	detach(c);
-	attach(c);
+	c->next = clients;
+	clients->prev = c;
+	clients = c;
 	focus(c);
 	arrange(NULL);
 }

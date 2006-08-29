@@ -106,6 +106,8 @@ settags(Client *c)
 	if(!matched)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = seltag[i];
+	for(i = 0; i < ntags && !c->tags[i]; i++);
+	c->weight = i;
 }
 
 void
@@ -120,8 +122,6 @@ tag(Arg *arg)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
 	settitle(sel);
-	detach(sel);
-	attach(sel);
 	if(!isvisible(sel))
 		arrange(NULL);
 	else
@@ -141,8 +141,6 @@ toggletag(Arg *arg)
 	if(i == ntags)
 		sel->tags[arg->i] = True;
 	settitle(sel);
-	detach(sel);
-	attach(sel);
 	if(!isvisible(sel))
 		arrange(NULL);
 	else
