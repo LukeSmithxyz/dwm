@@ -150,6 +150,7 @@ buttonpress(XEvent *e)
 static void
 configurerequest(XEvent *e)
 {
+	int ox, oy, ow, oh;
 	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
@@ -157,6 +158,10 @@ configurerequest(XEvent *e)
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
+		ox = c->x;
+		oy = c->y;
+		ow = c->w;
+		oh = c->h;
 		gravitate(c, True);
 		if(ev->value_mask & CWX)
 			c->x = ev->x;
@@ -191,8 +196,13 @@ configurerequest(XEvent *e)
 			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
 		}
 		XSync(dpy, False);
-		if(c->isfloat)
+		if(c->isfloat || c->ismax) {
 			resize(c, False, TopLeft);
+			c->x = ox;
+			c->y = oy;
+			c->w = ow;
+			c->h = oh;
+		}
 		else
 			arrange(NULL);
 	}

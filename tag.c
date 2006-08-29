@@ -31,7 +31,7 @@ static RReg *rreg = NULL;
 static unsigned int len = 0;
 
 static void
-applytag()
+commit()
 {
 	/* asserts sel != NULL */
 	settitle(sel);
@@ -132,7 +132,7 @@ tag(Arg *arg)
 	for(i = 0; i < ntags; i++)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
-	applytag();
+	commit();
 }
 
 void
@@ -147,5 +147,5 @@ toggletag(Arg *arg)
 	for(i = 0; i < ntags && !sel->tags[i]; i++);
 	if(i == ntags)
 		sel->tags[arg->i] = True;
-	applytag();
+	commit();
 }
