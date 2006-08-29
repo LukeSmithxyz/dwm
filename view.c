@@ -4,6 +4,31 @@
  */
 #include "dwm.h"
 
+/* static */
+
+static Client *
+getslot(Client *c)
+{
+	unsigned int i, tic;
+	Client *p;
+
+	for(tic = 0; tic < ntags && !c->tags[tic]; tic++);
+	for(p = clients; p; p = p->next) {
+		for(i = 0; i < ntags && !p->tags[i]; i++);
+		if(tic < i)
+			return p;
+	}
+	return p;
+}
+
+static Client *
+tail()
+{
+	Client *c;
+	for(c = clients; c && c->next; c = c->next);
+	return c;
+}
+
 /* extern */
 
 void (*arrange)(Arg *) = DEFMODE;
@@ -11,27 +36,29 @@ void (*arrange)(Arg *) = DEFMODE;
 void
 attach(Client *c)
 {
-	Client *first = getnext(clients);
+	Client *p;
 
-	if(!first) {
-		if(clients) {
-			for(first = clients; first->next; first = first->next);
-			first->next = c;
-			c->prev = first;
-		}
-		else
-			clients = c;
+	if(!clients) {
+		clients = c;
+		return;
 	}
-	else if(first == clients) {
+	if(!(p = getnext(clients)) && !(p = getslot(c))) {
+		p = tail();
+		c->prev = p;
+		p->next = c;
+		return;
+	}
+
+	if(p == clients) {
 		c->next = clients;
 		clients->prev = c;
 		clients = c;
 	}
 	else {
-		first->prev->next = c;
-		c->prev = first->prev;
-		first->prev = c;
-		c->next = first;
+		p->prev->next = c;
+		c->prev = p->prev;
+		p->prev = c;
+		c->next = p;
 	}
 }
 
