@@ -150,7 +150,6 @@ buttonpress(XEvent *e)
 static void
 configurerequest(XEvent *e)
 {
-	int ox, oy, ow, oh;
 	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
@@ -158,10 +157,20 @@ configurerequest(XEvent *e)
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
-		ox = c->x;
-		oy = c->y;
-		ow = c->w;
-		oh = c->h;
+		if(!c->isfloat && (arrange != dofloat) && c->ismax) {
+			synev.type = ConfigureNotify;
+			synev.xconfigure.display = dpy;
+			synev.xconfigure.event = c->win;
+			synev.xconfigure.window = c->win;
+			synev.xconfigure.x = sx;
+			synev.xconfigure.y = sy + bh;
+			synev.xconfigure.width = sw - 2;
+			synev.xconfigure.height = sw - 2 - bh;
+			synev.xconfigure.border_width = ev->border_width;
+			synev.xconfigure.above = None;
+			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+			return;
+		}
 		gravitate(c, True);
 		if(ev->value_mask & CWX)
 			c->x = ev->x;
@@ -192,19 +201,11 @@ configurerequest(XEvent *e)
 			synev.xconfigure.height = c->h;
 			synev.xconfigure.border_width = c->border;
 			synev.xconfigure.above = None;
-			/* Send synthetic ConfigureNotify */
 			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
 		}
 		XSync(dpy, False);
 		if(c->isfloat)
 			resize(c, False, TopLeft);
-		else if(c->ismax) {
-			resize(c, False, TopLeft);
-			c->x = ox;
-			c->y = oy;
-			c->w = ow;
-			c->h = oh;
-		}
 		else
 			arrange(NULL);
 	}
