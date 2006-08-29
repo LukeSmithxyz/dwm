@@ -3,31 +3,39 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
+#include <stdio.h>
 
 /* static */
+
+static Client *
+minclient()
+{
+	Client *c, *min;
+
+	for(min = c = clients; c; c = c->next)
+		if(c->weight < min->weight)
+			min = c;
+	return min;
+}
+
 
 static void
 reorder()
 {
-	Client *c, *orig, *p;
+	Client *c, *newclients, *tail;
 
-	orig = clients;
-	clients = NULL;
-
-	while((c = orig)) {
-		orig = orig->next;
+	newclients = tail = NULL;
+	while((c = minclient())) {
 		detach(c);
-
-		for(p = clients; p && p->next && p->weight <= c->weight; p = p->next);
-		c->prev = p;
-		if(p) {
-			if((c->next = p->next))
-				c->next->prev = c;
-			p->next = c;
+		if(tail) {
+			c->prev = tail;
+			tail->next = c;
+			tail = c;
 		}
 		else
-			clients = c;
+			tail = newclients = c;
 	}
+	clients = newclients;
 }
 
 /* extern */
@@ -59,9 +67,7 @@ dofloat(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!sel || !isvisible(sel))
-		sel = getnext(clients);
-	if(sel)
+	if((sel = getnext(clients)))
 		focus(sel);
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
@@ -124,9 +130,7 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!sel || !isvisible(sel))
-		sel = getnext(clients);
-	if(sel)
+	if((sel = getnext(clients)))
 		focus(sel);
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
