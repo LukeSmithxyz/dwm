@@ -30,6 +30,17 @@ RULES
 static RReg *rreg = NULL;
 static unsigned int len = 0;
 
+static void
+applytag()
+{
+	/* asserts sel != NULL */
+	settitle(sel);
+	if(!isvisible(sel))
+		arrange(NULL);
+	else
+		drawstatus();
+}
+
 /* extern */
 
 Client *
@@ -121,11 +132,7 @@ tag(Arg *arg)
 	for(i = 0; i < ntags; i++)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
-	settitle(sel);
-	if(!isvisible(sel))
-		arrange(NULL);
-	else
-		drawstatus();
+	applytag();
 }
 
 void
@@ -140,9 +147,5 @@ toggletag(Arg *arg)
 	for(i = 0; i < ntags && !sel->tags[i]; i++);
 	if(i == ntags)
 		sel->tags[arg->i] = True;
-	settitle(sel);
-	if(!isvisible(sel))
-		arrange(NULL);
-	else
-		drawstatus();
+	applytag();
 }
