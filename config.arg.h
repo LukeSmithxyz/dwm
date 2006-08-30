@@ -27,9 +27,9 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		{ .cmd = "exec uxterm -bg '#111111' -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
-		{ .cmd = "exec \"$(IFS=:; for dir in $PATH; do " \
-			"for file in \"$dir\"/*; do [ -x \"$file\" ] && echo \"${file##*/}\"; done; " \
-			"done | sort -u | dmenu)\"" } }, \
+		{ .cmd = "exe=\"$(IFS=:; for dir in $PATH; do " \
+			 "for file in \"$dir\"/*; do [ -x \"$file\" ] && echo \"${file##*/}\"; done; " \
+			 "done | sort -u | dmenu)\" && exec \"$exe\"" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
