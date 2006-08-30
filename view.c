@@ -261,7 +261,6 @@ void
 view(Arg *arg)
 {
 	unsigned int i;
-	Client *c;
 
 	for(i = 0; i < ntags; i++)
 		seltag[i] = False;
