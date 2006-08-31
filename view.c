@@ -280,6 +280,7 @@ viewall(Arg *arg)
 
 	for(i = 0; i < ntags; i++)
 		seltag[i] = True;
+	reorder();
 	arrange(NULL);
 }
 
