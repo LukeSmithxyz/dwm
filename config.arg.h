@@ -48,6 +48,7 @@ static Key key[] = { \
 	{ MODKEY,			XK_2,		view,		{ .i = 1 } }, \
 	{ MODKEY,			XK_3,		view,		{ .i = 2 } }, \
 	{ MODKEY,			XK_4,		view,		{ .i = 3 } }, \
+	{ MODKEY,			XK_a,		viewall,	{ 0 } }, \
 	{ MODKEY|ControlMask,		XK_1,		toggleview,	{ .i = 0 } }, \
 	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 1 } }, \
 	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 2 } }, \

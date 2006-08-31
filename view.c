@@ -274,6 +274,16 @@ view(Arg *arg)
 }
 
 void
+viewall(Arg *arg)
+{
+	unsigned int i;
+
+	for(i = 0; i < ntags; i++)
+		seltag[i] = True;
+	arrange(NULL);
+}
+
+void
 zoom(Arg *arg)
 {
 	Client *c = sel;

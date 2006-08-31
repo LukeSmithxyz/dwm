@@ -137,4 +137,5 @@ extern void restack();
 extern void togglemode(Arg *arg);
 extern void toggleview(Arg *arg);
 extern void view(Arg *arg);
+extern void viewall(Arg *arg);
 extern void zoom(Arg *arg);
