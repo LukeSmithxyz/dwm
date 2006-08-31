@@ -44,11 +44,11 @@ static Key key[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_4,		toggletag,	{ .i = 3 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
+	{ MODKEY,			XK_0,		viewall,	{ 0 } }, \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \
 	{ MODKEY,			XK_2,		view,		{ .i = 1 } }, \
 	{ MODKEY,			XK_3,		view,		{ .i = 2 } }, \
 	{ MODKEY,			XK_4,		view,		{ .i = 3 } }, \
-	{ MODKEY,			XK_a,		viewall,	{ 0 } }, \
 	{ MODKEY|ControlMask,		XK_1,		toggleview,	{ .i = 0 } }, \
 	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 1 } }, \
 	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 2 } }, \
