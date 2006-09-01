@@ -111,13 +111,16 @@ buttonpress(XEvent *e)
 			if(ev->x < x) {
 				switch(ev->button) {
 				case Button1:
-					view(&a);
-					break;
-				case Button2:
-					toggletag(&a);
+					if(ev->state & MODKEY)
+						tag(&a);
+					else
+						view(&a);
 					break;
 				case Button3:
-					toggleview(&a);
+					if(ev->state & MODKEY)
+						toggletag(&a);
+					else
+						toggleview(&a);
 					break;
 				}
 				return;
