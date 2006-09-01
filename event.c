@@ -109,19 +109,17 @@ buttonpress(XEvent *e)
 		for(a.i = 0; a.i < ntags; a.i++) {
 			x += textw(tags[a.i]);
 			if(ev->x < x) {
-				switch(ev->button) {
-				case Button1:
+				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
 						tag(&a);
 					else
 						view(&a);
-					break;
-				case Button3:
+				}
+				else if(ev->button == Button3) {
 					if(ev->state & MODKEY)
 						toggletag(&a);
 					else
 						toggleview(&a);
-					break;
 				}
 				return;
 			}
@@ -133,26 +131,17 @@ buttonpress(XEvent *e)
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
-		if(CLEANMASK(ev->state) != MODKEY)
+		if(c->ismax || CLEANMASK(ev->state) != MODKEY)
 			return;
-		switch(ev->button) {
-		default:
-			break;
-		case Button1:
-			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
-				restack(c);
-				movemouse(c);
-			}
-			break;
-		case Button2:
+		if((ev->button == Button1) && ((arrange == dofloat) || c->isfloat)) {
+			restack(c);
+			movemouse(c);
+		}
+		else if(ev->button == Button2)
 			zoom(NULL);
-			break;
-		case Button3:
-			if(!c->ismax && (arrange == dofloat || c->isfloat)) {
-				restack(c);
-				resizemouse(c);
-			}
-			break;
+		else if(ev->button == Button3 && ((arrange == dofloat) || c->isfloat)) {
+			restack(c);
+			resizemouse(c);
 		}
 	}
 }
