@@ -254,6 +254,8 @@ manage(Window w, XWindowAttributes *wa)
 	clients = c;
 
 	settitle(c);
+	if(isvisible(c))
+		sel = c;
 	arrange(NULL);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->twin);
