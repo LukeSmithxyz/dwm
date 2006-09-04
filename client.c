@@ -254,15 +254,12 @@ manage(Window w, XWindowAttributes *wa)
 	clients = c;
 
 	settitle(c);
-	if(isvisible(c)) {
-		focus(NULL);
-		sel = c;
-	}
-	arrange(NULL);
+	ban(c);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->twin);
 	if(isvisible(c))
 		focus(c);
+	arrange(NULL);
 }
 
 void
