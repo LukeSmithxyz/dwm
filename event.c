@@ -131,15 +131,15 @@ buttonpress(XEvent *e)
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
-		if(c->ismax || CLEANMASK(ev->state) != MODKEY)
+		if(maximized || CLEANMASK(ev->state) != MODKEY)
 			return;
-		if((ev->button == Button1) && ((arrange == dofloat) || c->isfloat)) {
+		if(ev->button == Button1 && (arrange == dofloat || c->isfloat)) {
 			restack(c);
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
-		else if(ev->button == Button3 && ((arrange == dofloat) || c->isfloat)) {
+		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat)) {
 			restack(c);
 			resizemouse(c);
 		}
@@ -173,7 +173,7 @@ configurerequest(XEvent *e)
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
-		if(!c->isfloat && (arrange != dofloat) && c->ismax) {
+		if((c == sel) && !c->isfloat && (arrange != dofloat) && maximized) {
 			synconfig(c, sx, sy + bh, sw - 2, sh - 2 - bh, ev->border_width);
 			XSync(dpy, False);
 			return;

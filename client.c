@@ -82,22 +82,29 @@ ban(Client *c)
 void
 focus(Client *c)
 {
-	Client *old = sel;
+	Client *old;
 
 	if(!issel)
 		return;
 	if(!sel)
 		sel = c;
 	else if(sel != c) {
-		if(sel->ismax)
+		if(maximized)
 			togglemax(NULL);
+		old = sel;
 		sel = c;
-		grabbuttons(old, False);
-		drawtitle(old);
+		if(old) {
+			grabbuttons(old, False);
+			drawtitle(old);
+		}
 	}
-	grabbuttons(c, True);
-	drawtitle(c);
-	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+	if(c) {
+		grabbuttons(c, True);
+		drawtitle(c);
+		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+	}
+	else
+		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 }
 
 Client *
@@ -247,8 +254,6 @@ manage(Window w, XWindowAttributes *wa)
 	clients = c;
 
 	settitle(c);
-	if(isvisible(c))
-		sel = c;
 	arrange(NULL);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->twin);
@@ -366,12 +371,13 @@ void
 togglemax(Arg *arg)
 {
 	int ox, oy, ow, oh;
+	Client *c;
 	XEvent ev;
 
 	if(!sel)
 		return;
 
-	if((sel->ismax = !sel->ismax)) {
+	if((maximized = !maximized)) {
 		ox = sel->x;
 		oy = sel->y;
 		ow = sel->w;
@@ -382,6 +388,9 @@ togglemax(Arg *arg)
 		sel->h = sh - 2 - bh;
 
 		restack();
+		for(c = getnext(clients); c; c = getnext(c->next))
+			if(c != sel)
+				ban(c);
 		resize(sel, arrange == dofloat, TopLeft);
 
 		sel->x = ox;
@@ -390,37 +399,36 @@ togglemax(Arg *arg)
 		sel->h = oh;
 	}
 	else
-		resize(sel, False, TopLeft);
+		arrange(NULL);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
 unmanage(Client *c)
 {
-	Client *tc;
+	Client *tc, *fc;
 	Window trans;
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
 
-	XGetTransientForHint(dpy, c->win, &trans);
+	detach(c);
+	if(sel == c) {
+		XGetTransientForHint(dpy, c->win, &trans);
+		if(trans && (tc = getclient(trans)) && isvisible(tc))
+			fc = tc;
+		else
+			fc = getnext(clients);
+		focus(fc);
+	}
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->twin);
 
-	detach(c);
-	if(sel == c) {
-		if(trans && (tc = getclient(trans)) && isvisible(tc))
-			sel = tc;
-		else
-			sel = getnext(clients);
-	}
 	free(c->tags);
 	free(c);
 
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	if(sel)
-		focus(sel);
 	arrange(NULL);
 }

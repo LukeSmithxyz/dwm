@@ -24,6 +24,7 @@ unsigned int ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool issel = True;
+Bool maximized = False;
 Client *clients = NULL;
 Client *sel = NULL;
 Cursor cursor[CurLast];

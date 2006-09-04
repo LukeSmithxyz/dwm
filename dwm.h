@@ -58,7 +58,6 @@ struct Client {
 	long flags; 
 	unsigned int border, weight;
 	Bool isfloat;
-	Bool ismax;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -73,7 +72,7 @@ extern unsigned int ntags, numlockmask;
 extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, issel, *seltag;
+extern Bool running, issel, maximized, *seltag;
 extern Client *clients, *sel;
 extern Cursor cursor[CurLast];
 extern DC dc;

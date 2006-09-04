@@ -57,22 +57,20 @@ detach(Client *c)
 void
 dofloat(Arg *arg)
 {
-	Client *c;
+	Client *c, *fc;
+
+	maximized = False;
 
 	for(c = clients; c; c = c->next) {
-		c->ismax = False;
 		if(isvisible(c)) {
 			resize(c, True, TopLeft);
 		}
 		else
 			ban(c);
 	}
-	if(!sel || !isvisible(sel))
-		sel = getnext(clients);
-	if(sel)
-		focus(sel);
-	else
-		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	if(!(fc = sel) || !isvisible(fc))
+		fc = getnext(clients);
+	focus(fc);
 	restack();
 }
 
@@ -80,7 +78,9 @@ void
 dotile(Arg *arg)
 {
 	int h, i, n, w;
-	Client *c;
+	Client *c, *fc;
+
+	maximized = False;
 
 	w = sw - mw;
 	for(n = 0, c = clients; c; c = c->next)
@@ -93,7 +93,6 @@ dotile(Arg *arg)
 		h = sh - bh;
 
 	for(i = 0, c = clients; c; c = c->next) {
-		c->ismax = False;
 		if(isvisible(c)) {
 			if(c->isfloat) {
 				resize(c, True, TopLeft);
@@ -132,12 +131,9 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!sel || !isvisible(sel))
-		sel = getnext(clients);
-	if(sel)
-		focus(sel);
-	else
-		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	if(!(fc = sel) || !isvisible(fc))
+		fc = getnext(clients);
+	focus(fc);
 	restack();
 }
 
@@ -289,7 +285,7 @@ zoom(Arg *arg)
 {
 	Client *c = sel;
 
-	if(!c || (arrange != dotile) || c->isfloat || c->ismax)
+	if(!c || (arrange != dotile) || c->isfloat || maximized)
 		return;
 
 	if(c == getnext(clients))
