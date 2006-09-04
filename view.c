@@ -68,9 +68,8 @@ dofloat(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!(fc = sel) || !isvisible(fc))
-		fc = getnext(clients);
-	focus(fc);
+	if(!sel || !isvisible(sel))
+		focus(getnext(clients));
 	restack();
 }
 
@@ -131,9 +130,8 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!(fc = sel) || !isvisible(fc))
-		fc = getnext(clients);
-	focus(fc);
+	if(!sel || !isvisible(sel))
+		focus(getnext(clients));
 	restack();
 }
 
