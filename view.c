@@ -57,7 +57,7 @@ detach(Client *c)
 void
 dofloat(Arg *arg)
 {
-	Client *c, *fc;
+	Client *c;
 
 	maximized = False;
 
@@ -77,7 +77,7 @@ void
 dotile(Arg *arg)
 {
 	int h, i, n, w;
-	Client *c, *fc;
+	Client *c;
 
 	maximized = False;
 
