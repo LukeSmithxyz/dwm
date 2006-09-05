@@ -106,8 +106,7 @@ settags(Client *c)
 	if(!matched)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = seltag[i];
-	for(i = 0; i < ntags && !c->tags[i]; i++);
-	c->weight = i;
+	for(c->weight = 0; c->weight < ntags && !c->tags[c->weight]; c->weight++);
 }
 
 void
@@ -121,6 +120,7 @@ tag(Arg *arg)
 	for(i = 0; i < ntags; i++)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
+	sel->weight = arg->i;
 	arrange(NULL);
 }
 
@@ -136,5 +136,6 @@ toggletag(Arg *arg)
 	for(i = 0; i < ntags && !sel->tags[i]; i++);
 	if(i == ntags)
 		sel->tags[arg->i] = True;
+	for(sel->weight = 0; sel->weight < ntags && !sel->tags[sel->weight]; sel->weight++);
 	arrange(NULL);
 }
