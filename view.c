@@ -183,10 +183,15 @@ isvisible(Client *c)
 void
 resizecol(Arg *arg)
 {
-	Client *c = getnext(clients);
+	unsigned int n;
+	Client *c;
 
-	if(!sel || !getnext(c->next) || (arrange != dotile))
+	for(n = 0, c = clients; c; c = c->next)
+		if(isvisible(c) && !c->isfloat)
+			n++;
+	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
+
 	if(sel == getnext(clients)) {
 		if(mw + arg->i > sw - 100)
 			return;
@@ -303,12 +308,16 @@ viewall(Arg *arg)
 void
 zoom(Arg *arg)
 {
-	Client *c = sel;
+	unsigned int n;
+	Client *c;
 
-	if(!c || (arrange != dotile) || c->isfloat || maximized)
+	for(n = 0, c = clients; c; c = c->next)
+		if(isvisible(c) && !c->isfloat)
+			n++;
+	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
 
-	if(c == getnext(clients))
+	if((c = sel)  == getnext(clients))
 		if(!(c = getnext(c->next)))
 			return;
 	detach(c);
