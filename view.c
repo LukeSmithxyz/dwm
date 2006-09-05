@@ -193,12 +193,12 @@ resizecol(Arg *arg)
 		return;
 
 	if(sel == getnext(clients)) {
-		if(mw + arg->i > sw - 100)
+		if(mw + arg->i > sw - 100 || mw + arg->i < 100)
 			return;
 		mw += arg->i;
 	}
 	else {
-		if(mw - arg->i < 100)
+		if(mw - arg->i > sw - 100 || mw - arg->i < 100)
 			return;
 		mw -= arg->i;
 	}
