@@ -82,8 +82,8 @@ dotile(Arg *arg)
 	maximized = False;
 
 	w = sw - mw;
-	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c) && !c->isfloat)
+	for(n = 0, c = clients; c && !c->isfloat; c = c->next)
+		if(isvisible(c))
 			n++;
 
 	if(n > 1)
@@ -186,8 +186,8 @@ resizecol(Arg *arg)
 	unsigned int n;
 	Client *c;
 
-	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c) && !c->isfloat)
+	for(n = 0, c = clients; c && !c->isfloat; c = c->next)
+		if(isvisible(c))
 			n++;
 	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
@@ -311,22 +311,15 @@ zoom(Arg *arg)
 	unsigned int n;
 	Client *c;
 
-	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c) && !c->isfloat)
+	for(n = 0, c = clients; c && !c->isfloat; c = c->next)
+		if(isvisible(c))
 			n++;
 	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
 
-	/* this is somewhat tricky, it asserts to only zoom tiled clients */
-	for(c = getnext(clients); c && c->isfloat; c = getnext(c->next));
-	if(c) {
-		if(c == sel)
-			for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
-		else
-			c = sel;
-	}
-	if(!c)
-		return;
+	if((c = sel) == getnext(clients))
+		if(!(c = getnext(c->next)) || c->isfloat)
+			return;
 	detach(c);
 	c->next = clients;
 	clients->prev = c;
