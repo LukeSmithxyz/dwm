@@ -132,7 +132,7 @@ extern void dotile(Arg *arg);
 extern void focusnext(Arg *arg);
 extern void focusprev(Arg *arg);
 extern Bool isvisible(Client *c);
-extern void resizetile(Arg *arg);
+extern void resizecol(Arg *arg);
 extern void restack();
 extern void togglemode(Arg *arg);
 extern void toggleview(Arg *arg);

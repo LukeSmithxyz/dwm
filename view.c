@@ -181,7 +181,7 @@ isvisible(Client *c)
 }
 
 void
-resizetile(Arg *arg)
+resizecol(Arg *arg)
 {
 	Client *c = getnext(clients);
 
