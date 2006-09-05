@@ -174,7 +174,7 @@ growcol(Arg *arg)
 {
 	Client *c = getnext(clients);
 
-	if(!sel || !c || !getnext(c->next) || (arrange != dotile))
+	if(!sel || !getnext(c->next) || (arrange != dotile))
 		return;
 	if(sel == getnext(clients)) {
 		if(mw + arg->i > sw - 100)
