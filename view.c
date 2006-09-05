@@ -317,9 +317,10 @@ zoom(Arg *arg)
 	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
 
-	if((c = sel)  == getnext(clients))
-		if(!(c = getnext(c->next)))
-			return;
+	if((c = sel) == getnext(clients))
+		for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
+	if(!c)
+		return;
 	detach(c);
 	c->next = clients;
 	clients->prev = c;
