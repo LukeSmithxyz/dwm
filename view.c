@@ -207,13 +207,15 @@ restack()
 
 	fi = 0;
 	mi = 2 * f;
-	if(sel->isfloat || arrange == dofloat) {
-		wins[fi++] = sel->twin;
-		wins[fi++] = sel->win;
-	}
-	else {
-		wins[mi++] = sel->twin;
-		wins[mi++] = sel->win;
+	if(sel) {
+		if(sel->isfloat || arrange == dofloat) {
+			wins[fi++] = sel->twin;
+			wins[fi++] = sel->win;
+		}
+		else {
+			wins[mi++] = sel->twin;
+			wins[mi++] = sel->win;
+		}
 	}
 	for(c = clients; c; c = c->next)
 		if(isvisible(c) && c != sel) {
