@@ -318,7 +318,7 @@ zoom(Arg *arg)
 		return;
 
 	/* this is somewhat tricky, it asserts to only zoom tiled clients */
-	for(c = clients; c && c->isfloat; c = getnext(c->next));
+	for(c = getnext(clients); c && c->isfloat; c = getnext(c->next));
 	if(c) {
 		if(c == sel)
 			for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
