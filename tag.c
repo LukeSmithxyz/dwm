@@ -136,6 +136,6 @@ toggletag(Arg *arg)
 	for(i = 0; i < ntags && !sel->tags[i]; i++);
 	if(i == ntags)
 		sel->tags[arg->i] = True;
-	for(sel->weight = 0; sel->weight < ntags && !sel->tags[sel->weight]; sel->weight++);
+	sel->weight = (i == ntags) ? arg->i : i;
 	arrange(NULL);
 }
