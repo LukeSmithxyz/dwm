@@ -169,8 +169,19 @@ focusprev(Arg *arg)
 	}
 }
 
+Bool
+isvisible(Client *c)
+{
+	unsigned int i;
+
+	for(i = 0; i < ntags; i++)
+		if(c->tags[i] && seltag[i])
+			return True;
+	return False;
+}
+
 void
-growcol(Arg *arg)
+resizetile(Arg *arg)
 {
 	Client *c = getnext(clients);
 
@@ -187,17 +198,6 @@ growcol(Arg *arg)
 		mw -= arg->i;
 	}
 	arrange(NULL);
-}
-
-Bool
-isvisible(Client *c)
-{
-	unsigned int i;
-
-	for(i = 0; i < ntags; i++)
-		if(c->tags[i] && seltag[i])
-			return True;
-	return False;
 }
 
 void
