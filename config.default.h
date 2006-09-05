@@ -30,6 +30,7 @@ static Key key[] = { \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_m,		togglemax,	{ 0 } }, \
 	{ MODKEY,			XK_g,		resizetile,	{ .i = 20 } }, \
+	{ MODKEY,			XK_s,		resizetile,	{ .i = -20 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
 	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 2 } }, \
