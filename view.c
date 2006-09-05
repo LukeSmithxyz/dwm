@@ -169,6 +169,24 @@ focusprev(Arg *arg)
 	}
 }
 
+void
+growcol(Arg *arg)
+{
+	if(!sel || (arrange != dotile))
+		return;
+	if(sel == getnext(clients)) {
+		if(mw + arg->i > sw - 100)
+			return;
+		mw += arg->i;
+	}
+	else {
+		if(mw - arg->i < 100)
+			return;
+		mw -= arg->i;
+	}
+	arrange(NULL);
+}
+
 Bool
 isvisible(Client *c)
 {

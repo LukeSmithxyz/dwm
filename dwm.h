@@ -131,6 +131,7 @@ extern void dofloat(Arg *arg);
 extern void dotile(Arg *arg);
 extern void focusnext(Arg *arg);
 extern void focusprev(Arg *arg);
+extern void growcol(Arg *arg);
 extern Bool isvisible(Client *c);
 extern void restack();
 extern void togglemode(Arg *arg);
