@@ -172,7 +172,7 @@ focusprev(Arg *arg)
 void
 growcol(Arg *arg)
 {
-	if(!sel || (arrange != dotile))
+	if(!sel || !clients || !clients->next || (arrange != dotile))
 		return;
 	if(sel == getnext(clients)) {
 		if(mw + arg->i > sw - 100)
