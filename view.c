@@ -317,8 +317,14 @@ zoom(Arg *arg)
 	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
 
-	if((c = sel) == getnext(clients))
-		for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
+	/* this is somewhat tricky, it asserts to only zoom tiled clients */
+	for(c = clients; c && c->isfloat; c = getnext(c->next));
+	if(c) {
+		if(c == sel)
+			for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
+		else
+			c = sel;
+	}
 	if(!c)
 		return;
 	detach(c);
