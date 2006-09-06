@@ -218,8 +218,10 @@ restack()
 	Client *c;
 	XEvent ev;
 	
-	if(!sel)
+	if(!sel) {
+		drawstatus();
 		return;
+	}
 	if(sel->isfloat || arrange == dofloat) {
 		XRaiseWindow(dpy, sel->win);
 		XRaiseWindow(dpy, sel->twin);
