@@ -38,6 +38,13 @@ reorder()
 	clients = newclients;
 }
 
+static Client *
+nexttiled(Client *c)
+{
+	for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
+	return c;
+}
+
 /* extern */
 
 void (*arrange)(Arg *) = DEFMODE;
@@ -82,8 +89,8 @@ dotile(Arg *arg)
 	maximized = False;
 
 	w = sw - mw;
-	for(n = 0, c = clients; c && !c->isfloat; c = c->next)
-		if(isvisible(c))
+	for(n = 0, c = clients; c; c = c->next)
+		if(isvisible(c) && !c->isfloat)
 			n++;
 
 	if(n > 1)
@@ -186,8 +193,8 @@ resizecol(Arg *arg)
 	unsigned int n;
 	Client *c;
 
-	for(n = 0, c = clients; c && !c->isfloat; c = c->next)
-		if(isvisible(c))
+	for(n = 0, c = clients; c; c = c->next)
+		if(isvisible(c) && !c->isfloat)
 			n++;
 	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
@@ -311,14 +318,14 @@ zoom(Arg *arg)
 	unsigned int n;
 	Client *c;
 
-	for(n = 0, c = clients; c && !c->isfloat; c = c->next)
-		if(isvisible(c))
+	for(n = 0, c = clients; c; c = c->next)
+		if(isvisible(c) && !c->isfloat)
 			n++;
 	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
 		return;
 
-	if((c = sel) == getnext(clients))
-		if(!(c = getnext(c->next)) || c->isfloat)
+	if((c = sel) == nexttiled(clients))
+		if(!(c = nexttiled(c)))
 			return;
 	detach(c);
 	c->next = clients;

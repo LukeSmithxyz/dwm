@@ -247,8 +247,6 @@ manage(Window w, XWindowAttributes *wa)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
-	if(c->isfloat)
-		c->weight = ntags;
 
 	if(clients)
 		clients->prev = c;
