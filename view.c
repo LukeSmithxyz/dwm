@@ -215,52 +215,20 @@ resizecol(Arg *arg)
 void
 restack()
 {
-	static unsigned int nwins = 0;
-	static Window *wins = NULL;
-	unsigned int f, fi, m, mi, n;
 	Client *c;
 	XEvent ev;
-
-	for(f = 0, m = 0, c = clients; c; c = c->next)
-		if(isvisible(c)) {
-			if(c->isfloat || arrange == dofloat)
-				f++;
-			else
-				m++;
-		}
-	if(!(n = 2 * (f + m))) {
-		drawstatus();
+	
+	if(!sel)
 		return;
+	if(sel->isfloat || arrange == dofloat) {
+		XRaiseWindow(dpy, sel->win);
+		XRaiseWindow(dpy, sel->twin);
 	}
-	if(nwins < n) {
-		nwins = n;
-		wins = erealloc(wins, nwins * sizeof(Window));
-	}
-
-	fi = 0;
-	mi = 2 * f;
-	if(sel) {
-		if(sel->isfloat || arrange == dofloat) {
-			wins[fi++] = sel->twin;
-			wins[fi++] = sel->win;
+	if(arrange != dofloat) 
+		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
+			XLowerWindow(dpy, c->twin);
+			XLowerWindow(dpy, c->win);
 		}
-		else {
-			wins[mi++] = sel->twin;
-			wins[mi++] = sel->win;
-		}
-	}
-	for(c = clients; c; c = c->next)
-		if(isvisible(c) && c != sel) {
-			if(c->isfloat || arrange == dofloat) {
-				wins[fi++] = c->twin;
-				wins[fi++] = c->win;
-			}
-			else {
-				wins[mi++] = c->twin;
-				wins[mi++] = c->win;
-			}
-		}
-	XRestackWindows(dpy, wins, n);
 	drawall();
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
