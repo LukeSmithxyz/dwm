@@ -12,20 +12,12 @@ minclient()
 {
 	Client *c, *min;
 
+	if((clients && clients->isfloat) || arrange == dofloat)
+		return clients; /* don't touch floating order */
 	for(min = c = clients; c; c = c->next)
 		if(c->weight < min->weight)
 			min = c;
 	return min;
-}
-
-static void
-pop(Client *c)
-{
-	detach(c);
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
 }
 
 static void
@@ -232,7 +224,6 @@ restack()
 		return;
 	}
 	if(sel->isfloat || arrange == dofloat) {
-		pop(sel);
 		XRaiseWindow(dpy, sel->win);
 		XRaiseWindow(dpy, sel->twin);
 	}
@@ -307,7 +298,11 @@ zoom(Arg *arg)
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
 			return;
-	pop(c);
+	detach(c);
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
 	focus(c);
 	arrange(NULL);
 }
