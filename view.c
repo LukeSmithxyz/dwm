@@ -41,7 +41,7 @@ reorder()
 static Client *
 nexttiled(Client *c)
 {
-	for(c = getnext(c->next); c && c->isfloat; c = getnext(c->next));
+	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
 	return c;
 }
 
@@ -325,7 +325,7 @@ zoom(Arg *arg)
 		return;
 
 	if((c = sel) == nexttiled(clients))
-		if(!(c = nexttiled(c)))
+		if(!(c = nexttiled(c->next)))
 			return;
 	detach(c);
 	c->next = clients;

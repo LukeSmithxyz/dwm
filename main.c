@@ -55,6 +55,7 @@ cleanup()
 	XDestroyWindow(dpy, barwin);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
+	free(seltag);
 }
 
 static void
