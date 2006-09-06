@@ -115,7 +115,7 @@ extern int xerror(Display *dsply, XErrorEvent *ee);
 extern void initrregs();
 extern Client *getnext(Client *c);
 extern Client *getprev(Client *c);
-extern void settags(Client *c);
+extern void settags(Client *c, Client *trans);
 extern void tag(Arg *arg);
 extern void toggletag(Arg *arg);
 

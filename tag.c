@@ -76,15 +76,19 @@ initrregs()
 }
 
 void
-settags(Client *c)
+settags(Client *c, Client *trans)
 {
 	char prop[512];
 	unsigned int i, j;
 	regmatch_t tmp;
-	Bool matched = False;
+	Bool matched = trans != NULL;
 	XClassHint ch;
 
-	if(XGetClassHint(dpy, c->win, &ch)) {
+	if(matched) {
+		for(i = 0; i < ntags; i++)
+			c->tags[i] = trans->tags[i];
+	}
+	else if(XGetClassHint(dpy, c->win, &ch)) {
 		snprintf(prop, sizeof(prop), "%s:%s:%s",
 				ch.res_class ? ch.res_class : "",
 				ch.res_name ? ch.res_name : "", c->name);

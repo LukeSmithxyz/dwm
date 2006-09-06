@@ -199,7 +199,7 @@ void
 manage(Window w, XWindowAttributes *wa)
 {
 	unsigned int i;
-	Client *c, *tc;
+	Client *c;
 	Window trans;
 	XSetWindowAttributes twa;
 
@@ -238,11 +238,7 @@ manage(Window w, XWindowAttributes *wa)
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
 	grabbuttons(c, False);
-	if((tc = getclient(trans))) /* inherit tags */
-		for(i = 0; i < ntags; i++)
-			c->tags[i] = tc->tags[i];
-	else
-		settags(c);
+	settags(c, getclient(trans));
 	if(!c->isfloat)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
