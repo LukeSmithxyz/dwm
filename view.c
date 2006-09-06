@@ -18,6 +18,15 @@ minclient()
 	return min;
 }
 
+static void
+pop(Client *c)
+{
+	detach(c);
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
+}
 
 static void
 reorder()
@@ -223,6 +232,7 @@ restack()
 		return;
 	}
 	if(sel->isfloat || arrange == dofloat) {
+		pop(sel);
 		XRaiseWindow(dpy, sel->win);
 		XRaiseWindow(dpy, sel->twin);
 	}
@@ -297,10 +307,7 @@ zoom(Arg *arg)
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
 			return;
-	detach(c);
-	c->next = clients;
-	clients->prev = c;
-	clients = c;
+	pop(c);
 	focus(c);
 	arrange(NULL);
 }
