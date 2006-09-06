@@ -99,6 +99,14 @@ focus(Client *c)
 		}
 	}
 	if(c) {
+		if((c->isfloat || arrange == dofloat) && (c != clients)) {
+			detach(c);
+			if(clients) {
+				clients->prev = c;
+				c->next = clients;
+			}
+			clients = c;
+		}
 		grabbuttons(c, True);
 		drawtitle(c);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
