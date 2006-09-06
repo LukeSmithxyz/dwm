@@ -99,6 +99,13 @@ focus(Client *c)
 		}
 	}
 	if(c) {
+		if(c->isfloat || arrange == dofloat) {
+			detach(c);
+			if(clients)
+				clients->prev = c;
+			c->next = clients;
+			clients = c;
+		}
 		grabbuttons(c, True);
 		drawtitle(c);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -243,8 +250,6 @@ manage(Window w, XWindowAttributes *wa)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
-	if(c->isfloat)
-		c->weight = ntags;
 
 	if(clients)
 		clients->prev = c;
