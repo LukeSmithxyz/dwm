@@ -76,8 +76,10 @@ dofloat(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!sel || !isvisible(sel))
-		focus(getnext(clients));
+	if(!sel || !isvisible(sel)) {
+		for(sel = stack; sel && !isvisible(sel); sel = sel->snext);
+		focus(sel);
+	}
 	restack();
 }
 
@@ -138,8 +140,10 @@ dotile(Arg *arg)
 		else
 			ban(c);
 	}
-	if(!sel || !isvisible(sel))
-		focus(getnext(clients));
+	if(!sel || !isvisible(sel)) {
+		for(sel = stack; sel && !isvisible(sel); sel = sel->snext);
+		focus(sel);
+	}
 	restack();
 }
 
@@ -227,7 +231,7 @@ restack()
 		XRaiseWindow(dpy, sel->win);
 		XRaiseWindow(dpy, sel->twin);
 	}
-	if(arrange != dofloat) 
+	if(arrange != dofloat)
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			XLowerWindow(dpy, c->twin);
 			XLowerWindow(dpy, c->win);

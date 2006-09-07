@@ -27,6 +27,7 @@ Bool issel = True;
 Bool maximized = False;
 Client *clients = NULL;
 Client *sel = NULL;
+Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};

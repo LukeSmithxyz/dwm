@@ -11,6 +11,14 @@
 /* static functions */
 
 static void
+detachstack(Client *c)
+{
+	Client **tc;
+	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
+	*tc = c->snext;
+}
+
+static void
 grabbuttons(Client *c, Bool focus)
 {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
@@ -99,6 +107,9 @@ focus(Client *c)
 		}
 	}
 	if(c) {
+		detachstack(c);
+		c->snext = stack;
+		stack = c;
 		grabbuttons(c, True);
 		drawtitle(c);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
@@ -198,7 +209,6 @@ killclient(Arg *arg)
 void
 manage(Window w, XWindowAttributes *wa)
 {
-	unsigned int i;
 	Client *c;
 	Window trans;
 	XSetWindowAttributes twa;
@@ -247,7 +257,8 @@ manage(Window w, XWindowAttributes *wa)
 	if(clients)
 		clients->prev = c;
 	c->next = clients;
-	clients = c;
+	c->snext = stack;
+	stack = clients = c;
 
 	settitle(c);
 	ban(c);
@@ -421,6 +432,7 @@ unmanage(Client *c)
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->twin);
 
+	detachstack(c);
 	free(c->tags);
 	free(c);
 

@@ -61,6 +61,7 @@ struct Client {
 	Bool *tags;
 	Client *next;
 	Client *prev;
+	Client *snext;
 	Window win;
 	Window twin;
 };
@@ -73,7 +74,7 @@ extern void (*handler[LASTEvent])(XEvent *);
 extern void (*arrange)(Arg *);
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, issel, maximized, *seltag;
-extern Client *clients, *sel;
+extern Client *clients, *sel, *stack;
 extern Cursor cursor[CurLast];
 extern DC dc;
 extern Display *dpy;
