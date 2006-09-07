@@ -414,19 +414,13 @@ togglemax(Arg *arg)
 void
 unmanage(Client *c)
 {
-	Client *tc, *fc;
-	Window trans;
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
 
 	detach(c);
 	if(sel == c) {
-		XGetTransientForHint(dpy, c->win, &trans);
-		if(trans && (tc = getclient(trans)) && isvisible(tc))
-			fc = tc;
-		else
-			fc = getnext(clients);
-		focus(fc);
+		for(sel = stack; sel && !isvisible(sel); sel = sel->snext);
+		focus(sel);
 	}
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
