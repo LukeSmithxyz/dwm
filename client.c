@@ -418,6 +418,7 @@ unmanage(Client *c)
 	XSetErrorHandler(xerrordummy);
 
 	detach(c);
+	detachstack(c);
 	if(sel == c) {
 		for(sel = stack; sel && !isvisible(sel); sel = sel->snext);
 		focus(sel);
@@ -426,7 +427,6 @@ unmanage(Client *c)
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->twin);
 
-	detachstack(c);
 	free(c->tags);
 	free(c);
 
