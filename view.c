@@ -77,8 +77,8 @@ dofloat(Arg *arg)
 			ban(c);
 	}
 	if(!sel || !isvisible(sel)) {
-		for(sel = stack; sel && !isvisible(sel); sel = sel->snext);
-		focus(sel);
+		for(c = stack; c && !isvisible(c); c = c->snext);
+		focus(c);
 	}
 	restack();
 }
@@ -141,8 +141,8 @@ dotile(Arg *arg)
 			ban(c);
 	}
 	if(!sel || !isvisible(sel)) {
-		for(sel = stack; sel && !isvisible(sel); sel = sel->snext);
-		focus(sel);
+		for(c = stack; c && !isvisible(c); c = c->snext);
+		focus(c);
 	}
 	restack();
 }
