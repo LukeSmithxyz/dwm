@@ -48,7 +48,7 @@ struct Client {
 	char name[256];
 	int proto;
 	int x, y, w, h;
-	int tx, ty, tw, th; /* title */
+	int tx, ty, tw, th; /* title window geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	long flags; 
@@ -121,7 +121,7 @@ extern void toggletag(Arg *arg);		/* toggles c tags accordingly to arg's index *
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints error string and exits with return code 1 */
 extern void *erealloc(void *ptr, unsigned int size);	/* reallocates memory, exits on error */
-extern void spawn(Arg *arg)			/* forks a new subprocess accordingly to arg's cmd */
+extern void spawn(Arg *arg);			/* forks a new subprocess accordingly to arg's cmd */
 
 /* view.c */
 extern void detach(Client *c);			/* detaches c from global client list */
