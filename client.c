@@ -19,11 +19,11 @@ detachstack(Client *c)
 }
 
 static void
-grabbuttons(Client *c, Bool focus)
+grabbuttons(Client *c, Bool focused)
 {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
-	if(focus) {
+	if(focused) {
 		XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
 		XGrabButton(dpy, Button1, MODKEY | LockMask, c->win, False, BUTTONMASK,
@@ -304,7 +304,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 		wc.border_width = 0;
 	else
 		wc.border_width = 1;
-	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
+	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
 	XSync(dpy, False);
 }
 
