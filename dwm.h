@@ -97,7 +97,7 @@ extern void drawstatus();			/* draw the bar */
 extern void drawtitle(Client *c);		/* draw title of c */
 extern unsigned long getcolor(const char *colstr);	/* return color of colstr */
 extern void setfont(const char *fontstr);	/* set the font for DC */
-extern unsigned int textw(const char *text);	/* return the text width of text */
+extern unsigned int textw(const char *text);	/* return the width of text in px*/
 
 /* event.c */
 extern void grabkeys();				/* grab all keys defined in config.h */
@@ -114,26 +114,26 @@ extern void initrregs();			/* initialize regexps of rules defined in config.h */
 extern Client *getnext(Client *c);		/* returns next visible client */
 extern Client *getprev(Client *c);		/* returns previous visible client */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
-extern void tag(Arg *arg);			/* tags c accordingly to arg's index */
-extern void toggletag(Arg *arg);		/* toggles c tags accordingly to arg's index */
+extern void tag(Arg *arg);			/* tags c with arg's index */
+extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
-extern void eprint(const char *errstr, ...);	/* prints error string and exits with return code 1 */
+extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
 extern void *erealloc(void *ptr, unsigned int size);	/* reallocates memory, exits on error */
-extern void spawn(Arg *arg);			/* forks a new subprocess accordingly to arg's cmd */
+extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
 
 /* view.c */
 extern void detach(Client *c);			/* detaches c from global client list */
-extern void dofloat(Arg *arg);			/* arranges all windows in a floating way, arg is ignored */
-extern void dotile(Arg *arg);			/* arranges all windows in a tiled way, arg is ignored */
+extern void dofloat(Arg *arg);			/* arranges all windows floating, arg is ignored */
+extern void dotile(Arg *arg);			/* arranges all windows, arg is ignored */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void resizecol(Arg *arg);		/* resizes the master width accordingly to arg's index value */
+extern void resizecol(Arg *arg);		/* resizes the master width with arg's index value */
 extern void restack();				/* restores z layers of all clients */
-extern void togglemode(Arg *arg);		/* toggles global arrange function (between dotile and dofloat) */
-extern void toggleview(Arg *arg);		/* toggles the tag accordingly to arg's index (in)visible */
-extern void view(Arg *arg);			/* views the tag accordingly to arg's index */
+extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
+extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
+extern void view(Arg *arg);			/* views the tag with arg's index */
 extern void viewall(Arg *arg);			/* views all tags, arg is ignored */
 extern void zoom(Arg *arg);			/* zooms the focused client to master column, arg is ignored */
