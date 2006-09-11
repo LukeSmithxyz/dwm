@@ -343,11 +343,11 @@ propertynotify(XEvent *e)
 					arrange(NULL);
 				break;
 			case XA_WM_NORMAL_HINTS:
-				setsize(c);
+				updatesize(c);
 				break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
-			settitle(c);
+			updatetitle(c);
 			drawtitle(c);
 		}
 	}

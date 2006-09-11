@@ -66,19 +66,19 @@ extern const char *tags[];			/* all tags */
 extern char stext[1024];			/* status text */
 extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
 extern int mw, screen, sx, sy, sw, sh;		/* screen geometry, master width */
-extern unsigned int ntags, numlockmask;		/* number of tags, and dynamic lock mask */
+extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, issel, maximized, *seltag;	/* seltag is array of Bool */
-extern Client *clients, *sel, *stack;		/* Client containers */
+extern Client *clients, *sel, *stack;		/* global cleint list and stack */
 extern Cursor cursor[CurLast];
-extern DC dc;					/* draw context for everything */
+extern DC dc;					/* global draw context */
 extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
-extern void ban(Client *c);			/* ban client from screen */
+extern void ban(Client *c);			/* ban c from screen */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
 extern Client *getctitle(Window w);		/* return client of title window */
@@ -86,8 +86,8 @@ extern void gravitate(Client *c, Bool invert);	/* gravitate c */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
-extern void setsize(Client *c);			/* set the size structs of c */
-extern void settitle(Client *c);		/* set the name of c */
+extern void updatesize(Client *c);			/* update the size structs of c */
+extern void updatetitle(Client *c);		/* update the name of c */
 extern void togglemax(Arg *arg);		/* (un)maximize c */
 extern void unmanage(Client *c);		/* destroy c */
 
@@ -113,7 +113,7 @@ extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 extern void initrregs();			/* initialize regexps of rules defined in config.h */
 extern Client *getnext(Client *c);		/* returns next visible client */
 extern Client *getprev(Client *c);		/* returns previous visible client */
-extern void settags(Client *c, Client *trans);	/* updates tags of c */
+extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c accordingly to arg's index */
 extern void toggletag(Arg *arg);		/* toggles c tags accordingly to arg's index */
 
@@ -132,8 +132,8 @@ extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ign
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizecol(Arg *arg);		/* resizes the master width accordingly to arg's index value */
 extern void restack();				/* restores z layers of all clients */
-extern void togglemode(Arg *arg);		/* toggles global arrange mode (between dotile and dofloat) */
-extern void toggleview(Arg *arg);		/* makes the tag accordingly to arg's index (in)visible */
-extern void view(Arg *arg);			/* makes the tag accordingly to arg's index visible */
-extern void viewall(Arg *arg);			/* makes all tags visible, arg is ignored */
+extern void togglemode(Arg *arg);		/* toggles global arrange function (between dotile and dofloat) */
+extern void toggleview(Arg *arg);		/* toggles the tag accordingly to arg's index (in)visible */
+extern void view(Arg *arg);			/* views the tag accordingly to arg's index */
+extern void viewall(Arg *arg);			/* views all tags, arg is ignored */
 extern void zoom(Arg *arg);			/* zooms the focused client to master column, arg is ignored */

@@ -223,7 +223,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->th = bh;
 
 	c->border = 0;
-	setsize(c);
+	updatesize(c);
 
 	if(c->x + c->w + 2 > sw)
 		c->x = sw - c->w - 2;
@@ -260,7 +260,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->snext = stack;
 	stack = clients = c;
 
-	settitle(c);
+	updatetitle(c);
 	ban(c);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->twin);
@@ -309,7 +309,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 }
 
 void
-setsize(Client *c)
+updatesize(Client *c)
 {
 	long msize;
 	XSizeHints size;
@@ -348,7 +348,7 @@ setsize(Client *c)
 }
 
 void
-settitle(Client *c)
+updatetitle(Client *c)
 {
 	char **list = NULL;
 	int n;
