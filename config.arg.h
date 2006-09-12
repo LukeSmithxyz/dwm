@@ -29,7 +29,7 @@ static Key key[] = { \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(IFS=:; for dir in $PATH; do " \
 			 "for file in \"$dir\"/*; do [ -x \"$file\" ] && echo \"${file##*/}\"; done; " \
-			 "done | sort -u | dmenu)\" && exec \"$exe\"" } }, \
+			 "done | sort -u | dmenu)\" && exec $exe" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
