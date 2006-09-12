@@ -39,8 +39,7 @@ static int (*xerrorxlib)(Display *, XErrorEvent *);
 static Bool otherwm, readin;
 
 static void
-cleanup()
-{
+cleanup() {
 	close(STDIN_FILENO);
 	while(sel) {
 		resize(sel, True, TopLeft);
@@ -60,8 +59,7 @@ cleanup()
 }
 
 static void
-scan()
-{
+scan() {
 	unsigned int i, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
@@ -82,8 +80,7 @@ scan()
 }
 
 static void
-setup()
-{
+setup() {
 	int i, j;
 	unsigned int mask;
 	Window w;
@@ -112,7 +109,8 @@ setup()
 	}
 	XFree(modmap);
 
-	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask | LeaveWindowMask;
+	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
+		| EnterWindowMask | LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
@@ -163,8 +161,7 @@ setup()
  * is already running.
  */
 static int
-xerrorstart(Display *dsply, XErrorEvent *ee)
-{
+xerrorstart(Display *dsply, XErrorEvent *ee) {
 	otherwm = True;
 	return -1;
 }
@@ -172,8 +169,7 @@ xerrorstart(Display *dsply, XErrorEvent *ee)
 /* extern */
 
 int
-getproto(Window w)
-{
+getproto(Window w) {
 	int i, format, protos, status;
 	unsigned long extra, res;
 	Atom *protocols, real;
@@ -191,8 +187,7 @@ getproto(Window w)
 }
 
 void
-sendevent(Window w, Atom a, long value)
-{
+sendevent(Window w, Atom a, long value) {
 	XEvent e;
 
 	e.type = ClientMessage;
@@ -206,8 +201,7 @@ sendevent(Window w, Atom a, long value)
 }
 
 void
-quit(Arg *arg)
-{
+quit(Arg *arg) {
 	readin = running = False;
 }
 
@@ -217,8 +211,7 @@ quit(Arg *arg)
  * default error handler, which may call exit.
  */
 int
-xerror(Display *dpy, XErrorEvent *ee)
-{
+xerror(Display *dpy, XErrorEvent *ee) {
 	if(ee->error_code == BadWindow
 	|| (ee->request_code == X_SetInputFocus && ee->error_code == BadMatch)
 	|| (ee->request_code == X_PolyText8 && ee->error_code == BadDrawable)
@@ -234,8 +227,7 @@ xerror(Display *dpy, XErrorEvent *ee)
 }
 
 int
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
 	int r, xfd;
 	fd_set rd;
 

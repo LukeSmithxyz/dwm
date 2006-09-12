@@ -12,8 +12,7 @@
 /* extern */
 
 void *
-emallocz(unsigned int size)
-{
+emallocz(unsigned int size) {
 	void *res = calloc(1, size);
 
 	if(!res)
@@ -22,8 +21,7 @@ emallocz(unsigned int size)
 }
 
 void
-eprint(const char *errstr, ...)
-{
+eprint(const char *errstr, ...) {
 	va_list ap;
 
 	va_start(ap, errstr);
@@ -33,8 +31,7 @@ eprint(const char *errstr, ...)
 }
 
 void *
-erealloc(void *ptr, unsigned int size)
-{
+erealloc(void *ptr, unsigned int size) {
 	void *res = realloc(ptr, size);
 	if(!res)
 		eprint("fatal: could not malloc() %u bytes\n", size);
@@ -42,8 +39,7 @@ erealloc(void *ptr, unsigned int size)
 }
 
 void
-spawn(Arg *arg)
-{
+spawn(Arg *arg) {
 	static char *shell = NULL;
 
 	if(!shell && !(shell = getenv("SHELL")))

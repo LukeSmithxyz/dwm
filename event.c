@@ -21,8 +21,7 @@ KEYS
 #define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
 
 static void
-movemouse(Client *c)
-{
+movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di;
 	unsigned int dui;
 	Window dummy;
@@ -37,7 +36,8 @@ movemouse(Client *c)
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch (ev.type) {
-		default: break;
+		default:
+			break;
 		case Expose:
 			handler[Expose](&ev);
 			break;
@@ -55,8 +55,7 @@ movemouse(Client *c)
 }
 
 static void
-resizemouse(Client *c)
-{
+resizemouse(Client *c) {
 	int ocx, ocy;
 	int nw, nh;
 	Corner sticky;
@@ -71,7 +70,8 @@ resizemouse(Client *c)
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch(ev.type) {
-		default: break;
+		default:
+			break;
 		case Expose:
 			handler[Expose](&ev);
 			break;
@@ -97,8 +97,7 @@ resizemouse(Client *c)
 }
 
 static void
-buttonpress(XEvent *e)
-{
+buttonpress(XEvent *e) {
 	int x;
 	Arg a;
 	Client *c;
@@ -147,8 +146,7 @@ buttonpress(XEvent *e)
 }
 
 static void
-synconfig(Client *c, int x, int y, int w, int h, unsigned int border)
-{
+synconfig(Client *c, int x, int y, int w, int h, unsigned int border) {
 	XEvent synev;
 
 	synev.type = ConfigureNotify;
@@ -165,8 +163,7 @@ synconfig(Client *c, int x, int y, int w, int h, unsigned int border)
 }
 
 static void
-configurerequest(XEvent *e)
-{
+configurerequest(XEvent *e) {
 	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
@@ -219,8 +216,7 @@ configurerequest(XEvent *e)
 }
 
 static void
-destroynotify(XEvent *e)
-{
+destroynotify(XEvent *e) {
 	Client *c;
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
@@ -229,8 +225,7 @@ destroynotify(XEvent *e)
 }
 
 static void
-enternotify(XEvent *e)
-{
+enternotify(XEvent *e) {
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
@@ -247,8 +242,7 @@ enternotify(XEvent *e)
 }
 
 static void
-expose(XEvent *e)
-{
+expose(XEvent *e) {
 	Client *c;
 	XExposeEvent *ev = &e->xexpose;
 
@@ -261,8 +255,7 @@ expose(XEvent *e)
 }
 
 static void
-keypress(XEvent *e)
-{
+keypress(XEvent *e) {
 	static unsigned int len = sizeof(key) / sizeof(key[0]);
 	unsigned int i;
 	KeySym keysym;
@@ -270,8 +263,8 @@ keypress(XEvent *e)
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++) {
-		if(keysym == key[i].keysym &&
-				CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
+		if(keysym == key[i].keysym
+			&& CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
 		{
 			if(key[i].func)
 				key[i].func(&key[i].arg);
@@ -281,8 +274,7 @@ keypress(XEvent *e)
 }
 
 static void
-leavenotify(XEvent *e)
-{
+leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->window == root) && !ev->same_screen) {
@@ -292,8 +284,7 @@ leavenotify(XEvent *e)
 }
 
 static void
-mappingnotify(XEvent *e)
-{
+mappingnotify(XEvent *e) {
 	XMappingEvent *ev = &e->xmapping;
 
 	XRefreshKeyboardMapping(ev);
@@ -302,8 +293,7 @@ mappingnotify(XEvent *e)
 }
 
 static void
-maprequest(XEvent *e)
-{
+maprequest(XEvent *e) {
 	static XWindowAttributes wa;
 	XMapRequestEvent *ev = &e->xmaprequest;
 
@@ -321,8 +311,7 @@ maprequest(XEvent *e)
 }
 
 static void
-propertynotify(XEvent *e)
-{
+propertynotify(XEvent *e) {
 	Client *c;
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
@@ -354,8 +343,7 @@ propertynotify(XEvent *e)
 }
 
 static void
-unmapnotify(XEvent *e)
-{
+unmapnotify(XEvent *e) {
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
@@ -380,8 +368,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 };
 
 void
-grabkeys()
-{
+grabkeys() {
 	static unsigned int len = sizeof(key) / sizeof(key[0]);
 	unsigned int i;
 	KeyCode code;
@@ -401,8 +388,7 @@ grabkeys()
 }
 
 void
-procevent()
-{
+procevent() {
 	XEvent ev;
 
 	while(XPending(dpy)) {
@@ -411,4 +397,3 @@ procevent()
 			(handler[ev.type])(&ev); /* call handler */
 	}
 }
-

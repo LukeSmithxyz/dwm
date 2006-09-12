@@ -11,16 +11,14 @@
 /* static functions */
 
 static void
-detachstack(Client *c)
-{
+detachstack(Client *c) {
 	Client **tc;
 	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
 	*tc = c->snext;
 }
 
 static void
-grabbuttons(Client *c, Bool focused)
-{
+grabbuttons(Client *c, Bool focused) {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
 	if(focused) {
@@ -54,12 +52,10 @@ grabbuttons(Client *c, Bool focused)
 	else
 		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-
 }
 
 static void
-resizetitle(Client *c)
-{
+resizetitle(Client *c) {
 	c->tw = textw(c->name);
 	if(c->tw > c->w)
 		c->tw = c->w + 2;
@@ -69,27 +65,23 @@ resizetitle(Client *c)
 		XMoveResizeWindow(dpy, c->twin, c->tx, c->ty, c->tw, c->th);
 	else
 		XMoveResizeWindow(dpy, c->twin, c->tx + 2 * sw, c->ty, c->tw, c->th);
-
 }
 
 static int
-xerrordummy(Display *dsply, XErrorEvent *ee)
-{
+xerrordummy(Display *dsply, XErrorEvent *ee) {
 	return 0;
 }
 
 /* extern functions */
 
 void
-ban(Client *c)
-{
+ban(Client *c) {
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMoveWindow(dpy, c->twin, c->tx + 2 * sw, c->ty);
 }
 
 void
-focus(Client *c)
-{
+focus(Client *c) {
 	Client *old;
 
 	if(!issel)
@@ -119,8 +111,7 @@ focus(Client *c)
 }
 
 Client *
-getclient(Window w)
-{
+getclient(Window w) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -130,8 +121,7 @@ getclient(Window w)
 }
 
 Client *
-getctitle(Window w)
-{
+getctitle(Window w) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -141,8 +131,7 @@ getctitle(Window w)
 }
 
 void
-gravitate(Client *c, Bool invert)
-{
+gravitate(Client *c, Bool invert) {
 	int dx = 0, dy = 0;
 
 	switch(c->grav) {
@@ -196,8 +185,7 @@ gravitate(Client *c, Bool invert)
 }
 
 void
-killclient(Arg *arg)
-{
+killclient(Arg *arg) {
 	if(!sel)
 		return;
 	if(sel->proto & PROTODELWIN)
@@ -207,8 +195,7 @@ killclient(Arg *arg)
 }
 
 void
-manage(Window w, XWindowAttributes *wa)
-{
+manage(Window w, XWindowAttributes *wa) {
 	Client *c;
 	Window trans;
 	XSetWindowAttributes twa;
@@ -270,8 +257,7 @@ manage(Window w, XWindowAttributes *wa)
 }
 
 void
-resize(Client *c, Bool sizehints, Corner sticky)
-{
+resize(Client *c, Bool sizehints, Corner sticky) {
 	int bottom = c->y + c->h;
 	int right = c->x + c->w;
 	XWindowChanges wc;
@@ -309,8 +295,7 @@ resize(Client *c, Bool sizehints, Corner sticky)
 }
 
 void
-updatesize(Client *c)
-{
+updatesize(Client *c) {
 	long msize;
 	XSizeHints size;
 
@@ -348,8 +333,7 @@ updatesize(Client *c)
 }
 
 void
-updatetitle(Client *c)
-{
+updatetitle(Client *c) {
 	char **list = NULL;
 	int n;
 	XTextProperty name;
@@ -376,8 +360,7 @@ updatetitle(Client *c)
 }
 
 void
-togglemax(Arg *arg)
-{
+togglemax(Arg *arg) {
 	int ox, oy, ow, oh;
 	Client *c;
 	XEvent ev;
@@ -412,8 +395,7 @@ togglemax(Arg *arg)
 }
 
 void
-unmanage(Client *c)
-{
+unmanage(Client *c) {
 	Client *nc;
 
 	XGrabServer(dpy);

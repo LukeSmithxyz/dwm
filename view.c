@@ -8,8 +8,7 @@
 /* static */
 
 static Client *
-minclient()
-{
+minclient() {
 	Client *c, *min;
 
 	if((clients && clients->isfloat) || arrange == dofloat)
@@ -21,8 +20,7 @@ minclient()
 }
 
 static void
-reorder()
-{
+reorder() {
 	Client *c, *newclients, *tail;
 
 	newclients = tail = NULL;
@@ -40,8 +38,7 @@ reorder()
 }
 
 static Client *
-nexttiled(Client *c)
-{
+nexttiled(Client *c) {
 	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
 	return c;
 }
@@ -51,8 +48,7 @@ nexttiled(Client *c)
 void (*arrange)(Arg *) = DEFMODE;
 
 void
-detach(Client *c)
-{
+detach(Client *c) {
 	if(c->prev)
 		c->prev->next = c->next;
 	if(c->next)
@@ -63,8 +59,7 @@ detach(Client *c)
 }
 
 void
-dofloat(Arg *arg)
-{
+dofloat(Arg *arg) {
 	Client *c;
 
 	maximized = False;
@@ -84,8 +79,7 @@ dofloat(Arg *arg)
 }
 
 void
-dotile(Arg *arg)
-{
+dotile(Arg *arg) {
 	int h, i, n, w;
 	Client *c;
 
@@ -148,8 +142,7 @@ dotile(Arg *arg)
 }
 
 void
-focusnext(Arg *arg)
-{
+focusnext(Arg *arg) {
 	Client *c;
    
 	if(!sel)
@@ -164,8 +157,7 @@ focusnext(Arg *arg)
 }
 
 void
-focusprev(Arg *arg)
-{
+focusprev(Arg *arg) {
 	Client *c;
 
 	if(!sel)
@@ -182,8 +174,7 @@ focusprev(Arg *arg)
 }
 
 Bool
-isvisible(Client *c)
-{
+isvisible(Client *c) {
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
@@ -193,8 +184,7 @@ isvisible(Client *c)
 }
 
 void
-resizecol(Arg *arg)
-{
+resizecol(Arg *arg) {
 	unsigned int n;
 	Client *c;
 
@@ -218,8 +208,7 @@ resizecol(Arg *arg)
 }
 
 void
-restack()
-{
+restack() {
 	Client *c;
 	XEvent ev;
 	
@@ -242,8 +231,7 @@ restack()
 }
 
 void
-togglemode(Arg *arg)
-{
+togglemode(Arg *arg) {
 	arrange = (arrange == dofloat) ? dotile : dofloat;
 	if(sel)
 		arrange(NULL);
@@ -252,8 +240,7 @@ togglemode(Arg *arg)
 }
 
 void
-toggleview(Arg *arg)
-{
+toggleview(Arg *arg) {
 	unsigned int i;
 
 	seltag[arg->i] = !seltag[arg->i];
@@ -265,8 +252,7 @@ toggleview(Arg *arg)
 }
 
 void
-view(Arg *arg)
-{
+view(Arg *arg) {
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
@@ -277,8 +263,7 @@ view(Arg *arg)
 }
 
 void
-viewall(Arg *arg)
-{
+viewall(Arg *arg) {
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
@@ -288,8 +273,7 @@ viewall(Arg *arg)
 }
 
 void
-zoom(Arg *arg)
-{
+zoom(Arg *arg) {
 	unsigned int n;
 	Client *c;
 

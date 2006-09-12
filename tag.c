@@ -33,22 +33,19 @@ static unsigned int len = 0;
 /* extern */
 
 Client *
-getnext(Client *c)
-{
+getnext(Client *c) {
 	for(; c && !isvisible(c); c = c->next);
 	return c;
 }
 
 Client *
-getprev(Client *c)
-{
+getprev(Client *c) {
 	for(; c && !isvisible(c); c = c->prev);
 	return c;
 }
 
 void
-initrregs()
-{
+initrregs() {
 	unsigned int i;
 	regex_t *reg;
 
@@ -76,8 +73,7 @@ initrregs()
 }
 
 void
-settags(Client *c, Client *trans)
-{
+settags(Client *c, Client *trans) {
 	char prop[512];
 	unsigned int i, j;
 	regmatch_t tmp;
@@ -114,8 +110,7 @@ settags(Client *c, Client *trans)
 }
 
 void
-tag(Arg *arg)
-{
+tag(Arg *arg) {
 	unsigned int i;
 
 	if(!sel)
@@ -129,8 +124,7 @@ tag(Arg *arg)
 }
 
 void
-toggletag(Arg *arg)
-{
+toggletag(Arg *arg) {
 	unsigned int i;
 
 	if(!sel)
