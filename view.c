@@ -3,7 +3,6 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
-#include <stdio.h>
 
 /* static */
 
