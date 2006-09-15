@@ -84,7 +84,7 @@ void
 focus(Client *c) {
 	Client *old;
 
-	if(!issel)
+	if(!issel || (c && !isvisible(c)))
 		return;
 	if(!sel)
 		sel = c;
