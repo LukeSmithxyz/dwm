@@ -232,7 +232,7 @@ enternotify(XEvent *e) {
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
 
-	if((c = getclient(ev->window)) || (c = getctitle(ev->window)))
+	if(((c = getclient(ev->window)) || (c = getctitle(ev->window))) && isvisible(c))
 		focus(c);
 	else if(ev->window == root) {
 		issel = True;
