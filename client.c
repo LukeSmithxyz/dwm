@@ -281,6 +281,16 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	if(sticky == BotLeft || sticky == BotRight)
 		c->y = bottom - c->h;
 
+	/* offscreen appearance fixes */
+	if(c->x + c->w < 0)
+		c->x = 0;
+	if(c->y + c->h < bh)
+		c->y = bh;
+	if(c->x > sw)
+		c->x = sw - c->w;
+	if(c->y > sh)
+		c->y = sh - c->h;
+
 	resizetitle(c);
 	wc.x = c->x;
 	wc.y = c->y;
