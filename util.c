@@ -47,7 +47,8 @@ spawn(Arg *arg) {
 
 	if(!arg->cmd)
 		return;
-	/* the double-fork construct avoids zombie processes */
+	/* The double-fork construct avoids zombie processes and keeps the code
+	 * clean from stupid signal handlers. */
 	if(fork() == 0) {
 		if(fork() == 0) {
 			if(dpy)
