@@ -408,6 +408,7 @@ void
 unmanage(Client *c) {
 	Client *nc;
 
+	/* The server grab construct avoids race conditions. */
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
 
