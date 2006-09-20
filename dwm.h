@@ -9,7 +9,7 @@
  * allowed to select for this event mask.
  *
  * Calls to fetch an X event from the event queue are blocking.  Due reading
- * status text from standard input, a select-driven main loop has been
+ * status text from standard input, a select()-driven main loop has been
  * implemented which selects for reads on the X connection and STDIN_FILENO to
  * handle all data smoothly. The event handlers of dwm are organized in an
  * array which is accessed whenever a new event has been fetched. This allows
@@ -26,8 +26,8 @@
  * Keys and tagging rules are organized as arrays and defined in the config.h
  * file. These arrays are kept static in event.o and tag.o respectively,
  * because no other part of dwm needs access to them.  The current mode is
- * represented by the arrange function pointer, which wether points to dofloat
- * or dotile. 
+ * represented by the arrange() function pointer, which wether points to
+ * dofloat() or dotile(). 
  *
  * To understand everything else, start reading main.c:main().
  */
