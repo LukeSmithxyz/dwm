@@ -108,9 +108,9 @@ resizemouse(Client *c) {
 		case MotionNotify:
 			XSync(dpy, False);
 			if((nw = abs(ocx - ev.xmotion.x)))
-				c->w = abs(ocx - ev.xmotion.x);
+				c->w = nw;
 			if((nh = abs(ocy - ev.xmotion.y)))
-				c->h = abs(ocy - ev.xmotion.y);
+				c->h = nh;
 			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
 			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
 			if(ocx <= ev.xmotion.x)
