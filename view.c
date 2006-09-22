@@ -278,10 +278,10 @@ zoom(Arg *arg) {
 		return;
 
 	if(sel->isfloat || (arrange == dofloat)) {
-		tmp = sel->x; sel->x = sel->rx; sel->rx = tmp;
-		tmp = sel->y; sel->y = sel->ry; sel->ry = tmp;
-		tmp = sel->w; sel->w = sel->rw; sel->rw = tmp;
-		tmp = sel->h; sel->h = sel->rh; sel->rh = tmp;
+		sel->x = sx;
+		sel->y = bh;
+		sel->w = sw;
+		sel->h = sh - bh;
 		resize(sel, True, TopLeft);
 		while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 		return;

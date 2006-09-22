@@ -206,10 +206,6 @@ manage(Window w, XWindowAttributes *wa) {
 	c->w = c->tw = wa->width;
 	c->h = wa->height;
 	c->th = bh;
-	c->rx = sx;
-	c->ry = bh;
-	c->rw = sw;
-	c->rh = sh - bh;
 
 	c->border = 0;
 	updatesize(c);

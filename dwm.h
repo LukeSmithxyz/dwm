@@ -78,7 +78,6 @@ struct Client {
 	int proto;
 	int x, y, w, h;
 	int tx, ty, tw, th; /* title window geometry */
-	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	long flags; 
