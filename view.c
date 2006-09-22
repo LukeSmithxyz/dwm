@@ -45,17 +45,18 @@ reorder() {
 static void
 togglemax(Client *c)
 {
+	XEvent ev;
 	if((c->ismax = !c->ismax)) {
 		c->rx = c->x; c->x = sx;
 		c->ry = c->y; c->y = bh;
 		c->rw = c->w; c->w = sw;
-		c->rh = c->h; c->h = sh;
+		c->rh = c->h; c->h = sh - bh;
 	}
 	else {
 		c->x = c->rx;
 		c->y = c->ry;
-		c->w = c->w;
-		c->h = c->h;
+		c->w = c->rw;
+		c->h = c->rh;
 	}
 	resize(c, True, TopLeft);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
@@ -231,7 +232,7 @@ void
 restack() {
 	Client *c;
 	XEvent ev;
-	
+
 	if(!sel) {
 		drawstatus();
 		return;
@@ -296,7 +297,6 @@ void
 zoom(Arg *arg) {
 	unsigned int n;
 	Client *c;
-	XEvent ev;
 
 	if(!sel)
 		return;
