@@ -102,14 +102,8 @@ dotile(Arg *arg) {
 
 	w = sw - mw;
 	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c)) {
-			if(c->isfloat) {
-				if(c->ismax)
-					togglemax(c);
-			}
-			else
-				n++;
-		}
+		if(isvisible(c) && !c->isfloat)
+			n++;
 
 	if(n > 1)
 		h = (sh - bh) / (n - 1);
@@ -118,6 +112,8 @@ dotile(Arg *arg) {
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(isvisible(c)) {
+			if(c->ismax)
+				togglemax(c);
 			if(c->isfloat) {
 				resize(c, True, TopLeft);
 				continue;
