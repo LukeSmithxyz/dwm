@@ -78,6 +78,7 @@ struct Client {
 	int proto;
 	int x, y, w, h;
 	int tx, ty, tw, th; /* title window geometry */
+	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	long flags; 
@@ -99,7 +100,7 @@ extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, issel, maximized, *seltag;	/* seltag is array of Bool */
+extern Bool running, issel, *seltag;		/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global cleint list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
@@ -117,7 +118,6 @@ extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
 extern void updatesize(Client *c);			/* update the size structs of c */
 extern void updatetitle(Client *c);		/* update the name of c */
-extern void togglemax(Arg *arg);		/* (un)maximize c */
 extern void unmanage(Client *c);		/* destroy c */
 
 /* draw.c */

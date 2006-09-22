@@ -61,8 +61,6 @@ void
 dofloat(Arg *arg) {
 	Client *c;
 
-	maximized = False;
-
 	for(c = clients; c; c = c->next) {
 		if(isvisible(c)) {
 			resize(c, True, TopLeft);
@@ -81,8 +79,6 @@ void
 dotile(Arg *arg) {
 	int h, i, n, w;
 	Client *c;
-
-	maximized = False;
 
 	w = sw - mw;
 	for(n = 0, c = clients; c; c = c->next)
@@ -190,7 +186,7 @@ resizecol(Arg *arg) {
 	for(n = 0, c = clients; c; c = c->next)
 		if(isvisible(c) && !c->isfloat)
 			n++;
-	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
+	if(!sel || sel->isfloat || n < 2 || (arrange != dotile))
 		return;
 
 	if(sel == getnext(clients)) {
@@ -273,13 +269,28 @@ viewall(Arg *arg) {
 
 void
 zoom(Arg *arg) {
+	int tmp;
 	unsigned int n;
 	Client *c;
+	XEvent ev;
+
+	if(!sel)
+		return;
+
+	if(sel->isfloat || (arrange == dofloat)) {
+		tmp = sel->x; sel->x = sel->rx; sel->rx = tmp;
+		tmp = sel->y; sel->y = sel->ry; sel->ry = tmp;
+		tmp = sel->w; sel->w = sel->rw; sel->rw = tmp;
+		tmp = sel->h; sel->h = sel->rh; sel->rh = tmp;
+		resize(sel, True, TopLeft);
+		while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+		return;
+	}
 
 	for(n = 0, c = clients; c; c = c->next)
 		if(isvisible(c) && !c->isfloat)
 			n++;
-	if(!sel || sel->isfloat || n < 2 || (arrange != dotile) || maximized)
+	if(n < 2 || (arrange != dotile))
 		return;
 
 	if((c = sel) == nexttiled(clients))

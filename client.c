@@ -89,8 +89,6 @@ focus(Client *c) {
 	if(!sel)
 		sel = c;
 	else if(sel != c) {
-		if(maximized)
-			togglemax(NULL);
 		old = sel;
 		sel = c;
 		if(old) {
@@ -208,6 +206,10 @@ manage(Window w, XWindowAttributes *wa) {
 	c->w = c->tw = wa->width;
 	c->h = wa->height;
 	c->th = bh;
+	c->rx = sx;
+	c->ry = bh;
+	c->rw = sw;
+	c->rh = sh - bh;
 
 	c->border = 0;
 	updatesize(c);
@@ -367,41 +369,6 @@ updatetitle(Client *c) {
 	}
 	XFree(name.value);
 	resizetitle(c);
-}
-
-void
-togglemax(Arg *arg) {
-	int ox, oy, ow, oh;
-	Client *c;
-	XEvent ev;
-
-	if(!sel)
-		return;
-
-	if((maximized = !maximized)) {
-		ox = sel->x;
-		oy = sel->y;
-		ow = sel->w;
-		oh = sel->h;
-		sel->x = sx;
-		sel->y = sy + bh;
-		sel->w = sw - 2;
-		sel->h = sh - 2 - bh;
-
-		restack();
-		for(c = getnext(clients); c; c = getnext(c->next))
-			if(c != sel)
-				ban(c);
-		resize(sel, arrange == dofloat, TopLeft);
-
-		sel->x = ox;
-		sel->y = oy;
-		sel->w = ow;
-		sel->h = oh;
-	}
-	else
-		arrange(NULL);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
