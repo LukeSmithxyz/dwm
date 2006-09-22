@@ -104,7 +104,7 @@ drawstatus() {
 	}
 
 	dc.w = bmw;
-	drawtext(arrange == dotile ? TILESYMBOL : FLOATSYMBOL, dc.status, False);
+	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.status, False);
 
 	x = dc.x + dc.w;
 	dc.w = textw(stext);

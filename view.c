@@ -50,7 +50,7 @@ togglemax(Client *c)
 		c->rx = c->x; c->x = sx;
 		c->ry = c->y; c->y = bh;
 		c->rw = c->w; c->w = sw;
-		c->rh = c->h; c->h = sh - bh;
+		c->rh = c->h; c->h = sh - bh - 2;
 	}
 	else {
 		c->x = c->rx;
@@ -208,7 +208,7 @@ resizecol(Arg *arg) {
 	for(n = 0, c = clients; c; c = c->next)
 		if(isvisible(c) && !c->isfloat)
 			n++;
-	if(!sel || sel->isfloat || n < 2 || (arrange != dotile))
+	if(!sel || sel->isfloat || n < 2 || (arrange == dofloat))
 		return;
 
 	if(sel == getnext(clients)) {
@@ -305,7 +305,7 @@ zoom(Arg *arg) {
 	for(n = 0, c = clients; c; c = c->next)
 		if(isvisible(c) && !c->isfloat)
 			n++;
-	if(n < 2 || (arrange != dotile))
+	if(n < 2 || (arrange == dofloat))
 		return;
 
 	if((c = sel) == nexttiled(clients))
