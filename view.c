@@ -18,6 +18,12 @@ minclient() {
 	return min;
 }
 
+static Client *
+nexttiled(Client *c) {
+	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
+	return c;
+}
+
 static void
 reorder() {
 	Client *c, *newclients, *tail;
@@ -36,10 +42,23 @@ reorder() {
 	clients = newclients;
 }
 
-static Client *
-nexttiled(Client *c) {
-	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
-	return c;
+static void
+togglemax(Client *c)
+{
+	if((c->ismax = !c->ismax)) {
+		c->rx = c->x; c->x = sx;
+		c->ry = c->y; c->y = bh;
+		c->rw = c->w; c->w = sw;
+		c->rh = c->h; c->h = sh;
+	}
+	else {
+		c->x = c->rx;
+		c->y = c->ry;
+		c->w = c->w;
+		c->h = c->h;
+	}
+	resize(c, True, TopLeft);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 /* extern */
@@ -82,8 +101,14 @@ dotile(Arg *arg) {
 
 	w = sw - mw;
 	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c) && !c->isfloat)
-			n++;
+		if(isvisible(c)) {
+			if(c->isfloat) {
+				if(c->ismax)
+					togglemax(c);
+			}
+			else
+				n++;
+		}
 
 	if(n > 1)
 		h = (sh - bh) / (n - 1);
@@ -269,7 +294,6 @@ viewall(Arg *arg) {
 
 void
 zoom(Arg *arg) {
-	int tmp;
 	unsigned int n;
 	Client *c;
 	XEvent ev;
@@ -278,12 +302,7 @@ zoom(Arg *arg) {
 		return;
 
 	if(sel->isfloat || (arrange == dofloat)) {
-		sel->x = sx;
-		sel->y = bh;
-		sel->w = sw;
-		sel->h = sh - bh;
-		resize(sel, True, TopLeft);
-		while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+		togglemax(sel);
 		return;
 	}
 

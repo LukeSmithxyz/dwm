@@ -77,12 +77,13 @@ struct Client {
 	char name[256];
 	int proto;
 	int x, y, w, h;
+	int rx, ry, rw, rh; /* revert geometry */
 	int tx, ty, tw, th; /* title window geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	long flags; 
 	unsigned int border, weight;
-	Bool isfloat;
+	Bool isfloat, ismax;
 	Bool *tags;
 	Client *next;
 	Client *prev;
