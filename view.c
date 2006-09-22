@@ -112,12 +112,12 @@ dotile(Arg *arg) {
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(isvisible(c)) {
-			if(c->ismax)
-				togglemax(c);
 			if(c->isfloat) {
 				resize(c, True, TopLeft);
 				continue;
 			}
+			if(c->ismax)
+				togglemax(c);
 			if(n == 1) {
 				c->x = sx;
 				c->y = sy + bh;
