@@ -21,23 +21,6 @@ KEYS
 #define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
 
 static void
-synconfig(Client *c, int x, int y, int w, int h, unsigned int border) {
-	XEvent synev;
-
-	synev.type = ConfigureNotify;
-	synev.xconfigure.display = dpy;
-	synev.xconfigure.event = c->win;
-	synev.xconfigure.window = c->win;
-	synev.xconfigure.x = x;
-	synev.xconfigure.y = y;
-	synev.xconfigure.width = w;
-	synev.xconfigure.height = h;
-	synev.xconfigure.border_width = border;
-	synev.xconfigure.above = None;
-	XSendEvent(dpy, c->win, True, NoEventMask, &synev);
-}
-
-static void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di;
 	unsigned int dui;
@@ -52,14 +35,8 @@ movemouse(Client *c) {
 	c->ismax = False;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
-		XMaskEvent(dpy, MOUSEMASK | ExposureMask | StructureNotifyMask, &ev);
+		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch (ev.type) {
-		default:
-			break;
-		case ConfigureRequest:
-			synconfig(c, c->x, c->y, c->w, c->h, ev.xconfigure.border_width);
-			XSync(dpy, False);
-			break;
 		case Expose:
 			handler[Expose](&ev);
 			break;
@@ -71,11 +48,6 @@ movemouse(Client *c) {
 			break;
 		case ButtonRelease:
 			XUngrabPointer(dpy, CurrentTime);
-			return;
-		case DestroyNotify:
-		case UnmapNotify:
-			XUngrabPointer(dpy, CurrentTime);
-			handler[ev.type](&ev);
 			return;
 		}
 	}
@@ -96,14 +68,8 @@ resizemouse(Client *c) {
 	c->ismax = False;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 	for(;;) {
-		XMaskEvent(dpy, MOUSEMASK | ExposureMask | StructureNotifyMask, &ev);
+		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch(ev.type) {
-		default:
-			break;
-		case ConfigureRequest:
-			synconfig(c, c->x, c->y, c->w, c->h, ev.xconfigure.border_width);
-			XSync(dpy, False);
-			break;
 		case Expose:
 			handler[Expose](&ev);
 			break;
@@ -123,11 +89,6 @@ resizemouse(Client *c) {
 			break;
 		case ButtonRelease:
 			XUngrabPointer(dpy, CurrentTime);
-			return;
-		case DestroyNotify:
-		case UnmapNotify:
-			XUngrabPointer(dpy, CurrentTime);
-			handler[ev.type](&ev);
 			return;
 		}
 	}
@@ -187,6 +148,7 @@ configurerequest(XEvent *e) {
 	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
+	XEvent synev;
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
@@ -210,8 +172,19 @@ configurerequest(XEvent *e) {
 		newmask = ev->value_mask & (~(CWSibling | CWStackMode | CWBorderWidth));
 		if(newmask)
 			XConfigureWindow(dpy, c->win, newmask, &wc);
-		else
-			synconfig(c, c->x, c->y, c->w, c->h, c->border);
+		else {
+			synev.type = ConfigureNotify;
+			synev.xconfigure.display = dpy;
+			synev.xconfigure.event = c->win;
+			synev.xconfigure.window = c->win;
+			synev.xconfigure.x = c->x;
+			synev.xconfigure.y = c->y;
+			synev.xconfigure.width = c->w;
+			synev.xconfigure.height = c->h;
+			synev.xconfigure.border_width = c->border;
+			synev.xconfigure.above = None;
+			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+		}
 		XSync(dpy, False);
 		if(c->isfloat)
 			resize(c, False, TopLeft);
