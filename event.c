@@ -37,6 +37,9 @@ movemouse(Client *c) {
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch (ev.type) {
+		case ButtonRelease:
+			XUngrabPointer(dpy, CurrentTime);
+			return;
 		case Expose:
 			handler[Expose](&ev);
 			break;
@@ -46,9 +49,6 @@ movemouse(Client *c) {
 			c->y = ocy + (ev.xmotion.y - y1);
 			resize(c, False, TopLeft);
 			break;
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
 		}
 	}
 }
@@ -70,6 +70,9 @@ resizemouse(Client *c) {
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch(ev.type) {
+		case ButtonRelease:
+			XUngrabPointer(dpy, CurrentTime);
+			return;
 		case Expose:
 			handler[Expose](&ev);
 			break;
@@ -87,9 +90,6 @@ resizemouse(Client *c) {
 				sticky = (ocy <= ev.xmotion.y) ? TopRight : BotRight;
 			resize(c, True, sticky);
 			break;
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
 		}
 	}
 }
