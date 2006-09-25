@@ -38,7 +38,7 @@ static int (*xerrorxlib)(Display *, XErrorEvent *);
 static Bool otherwm, readin;
 
 static void
-cleanup() {
+cleanup(void) {
 	close(STDIN_FILENO);
 	while(sel) {
 		resize(sel, True, TopLeft);
@@ -58,7 +58,7 @@ cleanup() {
 }
 
 static void
-scan() {
+scan(void) {
 	unsigned int i, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
@@ -79,7 +79,7 @@ scan() {
 }
 
 static void
-setup() {
+setup(void) {
 	int i, j;
 	unsigned int mask;
 	Window w;

@@ -80,7 +80,7 @@ drawtext(const char *text, unsigned long col[ColLast], Bool highlight) {
 /* extern */
 
 void
-drawall() {
+drawall(void) {
 	Client *c;
 
 	for(c = clients; c; c = getnext(c->next))
@@ -89,7 +89,7 @@ drawall() {
 }
 
 void
-drawstatus() {
+drawstatus(void) {
 	int i, x;
 
 	dc.x = dc.y = 0;

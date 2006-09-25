@@ -45,7 +45,7 @@ getprev(Client *c) {
 }
 
 void
-initrregs() {
+initrregs(void) {
 	unsigned int i;
 	regex_t *reg;
 

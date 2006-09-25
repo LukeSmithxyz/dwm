@@ -170,13 +170,13 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1 && (arrange == dofloat || c->isfloat)) {
-			restack(c);
+			restack();
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
 		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat)) {
-			restack(c);
+			restack();
 			resizemouse(c);
 		}
 	}
@@ -388,7 +388,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 };
 
 void
-grabkeys() {
+grabkeys(void) {
 	static unsigned int len = sizeof(key) / sizeof(key[0]);
 	unsigned int i;
 	KeyCode code;
@@ -408,7 +408,7 @@ grabkeys() {
 }
 
 void
-procevent() {
+procevent(void) {
 	XEvent ev;
 
 	while(XPending(dpy)) {

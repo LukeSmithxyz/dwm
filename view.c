@@ -7,7 +7,7 @@
 /* static */
 
 static Client *
-minclient() {
+minclient(void) {
 	Client *c, *min;
 
 	if((clients && clients->isfloat) || arrange == dofloat)
@@ -25,7 +25,7 @@ nexttiled(Client *c) {
 }
 
 static void
-reorder() {
+reorder(void) {
 	Client *c, *newclients, *tail;
 
 	newclients = tail = NULL;
@@ -225,7 +225,7 @@ resizecol(Arg *arg) {
 }
 
 void
-restack() {
+restack(void) {
 	Client *c;
 	XEvent ev;
 

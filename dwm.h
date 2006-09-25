@@ -121,16 +121,16 @@ extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
 
 /* draw.c */
-extern void drawall();				/* draw all visible client titles and the bar */
-extern void drawstatus();			/* draw the bar */
+extern void drawall(void);			/* draw all visible client titles and the bar */
+extern void drawstatus(void);			/* draw the bar */
 extern void drawtitle(Client *c);		/* draw title of c */
 extern unsigned long getcolor(const char *colstr);	/* return color of colstr */
 extern void setfont(const char *fontstr);	/* set the font for DC */
 extern unsigned int textw(const char *text);	/* return the width of text in px*/
 
 /* event.c */
-extern void grabkeys();				/* grab all keys defined in config.h */
-extern void procevent();			/* process pending X events */
+extern void grabkeys(void);			/* grab all keys defined in config.h */
+extern void procevent(void);			/* process pending X events */
 
 /* main.c */
 extern int getproto(Window w);			/* return protocol mask of WMProtocols property of w */
@@ -139,7 +139,7 @@ extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to 
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* tag.c */
-extern void initrregs();			/* initialize regexps of rules defined in config.h */
+extern void initrregs(void);			/* initialize regexps of rules defined in config.h */
 extern Client *getnext(Client *c);		/* returns next visible client */
 extern Client *getprev(Client *c);		/* returns previous visible client */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
@@ -160,7 +160,7 @@ extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizecol(Arg *arg);		/* resizes the master width with arg's index value */
-extern void restack();				/* restores z layers of all clients */
+extern void restack(void);			/* restores z layers of all clients */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void view(Arg *arg);			/* views the tag with arg's index */
