@@ -190,11 +190,7 @@ configurerequest(XEvent *e) {
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
-		if((c == sel) && !c->isfloat && (arrange != dofloat)) {
-			synconfig(c, sx, sy + bh, sw - 2, sh - 2 - bh, ev->border_width);
-			XSync(dpy, False);
-			return;
-		}
+		c->ismax = False;
 		gravitate(c, True);
 		if(ev->value_mask & CWX)
 			c->x = ev->x;

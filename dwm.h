@@ -101,7 +101,7 @@ extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, issel, *seltag;		/* seltag is array of Bool */
-extern Client *clients, *sel, *stack;		/* global cleint list and stack */
+extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
 extern Display *dpy;
