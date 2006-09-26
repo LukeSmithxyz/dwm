@@ -150,7 +150,6 @@ configurerequest(XEvent *e) {
 	unsigned long newmask;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
-	XEvent synev;
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
