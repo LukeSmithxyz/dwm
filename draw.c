@@ -149,7 +149,8 @@ getcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
-	XAllocNamedColor(dpy, cmap, colstr, &color, &color);
+	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
+		eprint("error, cannot allocate color '%s'\n", colstr);
 	return color.pixel;
 }
 
