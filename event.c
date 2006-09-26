@@ -1,4 +1,3 @@
-#include <stdio.h>
 /*
  * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
@@ -154,7 +153,6 @@ configurerequest(XEvent *e) {
 	XEvent synev;
 	XWindowChanges wc;
 
-	fputs("configurerequest\n", stderr);
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
 		gravitate(c, True);
@@ -211,7 +209,6 @@ enternotify(XEvent *e) {
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
-	fputs("enternotify\n", stderr);
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
 
@@ -299,7 +296,6 @@ propertynotify(XEvent *e) {
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
 
-	fputs("propertynotify\n", stderr);
 	if(ev->state == PropertyDelete)
 		return; /* ignore */
 
