@@ -109,6 +109,7 @@ extern Window root, barwin;
 
 /* client.c */
 extern void ban(Client *c);			/* ban c from screen */
+extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
 extern Client *getctitle(Window w);		/* return client of title window */

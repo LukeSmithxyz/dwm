@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*
  * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
@@ -38,6 +39,7 @@ movemouse(Client *c) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch (ev.type) {
 		case ButtonRelease:
+			resize(c, True, TopLeft);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		case Expose:
@@ -71,6 +73,7 @@ resizemouse(Client *c) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
 		switch(ev.type) {
 		case ButtonRelease:
+			resize(c, True, TopLeft);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		case Expose:
@@ -151,6 +154,7 @@ configurerequest(XEvent *e) {
 	XEvent synev;
 	XWindowChanges wc;
 
+	fputs("configurerequest\n", stderr);
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
 		gravitate(c, True);
@@ -172,19 +176,8 @@ configurerequest(XEvent *e) {
 		newmask = ev->value_mask & (~(CWSibling | CWStackMode | CWBorderWidth));
 		if(newmask)
 			XConfigureWindow(dpy, c->win, newmask, &wc);
-		else {
-			synev.type = ConfigureNotify;
-			synev.xconfigure.display = dpy;
-			synev.xconfigure.event = c->win;
-			synev.xconfigure.window = c->win;
-			synev.xconfigure.x = c->x;
-			synev.xconfigure.y = c->y;
-			synev.xconfigure.width = c->w;
-			synev.xconfigure.height = c->h;
-			synev.xconfigure.border_width = c->border;
-			synev.xconfigure.above = None;
-			XSendEvent(dpy, c->win, True, NoEventMask, &synev);
-		}
+		else
+			configure(c);
 		XSync(dpy, False);
 		if(c->isfloat)
 			resize(c, False, TopLeft);
@@ -218,6 +211,7 @@ enternotify(XEvent *e) {
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
+	fputs("enternotify\n", stderr);
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
 
@@ -305,6 +299,7 @@ propertynotify(XEvent *e) {
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
 
+	fputs("propertynotify\n", stderr);
 	if(ev->state == PropertyDelete)
 		return; /* ignore */
 

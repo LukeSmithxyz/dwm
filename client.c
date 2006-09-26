@@ -81,6 +81,23 @@ ban(Client *c) {
 }
 
 void
+configure(Client *c) {
+	XEvent synev;
+
+	synev.type = ConfigureNotify;
+	synev.xconfigure.display = dpy;
+	synev.xconfigure.event = c->win;
+	synev.xconfigure.window = c->win;
+	synev.xconfigure.x = c->x;
+	synev.xconfigure.y = c->y;
+	synev.xconfigure.width = c->w;
+	synev.xconfigure.height = c->h;
+	synev.xconfigure.border_width = c->border;
+	synev.xconfigure.above = None;
+	XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+}
+
+void
 focus(Client *c) {
 	Client *old;
 
@@ -299,6 +316,7 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	else
 		wc.border_width = 1;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
+	configure(c);
 	XSync(dpy, False);
 }
 
