@@ -28,8 +28,8 @@ static Key key[] = { \
 		{ .cmd = "exec uxterm -bg '#111111' -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(IFS=:; for dir in $PATH; do " \
-			 "for file in \"$dir\"/*; do [ -x \"$file\" ] && echo \"${file##*/}\"; done; " \
-			 "done | sort -u | dmenu -font '"FONT"' -normbg '"NORMBGCOLOR"' -normfg '"NORMFGCOLOR"' " \
+			 "for file in \"$dir\"/*; do [ -x \"$file\" ] && echo \"${file##*/}\"; done; done " \
+			 "| sort -u | dmenu -font '"FONT"' -normbg '"NORMBGCOLOR"' -normfg '"NORMFGCOLOR"' " \
 			 "-selbg '"SELBGCOLOR"' -selfg '"SELFGCOLOR"')\" && exec $exe" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
