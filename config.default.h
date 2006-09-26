@@ -11,15 +11,15 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 #define TILESYMBOL		"[]="
 
 #define FONT			"fixed"
-#define SELBGCOLOR		"#666699"
-#define SELFGCOLOR		"#eeeeee"
 #define NORMBGCOLOR		"#333366"
 #define NORMFGCOLOR		"#cccccc"
+#define SELBGCOLOR		"#666699"
+#define SELFGCOLOR		"#eeeeee"
 #define STATUSBGCOLOR		"#dddddd"
 #define STATUSFGCOLOR		"#222222"
 
-#define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
+#define MODKEY			Mod1Mask
 
 #define KEYS \
 static Key key[] = { \

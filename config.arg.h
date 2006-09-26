@@ -11,15 +11,15 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define TILESYMBOL		"[]="
 
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
-#define SELBGCOLOR		"#333366"
-#define SELFGCOLOR		"#eeeeee"
 #define NORMBGCOLOR		"#333333"
 #define NORMFGCOLOR		"#dddddd"
+#define SELBGCOLOR		"#333366"
+#define SELFGCOLOR		"#eeeeee"
 #define STATUSBGCOLOR		"#222222"
 #define STATUSFGCOLOR		"#9999cc"
 
-#define MODKEY			Mod1Mask
 #define MASTERW			60 /* percent */
+#define MODKEY			Mod1Mask
 
 #define KEYS \
 static Key key[] = { \
@@ -29,7 +29,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(IFS=:; for dir in $PATH; do " \
 			 "for file in \"$dir\"/*; do [ -x \"$file\" ] && echo \"${file##*/}\"; done; " \
-			 "done | sort -u | dmenu)\" && exec $exe" } }, \
+			 "done | sort -u | dmenu -font '"FONT"' -normbg '"NORMBGCOLOR"' -normfg '"NORMFGCOLOR"'" \
+			 "-selbg '"SELBGCOLOR"' -selfg '"SELFGCOLOR"')\" && exec $exe" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
