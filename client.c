@@ -54,19 +54,6 @@ grabbuttons(Client *c, Bool focused) {
 				GrabModeAsync, GrabModeSync, None, None);
 }
 
-static void
-resizetitle(Client *c) {
-	c->tw = textw(c->name);
-	if(c->tw > c->w)
-		c->tw = c->w + 2;
-	c->tx = c->x + c->w - c->tw + 2;
-	c->ty = c->y;
-	if(isvisible(c))
-		XMoveResizeWindow(dpy, c->twin, c->tx, c->ty, c->tw, c->th);
-	else
-		XMoveResizeWindow(dpy, c->twin, c->tx + 2 * sw, c->ty, c->tw, c->th);
-}
-
 static int
 xerrordummy(Display *dsply, XErrorEvent *ee) {
 	return 0;
@@ -250,11 +237,13 @@ manage(Window w, XWindowAttributes *wa) {
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 
 	grabbuttons(c, False);
+	updatetitle(c);
 	settags(c, getclient(trans));
 	if(!c->isfloat)
 		c->isfloat = trans
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
+	resizetitle(c);
 
 	if(clients)
 		clients->prev = c;
@@ -262,7 +251,6 @@ manage(Window w, XWindowAttributes *wa) {
 	c->snext = stack;
 	stack = clients = c;
 
-	updatetitle(c);
 	ban(c);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->twin);
@@ -318,6 +306,19 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
+}
+
+void
+resizetitle(Client *c) {
+	c->tw = textw(c->name);
+	if(c->tw > c->w)
+		c->tw = c->w + 2;
+	c->tx = c->x + c->w - c->tw + 2;
+	c->ty = c->y;
+	if(isvisible(c))
+		XMoveResizeWindow(dpy, c->twin, c->tx, c->ty, c->tw, c->th);
+	else
+		XMoveResizeWindow(dpy, c->twin, c->tx + 2 * sw, c->ty, c->tw, c->th);
 }
 
 void
@@ -382,7 +383,6 @@ updatetitle(Client *c) {
 		}
 	}
 	XFree(name.value);
-	resizetitle(c);
 }
 
 void

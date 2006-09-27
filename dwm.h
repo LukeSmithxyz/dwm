@@ -117,6 +117,7 @@ extern void gravitate(Client *c, Bool invert);	/* gravitate c */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
+extern void resizetitle(Client *c);		/* resizes c->twin correctly */
 extern void updatesize(Client *c);			/* update the size structs of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */

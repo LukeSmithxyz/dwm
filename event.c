@@ -316,6 +316,7 @@ propertynotify(XEvent *e) {
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
+			resizetitle(c);
 			drawtitle(c);
 		}
 	}
