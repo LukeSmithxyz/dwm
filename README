@@ -37,7 +37,7 @@ like this in your .xinitrc:
 
     while true
     do
-        echo `date` `uptime | sed 's/.*://; s/,//g'`
+        echo `date` `uptime | sed 's/.*,//'`
         sleep 1
     done | dwm
 
