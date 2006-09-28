@@ -95,6 +95,24 @@ dofloat(Arg *arg) {
 	restack();
 }
 
+/* This algorithm is based on a (M)aster area and a (S)tacking area.
+ * It supports following arrangements:
+ *
+ * 	MMMS		MMMM
+ * 	MMMS		MMMM
+ * 	MMMS		SSSS
+ *
+ * The stacking area can be set to arrange clients vertically or horizontally.
+ * Through inverting the algorithm it can be used to achieve following setup in
+ * a dual head environment (due to running two dwm instances concurrently on
+ * the specific screen):
+ *
+ * 	SMM MMS		MMM MMM
+ * 	SMM MMS		MMM MMM
+ * 	SMM MMS		SSS SSS
+ *
+ * This uses the center of the two screens for master areas.
+ */
 void
 dotile(Arg *arg) {
 	int h, i, n, w;
