@@ -214,11 +214,11 @@ manage(Window w, XWindowAttributes *wa) {
 	c->border = 0;
 	updatesize(c);
 
-	if(c->x + c->w + 2 > sw)
-		c->x = sw - c->w - 2;
+	if(c->x + c->w + 2 * BORDERPX > sw)
+		c->x = sw - c->w - 2 * BORDERPX;
 	if(c->x < 0)
 		c->x = 0;
-	if(c->y + c->h + 2 > sh)
+	if(c->y + c->h + 2 * BORDERPX > sh)
 		c->y = sh - c->h - 2;
 	if(c->h != sh && c->y < bh)
 		c->y = bh;
@@ -302,7 +302,7 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	if(c->w == sw && c->h == sh)
 		wc.border_width = 0;
 	else
-		wc.border_width = 1;
+		wc.border_width = BORDERPX;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
@@ -312,8 +312,8 @@ void
 resizetitle(Client *c) {
 	c->tw = textw(c->name);
 	if(c->tw > c->w)
-		c->tw = c->w + 2;
-	c->tx = c->x + c->w - c->tw + 2;
+		c->tw = c->w + 2 * BORDERPX;
+	c->tx = c->x + c->w - c->tw + 2 * BORDERPX;
 	c->ty = c->y;
 	if(isvisible(c))
 		XMoveResizeWindow(dpy, c->twin, c->tx, c->ty, c->tw, c->th);

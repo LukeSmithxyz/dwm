@@ -49,8 +49,8 @@ togglemax(Client *c)
 	if((c->ismax = !c->ismax)) {
 		c->rx = c->x; c->x = sx;
 		c->ry = c->y; c->y = bh;
-		c->rw = c->w; c->w = sw;
-		c->rh = c->h; c->h = sh - bh - 2;
+		c->rw = c->w; c->w = sw - 2 * BORDERPX;
+		c->rh = c->h; c->h = sh - bh - 2 * BORDERPX;
 	}
 	else {
 		c->x = c->rx;
@@ -119,29 +119,29 @@ dotile(Arg *arg) {
 			if(n == 1) {
 				c->x = sx;
 				c->y = sy + bh;
-				c->w = sw - 2;
-				c->h = sh - 2 - bh;
+				c->w = sw - 2 * BORDERPX;
+				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(i == 0) {
 				c->x = sx;
 				c->y = sy + bh;
-				c->w = mw - 2;
-				c->h = sh - 2 - bh;
+				c->w = mw - 2 * BORDERPX;
+				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(h > bh) {
 				c->x = sx + mw;
 				c->y = sy + (i - 1) * h + bh;
-				c->w = w - 2;
+				c->w = w - 2 * BORDERPX;
 				if(i + 1 == n)
-					c->h = sh - c->y - 2;
+					c->h = sh - c->y - 2 * BORDERPX;
 				else
-					c->h = h - 2;
+					c->h = h - 2 * BORDERPX;
 			}
 			else { /* fallback if h < bh */
 				c->x = sx + mw;
 				c->y = sy + bh;
-				c->w = w - 2;
-				c->h = sh - 2 - bh;
+				c->w = w - 2 * BORDERPX;
+				c->h = sh - 2 * BORDERPX - bh;
 			}
 			resize(c, False, TopLeft);
 			i++;
