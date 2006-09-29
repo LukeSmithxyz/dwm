@@ -294,11 +294,18 @@ restack(void) {
 		XRaiseWindow(dpy, sel->win);
 		XRaiseWindow(dpy, sel->twin);
 	}
-	if(arrange != dofloat)
+	if(arrange != dofloat) {
+		if(!sel->isfloat) {
+			XLowerWindow(dpy, sel->twin);
+			XLowerWindow(dpy, sel->win);
+		}
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
+			if(c == sel)
+				continue;
 			XLowerWindow(dpy, c->twin);
 			XLowerWindow(dpy, c->win);
 		}
+	}
 	drawall();
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
