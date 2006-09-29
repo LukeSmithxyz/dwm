@@ -99,36 +99,39 @@ dofloat(Arg *arg) {
 
 /* This algorithm is based on a (M)aster area and a (S)tacking area.
  * It supports following arrangements:
- * 	MMMS		MMMM		SMMM
- * 	MMMS		MMMM		SMMM
- * 	MMMS		SSSS		SMMM
+ * 	SSMMM	MMMMM	MMMSS
+ * 	SSMMM	SSSSS	MMMSS
  */
 void
 dotile(Arg *arg) {
-	int h, i, n, w;
+	int i, n, stackw, stackh, tw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
-	if(isvertical) {
-		if(stackpos == StackBottom) {
-			w = sw;
-			if(n > 1)
-				h = (sh - bh) / (n - 1);
-			else
-				h = sh - bh;
-		}
-		else {
-			w = sw - master;
-			if(n > 1)
-				h = (sh - bh) / (n - 1);
-			else
-				h = sh - bh;
-		}
+	if(stackpos == StackBottom) {
+		stackw = sw;
+		stackh = sh - bh - master;
 	}
-	else { /* horizontal stack */
+	else {
+		stackw = sw - master;
+		stackh = sh - bh;
+	}
 
+	if(isvertical) {
+		tw = stackw;
+		if(n > 1)
+			th = stackh / (n - 1);
+		else
+			th = stackh;
+	}
+	else {
+		th = stackh;
+		if(n > 1)
+			tw = stackw / (n - 1);
+		else
+			tw = stackw;
 	}
 
 	for(i = 0, c = clients; c; c = c->next) {
@@ -138,32 +141,59 @@ dotile(Arg *arg) {
 				continue;
 			}
 			c->ismax = False;
-			if(n == 1) {
+			if(n == 1) { /* only 1 window */
 				c->x = sx;
 				c->y = sy + bh;
 				c->w = sw - 2 * BORDERPX;
 				c->h = sh - 2 * BORDERPX - bh;
 			}
-			else if(i == 0) {
+			else if(i == 0) { /* master window */
+				c->x = sx;
+				if(stackpos == StackLeft)
+					c->x += master;
+				c->y = sy + bh;
+				if(isvertical) {
+					c->w = master - 2 * BORDERPX;
+					c->h = sh - 2 * BORDERPX - bh;
+				}
+				else {
+					c->w = sw;
+					c->h = master - 2 * BORDERPX;
+				}
+			}
+			else if((isvertical && th > bh) || (!isvertical && tw > MINW)) {
+				/* tile window */
+				c->x = sx;
+				if(isvertical)
+					c->y = sy + (i - 1) * th + bh;
+				else
+					c->y = sy + bh;
+				if(stackpos == StackRight)
+					c->x += master;
+				else if(stackpos == StackBottom)
+					c->y += master;
+				c->w = tw - 2 * BORDERPX;
+				c->h = th - 2 * BORDERPX;
+				if(i + 1 == n) { /* fixes for last tile to take up rest space */
+					if(isvertical)
+						c->h = sh - c->y - 2 * BORDERPX;
+					else {
+						if(stackpos == StackLeft)
+							c->w = master - c->x - 2 * BORDERPX;
+						else
+							c->w = sw - c->x - 2 * BORDERPX;
+					}
+				}
+			}
+			else { /* fallback if th < bh resp. tw < MINW */
 				c->x = sx;
 				c->y = sy + bh;
-				c->w = master - 2 * BORDERPX;
-				c->h = sh - 2 * BORDERPX - bh;
-			}
-			else if(h > bh) {
-				c->x = sx + master;
-				c->y = sy + (i - 1) * h + bh;
-				c->w = w - 2 * BORDERPX;
-				if(i + 1 == n)
-					c->h = sh - c->y - 2 * BORDERPX;
-				else
-					c->h = h - 2 * BORDERPX;
-			}
-			else { /* fallback if h < bh */
-				c->x = sx + master;
-				c->y = sy + bh;
-				c->w = w - 2 * BORDERPX;
-				c->h = sh - 2 * BORDERPX - bh;
+				if(stackpos == StackRight)
+					c->x += master;
+				else if(stackpos == StackBottom)
+					c->y += master;
+				c->w = stackw - 2 * BORDERPX;
+				c->h = stackh - 2 * BORDERPX;
 			}
 			resize(c, False, TopLeft);
 			i++;
@@ -232,12 +262,12 @@ resizecol(Arg *arg) {
 		return;
 
 	if(sel == getnext(clients)) {
-		if(master + arg->i > sw - 100 || master + arg->i < 100)
+		if(master + arg->i > sw - MINW || master + arg->i < MINW)
 			return;
 		master += arg->i;
 	}
 	else {
-		if(master - arg->i > sw - 100 || master - arg->i < 100)
+		if(master - arg->i > sw - MINW || master - arg->i < MINW)
 			return;
 		master -= arg->i;
 	}

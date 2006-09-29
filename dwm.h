@@ -40,6 +40,7 @@
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 /* other stuff used in different places */
 #define BORDERPX		1
+#define MINW			100
 #define PROTODELWIN		1
 
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
