@@ -108,7 +108,6 @@ extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, issel, *seltag;		/* seltag is array of Bool */
-extern Bool isvertical;				/* stack direction */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
@@ -172,7 +171,6 @@ extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ign
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizecol(Arg *arg);		/* resizes the master dimension with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
-extern void togglestackdir(Arg *arg);		/* toggles stack direction */
 extern void togglestackpos(Arg *arg);		/* toggles stack position */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */

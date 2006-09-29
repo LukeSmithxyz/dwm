@@ -10,7 +10,6 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define FLOATSYMBOL		"><>"
 #define STACKPOS		StackRight	/* StackLeft */
 #define TILESYMBOL		"[]="
-#define VERTICALSTACK		True		/* False == horizontal stack  */
 
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
 #define NORMBGCOLOR		"#333333"
@@ -37,7 +36,6 @@ static Key key[] = { \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_b,		togglestackpos,	{ 0 } }, \
-	{ MODKEY,			XK_d,		togglestackdir,	{ 0 } }, \
 	{ MODKEY,			XK_g,		resizecol,	{ .i = 20 } }, \
 	{ MODKEY,			XK_s,		resizecol,	{ .i = -20 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \

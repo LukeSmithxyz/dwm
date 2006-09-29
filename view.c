@@ -65,7 +65,6 @@ togglemax(Client *c)
 /* extern */
 
 void (*arrange)(Arg *) = DEFMODE;
-Bool isvertical = VERTICALSTACK;
 StackPos stackpos = STACKPOS;
 
 void
@@ -119,20 +118,11 @@ dotile(Arg *arg) {
 		stackh = sh - bh;
 	}
 
-	if(isvertical) {
-		tw = stackw;
-		if(n > 1)
-			th = stackh / (n - 1);
-		else
-			th = stackh;
-	}
-	else {
+	tw = stackw;
+	if(n > 1)
+		th = stackh / (n - 1);
+	else
 		th = stackh;
-		if(n > 1)
-			tw = stackw / (n - 1);
-		else
-			tw = stackw;
-	}
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(isvisible(c)) {
@@ -169,56 +159,32 @@ dotile(Arg *arg) {
 					break;
 				}
 			}
-			else if((isvertical && th > bh) || (!isvertical && tw > MINW)) {
+			else if(th > bh) {
 				/* tile window */
 				c->w = tw - 2 * BORDERPX;
 				c->h = th - 2 * BORDERPX;
 				switch(stackpos) {
 				case StackLeft:
-					if(isvertical) {
-						c->x = sx;
-						c->y = sy + (i - 1) * th + bh;
-						if(i + 1 == n)
-							c->h = sh - c->y - 2 * BORDERPX;
-					}
-					else {
-						c->x = sx + (i - 1) * tw;
-						c->y = sy + bh;
-						if(i + 1 == n)
-							c->w = sx + stackw - c->x - 2 * BORDERPX;
-					}
+					c->x = sx;
+					c->y = sy + (i - 1) * th + bh;
+					if(i + 1 == n)
+						c->h = sh - c->y - 2 * BORDERPX;
 					break;
 				case StackBottom:
-					if(isvertical) {
-						c->x = sx;
-						c->y = sy + master + (i - 1) * th + bh;
-						if(i + 1 == n)
-							c->h = sh - c->y - 2 * BORDERPX;
-					}
-					else {
-						c->x = sx + (i - 1) * tw;
-						c->y = sy + bh + master;
-						if(i + 1 == n)
-							c->w = sw - c->x - 2 * BORDERPX;
-					}
+					c->x = sx;
+					c->y = sy + master + (i - 1) * th + bh;
+					if(i + 1 == n)
+						c->h = sh - c->y - 2 * BORDERPX;
 					break;
 				case StackRight:
-					if(isvertical) {
-						c->x = sx + master;
-						c->y = sy + (i - 1) * th + bh;
-						if(i + 1 == n)
-							c->h = sh - c->y - 2 * BORDERPX;
-					}
-					else {
-						c->x = sx + master + (i - 1) * tw;
-						c->y = sy + bh;
-						if(i + 1 == n)
-							c->w = sw - c->x - 2 * BORDERPX;
-					}
+					c->x = sx + master;
+					c->y = sy + (i - 1) * th + bh;
+					if(i + 1 == n)
+						c->h = sh - c->y - 2 * BORDERPX;
 					break;
 				}
 			}
-			else { /* fallback if th < bh resp. tw < MINW */
+			else { /* fallback if th < bh */
 				c->w = stackw - 2 * BORDERPX;
 				c->h = stackh - 2 * BORDERPX;
 				switch(stackpos) {
@@ -356,14 +322,6 @@ toggleview(Arg *arg) {
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
 	reorder();
-	arrange(NULL);
-}
-
-void
-togglestackdir(Arg *arg) {
-	if(arrange == dofloat)
-		return;
-	isvertical = !isvertical;
 	arrange(NULL);
 }
 
