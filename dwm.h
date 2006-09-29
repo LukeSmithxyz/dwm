@@ -174,7 +174,6 @@ extern void restack(void);			/* restores z layers of all clients */
 extern void togglestackpos(Arg *arg);		/* toggles stack position */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
-extern void updatemaster(void);			/* updates master dimension */
 extern void view(Arg *arg);			/* views the tag with arg's index */
 extern void viewall(Arg *arg);			/* views all tags, arg is ignored */
 extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */

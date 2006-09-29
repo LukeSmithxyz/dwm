@@ -340,13 +340,8 @@ togglestackpos(Arg *arg) {
 		stackpos = STACKPOS;
 	else
 		stackpos = StackBottom;
-	updatemaster();
-	arrange(NULL);
-}
-
-void
-updatemaster(void) {
 	master = ((stackpos == StackBottom ? sh - bh : sw) * MASTER) / 100;
+	arrange(NULL);
 }
 
 void
