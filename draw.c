@@ -72,7 +72,7 @@ drawtext(const char *text, unsigned long col[ColLast], Bool highlight) {
 	if(highlight) {
 		r.x = dc.x + 2;
 		r.y = dc.y + 2;
-		r.width = r.height = 3;
+		r.width = r.height = (h + 2) / 4;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 }
