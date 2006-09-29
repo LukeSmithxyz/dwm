@@ -133,7 +133,7 @@ setup(void) {
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	master = ((stackpos == StackBottom ? sh - bh : sw) * MASTER) / 100;
+	updatemaster();
 
 	bx = by = 0;
 	bw = sw;

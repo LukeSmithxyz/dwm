@@ -30,6 +30,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_Tab,		focusnext,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_Tab,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
+	{ MODKEY,			XK_b,		togglestackpos,	{ 0 } }, \
+	{ MODKEY,			XK_d,		togglestackdir,	{ 0 } }, \
 	{ MODKEY,			XK_g,		resizecol,	{ .i = 20 } }, \
 	{ MODKEY,			XK_s,		resizecol,	{ .i = -20 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \

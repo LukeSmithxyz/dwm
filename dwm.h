@@ -102,7 +102,7 @@ struct Client {
 extern const char *tags[];			/* all tags */
 extern char stext[1024];			/* status text */
 extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
-extern int master, screen, sx, sy, sw, sh;	/* screen geometry, master width */
+extern int master, screen, sx, sy, sw, sh;	/* screen geometry, master dimension*/
 extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
@@ -170,10 +170,13 @@ extern void dotile(Arg *arg);			/* arranges all windows, arg is ignored */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void resizecol(Arg *arg);		/* resizes the master width with arg's index value */
+extern void resizecol(Arg *arg);		/* resizes the master dimension with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
+extern void togglestackdir(Arg *arg);		/* toggles stack direction */
+extern void togglestackpos(Arg *arg);		/* toggles stack position */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
+extern void updatemaster(void);			/* updates master dimension */
 extern void view(Arg *arg);			/* views the tag with arg's index */
 extern void viewall(Arg *arg);			/* views all tags, arg is ignored */
-extern void zoom(Arg *arg);			/* zooms the focused client to master column, arg is ignored */
+extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */

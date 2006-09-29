@@ -148,52 +148,93 @@ dotile(Arg *arg) {
 				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(i == 0) { /* master window */
-				c->x = sx;
-				if(stackpos == StackLeft)
-					c->x += master;
-				c->y = sy + bh;
-				if(isvertical) {
+				switch(stackpos) {
+				case StackLeft:
+					c->x = sx + stackw;
+					c->y = sy + bh;
 					c->w = master - 2 * BORDERPX;
-					c->h = sh - 2 * BORDERPX - bh;
-				}
-				else {
-					c->w = sw;
+					c->h = sh - bh - 2 * BORDERPX;
+					break;
+				case StackBottom:
+					c->x = sx;
+					c->y = sy + bh;
+					c->w = sw - 2 * BORDERPX;
 					c->h = master - 2 * BORDERPX;
+					break;
+				case StackRight:
+					c->x = sx;
+					c->y = sy + bh;
+					c->w = master - 2 * BORDERPX;
+					c->h = sh - bh - 2 * BORDERPX;
+					break;
 				}
 			}
 			else if((isvertical && th > bh) || (!isvertical && tw > MINW)) {
 				/* tile window */
-				c->x = sx;
-				if(isvertical)
-					c->y = sy + (i - 1) * th + bh;
-				else
-					c->y = sy + bh;
-				if(stackpos == StackRight)
-					c->x += master;
-				else if(stackpos == StackBottom)
-					c->y += master;
 				c->w = tw - 2 * BORDERPX;
 				c->h = th - 2 * BORDERPX;
-				if(i + 1 == n) { /* fixes for last tile to take up rest space */
-					if(isvertical)
-						c->h = sh - c->y - 2 * BORDERPX;
+				switch(stackpos) {
+				case StackLeft:
+					if(isvertical) {
+						c->x = sx;
+						c->y = sy + (i - 1) * th + bh;
+						if(i + 1 == n)
+							c->h = sh - c->y - 2 * BORDERPX;
+					}
 					else {
-						if(stackpos == StackLeft)
-							c->w = master - c->x - 2 * BORDERPX;
-						else
+						c->x = sx + (i - 1) * tw;
+						c->y = sy + bh;
+						if(i + 1 == n)
+							c->w = sx + stackw - c->x - 2 * BORDERPX;
+					}
+					break;
+				case StackBottom:
+					if(isvertical) {
+						c->x = sx;
+						c->y = sy + master + (i - 1) * th + bh;
+						if(i + 1 == n)
+							c->h = sh - c->y - 2 * BORDERPX;
+					}
+					else {
+						c->x = sx + (i - 1) * tw;
+						c->y = sy + bh + master;
+						if(i + 1 == n)
 							c->w = sw - c->x - 2 * BORDERPX;
 					}
+					break;
+				case StackRight:
+					if(isvertical) {
+						c->x = sx + master;
+						c->y = sy + (i - 1) * th + bh;
+						if(i + 1 == n)
+							c->h = sh - c->y - 2 * BORDERPX;
+					}
+					else {
+						c->x = sx + master + (i - 1) * tw;
+						c->y = sy + bh;
+						if(i + 1 == n)
+							c->w = sx + stackw - c->x - 2 * BORDERPX;
+					}
+					break;
 				}
 			}
 			else { /* fallback if th < bh resp. tw < MINW */
-				c->x = sx;
-				c->y = sy + bh;
-				if(stackpos == StackRight)
-					c->x += master;
-				else if(stackpos == StackBottom)
-					c->y += master;
 				c->w = stackw - 2 * BORDERPX;
 				c->h = stackh - 2 * BORDERPX;
+				switch(stackpos) {
+				case StackLeft:
+					c->x = sx;
+					c->y = sy + bh;
+					break;
+				case StackBottom:
+					c->x = sx;
+					c->y = sy + master;
+					break;
+				case StackRight:
+					c->x = sx + master;
+					c->y = sy + bh;
+					break;
+				}
 			}
 			resize(c, False, TopLeft);
 			i++;
@@ -319,6 +360,31 @@ toggleview(Arg *arg) {
 }
 
 void
+togglestackdir(Arg *arg) {
+	if(arrange == dofloat)
+		return;
+	isvertical = !isvertical;
+	arrange(NULL);
+}
+
+void
+togglestackpos(Arg *arg) {
+	if(arrange == dofloat)
+		return;
+	if(stackpos == StackBottom)
+		stackpos = STACKPOS;
+	else
+		stackpos = StackBottom;
+	updatemaster();
+	arrange(NULL);
+}
+
+void
+updatemaster(void) {
+	master = ((stackpos == StackBottom ? sh - bh : sw) * MASTER) / 100;
+}
+
+void
 view(Arg *arg) {
 	unsigned int i;
 
@@ -338,6 +404,8 @@ viewall(Arg *arg) {
 	reorder();
 	arrange(NULL);
 }
+
+
 
 void
 zoom(Arg *arg) {
