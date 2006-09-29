@@ -104,7 +104,9 @@ drawstatus(void) {
 	}
 
 	dc.w = bmw;
-	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.status, False);
+	drawtext(arrange == dofloat ?
+		FLOATSYMBOL : stackpos == StackBottom ?
+			BSTACKSYMBOL : VSTACKSYMBOL, dc.status, False);
 
 	x = dc.x + dc.w;
 	dc.w = textw(stext);

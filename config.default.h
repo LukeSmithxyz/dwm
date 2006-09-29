@@ -9,7 +9,8 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 #define DEFMODE			dotile /* dofloat */
 #define FLOATSYMBOL		"><>"
 #define STACKPOS		StackRight	/* StackLeft */
-#define TILESYMBOL		"[]="
+#define BSTACKSYMBOL		"==="
+#define VSTACKSYMBOL		"[]="
 
 #define FONT			"fixed"
 #define NORMBGCOLOR		"#333366"
