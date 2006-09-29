@@ -194,7 +194,7 @@ dotile(Arg *arg) {
 					break;
 				case StackBottom:
 					c->x = sx;
-					c->y = sy + master;
+					c->y = sy + master + bh;
 					break;
 				case StackRight:
 					c->x = sx + master;
