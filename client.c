@@ -216,10 +216,10 @@ manage(Window w, XWindowAttributes *wa) {
 
 	if(c->x + c->w + 2 * BORDERPX > sw)
 		c->x = sw - c->w - 2 * BORDERPX;
-	if(c->x < 0)
-		c->x = 0;
+	if(c->x < sx)
+		c->x = sx;
 	if(c->y + c->h + 2 * BORDERPX > sh)
-		c->y = sh - c->h - 2;
+		c->y = sh - c->h - 2 * BORDERPX;
 	if(c->h != sh && c->y < bh)
 		c->y = bh;
 
@@ -285,8 +285,8 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 		c->y = bottom - c->h;
 
 	/* offscreen appearance fixes */
-	if(c->x + c->w < 0)
-		c->x = 0;
+	if(c->x + c->w < sx)
+		c->x = sx;
 	if(c->y + c->h < bh)
 		c->y = bh;
 	if(c->x > sw)
