@@ -8,7 +8,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 
 #define DEFMODE			dotile /* dofloat */
 #define FLOATSYMBOL		"><>"
-#define STACKPOS		StackRight	/* StackLeft, StackBottom */
+#define STACKPOS		StackRight	/* StackLeft */
 #define TILESYMBOL		"[]="
 #define VERTICALSTACK		True		/* False == horizontal stack  */
 
