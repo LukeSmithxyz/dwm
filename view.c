@@ -65,6 +65,8 @@ togglemax(Client *c)
 /* extern */
 
 void (*arrange)(Arg *) = DEFMODE;
+Bool isvertical = VERTICALSTACK;
+StackPos stackpos = STACKPOS;
 
 void
 detach(Client *c) {
@@ -97,35 +99,37 @@ dofloat(Arg *arg) {
 
 /* This algorithm is based on a (M)aster area and a (S)tacking area.
  * It supports following arrangements:
- *
- * 	MMMS		MMMM
- * 	MMMS		MMMM
- * 	MMMS		SSSS
- *
- * The stacking area can be set to arrange clients vertically or horizontally.
- * Through inverting the algorithm it can be used to achieve following setup in
- * a dual head environment (due to running two dwm instances concurrently on
- * the specific screen):
- *
- * 	SMM MMS		MMM MMM
- * 	SMM MMS		MMM MMM
- * 	SMM MMS		SSS SSS
- *
- * This uses the center of the two screens for master areas.
+ * 	MMMS		MMMM		SMMM
+ * 	MMMS		MMMM		SMMM
+ * 	MMMS		SSSS		SMMM
  */
 void
 dotile(Arg *arg) {
 	int h, i, n, w;
 	Client *c;
 
-	w = sw - mw;
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
-	if(n > 1)
-		h = (sh - bh) / (n - 1);
-	else
-		h = sh - bh;
+	if(isvertical) {
+		if(stackpos == StackBottom) {
+			w = sw;
+			if(n > 1)
+				h = (sh - bh) / (n - 1);
+			else
+				h = sh - bh;
+		}
+		else {
+			w = sw - master;
+			if(n > 1)
+				h = (sh - bh) / (n - 1);
+			else
+				h = sh - bh;
+		}
+	}
+	else { /* horizontal stack */
+
+	}
 
 	for(i = 0, c = clients; c; c = c->next) {
 		if(isvisible(c)) {
@@ -143,11 +147,11 @@ dotile(Arg *arg) {
 			else if(i == 0) {
 				c->x = sx;
 				c->y = sy + bh;
-				c->w = mw - 2 * BORDERPX;
+				c->w = master - 2 * BORDERPX;
 				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(h > bh) {
-				c->x = sx + mw;
+				c->x = sx + master;
 				c->y = sy + (i - 1) * h + bh;
 				c->w = w - 2 * BORDERPX;
 				if(i + 1 == n)
@@ -156,7 +160,7 @@ dotile(Arg *arg) {
 					c->h = h - 2 * BORDERPX;
 			}
 			else { /* fallback if h < bh */
-				c->x = sx + mw;
+				c->x = sx + master;
 				c->y = sy + bh;
 				c->w = w - 2 * BORDERPX;
 				c->h = sh - 2 * BORDERPX - bh;
@@ -228,14 +232,14 @@ resizecol(Arg *arg) {
 		return;
 
 	if(sel == getnext(clients)) {
-		if(mw + arg->i > sw - 100 || mw + arg->i < 100)
+		if(master + arg->i > sw - 100 || master + arg->i < 100)
 			return;
-		mw += arg->i;
+		master += arg->i;
 	}
 	else {
-		if(mw - arg->i > sw - 100 || mw - arg->i < 100)
+		if(master - arg->i > sw - 100 || master - arg->i < 100)
 			return;
-		mw -= arg->i;
+		master -= arg->i;
 	}
 	arrange(NULL);
 }

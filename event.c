@@ -176,8 +176,11 @@ configurerequest(XEvent *e) {
 		else
 			configure(c);
 		XSync(dpy, False);
-		if(c->isfloat)
+		if(c->isfloat) {
 			resize(c, False, TopLeft);
+			if(!isvisible(c))
+				ban(c);
+		}
 		else
 			arrange(NULL);
 	}

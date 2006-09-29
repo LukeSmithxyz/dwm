@@ -48,6 +48,10 @@ enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColFG, ColBG, ColLast };				/* color */
 
 typedef enum {
+	StackLeft, StackBottom, StackRight
+} StackPos; /* stack position*/
+
+typedef enum {
 	TopLeft, TopRight, BotLeft, BotRight
 } Corner; /* window corners */
 
@@ -97,16 +101,18 @@ struct Client {
 extern const char *tags[];			/* all tags */
 extern char stext[1024];			/* status text */
 extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
-extern int mw, screen, sx, sy, sw, sh;		/* screen geometry, master width */
+extern int master, screen, sx, sy, sw, sh;	/* screen geometry, master width */
 extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, issel, *seltag;		/* seltag is array of Bool */
+extern Bool isvertical;				/* stack direction */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
 extern Display *dpy;
+extern StackPos stackpos;
 extern Window root, barwin;
 
 /* client.c */
