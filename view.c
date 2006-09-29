@@ -213,7 +213,7 @@ dotile(Arg *arg) {
 						c->x = sx + master + (i - 1) * tw;
 						c->y = sy + bh;
 						if(i + 1 == n)
-							c->w = sx + stackw - c->x - 2 * BORDERPX;
+							c->w = sw - c->x - 2 * BORDERPX;
 					}
 					break;
 				}
