@@ -103,18 +103,19 @@ dofloat(Arg *arg) {
  */
 void
 dotile(Arg *arg) {
-	int i, n, stackw, stackh, tw, th;
-	unsigned int md = ((stackpos == StackBottom ? sh - bh : sw) * master) / 100;
+	unsigned int i, n, md, stackw, stackh, tw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
 	if(stackpos == StackBottom) {
+		md = ((sh - bh) * master) / 100;
 		stackw = sw;
 		stackh = sh - bh - md;
 	}
 	else {
+		md = (sw * master) / 100;
 		stackw = sw - md;
 		stackh = sh - bh;
 	}
