@@ -133,17 +133,15 @@ dotile(Arg *arg) {
 				continue;
 			}
 			c->ismax = False;
+			c->x = sx;
+			c->y = sy + bh;
 			if(n == 1) { /* only 1 window */
-				c->x = sx;
-				c->y = sy + bh;
 				c->w = sw - 2 * BORDERPX;
 				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(i == 0) { /* master window */
-				c->x = sx;
 				if(stackpos == StackLeft)
 					c->x += stackw;
-				c->y = sy + bh;
 				switch(stackpos) {
 				case StackLeft:
 				case StackRight:
@@ -156,35 +154,32 @@ dotile(Arg *arg) {
 					break;
 				}
 			}
-			else if(th > bh) { /* tile window */
-				c->x = sx;
+			else {  /* tile window */
 				if(stackpos == StackRight)
 					c->x += master;
-				c->w = tw - 2 * BORDERPX;
-				c->h = th - 2 * BORDERPX;
-				switch(stackpos) {
-				case StackLeft:
-				case StackRight:
-					c->y = sy + (i - 1) * th + bh;
-					if(i + 1 == n)
-						c->h = sh - c->y - 2 * BORDERPX;
-					break;
-				case StackBottom:
-					c->y = sy + master + (i - 1) * th + bh;
-					if(i + 1 == n)
-						c->h = sh - c->y - 2 * BORDERPX;
-					break;
+				if(th > bh) {
+					switch(stackpos) {
+					case StackLeft:
+					case StackRight:
+						c->y = sy + (i - 1) * th + bh;
+						if(i + 1 == n)
+							c->h = sh - c->y - 2 * BORDERPX;
+						break;
+					case StackBottom:
+						c->y = sy + master + (i - 1) * th + bh;
+						if(i + 1 == n)
+							c->h = sh - c->y - 2 * BORDERPX;
+						break;
+					}
+					c->w = tw - 2 * BORDERPX;
+					c->h = th - 2 * BORDERPX;
 				}
-			}
-			else { /* fallback if th < bh */
-				c->x = sx;
-				if(stackpos == StackRight)
-					c->x += master;
-				c->y = sy + bh;
-				if(stackpos == StackBottom)
-					c->y += master;
-				c->w = stackw - 2 * BORDERPX;
-				c->h = stackh - 2 * BORDERPX;
+				else { /* fallback if th < bh */
+					if(stackpos == StackBottom)
+						c->y += master;
+					c->w = stackw - 2 * BORDERPX;
+					c->h = stackh - 2 * BORDERPX;
+				}
 			}
 			resize(c, False, TopLeft);
 			i++;
