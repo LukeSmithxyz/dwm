@@ -248,12 +248,12 @@ resizecol(Arg *arg) {
 		return;
 
 	if(sel == getnext(clients)) {
-		if(master + arg->i > 95 || master + arg->i < 5)
+		if(master + arg->i > 950 || master + arg->i < 50)
 			return;
 		master += arg->i;
 	}
 	else {
-		if(master - arg->i > 95 || master - arg->i < 5)
+		if(master - arg->i > 950 || master - arg->i < 50)
 			return;
 		master -= arg->i;
 	}
