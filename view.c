@@ -4,8 +4,6 @@
  */
 #include "dwm.h"
 
-#define MINDIM			100
-
 /* static */
 
 static Client *
@@ -106,6 +104,7 @@ dofloat(Arg *arg) {
 void
 dotile(Arg *arg) {
 	int i, n, stackw, stackh, tw, th;
+	unsigned int md = ((stackpos == StackBottom ? sh - bh : sw) * master) / 100;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
@@ -113,10 +112,10 @@ dotile(Arg *arg) {
 
 	if(stackpos == StackBottom) {
 		stackw = sw;
-		stackh = sh - bh - master;
+		stackh = sh - bh - md;
 	}
 	else {
-		stackw = sw - master;
+		stackw = sw - md;
 		stackh = sh - bh;
 	}
 
@@ -145,18 +144,18 @@ dotile(Arg *arg) {
 				switch(stackpos) {
 				case StackLeft:
 				case StackRight:
-					c->w = master - 2 * BORDERPX;
+					c->w = md - 2 * BORDERPX;
 					c->h = sh - bh - 2 * BORDERPX;
 					break;
 				case StackBottom:
 					c->w = sw - 2 * BORDERPX;
-					c->h = master - 2 * BORDERPX;
+					c->h = md - 2 * BORDERPX;
 					break;
 				}
 			}
 			else {  /* tile window */
 				if(stackpos == StackRight)
-					c->x += master;
+					c->x += md;
 				if(th > bh) {
 					switch(stackpos) {
 					case StackLeft:
@@ -166,7 +165,7 @@ dotile(Arg *arg) {
 							c->h = sh - c->y - 2 * BORDERPX;
 						break;
 					case StackBottom:
-						c->y = sy + master + (i - 1) * th + bh;
+						c->y = sy + md + (i - 1) * th + bh;
 						if(i + 1 == n)
 							c->h = sh - c->y - 2 * BORDERPX;
 						break;
@@ -176,7 +175,7 @@ dotile(Arg *arg) {
 				}
 				else { /* fallback if th < bh */
 					if(stackpos == StackBottom)
-						c->y += master;
+						c->y += md;
 					c->w = stackw - 2 * BORDERPX;
 					c->h = stackh - 2 * BORDERPX;
 				}
@@ -238,7 +237,6 @@ isvisible(Client *c) {
 
 void
 resizecol(Arg *arg) {
-	int s;
 	unsigned int n;
 	Client *c;
 
@@ -248,14 +246,13 @@ resizecol(Arg *arg) {
 	if(!sel || sel->isfloat || n < 2 || (arrange == dofloat))
 		return;
 
-	s = stackpos == StackBottom ? sh - bh : sw;
 	if(sel == getnext(clients)) {
-		if(master + arg->i > s - MINDIM || master + arg->i < MINDIM)
+		if(master + arg->i > 95 || master + arg->i < 5)
 			return;
 		master += arg->i;
 	}
 	else {
-		if(master - arg->i > s - MINDIM || master - arg->i < MINDIM)
+		if(master - arg->i > 95 || master - arg->i < 5)
 			return;
 		master -= arg->i;
 	}
@@ -321,7 +318,6 @@ togglestackpos(Arg *arg) {
 		stackpos = STACKPOS;
 	else
 		stackpos = StackBottom;
-	master = ((stackpos == StackBottom ? sh - bh : sw) * MASTER) / 100;
 	arrange(NULL);
 }
 

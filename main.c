@@ -19,8 +19,8 @@
 
 char stext[1024];
 Bool *seltag;
-int bx, by, bw, bh, bmw, master, screen, sx, sy, sw, sh;
-unsigned int ntags, numlockmask;
+int bx, by, bw, bh, bmw, masterd, screen, sx, sy, sw, sh;
+unsigned int master, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool issel = True;
@@ -136,7 +136,7 @@ setup(void) {
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	master = ((stackpos == StackBottom ? sh - bh : sw) * MASTER) / 100;
+	master = MASTER;
 
 	bx = by = 0;
 	bw = sw;

@@ -101,8 +101,8 @@ struct Client {
 extern const char *tags[];			/* all tags */
 extern char stext[1024];			/* status text */
 extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
-extern int master, screen, sx, sy, sw, sh;	/* screen geometry, master dimension*/
-extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
+extern int screen, sx, sy, sw, sh;		/* screen geometry */
+extern unsigned int master, ntags, numlockmask;	/* master percent, number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
@@ -168,7 +168,7 @@ extern void dotile(Arg *arg);			/* arranges all windows, arg is ignored */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void resizecol(Arg *arg);		/* resizes the master dimension with arg's index value */
+extern void resizecol(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
 extern void togglestackpos(Arg *arg);		/* toggles stack position */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
