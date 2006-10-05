@@ -48,10 +48,6 @@ enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColFG, ColBG, ColLast };				/* color */
 
 typedef enum {
-	StackLeft, StackBottom, StackRight
-} StackPos; /* stack position*/
-
-typedef enum {
 	TopLeft, TopRight, BotLeft, BotRight
 } Corner; /* window corners */
 
@@ -111,7 +107,6 @@ extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
 extern Display *dpy;
-extern StackPos stackpos;
 extern Window root, barwin;
 
 /* client.c */
@@ -170,7 +165,6 @@ extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ign
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizecol(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
-extern void togglestackpos(Arg *arg);		/* toggles stack position */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void view(Arg *arg);			/* views the tag with arg's index */

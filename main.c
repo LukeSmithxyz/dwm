@@ -129,10 +129,7 @@ setup(void) {
 	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
  
-	bmw = textw(VSTACKSYMBOL) > textw(BSTACKSYMBOL) ?
-		textw(VSTACKSYMBOL) : textw(BSTACKSYMBOL);
-	bmw = bmw > textw(FLOATSYMBOL) ?
-		bmw : textw(FLOATSYMBOL);
+	bmw = textw(TILESYMBOL) > textw(FLOATSYMBOL) ?  textw(TILESYMBOL) : textw(FLOATSYMBOL);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);

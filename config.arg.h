@@ -8,9 +8,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 
 #define DEFMODE			dotile		/* dofloat */
 #define FLOATSYMBOL		"><>"
-#define STACKPOS		StackRight	/* StackLeft */
-#define BSTACKSYMBOL		"==="
-#define VSTACKSYMBOL		"[]="
+#define TILESYMBOL		"[]="
 
 #define FONT			"-*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-*"
 #define NORMBGCOLOR		"#333333"
@@ -20,7 +18,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define STATUSBGCOLOR		"#222222"
 #define STATUSFGCOLOR		"#9999cc"
 
-#define MASTER			600 /* per mill */
+#define MASTER			600 /* per thousand */
 #define MODKEY			Mod1Mask
 
 #define KEYS \
@@ -36,9 +34,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
-	{ MODKEY,			XK_b,		togglestackpos,	{ 0 } }, \
-	{ MODKEY,			XK_g,		resizecol,	{ .i = 10 } }, \
-	{ MODKEY,			XK_s,		resizecol,	{ .i = -10 } }, \
+	{ MODKEY,			XK_g,		resizecol,	{ .i = 15 } }, \
+	{ MODKEY,			XK_s,		resizecol,	{ .i = -15 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
 	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 2 } }, \

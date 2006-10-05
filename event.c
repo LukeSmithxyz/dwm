@@ -123,12 +123,8 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
-		if(ev->x < x + bmw) {
-			if(ev->button == Button1)
-				togglemode(NULL);
-			else if(ev->button == Button3)
-				togglestackpos(NULL);
-		}
+		if((ev->x < x + bmw) && (ev->button == Button1))
+			togglemode(NULL);
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
