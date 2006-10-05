@@ -4,6 +4,8 @@
  */
 #include "dwm.h"
 
+#define MINDIM			100
+
 /* static */
 
 static Client *
@@ -138,69 +140,51 @@ dotile(Arg *arg) {
 				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(i == 0) { /* master window */
+				c->x = sx;
+				if(stackpos == StackLeft)
+					c->x += stackw;
+				c->y = sy + bh;
 				switch(stackpos) {
 				case StackLeft:
-					c->x = sx + stackw;
-					c->y = sy + bh;
+				case StackRight:
 					c->w = master - 2 * BORDERPX;
 					c->h = sh - bh - 2 * BORDERPX;
 					break;
 				case StackBottom:
-					c->x = sx;
-					c->y = sy + bh;
 					c->w = sw - 2 * BORDERPX;
 					c->h = master - 2 * BORDERPX;
 					break;
-				case StackRight:
-					c->x = sx;
-					c->y = sy + bh;
-					c->w = master - 2 * BORDERPX;
-					c->h = sh - bh - 2 * BORDERPX;
-					break;
 				}
 			}
-			else if(th > bh) {
-				/* tile window */
+			else if(th > bh) { /* tile window */
+				c->x = sx;
+				if(stackpos == StackRight)
+					c->x += master;
 				c->w = tw - 2 * BORDERPX;
 				c->h = th - 2 * BORDERPX;
 				switch(stackpos) {
 				case StackLeft:
-					c->x = sx;
+				case StackRight:
 					c->y = sy + (i - 1) * th + bh;
 					if(i + 1 == n)
 						c->h = sh - c->y - 2 * BORDERPX;
 					break;
 				case StackBottom:
-					c->x = sx;
 					c->y = sy + master + (i - 1) * th + bh;
-					if(i + 1 == n)
-						c->h = sh - c->y - 2 * BORDERPX;
-					break;
-				case StackRight:
-					c->x = sx + master;
-					c->y = sy + (i - 1) * th + bh;
 					if(i + 1 == n)
 						c->h = sh - c->y - 2 * BORDERPX;
 					break;
 				}
 			}
 			else { /* fallback if th < bh */
+				c->x = sx;
+				if(stackpos == StackRight)
+					c->x += master;
+				c->y = sy + bh;
+				if(stackpos == StackBottom)
+					c->y += master;
 				c->w = stackw - 2 * BORDERPX;
 				c->h = stackh - 2 * BORDERPX;
-				switch(stackpos) {
-				case StackLeft:
-					c->x = sx;
-					c->y = sy + bh;
-					break;
-				case StackBottom:
-					c->x = sx;
-					c->y = sy + master + bh;
-					break;
-				case StackRight:
-					c->x = sx + master;
-					c->y = sy + bh;
-					break;
-				}
 			}
 			resize(c, False, TopLeft);
 			i++;
@@ -271,12 +255,12 @@ resizecol(Arg *arg) {
 
 	s = stackpos == StackBottom ? sh - bh : sw;
 	if(sel == getnext(clients)) {
-		if(master + arg->i > s - MINW || master + arg->i < MINW)
+		if(master + arg->i > s - MINDIM || master + arg->i < MINDIM)
 			return;
 		master += arg->i;
 	}
 	else {
-		if(master - arg->i > s - MINW || master - arg->i < MINW)
+		if(master - arg->i > s - MINDIM || master - arg->i < MINDIM)
 			return;
 		master -= arg->i;
 	}
