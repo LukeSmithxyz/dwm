@@ -110,12 +110,12 @@ dotile(Arg *arg) {
 		n++;
 
 	if(stackpos == StackBottom) {
-		md = ((sh - bh) * master) / 100;
+		md = ((sh - bh) * master) / 1000;
 		stackw = sw;
 		stackh = sh - bh - md;
 	}
 	else {
-		md = (sw * master) / 100;
+		md = (sw * master) / 1000;
 		stackw = sw - md;
 		stackh = sh - bh;
 	}

@@ -20,7 +20,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 #define STATUSBGCOLOR		"#dddddd"
 #define STATUSFGCOLOR		"#222222"
 
-#define MASTER			60 /* percent */
+#define MASTER			600 /* per mill */
 #define MODKEY			Mod1Mask
 
 #define KEYS \
@@ -31,8 +31,8 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Tab,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_b,		togglestackpos,	{ 0 } }, \
-	{ MODKEY,			XK_g,		resizecol,	{ .i = 1 } }, \
-	{ MODKEY,			XK_s,		resizecol,	{ .i = -1 } }, \
+	{ MODKEY,			XK_g,		resizecol,	{ .i = 10 } }, \
+	{ MODKEY,			XK_s,		resizecol,	{ .i = -10 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
 	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 2 } }, \
