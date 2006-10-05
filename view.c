@@ -259,6 +259,7 @@ isvisible(Client *c) {
 
 void
 resizecol(Arg *arg) {
+	int s;
 	unsigned int n;
 	Client *c;
 
@@ -268,13 +269,14 @@ resizecol(Arg *arg) {
 	if(!sel || sel->isfloat || n < 2 || (arrange == dofloat))
 		return;
 
+	s = stackpos == StackBottom ? sh - bh : sw;
 	if(sel == getnext(clients)) {
-		if(master + arg->i > sw - MINW || master + arg->i < MINW)
+		if(master + arg->i > s - MINW || master + arg->i < MINW)
 			return;
 		master += arg->i;
 	}
 	else {
-		if(master - arg->i > sw - MINW || master - arg->i < MINW)
+		if(master - arg->i > s - MINW || master - arg->i < MINW)
 			return;
 		master -= arg->i;
 	}
