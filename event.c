@@ -179,7 +179,7 @@ configurerequest(XEvent *e) {
 				ban(c);
 		}
 		else
-			arrange(NULL);
+			arrange();
 	}
 	else {
 		wc.x = ev->x;
@@ -304,7 +304,7 @@ propertynotify(XEvent *e) {
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
 				if(!c->isfloat && (c->isfloat = (trans != 0)))
-					arrange(NULL);
+					arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
 				updatesize(c);

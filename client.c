@@ -246,7 +246,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XMapWindow(dpy, c->twin);
 	if(isvisible(c))
 		focus(c);
-	arrange(NULL);
+	arrange();
 }
 
 void
@@ -393,5 +393,5 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	arrange(NULL);
+	arrange();
 }

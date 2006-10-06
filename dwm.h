@@ -99,7 +99,7 @@ extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
 extern unsigned int master, ntags, numlockmask;	/* master percent, number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern void (*arrange)(Arg *);			/* arrange function, indicates mode  */
+extern void (*arrange)(void);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, issel, *seltag;		/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
@@ -157,8 +157,8 @@ extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
 
 /* view.c */
 extern void detach(Client *c);			/* detaches c from global client list */
-extern void dofloat(Arg *arg);			/* arranges all windows floating, arg is ignored */
-extern void dotile(Arg *arg);			/* arranges all windows, arg is ignored */
+extern void dofloat(void);			/* arranges all windows floating */
+extern void dotile(void);			/* arranges all windows tiled */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */

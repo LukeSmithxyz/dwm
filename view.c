@@ -63,7 +63,7 @@ togglemax(Client *c) {
 
 /* extern */
 
-void (*arrange)(Arg *) = DEFMODE;
+void (*arrange)(void) = DEFMODE;
 
 void
 detach(Client *c) {
@@ -77,7 +77,7 @@ detach(Client *c) {
 }
 
 void
-dofloat(Arg *arg) {
+dofloat(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next) {
@@ -95,7 +95,7 @@ dofloat(Arg *arg) {
 }
 
 void
-dotile(Arg *arg) {
+dotile(void) {
 	unsigned int i, n, mpx, stackw, stackh, th;
 	Client *c;
 
@@ -210,7 +210,7 @@ resizecol(Arg *arg) {
 			return;
 		master -= arg->i;
 	}
-	arrange(NULL);
+	arrange();
 }
 
 void
@@ -247,7 +247,7 @@ void
 togglemode(Arg *arg) {
 	arrange = (arrange == dofloat) ? dotile : dofloat;
 	if(sel)
-		arrange(NULL);
+		arrange();
 	else
 		drawstatus();
 }
@@ -261,7 +261,7 @@ toggleview(Arg *arg) {
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
 	reorder();
-	arrange(NULL);
+	arrange();
 }
 
 void
@@ -272,7 +272,7 @@ view(Arg *arg) {
 		seltag[i] = False;
 	seltag[arg->i] = True;
 	reorder();
-	arrange(NULL);
+	arrange();
 }
 
 void
@@ -282,7 +282,7 @@ viewall(Arg *arg) {
 	for(i = 0; i < ntags; i++)
 		seltag[i] = True;
 	reorder();
-	arrange(NULL);
+	arrange();
 }
 
 void
@@ -310,5 +310,5 @@ zoom(Arg *arg) {
 	c->next = clients;
 	clients = c;
 	focus(c);
-	arrange(NULL);
+	arrange();
 }

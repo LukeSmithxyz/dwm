@@ -117,7 +117,7 @@ tag(Arg *arg) {
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
 	sel->weight = arg->i;
-	arrange(NULL);
+	arrange();
 }
 
 void
@@ -131,5 +131,5 @@ toggletag(Arg *arg) {
 	if(i == ntags)
 		sel->tags[arg->i] = True;
 	sel->weight = (i == ntags) ? arg->i : i;
-	arrange(NULL);
+	arrange();
 }
