@@ -95,28 +95,23 @@ dofloat(Arg *arg) {
 	restack();
 }
 
-/* This algorithm is based on a (M)aster area and a (S)tacking area.
- * It supports following arrangements:
- * 	SSMMM	MMMMM	MMMSS
- * 	SSMMM	SSSSS	MMMSS
- */
 void
 dotile(Arg *arg) {
-	unsigned int i, n, md, stackw, stackh, th;
+	unsigned int i, n, mpx, stackw, stackh, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
-	md = (sw * master) / 1000;
-	stackw = sw - md;
+	mpx = (sw * master) / 1000;
+	stackw = sw - mpx;
 	stackh = sh - bh;
 
 	th = stackh;
 	if(n > 1)
 		th /= (n - 1);
 
-	for(i = 0, c = clients; c; c = c->next) {
+	for(i = 0, c = clients; c; c = c->next, i++)
 		if(isvisible(c)) {
 			if(c->isfloat) {
 				resize(c, True, TopLeft);
@@ -130,29 +125,26 @@ dotile(Arg *arg) {
 				c->h = sh - 2 * BORDERPX - bh;
 			}
 			else if(i == 0) { /* master window */
-				c->w = md - 2 * BORDERPX;
+				c->w = mpx - 2 * BORDERPX;
 				c->h = sh - bh - 2 * BORDERPX;
 			}
 			else {  /* tile window */
-				c->x += md;
+				c->x += mpx;
+				c->w = stackw - 2 * BORDERPX;
 				if(th > bh) {
 					c->y = sy + (i - 1) * th + bh;
 					if(i + 1 == n)
 						c->h = sh - c->y - 2 * BORDERPX;
-					c->w = stackw - 2 * BORDERPX;
-					c->h = th - 2 * BORDERPX;
+					else
+						c->h = th - 2 * BORDERPX;
 				}
-				else { /* fallback if th < bh */
-					c->w = stackw - 2 * BORDERPX;
+				else /* fallback if th < bh */
 					c->h = stackh - 2 * BORDERPX;
-				}
 			}
 			resize(c, False, TopLeft);
-			i++;
 		}
 		else
 			ban(c);
-	}
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
 		focus(c);
