@@ -108,7 +108,7 @@ dotile(void) {
 	if(n > 1)
 		th /= (n - 1);
 
-	for(i = 0, c = clients; c; c = c->next, i++)
+	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
 			if(c->isfloat) {
 				resize(c, True, TopLeft);
@@ -139,6 +139,7 @@ dotile(void) {
 					c->h = stackh - 2 * BORDERPX;
 			}
 			resize(c, False, TopLeft);
+			i++;
 		}
 		else
 			ban(c);
