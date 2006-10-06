@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  *
  * dynamic window manager is designed like any other X client as well. It is

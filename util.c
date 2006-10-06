@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 #include "dwm.h"
@@ -33,6 +32,7 @@ eprint(const char *errstr, ...) {
 void *
 erealloc(void *ptr, unsigned int size) {
 	void *res = realloc(ptr, size);
+
 	if(!res)
 		eprint("fatal: could not malloc() %u bytes\n", size);
 	return res;
@@ -44,7 +44,6 @@ spawn(Arg *arg) {
 
 	if(!shell && !(shell = getenv("SHELL")))
 		shell = "/bin/sh";
-
 	if(!arg->cmd)
 		return;
 	/* The double-fork construct avoids zombie processes and keeps the code

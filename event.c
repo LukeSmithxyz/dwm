@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 #include "dwm.h"
@@ -64,7 +63,7 @@ resizemouse(Client *c) {
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-				None, cursor[CurResize], CurrentTime) != GrabSuccess)
+			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	c->ismax = False;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
@@ -211,7 +210,6 @@ enternotify(XEvent *e) {
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
-
 	if(((c = getclient(ev->window)) || (c = getctitle(ev->window))) && isvisible(c))
 		focus(c);
 	else if(ev->window == root) {
@@ -279,13 +277,11 @@ maprequest(XEvent *e) {
 
 	if(!XGetWindowAttributes(dpy, ev->window, &wa))
 		return;
-
 	if(wa.override_redirect) {
 		XSelectInput(dpy, ev->window,
 				(StructureNotifyMask | PropertyChangeMask));
 		return;
 	}
-
 	if(!getclient(ev->window))
 		manage(ev->window, &wa);
 }
@@ -298,7 +294,6 @@ propertynotify(XEvent *e) {
 
 	if(ev->state == PropertyDelete)
 		return; /* ignore */
-
 	if((c = getclient(ev->window))) {
 		if(ev->atom == wmatom[WMProtocols]) {
 			c->proto = getproto(c->win);

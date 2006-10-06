@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMIV-MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMIV-MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 #include "dwm.h"
@@ -30,21 +29,17 @@ drawtext(const char *text, unsigned long col[ColLast], Bool highlight) {
 
 	XSetForeground(dpy, dc.gc, col[ColBG]);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
-
 	if(!text)
 		return;
-
 	w = 0;
 	olen = len = strlen(text);
 	if(len >= sizeof(buf))
 		len = sizeof(buf) - 1;
 	memcpy(buf, text, len);
 	buf[len] = 0;
-
 	h = dc.font.ascent + dc.font.descent;
 	y = dc.y + (dc.h / 2) - (h / 2) + dc.font.ascent;
 	x = dc.x + (h / 2);
-
 	/* shorten text if necessary */
 	while(len && (w = textnw(buf, len)) > dc.w - h)
 		buf[--len] = 0;
@@ -56,7 +51,6 @@ drawtext(const char *text, unsigned long col[ColLast], Bool highlight) {
 		if(len > 3)
 			buf[len - 3] = '.';
 	}
-
 	if(w > dc.w)
 		return; /* too long */
 	gcv.foreground = col[ColFG];
@@ -93,7 +87,6 @@ drawstatus(void) {
 	int i, x;
 
 	dc.x = dc.y = 0;
-
 	for(i = 0; i < ntags; i++) {
 		dc.w = textw(tags[i]);
 		if(seltag[i])
@@ -102,10 +95,8 @@ drawstatus(void) {
 			drawtext(tags[i], dc.norm, sel && sel->tags[i]);
 		dc.x += dc.w;
 	}
-
 	dc.w = bmw;
 	drawtext(arrange == dofloat ?  FLOATSYMBOL : TILESYMBOL, dc.status, False);
-
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bx + bw - dc.w;
@@ -114,7 +105,6 @@ drawstatus(void) {
 		dc.w = bw - x;
 	}
 	drawtext(stext, dc.status, False);
-
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
 		if(sel)
@@ -134,7 +124,6 @@ drawtitle(Client *c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBG]);
 		return;
 	}
-
 	XSetWindowBorder(dpy, c->win, dc.norm[ColBG]);
 	XMapWindow(dpy, c->twin);
 	dc.x = dc.y = 0;
@@ -177,7 +166,6 @@ setfont(const char *fontstr) {
 		XFontSetExtents *font_extents;
 		XFontStruct **xfonts;
 		char **font_names;
-
 		dc.font.ascent = dc.font.descent = 0;
 		font_extents = XExtentsOfFontSet(dc.font.set);
 		n = XFontsOfFontSet(dc.font.set, &xfonts, &font_names);

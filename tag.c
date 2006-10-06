@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 #include "dwm.h"
@@ -53,7 +52,6 @@ initrregs(void) {
 		return;
 	len = sizeof(rule) / sizeof(rule[0]);
 	rreg = emallocz(len * sizeof(RReg));
-
 	for(i = 0; i < len; i++) {
 		if(rule[i].clpattern) {
 			reg = emallocz(sizeof(regex_t));
@@ -115,7 +113,6 @@ tag(Arg *arg) {
 
 	if(!sel)
 		return;
-
 	for(i = 0; i < ntags; i++)
 		sel->tags[i] = False;
 	sel->tags[arg->i] = True;
@@ -129,7 +126,6 @@ toggletag(Arg *arg) {
 
 	if(!sel)
 		return;
-
 	sel->tags[arg->i] = !sel->tags[arg->i];
 	for(i = 0; i < ntags && !sel->tags[i]; i++);
 	if(i == ntags)

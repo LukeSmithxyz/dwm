@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 #include "dwm.h"
@@ -156,7 +155,6 @@ gravitate(Client *c, Bool invert) {
 		dy = -(c->h);
 		break;
 	}
-
 	switch (c->grav) {
 	default:
 		break;
@@ -177,7 +175,6 @@ gravitate(Client *c, Bool invert) {
 		dx = -(c->w + c->border);
 		break;
 	}
-
 	if(invert) {
 		dx = -dx;
 		dy = -dy;
@@ -210,10 +207,8 @@ manage(Window w, XWindowAttributes *wa) {
 	c->w = c->tw = wa->width;
 	c->h = wa->height;
 	c->th = bh;
-
 	c->border = 0;
 	updatesize(c);
-
 	if(c->x + c->w + 2 * BORDERPX > sw)
 		c->x = sw - c->w - 2 * BORDERPX;
 	if(c->x < sx)
@@ -222,7 +217,6 @@ manage(Window w, XWindowAttributes *wa) {
 		c->y = sh - c->h - 2 * BORDERPX;
 	if(c->h != sh && c->y < bh)
 		c->y = bh;
-
 	c->proto = getproto(c->win);
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
@@ -230,12 +224,10 @@ manage(Window w, XWindowAttributes *wa) {
 	twa.override_redirect = 1;
 	twa.background_pixmap = ParentRelative;
 	twa.event_mask = ExposureMask | EnterWindowMask;
-
 	c->twin = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
 			0, DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
-
 	grabbuttons(c, False);
 	updatetitle(c);
 	settags(c, getclient(trans));
@@ -244,13 +236,11 @@ manage(Window w, XWindowAttributes *wa) {
 			|| (c->maxw && c->minw &&
 				c->maxw == c->minw && c->maxh == c->minh);
 	resizetitle(c);
-
 	if(clients)
 		clients->prev = c;
 	c->next = clients;
 	c->snext = stack;
 	stack = clients = c;
-
 	ban(c);
 	XMapWindow(dpy, c->win);
 	XMapWindow(dpy, c->twin);
@@ -283,7 +273,6 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 		c->x = right - c->w;
 	if(sticky == BotLeft || sticky == BotRight)
 		c->y = bottom - c->h;
-
 	/* offscreen appearance fixes */
 	if(c->x + c->w < sx)
 		c->x = sx;
@@ -293,7 +282,6 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 		c->x = sw - c->w;
 	if(c->y > sh)
 		c->y = sh - c->h;
-
 	resizetitle(c);
 	wc.x = c->x;
 	wc.y = c->y;
@@ -392,20 +380,16 @@ unmanage(Client *c) {
 	/* The server grab construct avoids race conditions. */
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
-
 	detach(c);
 	detachstack(c);
 	if(sel == c) {
 		for(nc = stack; nc && !isvisible(nc); nc = nc->snext);
 		focus(nc);
 	}
-
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	XDestroyWindow(dpy, c->twin);
-
 	free(c->tags);
 	free(c);
-
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);

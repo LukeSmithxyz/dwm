@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 
@@ -93,12 +92,11 @@ setup(void) {
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
 	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
 			PropModeReplace, (unsigned char *) netatom, NetLast);
-
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
-
+	/* init modifier map */
 	modmap = XGetModifierMapping(dpy);
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < modmap->max_keypermod; j++) {
@@ -107,19 +105,16 @@ setup(void) {
 		}
 	}
 	XFree(modmap);
-
+	/* select for events */
 	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
 		| EnterWindowMask | LeaveWindowMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
-
 	grabkeys();
 	initrregs();
-
 	for(ntags = 0; tags[ntags]; ntags++);
 	seltag = emallocz(sizeof(Bool) * ntags);
 	seltag[0] = True;
-
 	/* style */
 	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
 	dc.norm[ColFG] = getcolor(NORMFGCOLOR);
@@ -128,13 +123,13 @@ setup(void) {
 	dc.status[ColBG] = getcolor(STATUSBGCOLOR);
 	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
- 
+	/* geometry */
 	bmw = textw(TILESYMBOL) > textw(FLOATSYMBOL) ?  textw(TILESYMBOL) : textw(FLOATSYMBOL);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	master = MASTER;
-
+	/* bar */
 	bx = by = 0;
 	bw = sw;
 	dc.h = bh = dc.font.height + 2;
@@ -146,13 +141,13 @@ setup(void) {
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
-
+	strcpy(stext, "dwm-"VERSION);
+	/* pixmap for everything */
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
-
+	/* multihead support */
 	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
-	strcpy(stext, "dwm-"VERSION);
 }
 
 /*
@@ -204,8 +199,7 @@ quit(Arg *arg) {
 	readin = running = False;
 }
 
-/*
- * There's no way to check accesses to destroyed windows, thus those cases are
+/* There's no way to check accesses to destroyed windows, thus those cases are
  * ignored (especially on UnmapNotify's).  Other types of errors call Xlibs
  * default error handler, which may call exit.
  */
@@ -236,21 +230,17 @@ main(int argc, char *argv[]) {
 	}
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
-
 	dpy = XOpenDisplay(0);
 	if(!dpy)
 		eprint("dwm: cannot open display\n");
-
 	xfd = ConnectionNumber(dpy);
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
-
 	otherwm = False;
 	XSetErrorHandler(xerrorstart);
 	/* this causes an error if some other window manager is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
 	XSync(dpy, False);
-
 	if(otherwm)
 		eprint("dwm: another window manager is already running\n");
 
@@ -258,7 +248,6 @@ main(int argc, char *argv[]) {
 	XSetErrorHandler(NULL);
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
-
 	setup();
 	drawstatus();
 	scan();
@@ -291,6 +280,5 @@ main(int argc, char *argv[]) {
 	}
 	cleanup();
 	XCloseDisplay(dpy);
-
 	return 0;
 }

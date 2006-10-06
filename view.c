@@ -1,5 +1,4 @@
-/*
- * (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 #include "dwm.h"
@@ -43,9 +42,9 @@ reorder(void) {
 }
 
 static void
-togglemax(Client *c)
-{
+togglemax(Client *c) {
 	XEvent ev;
+
 	if((c->ismax = !c->ismax)) {
 		c->rx = c->x; c->x = sx;
 		c->ry = c->y; c->y = bh;
@@ -102,11 +101,9 @@ dotile(Arg *arg) {
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-
 	mpx = (sw * master) / 1000;
 	stackw = sw - mpx;
 	stackh = sh - bh;
-
 	th = stackh;
 	if(n > 1)
 		th /= (n - 1);
@@ -145,6 +142,7 @@ dotile(Arg *arg) {
 		}
 		else
 			ban(c);
+
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
 		focus(c);
@@ -158,7 +156,6 @@ focusnext(Arg *arg) {
    
 	if(!sel)
 		return;
-
 	if(!(c = getnext(sel->next)))
 		c = getnext(clients);
 	if(c) {
@@ -173,7 +170,6 @@ focusprev(Arg *arg) {
 
 	if(!sel)
 		return;
-
 	if(!(c = getprev(sel->prev))) {
 		for(c = clients; c && c->next; c = c->next);
 		c = getprev(c);
@@ -204,7 +200,6 @@ resizecol(Arg *arg) {
 			n++;
 	if(!sel || sel->isfloat || n < 2 || (arrange == dofloat))
 		return;
-
 	if(sel == getnext(clients)) {
 		if(master + arg->i > 950 || master + arg->i < 50)
 			return;
@@ -290,8 +285,6 @@ viewall(Arg *arg) {
 	arrange(NULL);
 }
 
-
-
 void
 zoom(Arg *arg) {
 	unsigned int n;
@@ -299,18 +292,15 @@ zoom(Arg *arg) {
 
 	if(!sel)
 		return;
-
 	if(sel->isfloat || (arrange == dofloat)) {
 		togglemax(sel);
 		return;
 	}
-
 	for(n = 0, c = clients; c; c = c->next)
 		if(isvisible(c) && !c->isfloat)
 			n++;
 	if(n < 2 || (arrange == dofloat))
 		return;
-
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
 			return;
