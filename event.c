@@ -18,6 +18,7 @@ typedef struct {
 KEYS
 
 #define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
+#define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 
 static void
 movemouse(Client *c) {
