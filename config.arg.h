@@ -24,7 +24,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 static Key key[] = { \
 	/* modifier			key		function	arguments */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec urxvtc -bg '#111111' -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
+		{ .cmd = "exec urxvtc -tr -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
 			" | dmenu -font '"FONT"' -normbg '"NORMBGCOLOR"' -normfg '"NORMFGCOLOR"' " \
