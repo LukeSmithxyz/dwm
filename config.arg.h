@@ -17,14 +17,14 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define STATUSBGCOLOR		"#222222"
 #define STATUSFGCOLOR		"#9999cc"
 
-#define MASTER			550 /* per thousand */
+#define MASTER			600 /* per thousand */
 #define MODKEY			Mod1Mask
 
 #define KEYS \
 static Key key[] = { \
 	/* modifier			key		function	arguments */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec uxterm -bg '#111111' -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
+		{ .cmd = "exec urxvtc -bg '#111111' -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
 			" | dmenu -font '"FONT"' -normbg '"NORMBGCOLOR"' -normfg '"NORMFGCOLOR"' " \
