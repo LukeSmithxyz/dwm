@@ -17,7 +17,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define STATUSBGCOLOR		"#222222"
 #define STATUSFGCOLOR		"#9999cc"
 
-#define MASTER			600 /* per thousand */
+#define MASTER			550 /* per thousand */
 #define MODKEY			Mod1Mask
 
 #define KEYS \
