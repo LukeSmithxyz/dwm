@@ -202,12 +202,12 @@ manage(Window w, XWindowAttributes *wa) {
 	c = emallocz(sizeof(Client));
 	c->tags = emallocz(ntags * sizeof(Bool));
 	c->win = w;
-	c->x = c->tx = wa->x; c->x -= BORDERPX;
-	c->y = c->ty = wa->y; c->y -= BORDERPX;
+	c->border = wa->border_width;
+	c->x = c->tx = wa->x;
+	c->y = c->ty = wa->y;
 	c->w = c->tw = wa->width;
 	c->h = wa->height;
 	c->th = bh;
-	c->border = 0;
 	updatesize(c);
 	if(c->x + c->w + 2 * BORDERPX > sw)
 		c->x = sw - c->w - 2 * BORDERPX;
