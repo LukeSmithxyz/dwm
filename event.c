@@ -136,7 +136,8 @@ buttonpress(XEvent *e) {
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
-		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat) && !c->isfixed) {
+		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat) &&
+				!c->isfixed) {
 			restack();
 			resizemouse(c);
 		}

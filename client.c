@@ -209,8 +209,6 @@ manage(Window w, XWindowAttributes *wa) {
 	c->h = wa->height;
 	c->th = bh;
 	updatesize(c);
-	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh &&
-				c->maxw == c->minw && c->maxh == c->minh);
 	if(c->x + c->w + 2 * BORDERPX > sw)
 		c->x = sw - c->w - 2 * BORDERPX;
 	if(c->x < sx)
@@ -341,6 +339,8 @@ updatesize(Client *c) {
 	}
 	else
 		c->minw = c->minh = 0;
+	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh &&
+				c->maxw == c->minw && c->maxh == c->minh);
 	if(c->flags & PWinGravity)
 		c->grav = size.win_gravity;
 	else
