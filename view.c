@@ -44,6 +44,10 @@ reorder(void) {
 static void
 togglemax(Client *c) {
 	XEvent ev;
+		
+	if (x->maxw && x->minw && x->maxh && x->minh &&
+			x->maxw == x->minw && x->maxh == x->minh)
+		return;
 
 	if((c->ismax = !c->ismax)) {
 		c->rx = c->x; c->x = sx;

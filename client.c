@@ -233,7 +233,7 @@ manage(Window w, XWindowAttributes *wa) {
 	settags(c, getclient(trans));
 	if(!c->isfloat)
 		c->isfloat = trans
-			|| (c->maxw && c->minw &&
+			|| (c->maxw && c->minw && c->maxh && c->minh &&
 				c->maxw == c->minw && c->maxh == c->minh);
 	resizetitle(c);
 	if(clients)
