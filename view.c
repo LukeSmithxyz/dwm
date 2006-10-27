@@ -45,8 +45,7 @@ static void
 togglemax(Client *c) {
 	XEvent ev;
 		
-	if (x->maxw && x->minw && x->maxh && x->minh &&
-			x->maxw == x->minw && x->maxh == x->minh)
+	if(c->isfixed)
 		return;
 
 	if((c->ismax = !c->ismax)) {

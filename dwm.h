@@ -83,7 +83,7 @@ struct Client {
 	int grav;
 	long flags; 
 	unsigned int border, weight;
-	Bool isfloat, ismax;
+	Bool isfloat, isfixed, ismax;
 	Bool *tags;
 	Client *next;
 	Client *prev;
