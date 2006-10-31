@@ -195,7 +195,7 @@ isvisible(Client *c) {
 }
 
 void
-resizecol(Arg *arg) {
+resizemaster(Arg *arg) {
 	if(master + arg->i > 950 || master + arg->i < 50)
 		return;
 	master += arg->i;

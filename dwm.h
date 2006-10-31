@@ -161,7 +161,7 @@ extern void dotile(void);			/* arranges all windows tiled */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void resizecol(Arg *arg);		/* resizes the master percent with arg's index value */
+extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
