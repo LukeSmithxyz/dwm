@@ -196,24 +196,9 @@ isvisible(Client *c) {
 
 void
 resizecol(Arg *arg) {
-	unsigned int n;
-	Client *c;
-
-	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c) && !c->isfloat)
-			n++;
-	if(!sel || sel->isfloat || n < 2 || (arrange == dofloat))
+	if(master + arg->i > 950 || master + arg->i < 50)
 		return;
-	if(sel == getnext(clients)) {
-		if(master + arg->i > 950 || master + arg->i < 50)
-			return;
-		master += arg->i;
-	}
-	else {
-		if(master - arg->i > 950 || master - arg->i < 50)
-			return;
-		master -= arg->i;
-	}
+	master += arg->i;
 	arrange();
 }
 
