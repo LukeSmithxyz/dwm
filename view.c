@@ -196,9 +196,13 @@ isvisible(Client *c) {
 
 void
 resizemaster(Arg *arg) {
-	if(master + arg->i > 950 || master + arg->i < 50)
-		return;
-	master += arg->i;
+	if(arg->i == 0)
+		master = MASTER;
+	else {
+		if(master + arg->i > 950 || master + arg->i < 50)
+			return;
+		master += arg->i;
+	}
 	arrange();
 }
 
