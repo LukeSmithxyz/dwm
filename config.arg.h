@@ -12,7 +12,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define FONT			"-*-terminus-medium-*-*-*-14-*-*-*-*-*-*-*"
 #define NORMBGCOLOR		"#333333"
 #define NORMFGCOLOR		"#dddddd"
-#define SELBGCOLOR		"#333366"
+#define SELBGCOLOR		"#666699"
 #define SELFGCOLOR		"#eeeeee"
 #define STATUSBGCOLOR		"#222222"
 #define STATUSFGCOLOR		"#9999cc"
