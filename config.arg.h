@@ -12,10 +12,10 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define FONT			"-*-terminus-medium-*-*-*-14-*-*-*-*-*-*-*"
 #define NORMBGCOLOR		"#333333"
 #define NORMFGCOLOR		"#dddddd"
-#define SELBGCOLOR		"#666699"
+#define SELBGCOLOR		"#336699"
 #define SELFGCOLOR		"#eeeeee"
 #define STATUSBGCOLOR		"#222222"
-#define STATUSFGCOLOR		"#9999cc"
+#define STATUSFGCOLOR		"#99ccff"
 
 #define MASTER			600 /* per thousand */
 #define MODKEY			Mod1Mask
