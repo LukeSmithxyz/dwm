@@ -49,10 +49,10 @@ togglemax(Client *c) {
 		return;
 
 	if((c->ismax = !c->ismax)) {
-		c->rx = c->x; c->x = sx;
-		c->ry = c->y; c->y = bh;
-		c->rw = c->w; c->w = sw - 2 * BORDERPX;
-		c->rh = c->h; c->h = sh - bh - 2 * BORDERPX;
+		c->rx = c->x; c->x = wax;
+		c->ry = c->y; c->y = way;
+		c->rw = c->w; c->w = waw - 2 * BORDERPX;
+		c->rh = c->h; c->h = wah - 2 * BORDERPX;
 	}
 	else {
 		c->x = c->rx;
@@ -99,17 +99,13 @@ dofloat(void) {
 
 void
 dotile(void) {
-	unsigned int i, n, mpx, stackw, stackh, th;
+	unsigned int i, n, mpx, stackw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-	mpx = (sw * master) / 1000;
-	stackw = sw - mpx;
-	stackh = sh - bh;
-	th = stackh;
-	if(n > 1)
-		th /= (n - 1);
+	mpx = (waw * master) / 1000;
+	stackw = waw - mpx;
 
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
@@ -118,28 +114,26 @@ dotile(void) {
 				continue;
 			}
 			c->ismax = False;
-			c->x = sx;
-			c->y = sy + bh;
+			c->x = wax;
+			c->y = way;
 			if(n == 1) { /* only 1 window */
-				c->w = sw - 2 * BORDERPX;
-				c->h = sh - 2 * BORDERPX - bh;
+				c->w = waw - 2 * BORDERPX;
+				c->h = wah - 2 * BORDERPX;
 			}
 			else if(i == 0) { /* master window */
-				c->w = mpx - 2 * BORDERPX;
-				c->h = sh - bh - 2 * BORDERPX;
+				c->w = waw - stackw - 2 * BORDERPX;
+				c->h = wah - 2 * BORDERPX;
+				th = wah / (n - 1);
 			}
 			else {  /* tile window */
 				c->x += mpx;
 				c->w = stackw - 2 * BORDERPX;
 				if(th > bh) {
-					c->y = sy + (i - 1) * th + bh;
-					if(i + 1 == n)
-						c->h = sh - c->y - 2 * BORDERPX;
-					else
-						c->h = th - 2 * BORDERPX;
+					c->y = way + (i - 1) * th;
+					c->h = th - 2 * BORDERPX;
 				}
 				else /* fallback if th < bh */
-					c->h = stackh - 2 * BORDERPX;
+					c->h = wah - 2 * BORDERPX;
 			}
 			resize(c, False, TopLeft);
 			i++;

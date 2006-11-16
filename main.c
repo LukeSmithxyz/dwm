@@ -18,7 +18,7 @@
 
 char stext[1024];
 Bool *seltag;
-int bx, by, bw, bh, bmw, masterd, screen, sx, sy, sw, sh;
+int bx, by, bw, bh, bmw, masterd, screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int master, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
@@ -142,6 +142,11 @@ setup(void) {
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
+	/* windowarea */
+	wax = sx;
+	way = bh;
+	wah = sh - bh;
+	waw = sw;
 	/* pixmap for everything */
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
