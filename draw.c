@@ -107,7 +107,7 @@ drawstatus(void) {
 	drawtext(stext, dc.status, False);
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
-		drawtext(sel ? sel->name : NULL, dc.sel, False);
+		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm, False);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
