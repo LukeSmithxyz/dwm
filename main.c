@@ -130,7 +130,8 @@ setup(void) {
 	sh = DisplayHeight(dpy, screen);
 	master = MASTER;
 	/* bar */
-	bx = by = 0;
+	bx = sx;
+	by = sy;
 	bw = sw;
 	dc.h = bh = dc.font.height + 2;
 	wa.override_redirect = 1;
@@ -144,7 +145,7 @@ setup(void) {
 	strcpy(stext, "dwm-"VERSION);
 	/* windowarea */
 	wax = sx;
-	way = bh;
+	way = sy + bh;
 	wah = sh - bh;
 	waw = sw;
 	/* pixmap for everything */
