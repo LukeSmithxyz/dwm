@@ -8,6 +8,16 @@
 
 /* static */
 
+static Bool
+isoccupied(unsigned int t)
+{
+	Client *c;
+	for(c = clients; c; c = c->next)
+		if(c->tags[t])
+			return True;
+	return False;
+}
+
 static unsigned int
 textnw(const char *text, unsigned int len) {
 	XRectangle r;
@@ -20,7 +30,7 @@ textnw(const char *text, unsigned int len) {
 }
 
 static void
-drawtext(const char *text, unsigned long col[ColLast], Bool highlight) {
+drawtext(const char *text, unsigned long col[ColLast], Bool ldot, Bool rdot) {
 	int x, y, w, h;
 	static char buf[256];
 	unsigned int len, olen;
@@ -63,10 +73,16 @@ drawtext(const char *text, unsigned long col[ColLast], Bool highlight) {
 		XChangeGC(dpy, dc.gc, GCForeground | GCFont, &gcv);
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
-	if(highlight) {
+	if(ldot) {
 		r.x = dc.x + 2;
 		r.y = dc.y + 2;
 		r.width = r.height = (h + 2) / 4;
+		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
+	}
+	if(rdot) {
+		r.width = r.height = (h + 2) / 4;
+		r.x = dc.x + dc.w - r.width - 2;
+		r.y = dc.y + dc.h - r.height - 2;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 }
@@ -90,13 +106,13 @@ drawstatus(void) {
 	for(i = 0; i < ntags; i++) {
 		dc.w = textw(tags[i]);
 		if(seltag[i])
-			drawtext(tags[i], dc.sel, sel && sel->tags[i]);
+			drawtext(tags[i], dc.sel, sel && sel->tags[i], isoccupied(i));
 		else
-			drawtext(tags[i], dc.norm, sel && sel->tags[i]);
+			drawtext(tags[i], dc.norm, sel && sel->tags[i], isoccupied(i));
 		dc.x += dc.w;
 	}
 	dc.w = bmw;
-	drawtext(arrange == dofloat ?  FLOATSYMBOL : TILESYMBOL, dc.status, False);
+	drawtext(arrange == dofloat ?  FLOATSYMBOL : TILESYMBOL, dc.status, False, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bw - dc.w;
@@ -104,10 +120,10 @@ drawstatus(void) {
 		dc.x = x;
 		dc.w = bw - x;
 	}
-	drawtext(stext, dc.status, False);
+	drawtext(stext, dc.status, False, False);
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
-		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm, False);
+		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm, False, False);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
@@ -125,7 +141,7 @@ drawtitle(Client *c) {
 	XMapWindow(dpy, c->twin);
 	dc.x = dc.y = 0;
 	dc.w = c->tw;
-	drawtext(c->name, dc.norm, False);
+	drawtext(c->name, dc.norm, False,False);
 	XCopyArea(dpy, dc.drawable, c->twin, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
 }
