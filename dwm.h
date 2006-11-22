@@ -82,7 +82,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int grav;
 	long flags; 
-	unsigned int border, weight;
+	unsigned int border;
 	Bool isfloat, isfixed, ismax;
 	Bool *tags;
 	Client *next;

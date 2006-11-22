@@ -6,39 +6,9 @@
 /* static */
 
 static Client *
-minclient(void) {
-	Client *c, *min;
-
-	if((clients && clients->isfloat) || arrange == dofloat)
-		return clients; /* don't touch floating order */
-	for(min = c = clients; c; c = c->next)
-		if(c->weight < min->weight)
-			min = c;
-	return min;
-}
-
-static Client *
 nexttiled(Client *c) {
 	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
 	return c;
-}
-
-static void
-reorder(void) {
-	Client *c, *newclients, *tail;
-
-	newclients = tail = NULL;
-	while((c = minclient())) {
-		detach(c);
-		if(tail) {
-			c->prev = tail;
-			tail->next = c;
-			tail = c;
-		}
-		else
-			tail = newclients = c;
-	}
-	clients = newclients;
 }
 
 static void
@@ -247,7 +217,6 @@ toggleview(Arg *arg) {
 	for(i = 0; i < ntags && !seltag[i]; i++);
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
-	reorder();
 	arrange();
 }
 
@@ -258,7 +227,6 @@ view(Arg *arg) {
 	for(i = 0; i < ntags; i++)
 		seltag[i] = False;
 	seltag[arg->i] = True;
-	reorder();
 	arrange();
 }
 
@@ -268,7 +236,6 @@ viewall(Arg *arg) {
 
 	for(i = 0; i < ntags; i++)
 		seltag[i] = True;
-	reorder();
 	arrange();
 }
 
