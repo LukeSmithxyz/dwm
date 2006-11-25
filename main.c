@@ -267,22 +267,29 @@ main(int argc, char *argv[]) {
 		if(readin)
 			FD_SET(STDIN_FILENO, &rd);
 		FD_SET(xfd, &rd);
-		r = select(xfd + 1, &rd, NULL, NULL, NULL);
-		if((r == -1) && (errno == EINTR))
-			continue;
-		if(r > 0) {
-			if(readin && FD_ISSET(STDIN_FILENO, &rd)) {
-				readin = NULL != fgets(stext, sizeof(stext), stdin);
-				if(readin)
-					stext[strlen(stext) - 1] = 0;
-				else 
-					strcpy(stext, "broken pipe");
-				drawstatus();
-			}
+		if(select(xfd + 1, &rd, NULL, NULL, NULL) == -1) {
+			if(errno == EINTR)
+				continue;
+			else
+				eprint("select failed\n");
 		}
-		else if(r < 0)
-			eprint("select failed\n");
-		procevent();
+		if(FD_ISSET(STDIN_FILENO, &rd)) {
+			switch(r = read(STDIN_FILENO, stext, sizeof(stext))) {
+			case -1:
+				strncpy(stext, strerror(errno), sizeof(stext));
+				readin = False;
+				break;
+			case 0:
+				strncpy(stext, "EOF", sizeof(stext));
+				readin = False;
+				break;
+			default:
+				stext[r-1] = 0;
+			}
+			drawstatus();
+		}
+		if(FD_ISSET(xfd, &rd))
+			procevent();
 	}
 	cleanup();
 	XCloseDisplay(dpy);
