@@ -274,9 +274,10 @@ main(int argc, char *argv[]) {
 				eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			switch(r = read(STDIN_FILENO, stext, sizeof(stext))) {
+			switch(r = read(STDIN_FILENO, stext, sizeof(stext) - 1)) {
 			case -1:
 				strncpy(stext, strerror(errno), sizeof(stext));
+				stext[sizeof(stext) - 1] = '\0';
 				readin = False;
 				break;
 			case 0:
@@ -284,7 +285,7 @@ main(int argc, char *argv[]) {
 				readin = False;
 				break;
 			default:
-				stext[r-1] = 0;
+				stext[r - (stext[r - 1] == '\n' ? 1 : 0)] = '\0';
 			}
 			drawstatus();
 		}
