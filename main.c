@@ -284,8 +284,8 @@ main(int argc, char *argv[]) {
 				readin = False;
 				break;
 			default:
-				stext[r - (stext[r - 1] == '\n' ? 1 : 0)] = '\0';
-				for(p = stext + strlen(stext) - 1; p > stext && *p != '\n'; --p);
+				for(stext[r] = '\0', p = stext + strlen(stext) - 1; p >= stext && *p == '\n'; *p-- = '\0');
+				for(p = stext + strlen(stext) - 1; p >= stext && *p != '\n'; --p);
 				if(p > stext)
 					strncpy(stext, p + 1, sizeof stext);
 			}
