@@ -227,6 +227,7 @@ xerror(Display *dpy, XErrorEvent *ee) {
 
 int
 main(int argc, char *argv[]) {
+	char *p;
 	int r, xfd;
 	fd_set rd;
 
@@ -270,22 +271,23 @@ main(int argc, char *argv[]) {
 		if(select(xfd + 1, &rd, NULL, NULL, NULL) == -1) {
 			if(errno == EINTR)
 				continue;
-			else
-				eprint("select failed\n");
+			eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			switch(r = read(STDIN_FILENO, stext, sizeof(stext) - 1)) {
+			switch(r = read(STDIN_FILENO, stext, sizeof stext - 1)) {
 			case -1:
-				strncpy(stext, strerror(errno), sizeof(stext));
-				stext[sizeof(stext) - 1] = '\0';
+				strncpy(stext, strerror(errno), sizeof stext - 1);
 				readin = False;
 				break;
 			case 0:
-				strncpy(stext, "EOF", sizeof(stext));
+				strncpy(stext, "EOF", sizeof stext);
 				readin = False;
 				break;
 			default:
 				stext[r - (stext[r - 1] == '\n' ? 1 : 0)] = '\0';
+				for(p = stext + strlen(stext) - 1; p > stext && *p != '\n'; --p);
+				if(p > stext)
+					strncpy(stext, p + 1, sizeof stext);
 			}
 			drawstatus();
 		}

@@ -43,8 +43,8 @@ drawtext(const char *text, unsigned long col[ColLast], Bool ldot, Bool rdot) {
 		return;
 	w = 0;
 	olen = len = strlen(text);
-	if(len >= sizeof(buf))
-		len = sizeof(buf) - 1;
+	if(len >= sizeof buf)
+		len = sizeof buf - 1;
 	memcpy(buf, text, len);
 	buf[len] = 0;
 	h = dc.font.ascent + dc.font.descent;

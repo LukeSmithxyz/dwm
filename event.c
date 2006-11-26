@@ -244,7 +244,7 @@ expose(XEvent *e) {
 
 static void
 keypress(XEvent *e) {
-	static unsigned int len = sizeof(key) / sizeof(key[0]);
+	static unsigned int len = sizeof key / sizeof key[0];
 	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
@@ -355,7 +355,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 
 void
 grabkeys(void) {
-	static unsigned int len = sizeof(key) / sizeof(key[0]);
+	static unsigned int len = sizeof key / sizeof key[0];
 	unsigned int i;
 	KeyCode code;
 

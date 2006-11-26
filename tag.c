@@ -50,7 +50,7 @@ initrregs(void) {
 
 	if(rreg)
 		return;
-	len = sizeof(rule) / sizeof(rule[0]);
+	len = sizeof rule / sizeof rule[0];
 	rreg = emallocz(len * sizeof(RReg));
 	for(i = 0; i < len; i++) {
 		if(rule[i].clpattern) {
@@ -83,7 +83,7 @@ settags(Client *c, Client *trans) {
 			c->tags[i] = trans->tags[i];
 	}
 	else if(XGetClassHint(dpy, c->win, &ch)) {
-		snprintf(prop, sizeof(prop), "%s:%s:%s",
+		snprintf(prop, sizeof prop, "%s:%s:%s",
 				ch.res_class ? ch.res_class : "",
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; !matched && i < len; i++)
