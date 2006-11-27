@@ -277,10 +277,11 @@ main(int argc, char *argv[]) {
 			switch(r = read(STDIN_FILENO, stext, sizeof stext - 1)) {
 			case -1:
 				strncpy(stext, strerror(errno), sizeof stext - 1);
+				stext[sizeof stext - 1] = '\0';
 				readin = False;
 				break;
 			case 0:
-				strncpy(stext, "EOF", sizeof stext);
+				strncpy(stext, "EOF", 4);
 				readin = False;
 				break;
 			default:
