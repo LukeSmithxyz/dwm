@@ -91,7 +91,7 @@ dotile(void) {
 				c->h = wah - 2 * BORDERPX;
 			}
 			else if(i == 0) { /* master window */
-				c->w = waw - stackw - 2 * BORDERPX;
+				c->w = mpx - 2 * BORDERPX;
 				c->h = wah - 2 * BORDERPX;
 				th = wah / (n - 1);
 			}
