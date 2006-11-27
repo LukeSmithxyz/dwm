@@ -201,6 +201,14 @@ restack(void) {
 }
 
 void
+togglefloat(Arg *arg) {
+	if (!sel)
+		return;
+	sel->isfloat = !sel->isfloat;
+	arrange();
+}
+
+void
 togglemode(Arg *arg) {
 	arrange = (arrange == dofloat) ? dotile : dofloat;
 	if(sel)

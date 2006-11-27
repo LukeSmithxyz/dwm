@@ -164,6 +164,7 @@ extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ign
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
+extern void togglefloat(Arg *arg);		/* toggles selected client floating/tiled resp. */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void view(Arg *arg);			/* views the tag with arg's index */
