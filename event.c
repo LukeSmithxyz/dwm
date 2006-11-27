@@ -11,7 +11,7 @@
 typedef struct {
 	unsigned long mod;
 	KeySym keysym;
-	void (*func[NFUNCS])(Arg *arg);
+	void (*func)(Arg *arg);
 	Arg arg;
 } Key;
 
@@ -245,7 +245,7 @@ expose(XEvent *e) {
 static void
 keypress(XEvent *e) {
 	static unsigned int len = sizeof key / sizeof key[0];
-	unsigned int i, j;
+	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
 
@@ -254,9 +254,8 @@ keypress(XEvent *e) {
 		if(keysym == key[i].keysym
 			&& CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
 		{
-			for(j = 0; j < NFUNCS; j++)
-				if(key[i].func[j])
-					key[i].func[j](&key[i].arg);
+			if(key[i].func)
+				key[i].func(&key[i].arg);
 			return;
 		}
 	}
