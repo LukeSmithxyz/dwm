@@ -256,7 +256,6 @@ keypress(XEvent *e) {
 		{
 			if(key[i].func)
 				key[i].func(&key[i].arg);
-			return;
 		}
 	}
 }
