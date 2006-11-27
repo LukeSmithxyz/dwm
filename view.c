@@ -99,7 +99,7 @@ dotile(void) {
 				c->x += mpx;
 				c->w = stackw - 2 * BORDERPX;
 				if(th > bh) {
-					c->y = way + (i - 1) * th;
+					c->y += (i - 1) * th;
 					c->h = th - 2 * BORDERPX;
 				}
 				else /* fallback if th < bh */
