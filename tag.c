@@ -113,7 +113,7 @@ tag(Arg *arg) {
 	if(!sel)
 		return;
 	for(i = 0; i < ntags; i++)
-		sel->tags[i] = False;
+		sel->tags[i] = (arg->i == -1) ? True : False;
 	sel->tags[arg->i] = True;
 	arrange();
 }

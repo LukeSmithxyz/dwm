@@ -30,6 +30,7 @@ static Key key[] = { \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_g,		resizemaster,	{ .i = 15 } }, \
 	{ MODKEY,			XK_s,		resizemaster,	{ .i = -15 } }, \
+	{ MODKEY|ShiftMask,		XK_0,		tag,		{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
 	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 2 } }, \
@@ -43,7 +44,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloat,	{ 0 } }, \
-	{ MODKEY,			XK_0,		viewall,	{ 0 } }, \
+	{ MODKEY,			XK_0,		view,		{ .i = -1 } }, \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \
 	{ MODKEY,			XK_2,		view,		{ .i = 1 } }, \
 	{ MODKEY,			XK_3,		view,		{ .i = 2 } }, \

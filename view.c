@@ -233,17 +233,8 @@ view(Arg *arg) {
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
-		seltag[i] = False;
+		seltag[i] = (arg->i == -1) ? True : False;
 	seltag[arg->i] = True;
-	arrange();
-}
-
-void
-viewall(Arg *arg) {
-	unsigned int i;
-
-	for(i = 0; i < ntags; i++)
-		seltag[i] = True;
 	arrange();
 }
 
