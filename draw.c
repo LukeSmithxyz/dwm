@@ -82,10 +82,10 @@ drawtext(const char *text, unsigned long col[ColLast], Bool dot, Bool border) {
 	}
 	if(border) {
 		pt[0].x = dc.x;
-		pt[0].y = dc.y + dc.h - 1;
+		pt[0].y = dc.y + dc.h;
 		pt[1].x = 0;
-		pt[1].y = -(dc.h - 1);
-		pt[2].x = dc.w - 1;
+		pt[1].y = -dc.h;
+		pt[2].x = dc.w;
 		pt[2].y = 0;
 		XDrawLines(dpy, dc.drawable, dc.gc, pt, 3, CoordModePrevious);
 	}
