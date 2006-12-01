@@ -76,14 +76,14 @@ drawtext(const char *text, unsigned long col[ColLast], Bool filledsquare, Bool e
 	}
 	x = (h + 2) / 4;
 	if(filledsquare) {
-		r.x = dc.x + 2;
-		r.y = dc.y + 2;
-		r.width = r.height = x;
+		r.x = dc.x + 1;
+		r.y = dc.y + 1;
+		r.width = r.height = x + 1;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 	else if(emptysquare) {
-		pt[0].x = dc.x + 2;
-		pt[0].y = dc.y + 2;
+		pt[0].x = dc.x + 1;
+		pt[0].y = dc.y + 1;
 		pt[1].x = x;
 		pt[1].y = 0;
 		pt[2].x = 0;
