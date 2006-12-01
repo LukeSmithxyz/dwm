@@ -30,13 +30,13 @@ textnw(const char *text, unsigned int len) {
 }
 
 static void
-drawtext(const char *text, unsigned long col[ColLast], Bool dot, Bool corner) {
+drawtext(const char *text, unsigned long col[ColLast], Bool filleddot, Bool emptydot) {
 	int x, y, w, h;
 	static char buf[256];
 	unsigned int len, olen;
 	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
-	XPoint pt[3];
+	XPoint pt[5];
 
 	XSetForeground(dpy, dc.gc, col[ColBG]);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
@@ -74,20 +74,25 @@ drawtext(const char *text, unsigned long col[ColLast], Bool dot, Bool corner) {
 		XChangeGC(dpy, dc.gc, GCForeground | GCFont, &gcv);
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
-	if(dot) {
+	x = (h + 2) / 4;
+	if(filleddot) {
 		r.x = dc.x + 2;
 		r.y = dc.y + 2;
-		r.width = r.height = (h + 2) / 4;
+		r.width = r.height = x;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
-	if(corner) {
-		pt[0].x = dc.x + 1;
-		pt[0].y = dc.y + dc.h / 2 + 1;
-		pt[1].x = 0;
-		pt[1].y = - dc.h / 2;
-		pt[2].x = dc.h / 2;
-		pt[2].y = 0;
-		XDrawLines(dpy, dc.drawable, dc.gc, pt, 3, CoordModePrevious);
+	if(emptydot) {
+		pt[0].x = dc.x + 2;
+		pt[0].y = dc.y + 2;
+		pt[1].x = x;
+		pt[1].y = 0;
+		pt[2].x = 0;
+		pt[2].y = x;
+		pt[3].x = -x;
+		pt[3].y = 0;
+		pt[4].x = 0;
+		pt[4].y = -x;
+		XDrawLines(dpy, dc.drawable, dc.gc, pt, 5, CoordModePrevious);
 	}
 }
 
