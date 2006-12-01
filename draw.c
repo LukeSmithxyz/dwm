@@ -30,7 +30,7 @@ textnw(const char *text, unsigned int len) {
 }
 
 static void
-drawtext(const char *text, unsigned long col[ColLast], Bool filleddot, Bool emptydot) {
+drawtext(const char *text, unsigned long col[ColLast], Bool filledsquare, Bool emptysquare) {
 	int x, y, w, h;
 	static char buf[256];
 	unsigned int len, olen;
@@ -75,13 +75,13 @@ drawtext(const char *text, unsigned long col[ColLast], Bool filleddot, Bool empt
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
 	x = (h + 2) / 4;
-	if(filleddot) {
+	if(filledsquare) {
 		r.x = dc.x + 2;
 		r.y = dc.y + 2;
 		r.width = r.height = x;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
-	if(emptydot) {
+	else if(emptysquare) {
 		pt[0].x = dc.x + 2;
 		pt[0].y = dc.y + 2;
 		pt[1].x = x;
