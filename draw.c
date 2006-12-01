@@ -75,9 +75,9 @@ drawtext(const char *text, unsigned long col[ColLast], Bool dot, Bool border) {
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
 	if(dot) {
+		r.x = dc.x + 2;
+		r.y = dc.y + 2;
 		r.width = r.height = (h + 2) / 4;
-		r.x = dc.x + dc.w - r.width - 2;
-		r.y = dc.y + dc.h - r.height - 2;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 	if(border) {
