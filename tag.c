@@ -55,14 +55,14 @@ initrregs(void) {
 	for(i = 0; i < len; i++) {
 		if(rule[i].clpattern) {
 			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].clpattern, 0))
+			if(regcomp(reg, rule[i].clpattern, REG_EXTENDED))
 				free(reg);
 			else
 				rreg[i].clregex = reg;
 		}
 		if(rule[i].tpattern) {
 			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].tpattern, 0))
+			if(regcomp(reg, rule[i].tpattern, REG_EXTENDED))
 				free(reg);
 			else
 				rreg[i].tregex = reg;
@@ -86,7 +86,7 @@ settags(Client *c, Client *trans) {
 		snprintf(prop, sizeof prop, "%s:%s:%s",
 				ch.res_class ? ch.res_class : "",
 				ch.res_name ? ch.res_name : "", c->name);
-		for(i = 0; !matched && i < len; i++)
+		for(i = 0; i < len; i++)
 			if(rreg[i].clregex && !regexec(rreg[i].clregex, prop, 1, &tmp, 0)) {
 				c->isfloat = rule[i].isfloat;
 				for(j = 0; rreg[i].tregex && j < ntags; j++) {
