@@ -114,7 +114,8 @@ tag(Arg *arg) {
 		return;
 	for(i = 0; i < ntags; i++)
 		sel->tags[i] = (arg->i == -1) ? True : False;
-	sel->tags[arg->i] = True;
+	if(arg->i >= 0 && arg->i < ntags)
+		sel->tags[arg->i] = True;
 	arrange();
 }
 

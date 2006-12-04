@@ -234,7 +234,8 @@ view(Arg *arg) {
 
 	for(i = 0; i < ntags; i++)
 		seltag[i] = (arg->i == -1) ? True : False;
-	seltag[arg->i] = True;
+	if(arg->i >= 0 && arg->i < ntags)
+		seltag[arg->i] = True;
 	arrange();
 }
 
