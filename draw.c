@@ -179,10 +179,6 @@ setfont(const char *fontstr) {
 		while(n--)
 			fprintf(stderr, "missing fontset: %s\n", missing[n]);
 		XFreeStringList(missing);
-		if(dc.font.set) {
-			XFreeFontSet(dpy, dc.font.set);
-			dc.font.set = NULL;
-		}
 	}
 	if(dc.font.set) {
 		XFontSetExtents *font_extents;
