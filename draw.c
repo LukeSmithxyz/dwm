@@ -170,8 +170,8 @@ setfont(const char *fontstr) {
 	char **missing, *def;
 	int i, n;
 
+	setlocale(LC_CTYPE, "");
 	missing = NULL;
-	setlocale(LC_ALL, "");
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
 	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
