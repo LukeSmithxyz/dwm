@@ -51,6 +51,9 @@ cleanup(void) {
 	XFreePixmap(dpy, dc.drawable);
 	XFreeGC(dpy, dc.gc);
 	XDestroyWindow(dpy, barwin);
+	XFreeCursor(dpy, cursor[CurNormal]);
+	XFreeCursor(dpy, cursor[CurResize]);
+	XFreeCursor(dpy, cursor[CurMove]);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
 	free(seltag);
@@ -104,7 +107,7 @@ setup(void) {
 				numlockmask = (1 << i);
 		}
 	}
-	XFree(modmap);
+	XFreeModifiermap(modmap);
 	/* select for events */
 	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
 		| EnterWindowMask | LeaveWindowMask;
