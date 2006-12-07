@@ -167,14 +167,16 @@ getcolor(const char *colstr) {
 
 void
 setfont(const char *fontstr) {
-	char **missing, *def;
+	char *def, *lc, **missing;
 	int i, n;
 
-	setlocale(LC_CTYPE, "");
+	lc = setlocale(LC_CTYPE, NULL);
+	setlocale(LC_CTYPE, "UTF-8");
 	missing = NULL;
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
 	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
+	setlocale(LC_CTYPE, lc);
 	if(missing) {
 		while(n--)
 			fprintf(stderr, "missing fontset: %s\n", missing[n]);
