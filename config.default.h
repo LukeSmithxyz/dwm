@@ -9,7 +9,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 #define FLOATSYMBOL		"><>"
 #define TILESYMBOL		"[]="
 
-#define FONT			"fixed"
+#define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
 #define NORMBGCOLOR		"#333366"
 #define NORMFGCOLOR		"#cccccc"
 #define SELBGCOLOR		"#666699"
