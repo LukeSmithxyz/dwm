@@ -2,7 +2,6 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
-#include <locale.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -167,16 +166,13 @@ getcolor(const char *colstr) {
 
 void
 setfont(const char *fontstr) {
-	char *def, *lc, **missing;
+	char *def, **missing;
 	int i, n;
 
-	lc = setlocale(LC_CTYPE, NULL);
-	setlocale(LC_CTYPE, "UTF-8");
 	missing = NULL;
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
 	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
-	setlocale(LC_CTYPE, lc);
 	if(missing) {
 		while(n--)
 			fprintf(stderr, "missing fontset: %s\n", missing[n]);

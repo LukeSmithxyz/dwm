@@ -4,6 +4,7 @@
 
 #include "dwm.h"
 #include <errno.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -240,6 +241,7 @@ main(int argc, char *argv[]) {
 	}
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
+	setlocale(LC_CTYPE, "");
 	dpy = XOpenDisplay(0);
 	if(!dpy)
 		eprint("dwm: cannot open display\n");
