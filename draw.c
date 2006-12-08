@@ -197,10 +197,7 @@ setfont(const char *fontstr) {
 		if(dc.font.xfont)
 			XFreeFont(dpy, dc.font.xfont);
 		dc.font.xfont = NULL;
-		dc.font.xfont = XLoadQueryFont(dpy, fontstr);
-		if (!dc.font.xfont)
-			dc.font.xfont = XLoadQueryFont(dpy, "fixed");
-		if (!dc.font.xfont)
+		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr)))
 			eprint("error, cannot init 'fixed' font\n");
 		dc.font.ascent = dc.font.xfont->ascent;
 		dc.font.descent = dc.font.xfont->descent;
