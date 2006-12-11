@@ -132,59 +132,6 @@ getctitle(Window w) {
 }
 
 void
-gravitate(Client *c, Bool invert) {
-	int dx = 0, dy = 0;
-
-	return;
-	switch(c->grav) {
-	default:
-		break;
-	case StaticGravity:
-	case NorthWestGravity:
-	case NorthGravity:
-	case NorthEastGravity:
-		dy = c->border;
-		break;
-	case EastGravity:
-	case CenterGravity:
-	case WestGravity:
-		dy = -(c->h / 2) + c->border;
-		break;
-	case SouthEastGravity:
-	case SouthGravity:
-	case SouthWestGravity:
-		dy = -(c->h);
-		break;
-	}
-	switch (c->grav) {
-	default:
-		break;
-	case StaticGravity:
-	case NorthWestGravity:
-	case WestGravity:
-	case SouthWestGravity:
-		dx = c->border;
-		break;
-	case NorthGravity:
-	case CenterGravity:
-	case SouthGravity:
-		dx = -(c->w / 2) + c->border;
-		break;
-	case NorthEastGravity:
-	case EastGravity:
-	case SouthEastGravity:
-		dx = -(c->w + c->border);
-		break;
-	}
-	if(invert) {
-		dx = -dx;
-		dy = -dy;
-	}
-	c->x += dx;
-	c->y += dy;
-}
-
-void
 killclient(Arg *arg) {
 	if(!sel)
 		return;
@@ -291,7 +238,7 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	else
 		wc.border_width = BORDERPX;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
-	/*configure(c);*/
+	configure(c);
 	XSync(dpy, False);
 }
 

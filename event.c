@@ -161,7 +161,6 @@ configurerequest(XEvent *e) {
 
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
-		gravitate(c, True);
 		if(ev->value_mask & CWX)
 			c->x = ev->x;
 		if(ev->value_mask & CWY)
@@ -172,7 +171,6 @@ configurerequest(XEvent *e) {
 			c->h = ev->height;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-		gravitate(c, False);
 		wc.x = c->x;
 		wc.y = c->y;
 		wc.width = c->w;

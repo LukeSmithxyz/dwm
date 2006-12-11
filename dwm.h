@@ -114,7 +114,6 @@ extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
 extern Client *getctitle(Window w);		/* return client of title window */
-extern void gravitate(Client *c, Bool invert);	/* gravitate c */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
