@@ -291,7 +291,7 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	else
 		wc.border_width = BORDERPX;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
-	configure(c);
+	/*configure(c);*/
 	XSync(dpy, False);
 }
 
