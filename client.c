@@ -135,6 +135,7 @@ void
 gravitate(Client *c, Bool invert) {
 	int dx = 0, dy = 0;
 
+	return;
 	switch(c->grav) {
 	default:
 		break;
