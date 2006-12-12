@@ -80,7 +80,6 @@ struct Client {
 	int rx, ry, rw, rh; /* revert geometry */
 	int tx, ty, tw, th; /* title window geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int grav;
 	long flags; 
 	unsigned int border;
 	Bool isfloat, isfixed, ismax;

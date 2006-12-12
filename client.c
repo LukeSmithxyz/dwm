@@ -289,10 +289,6 @@ updatesize(Client *c) {
 		c->minw = c->minh = 0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh &&
 				c->maxw == c->minw && c->maxh == c->minh);
-	if(c->flags & PWinGravity)
-		c->grav = size.win_gravity;
-	else
-		c->grav = NorthWestGravity;
 }
 
 void
