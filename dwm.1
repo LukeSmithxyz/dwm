@@ -123,8 +123,16 @@ code. This keeps it fast, secure and simple.
 .SH CAVEATS
 The status bar may display
 .BR "broken pipe"
-when dwm has been started by
+when dwm has been started by an X session manager like
 .BR xdm (1),
-because it closes standard output before executing dwm.
+because those close standard output before executing dwm.
+.P
+Java applications which use the XToolkit/XAWT backend may draw grey windows
+only. The XToolkit/XAWT backend breaks ICCCM-compliance in recent JDK 1.5 and early
+JDK 1.6 versions, because it assumes a reparenting window manager. As workaround
+wether you use JDK 1.4 (which don't contains the XToolkit/XAWT backend) or you
+define the following environment variable accordingly (to use the older Motif
+backend instead):
+.BR AWT_TOOLKIT=MToolkit .
 .SH SEE ALSO
 .BR dmenu (1)
