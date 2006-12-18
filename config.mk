@@ -1,5 +1,5 @@
 # dwm version
-VERSION = 2.7
+VERSION = 2.8
 
 # Customize below to fit your system
 
@@ -19,6 +19,11 @@ CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
 LDFLAGS = ${LIBS}
 #CFLAGS = -g -Wall -O2 ${INCS} -DVERSION=\"${VERSION}\"
 #LDFLAGS = -g ${LIBS}
+
+# Solaris
+#CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
+#LDFLAGS = ${LIBS}
+#CFLAGS += -xtarget=ultra
 
 # compiler and linker
 CC = cc
