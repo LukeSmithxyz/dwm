@@ -28,8 +28,8 @@ static Key key[] = { \
 		{ .cmd = "exec uxterm -bg black -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
-			" | dmenu -font '"FONT"' -normbg '"NORMBGCOLOR"' -normfg '"NORMFGCOLOR"' " \
-			"-selbg '"SELBGCOLOR"' -selfg '"SELFGCOLOR"')\" && exec $exe" } }, \
+			" | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' " \
+			"-sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"')\" && exec $exe" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
