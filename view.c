@@ -69,13 +69,12 @@ dofloat(void) {
 
 void
 dotile(void) {
-	unsigned int i, n, mpx, stackw, th;
+	unsigned int i, n, mpw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-	mpx = (waw * master) / 1000;
-	stackw = waw - mpx;
+	mpw = (waw * master) / 1000;
 
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
@@ -91,13 +90,13 @@ dotile(void) {
 				c->h = wah - 2 * BORDERPX;
 			}
 			else if(i == 0) { /* master window */
-				c->w = mpx - 2 * BORDERPX;
+				c->w = mpw - 2 * BORDERPX;
 				c->h = wah - 2 * BORDERPX;
 				th = wah / (n - 1);
 			}
 			else {  /* tile window */
-				c->x += mpx;
-				c->w = stackw - 2 * BORDERPX;
+				c->x += mpw;
+				c->w = (waw - mpw) - 2 * BORDERPX;
 				if(th > bh) {
 					c->y += (i - 1) * th;
 					c->h = th - 2 * BORDERPX;
