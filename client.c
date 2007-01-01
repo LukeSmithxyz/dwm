@@ -156,7 +156,7 @@ manage(Window w, XWindowAttributes *wa) {
 	c->w = c->tw = wa->width;
 	c->h = wa->height;
 	c->th = bh;
-	updatesize(c);
+	updatesizehints(c);
 	if(c->x + c->w + 2 * BORDERPX > sw)
 		c->x = sw - c->w - 2 * BORDERPX;
 	if(c->x < sx)
@@ -256,7 +256,7 @@ resizetitle(Client *c) {
 }
 
 void
-updatesize(Client *c) {
+updatesizehints(Client *c) {
 	long msize;
 	XSizeHints size;
 

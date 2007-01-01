@@ -314,7 +314,7 @@ propertynotify(XEvent *e) {
 					arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
-				updatesize(c);
+				updatesizehints(c);
 				break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
