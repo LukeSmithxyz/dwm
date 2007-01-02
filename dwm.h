@@ -117,7 +117,7 @@ extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
 extern void resizetitle(Client *c);		/* resizes c->twin correctly */
-extern void updatesizehints(Client *c);		/* update the size struct of c */
+extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
 
