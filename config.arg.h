@@ -15,7 +15,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 #define SELBGCOLOR		"#444444"
 #define SELFGCOLOR		"#ffffff"
 #define STATUSBGCOLOR		"#222222"
-#define STATUSFGCOLOR		"#99ccff"
+#define STATUSFGCOLOR		"#ccff00"
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask
