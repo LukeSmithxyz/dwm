@@ -40,9 +40,9 @@ static Bool otherwm, readin;
 static void
 cleanup(void) {
 	close(STDIN_FILENO);
-	while(clients) {
-		resize(clients, True, TopLeft);
-		unmanage(clients);
+	while(stack) {
+		resize(stack, True, TopLeft);
+		unmanage(stack);
 	}
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
