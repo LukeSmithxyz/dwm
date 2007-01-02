@@ -1,4 +1,4 @@
-/* (C)opyright MMVII Anselm R. Garbe <garbeam at gmail dot com>
+/* (C)opyright MMVI-MMVII Anselm R. Garbe <garbeam at gmail dot com>
  * See LICENSE file for license details.
  */
 
@@ -236,7 +236,7 @@ main(int argc, char *argv[]) {
 	fd_set rd;
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
-		fputs("dwm-"VERSION", (C)opyright MMVII Anselm R. Garbe\n", stdout);
+		fputs("dwm-"VERSION", (C)opyright MMVI-MMVII Anselm R. Garbe\n", stdout);
 		exit(EXIT_SUCCESS);
 	}
 	else if(argc != 1)
