@@ -96,7 +96,7 @@ focus(Client *c) {
 		sel = c;
 		if(old) {
 			grabbuttons(old, False);
-			drawtitle(old);
+			drawclient(old);
 		}
 	}
 	if(c) {
@@ -104,7 +104,7 @@ focus(Client *c) {
 		c->snext = stack;
 		stack = c;
 		grabbuttons(c, True);
-		drawtitle(c);
+		drawclient(c);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
 	else

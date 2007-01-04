@@ -102,7 +102,7 @@ drawall(void) {
 	Client *c;
 
 	for(c = clients; c; c = getnext(c->next))
-		drawtitle(c);
+		drawclient(c);
 	drawstatus();
 }
 
@@ -138,7 +138,7 @@ drawstatus(void) {
 }
 
 void
-drawtitle(Client *c) {
+drawclient(Client *c) {
 	if(c == sel && issel) {
 		drawstatus();
 		XUnmapWindow(dpy, c->twin);

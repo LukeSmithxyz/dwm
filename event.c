@@ -236,7 +236,7 @@ expose(XEvent *e) {
 		if(barwin == ev->window)
 			drawstatus();
 		else if((c = getctitle(ev->window)))
-			drawtitle(c);
+			drawclient(c);
 	}
 }
 
@@ -320,7 +320,7 @@ propertynotify(XEvent *e) {
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
 			resizetitle(c);
-			drawtitle(c);
+			drawclient(c);
 		}
 	}
 }
