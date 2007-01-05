@@ -32,17 +32,17 @@ pop(Client *c) {
 static void
 swap(Client *c1, Client *c2) {
 	Client tmp = *c1;
-	Client *cp = c1->prev;
-	Client *cn = c1->next;
+	Client *c1p = c1->prev;
+	Client *c1n = c1->next;
+	Client *c2p = c2->prev;
+	Client *c2n = c2->next;
 
 	*c1 = *c2;
-	c1->prev = cp;
-	c1->next = cn;
-	cp = c2->prev;
-	cn = c2->next;
 	*c2 = tmp;
-	c2->prev = cp;
-	c2->next = cn;
+	c1->prev = c1p;
+	c1->next = c1n;
+	c2->prev = c2p;
+	c2->next = c2n;
 }
 
 static void
@@ -192,10 +192,9 @@ focusprev(Arg *arg) {
 
 void
 incnmaster(Arg *arg) {
-	if(nmaster + arg->i < 1 || (wah / (nmaster + arg->i) < bh))
+	if((nmaster + arg->i < 1) || (wah / (nmaster + arg->i) < bh))
 		return;
 	nmaster += arg->i;
-
 	arrange();
 }
 
@@ -305,7 +304,9 @@ zoom(Arg *arg) {
 		n++;
 
 	c = sel;
-	if(n <= nmaster || (arrange == dofloat))
+	if(arrange == dofloat)
+		return;
+	else if(n <= nmaster)
 		pop(c);
 	else if(ismaster(sel)) {
 		if(!(c = topofstack()))
