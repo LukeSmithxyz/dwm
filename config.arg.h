@@ -19,6 +19,7 @@ const char *tags[] = { "dev", "work", "net", "fnord", NULL };
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask
+#define NMASTER			1		/* clients in master area */
 #define SNAP			40		/* pixel */
 
 #define KEYS \
@@ -30,10 +31,12 @@ static Key key[] = { \
 		{ .cmd = "exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
 			" | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' " \
 			"-sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"')\" && exec $exe" } }, \
+	{ MODKEY,			XK_d,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_g,		resizemaster,	{ .i = 15 } }, \
+	{ MODKEY,			XK_i,		incnmaster,	{ .i = 1 } }, \
 	{ MODKEY,			XK_s,		resizemaster,	{ .i = -15 } }, \
 	{ MODKEY|ShiftMask,		XK_0,		tag,		{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \

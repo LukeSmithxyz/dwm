@@ -96,7 +96,8 @@ extern char stext[1024];			/* status text */
 extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
 extern int wax, way, wah, waw;			/* windowarea geometry */
-extern unsigned int master, ntags, numlockmask;	/* master percent, number of tags, dynamic lock mask */
+extern unsigned int master, nmaster;		/* master percent, number of master clients */
+extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(void);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
@@ -159,6 +160,7 @@ extern void dofloat(void);			/* arranges all windows floating */
 extern void dotile(void);			/* arranges all windows tiled */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
+extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */

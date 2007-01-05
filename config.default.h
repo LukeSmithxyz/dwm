@@ -19,6 +19,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", NULL };
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask
+#define NMASTER			1		/* clients in master area */
 #define SNAP			20		/* pixel */
 
 #define KEYS \

@@ -69,12 +69,16 @@ dofloat(void) {
 
 void
 dotile(void) {
-	unsigned int i, n, mpw, th;
+	unsigned int i, n, mw, mh, tw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-	mpw = (waw * master) / 1000;
+	/* window geoms */
+	mw = (n > nmaster) ? (waw * master) / 1000 : waw;
+	mh = (n > nmaster) ? wah / nmaster : wah / (n > 0 ? n : 1);
+	tw = waw - mw;
+	th = (n > nmaster) ? wah / (n - nmaster) : 0;
 
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
@@ -85,20 +89,16 @@ dotile(void) {
 			c->ismax = False;
 			c->x = wax;
 			c->y = way;
-			if(n == 1) { /* only 1 window */
-				c->w = waw - 2 * BORDERPX;
-				c->h = wah - 2 * BORDERPX;
-			}
-			else if(i == 0) { /* master window */
-				c->w = mpw - 2 * BORDERPX;
-				c->h = wah - 2 * BORDERPX;
-				th = wah / (n - 1);
+			if(i < nmaster) {
+				c->y += i * mh;
+				c->w = mw - 2 * BORDERPX;
+				c->h = mh - 2 * BORDERPX;
 			}
 			else {  /* tile window */
-				c->x += mpw;
-				c->w = (waw - mpw) - 2 * BORDERPX;
+				c->x += mw;
+				c->w = tw - 2 * BORDERPX;
 				if(th > bh) {
-					c->y += (i - 1) * th;
+					c->y += (i - nmaster) * th;
 					c->h = th - 2 * BORDERPX;
 				}
 				else /* fallback if th < bh */
@@ -145,6 +145,14 @@ focusprev(Arg *arg) {
 		focus(c);
 		restack();
 	}
+}
+
+void
+incnmaster(Arg *arg) {
+	if(nmaster + arg->i < 1)
+		return;
+	nmaster += arg->i;
+	arrange();
 }
 
 Bool
@@ -240,7 +248,7 @@ view(Arg *arg) {
 
 void
 zoom(Arg *arg) {
-	unsigned int n;
+	unsigned int i, n;
 	Client *c;
 
 	if(!sel)
@@ -249,14 +257,19 @@ zoom(Arg *arg) {
 		togglemax(sel);
 		return;
 	}
-	for(n = 0, c = clients; c; c = c->next)
-		if(isvisible(c) && !c->isfloat)
-			n++;
-	if(n < 2 || (arrange == dofloat))
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
+		n++;
+	if(n <= nmaster || (arrange == dofloat))
 		return;
-	if((c = sel) == nexttiled(clients))
-		if(!(c = nexttiled(c->next)))
-			return;
+
+	for(c = nexttiled(clients), i = 0; c && (c != sel) && i < nmaster; c = nexttiled(c->next))
+		i++;
+	if(c == sel && i < nmaster)
+		for(; c && i < nmaster; c = nexttiled(c->next))
+			i++;
+	if(!c)
+		return;
+
 	detach(c);
 	if(clients)
 		clients->prev = c;
