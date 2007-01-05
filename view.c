@@ -261,7 +261,7 @@ zoom(Arg *arg) {
 		n++;
 
 	c = sel;
-	if(arrange != dofloat) {
+	if((arrange != dofloat) && c != nexttiled(clients)) {
 		detach(c);
 		if(clients)
 			clients->prev = c;
