@@ -11,6 +11,40 @@ nexttiled(Client *c) {
 	return c;
 }
 
+static Bool
+ismaster(Client *c) {
+	Client *cl;
+	unsigned int i;
+
+	for(cl = nexttiled(clients), i = 0; cl && cl != c; cl = nexttiled(cl->next), i++);
+	return i < nmaster;
+}
+
+static void
+pop(Client *c) {
+	detach(c);
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
+}
+
+static void
+swap(Client *c1, Client *c2) {
+	Client tmp = *c1;
+	Client *cp = c1->prev;
+	Client *cn = c1->next;
+
+	*c1 = *c2;
+	c1->prev = cp;
+	c1->next = cn;
+	cp = c2->prev;
+	cn = c2->next;
+	*c2 = tmp;
+	c2->prev = cp;
+	c2->next = cn;
+}
+
 static void
 togglemax(Client *c) {
 	XEvent ev;
@@ -32,6 +66,15 @@ togglemax(Client *c) {
 	}
 	resize(c, True, TopLeft);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+}
+
+static Client *
+topofstack() {
+	Client *c;
+	unsigned int i;
+
+	for(c = nexttiled(clients), i = 0; c && i < nmaster; c = nexttiled(c->next), i++);
+	return (i < nmaster) ? NULL : c;
 }
 
 /* extern */
@@ -248,7 +291,7 @@ view(Arg *arg) {
 
 void
 zoom(Arg *arg) {
-	unsigned int i, n;
+	unsigned int n;
 	Client *c;
 
 	if(!sel)
@@ -262,19 +305,15 @@ zoom(Arg *arg) {
 	if(n <= nmaster || (arrange == dofloat))
 		return;
 
-	for(c = nexttiled(clients), i = 0; c && (c != sel) && i < nmaster; c = nexttiled(c->next))
-		i++;
-	if(c == sel && i < nmaster)
-		for(; c && i < nmaster; c = nexttiled(c->next))
-			i++;
-	if(!c)
-		return;
+	if(ismaster((c = sel))) {
+		if(!(c = topofstack()))
+			return;
+		swap(c, sel);
+		c = sel;
+	}
+	else
+		pop(c);
 
-	detach(c);
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
 	focus(c);
 	arrange();
 }
