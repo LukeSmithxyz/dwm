@@ -302,10 +302,11 @@ zoom(Arg *arg) {
 	}
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-	if(n <= nmaster || (arrange == dofloat))
-		return;
 
-	if(ismaster((c = sel))) {
+	c = sel;
+	if(n <= nmaster || (arrange == dofloat))
+		pop(c);
+	else if(ismaster(sel)) {
 		if(!(c = topofstack()))
 			return;
 		swap(c, sel);
