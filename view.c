@@ -192,9 +192,10 @@ focusprev(Arg *arg) {
 
 void
 incnmaster(Arg *arg) {
-	if(nmaster + arg->i < 1)
+	if(nmaster + arg->i < 1 || (wah / (nmaster + arg->i) < bh))
 		return;
 	nmaster += arg->i;
+
 	arrange();
 }
 
