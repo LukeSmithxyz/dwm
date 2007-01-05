@@ -3,7 +3,7 @@
  */
 
 #define TAGS \
-const char *tags[] = { "local", "remote", "net", "cert", "fnord", NULL };
+const char *tags[] = { "home", "net", "www", "mon", "fnord", NULL };
 
 #define DEFMODE			dotile		/* dofloat */
 #define FLOATSYMBOL		"><>"
@@ -69,7 +69,7 @@ static Key key[] = { \
 #define RULES \
 static Rule rule[] = { \
 	/* class:instance:title regex	tags regex	isfloat */ \
-	{ "Firefox.*",			"net",		False }, \
+	{ "Firefox.*",			"www",		False }, \
 	{ "Gimp.*",			NULL,		True }, \
 	{ "MPlayer.*",			NULL,		True }, \
 	{ "Acroread.*",			NULL,		True }, \
