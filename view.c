@@ -260,14 +260,14 @@ zoom(Arg *arg) {
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
-	c = sel;
-	if((arrange != dofloat) && c != nexttiled(clients)) {
-		detach(c);
-		if(clients)
-			clients->prev = c;
-		c->next = clients;
-		clients = c;
-		focus(c);
-		arrange();
-	}
+	if((c = sel) == nexttiled(clients))
+		if(!(c = nexttiled(c->next)))
+			return;
+	detach(c);
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
+	focus(c);
+	arrange();
 }
