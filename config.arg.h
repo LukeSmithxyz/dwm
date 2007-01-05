@@ -3,7 +3,7 @@
  */
 
 #define TAGS \
-const char *tags[] = { "I", "II", "III", "IV", "V", "VI", "VII", NULL };
+const char *tags[] = { "local", "remote", "net", "cert", "fnord", NULL };
 
 #define DEFMODE			dotile		/* dofloat */
 #define FLOATSYMBOL		"><>"
@@ -44,15 +44,11 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_3,		tag,		{ .i = 2 } }, \
 	{ MODKEY|ShiftMask,		XK_4,		tag,		{ .i = 3 } }, \
 	{ MODKEY|ShiftMask,		XK_5,		tag,		{ .i = 4 } }, \
-	{ MODKEY|ShiftMask,		XK_6,		tag,		{ .i = 5 } }, \
-	{ MODKEY|ShiftMask,		XK_7,		tag,		{ .i = 6 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_1,		toggletag,	{ .i = 0 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_2,		toggletag,	{ .i = 1 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_3,		toggletag,	{ .i = 2 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_4,		toggletag,	{ .i = 3 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_5,		toggletag,	{ .i = 4 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_6,		toggletag,	{ .i = 5 } }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_7,		toggletag,	{ .i = 6 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloat,	{ 0 } }, \
@@ -62,15 +58,11 @@ static Key key[] = { \
 	{ MODKEY,			XK_3,		view,		{ .i = 2 } }, \
 	{ MODKEY,			XK_4,		view,		{ .i = 3 } }, \
 	{ MODKEY,			XK_5,		view,		{ .i = 4 } }, \
-	{ MODKEY,			XK_6,		view,		{ .i = 5 } }, \
-	{ MODKEY,			XK_7,		view,		{ .i = 6 } }, \
 	{ MODKEY|ControlMask,		XK_1,		toggleview,	{ .i = 0 } }, \
 	{ MODKEY|ControlMask,		XK_2,		toggleview,	{ .i = 1 } }, \
 	{ MODKEY|ControlMask,		XK_3,		toggleview,	{ .i = 2 } }, \
 	{ MODKEY|ControlMask,		XK_4,		toggleview,	{ .i = 3 } }, \
 	{ MODKEY|ControlMask,		XK_5,		toggleview,	{ .i = 4 } }, \
-	{ MODKEY|ControlMask,		XK_6,		toggleview,	{ .i = 5 } }, \
-	{ MODKEY|ControlMask,		XK_7,		toggleview,	{ .i = 6 } }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
 };
 
