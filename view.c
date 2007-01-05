@@ -34,15 +34,19 @@ swap(Client *c1, Client *c2) {
 	Client tmp = *c1;
 	Client *c1p = c1->prev;
 	Client *c1n = c1->next;
+	Client *c1s = c1->snext;
 	Client *c2p = c2->prev;
 	Client *c2n = c2->next;
+	Client *c2s = c2->snext;
 
 	*c1 = *c2;
 	*c2 = tmp;
 	c1->prev = c1p;
 	c1->next = c1n;
+	c1->snext = c1s;
 	c2->prev = c2p;
 	c2->next = c2n;
+	c2->snext = c2s;
 }
 
 static void
