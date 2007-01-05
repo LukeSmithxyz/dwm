@@ -36,8 +36,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_g,		resizemaster,	{ .i = 15 } }, \
 	{ MODKEY,			XK_s,		resizemaster,	{ .i = -15 } }, \
-	{ MODKEY|ShiftMask,		XK_plus,	incnmaster,	{ .i = 1 } }, \
-	{ MODKEY,			XK_minus,	incnmaster,	{ .i = -1 } }, \
+	{ MODKEY,			XK_i,		incnmaster,	{ .i = 1 } }, \
+	{ MODKEY,			XK_d,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_0,		tag,		{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
