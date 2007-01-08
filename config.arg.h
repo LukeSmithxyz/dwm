@@ -15,7 +15,7 @@ const char *tags[] = { "home", "net", "www", "mon", "fnord", NULL };
 #define SELBGCOLOR		"#336699"
 #define SELFGCOLOR		"#eeeeee"
 #define STATUSBGCOLOR		"#222222"
-#define STATUSFGCOLOR		"#99ccff"
+#define STATUSFGCOLOR		"#dddddd"
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask
