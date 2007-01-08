@@ -168,5 +168,6 @@ extern void restack(void);			/* restores z layers of all clients */
 extern void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
+extern void updatemodetext(void);		/* updates mtext */
 extern void view(Arg *arg);			/* views the tag with arg's index */
 extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */

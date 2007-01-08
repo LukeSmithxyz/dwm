@@ -153,8 +153,7 @@ incnmaster(Arg *arg) {
 	if((arrange == dofloat) || (nmaster + arg->i < 1) || (wah / (nmaster + arg->i) < bh))
 		return;
 	nmaster += arg->i;
-	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
-	bmw = textw(mtext);
+	updatemodetext();
 	if(sel)
 		arrange();
 	else
@@ -224,8 +223,7 @@ togglefloat(Arg *arg) {
 void
 togglemode(Arg *arg) {
 	arrange = (arrange == dofloat) ? dotile : dofloat;
-	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
-	bmw = textw(mtext);
+	updatemodetext();
 	if(sel)
 		arrange();
 	else
@@ -241,6 +239,12 @@ toggleview(Arg *arg) {
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
 	arrange();
+}
+
+void
+updatemodetext() {
+	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
+	bmw = textw(mtext);
 }
 
 void

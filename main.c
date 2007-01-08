@@ -133,8 +133,7 @@ setup(void) {
 	sh = DisplayHeight(dpy, screen);
 	master = MASTER;
 	nmaster = NMASTER;
-	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
-	bmw = textw(mtext);
+	updatemodetext();
 	/* bar */
 	bx = sx;
 	by = sy;
