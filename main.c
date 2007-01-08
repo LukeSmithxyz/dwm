@@ -17,7 +17,7 @@
 
 /* extern */
 
-char stext[1024];
+char stext[1024], mtext[32];
 Bool *seltag;
 int bx, by, bw, bh, bmw, masterd, screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int master, nmaster, ntags, numlockmask;
@@ -128,12 +128,13 @@ setup(void) {
 	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
 	/* geometry */
-	bmw = textw(TILESYMBOL) > textw(FLOATSYMBOL) ?  textw(TILESYMBOL) : textw(FLOATSYMBOL);
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	master = MASTER;
 	nmaster = NMASTER;
+	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
+	bmw = textw(mtext);
 	/* bar */
 	bx = sx;
 	by = sy;

@@ -93,6 +93,7 @@ struct Client {
 
 extern const char *tags[];			/* all tags */
 extern char stext[1024];			/* status text */
+extern char mtext[32];				/* mode text */
 extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
 extern int wax, way, wah, waw;			/* windowarea geometry */

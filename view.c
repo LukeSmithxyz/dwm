@@ -2,6 +2,7 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
+#include <stdio.h>
 
 /* static */
 
@@ -149,10 +150,15 @@ focusprev(Arg *arg) {
 
 void
 incnmaster(Arg *arg) {
-	if((nmaster + arg->i < 1) || (wah / (nmaster + arg->i) < bh))
+	if((arrange == dofloat) || (nmaster + arg->i < 1) || (wah / (nmaster + arg->i) < bh))
 		return;
 	nmaster += arg->i;
-	arrange();
+	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
+	bmw = textw(mtext);
+	if(sel)
+		arrange();
+	else
+		drawstatus();
 }
 
 Bool
@@ -218,6 +224,8 @@ togglefloat(Arg *arg) {
 void
 togglemode(Arg *arg) {
 	arrange = (arrange == dofloat) ? dotile : dofloat;
+	snprintf(mtext, sizeof mtext, arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, nmaster);
+	bmw = textw(mtext);
 	if(sel)
 		arrange();
 	else
