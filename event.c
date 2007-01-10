@@ -131,8 +131,20 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
-		if((ev->x < x + bmw) && (ev->button == Button1))
-			togglemode(NULL);
+		if(ev->x < x + bmw)
+			switch(ev->button) {
+			case Button1:
+				togglemode(NULL);
+				break;
+			case Button4:
+				a.i = 1;
+				incnmaster(&a);
+				break;
+			case Button5:
+				a.i = -1;
+				incnmaster(&a);
+				break;
+			}
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
