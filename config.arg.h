@@ -10,12 +10,12 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 #define TILESYMBOL		"[%u]="		/* %u is replaced with nmaster */
 
 #define FONT			"-*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*"
-#define NORMBGCOLOR		"#111111"
-#define NORMFGCOLOR		"#cccccc"
-#define SELBGCOLOR		"#336699"
-#define SELFGCOLOR		"#eeeeee"
-#define STATUSBGCOLOR		"#222222"
-#define STATUSFGCOLOR		"#dddddd"
+#define NORMBGCOLOR		"#222"
+#define NORMFGCOLOR		"#ccc"
+#define SELBGCOLOR		"#444"
+#define SELFGCOLOR		"#fff"
+#define STATUSBGCOLOR		"#333"
+#define STATUSFGCOLOR		"#9cf"
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask
@@ -26,7 +26,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 static Key key[] = { \
 	/* modifier			key		function		argument */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec uxterm -bg black -fg '#eeeeee' -cr '#eeeeee' +sb -fn '"FONT"'" } }, \
+		{ .cmd = "exec uxterm -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
 			" | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' " \
