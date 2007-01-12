@@ -75,14 +75,9 @@ dotile(void) {
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-
 	/* window geoms */
-	if(nmaster > 0) {
-		mh = (n > nmaster) ?  wah / nmaster : wah / (n > 0 ? n : 1);
-		mw = (n > nmaster) ? (waw * master) / 1000 : waw;
-	}
-	else
-		mh = mw = 0;
+	mh = (n > nmaster) ? wah / nmaster : wah / (n > 0 ? n : 1);
+	mw = (n > nmaster) ? (waw * master) / 1000 : waw;
 	th = (n > nmaster) ? wah / (n - nmaster) : 0;
 	tw = waw - mw;
 
@@ -95,7 +90,7 @@ dotile(void) {
 			c->ismax = False;
 			c->x = wax;
 			c->y = way;
-			if((nmaster > 0) && (i < nmaster)) {
+			if(i < nmaster) {
 				c->y += i * mh;
 				c->w = mw - 2 * BORDERPX;
 				c->h = mh - 2 * BORDERPX;
@@ -155,9 +150,7 @@ focusprev(Arg *arg) {
 
 void
 incnmaster(Arg *arg) {
-	if((arrange == dofloat)
-	|| ((int)nmaster + arg->i < 0)
-	|| (((int)nmaster + arg->i > 0) && (wah / (nmaster + arg->i) < bh)))
+	if((arrange == dofloat) || (nmaster + arg->i < 1) || (wah / (nmaster + arg->i) < bh))
 		return;
 	nmaster += arg->i;
 	updatemodetext();
