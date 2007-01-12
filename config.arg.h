@@ -33,11 +33,11 @@ static Key key[] = { \
 			"-sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"')\" && exec $exe" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
+	{ MODKEY,			XK_l,		incnmaster,	{ .i = 1 } }, \
+	{ MODKEY,			XK_h,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_g,		resizemaster,	{ .i = 15 } }, \
 	{ MODKEY,			XK_s,		resizemaster,	{ .i = -15 } }, \
-	{ MODKEY,			XK_i,		incnmaster,	{ .i = 1 } }, \
-	{ MODKEY,			XK_d,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_0,		tag,		{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
