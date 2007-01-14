@@ -121,12 +121,12 @@ setup(void) {
 	seltag = emallocz(sizeof(Bool) * ntags);
 	seltag[0] = True;
 	/* style */
+	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
 	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
 	dc.norm[ColFG] = getcolor(NORMFGCOLOR);
+	dc.sel[ColBorder] = getcolor(SELBORDERCOLOR);
 	dc.sel[ColBG] = getcolor(SELBGCOLOR);
 	dc.sel[ColFG] = getcolor(SELFGCOLOR);
-	dc.status[ColBG] = getcolor(STATUSBGCOLOR);
-	dc.status[ColFG] = getcolor(STATUSFGCOLOR);
 	setfont(FONT);
 	/* geometry */
 	sx = sy = 0;

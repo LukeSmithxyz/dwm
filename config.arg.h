@@ -10,12 +10,12 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 #define TILESYMBOL		"[]="
 
 #define FONT			"-*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*"
+#define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
+#define SELBORDERCOLOR		"#9cf"
 #define SELBGCOLOR		"#444"
 #define SELFGCOLOR		"#fff"
-#define STATUSBGCOLOR		"#333"
-#define STATUSFGCOLOR		"#9cf"
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask

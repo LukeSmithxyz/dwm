@@ -120,7 +120,7 @@ drawstatus(void) {
 		dc.x += dc.w;
 	}
 	dc.w = bmw;
-	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.status, False, False);
+	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.norm, False, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bw - dc.w;
@@ -128,7 +128,7 @@ drawstatus(void) {
 		dc.x = x;
 		dc.w = bw - x;
 	}
-	drawtext(stext, dc.status, False, False);
+	drawtext(stext, dc.norm, False, False);
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
 		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm, False, False);
@@ -141,10 +141,10 @@ void
 drawclient(Client *c) {
 	if(c == sel && issel) {
 		drawstatus();
-		XSetWindowBorder(dpy, c->win, dc.sel[ColBG]);
+		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		return;
 	}
-	XSetWindowBorder(dpy, c->win, dc.norm[ColBG]);
+	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
 	XSync(dpy, False);
 }
 

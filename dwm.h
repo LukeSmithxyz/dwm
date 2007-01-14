@@ -43,7 +43,7 @@
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
 enum { WMProtocols, WMDelete, WMLast };			/* default atoms */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
-enum { ColFG, ColBG, ColLast };				/* color */
+enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 
 typedef enum {
 	TopLeft, TopRight, BotLeft, BotRight
@@ -66,7 +66,6 @@ typedef struct {
 	int x, y, w, h;
 	unsigned long norm[ColLast];
 	unsigned long sel[ColLast];
-	unsigned long status[ColLast];
 	Drawable drawable;
 	Fnt font;
 	GC gc;
