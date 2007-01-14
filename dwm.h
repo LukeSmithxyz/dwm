@@ -78,7 +78,6 @@ struct Client {
 	int proto;
 	int x, y, w, h;
 	int rx, ry, rw, rh; /* revert geometry */
-	int tx, ty, tw, th; /* title window geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	long flags; 
 	unsigned int border;
@@ -88,7 +87,6 @@ struct Client {
 	Client *prev;
 	Client *snext;
 	Window win;
-	Window twin;
 };
 
 extern const char *tags[];			/* all tags */
@@ -110,15 +108,12 @@ extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
-extern void ban(Client *c);			/* ban c from screen */
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
-extern Client *getctitle(Window w);		/* return client of title window */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
-extern void resizetitle(Client *c);		/* resizes c->twin correctly */
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */

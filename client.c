@@ -61,12 +61,6 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 /* extern functions */
 
 void
-ban(Client *c) {
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-	XMoveWindow(dpy, c->twin, c->tx + 2 * sw, c->ty);
-}
-
-void
 configure(Client *c) {
 	XEvent synev;
 
@@ -121,16 +115,6 @@ getclient(Window w) {
 	return NULL;
 }
 
-Client *
-getctitle(Window w) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->twin == w)
-			return c;
-	return NULL;
-}
-
 void
 killclient(Arg *arg) {
 	if(!sel)
@@ -145,17 +129,15 @@ void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c;
 	Window trans;
-	XSetWindowAttributes twa;
 
 	c = emallocz(sizeof(Client));
 	c->tags = emallocz(ntags * sizeof(Bool));
 	c->win = w;
 	c->border = 0;
-	c->x = c->tx = wa->x;
-	c->y = c->ty = wa->y;
-	c->w = c->tw = wa->width;
+	c->x = wa->x;
+	c->y = wa->y;
+	c->w = wa->width;
 	c->h = wa->height;
-	c->th = bh;
 	updatesizehints(c);
 	if(c->x + c->w + 2 * BORDERPX > sw)
 		c->x = sw - c->w - 2 * BORDERPX;
@@ -169,27 +151,18 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
-	twa.override_redirect = 1;
-	twa.background_pixmap = ParentRelative;
-	twa.event_mask = ExposureMask | EnterWindowMask;
-	c->twin = XCreateWindow(dpy, root, c->tx, c->ty, c->tw, c->th,
-			0, DefaultDepth(dpy, screen), CopyFromParent,
-			DefaultVisual(dpy, screen),
-			CWOverrideRedirect | CWBackPixmap | CWEventMask, &twa);
 	grabbuttons(c, False);
 	updatetitle(c);
 	settags(c, getclient(trans));
 	if(!c->isfloat)
 		c->isfloat = trans || c->isfixed;
-	resizetitle(c);
 	if(clients)
 		clients->prev = c;
 	c->next = clients;
 	c->snext = stack;
 	stack = clients = c;
-	ban(c);
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMapWindow(dpy, c->win);
-	XMapWindow(dpy, c->twin);
 	if(isvisible(c))
 		focus(c);
 	arrange();
@@ -228,7 +201,6 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 		c->x = sw - c->w;
 	if(c->y > sh)
 		c->y = sh - c->h;
-	resizetitle(c);
 	wc.x = c->x;
 	wc.y = c->y;
 	wc.width = c->w;
@@ -240,19 +212,6 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
-}
-
-void
-resizetitle(Client *c) {
-	c->tw = textw(c->name);
-	if(c->tw > c->w)
-		c->tw = c->w + 2 * BORDERPX;
-	c->tx = c->x + c->w - c->tw + 2 * BORDERPX;
-	c->ty = c->y;
-	if(isvisible(c))
-		XMoveResizeWindow(dpy, c->twin, c->tx, c->ty, c->tw, c->th);
-	else
-		XMoveResizeWindow(dpy, c->twin, c->tx + 2 * sw, c->ty, c->tw, c->th);
 }
 
 void
@@ -331,7 +290,6 @@ unmanage(Client *c) {
 		focus(nc);
 	}
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	XDestroyWindow(dpy, c->twin);
 	free(c->tags);
 	free(c);
 	XSync(dpy, False);

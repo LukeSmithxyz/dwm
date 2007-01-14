@@ -141,16 +141,10 @@ void
 drawclient(Client *c) {
 	if(c == sel && issel) {
 		drawstatus();
-		XUnmapWindow(dpy, c->twin);
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBG]);
 		return;
 	}
 	XSetWindowBorder(dpy, c->win, dc.norm[ColBG]);
-	XMapWindow(dpy, c->twin);
-	dc.x = dc.y = 0;
-	dc.w = c->tw;
-	drawtext(c->name, dc.norm, False, False);
-	XCopyArea(dpy, dc.drawable, c->twin, dc.gc, 0, 0, c->tw, c->th, 0, 0);
 	XSync(dpy, False);
 }
 

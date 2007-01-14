@@ -59,7 +59,7 @@ dofloat(void) {
 			resize(c, True, TopLeft);
 		}
 		else
-			ban(c);
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	}
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
@@ -109,8 +109,7 @@ dotile(void) {
 			i++;
 		}
 		else
-			ban(c);
-
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
 		focus(c);
@@ -191,19 +190,14 @@ restack(void) {
 		drawstatus();
 		return;
 	}
-	if(sel->isfloat || arrange == dofloat) {
+	if(sel->isfloat || arrange == dofloat)
 		XRaiseWindow(dpy, sel->win);
-		XRaiseWindow(dpy, sel->twin);
-	}
 	if(arrange != dofloat) {
-		if(!sel->isfloat) {
-			XLowerWindow(dpy, sel->twin);
+		if(!sel->isfloat)
 			XLowerWindow(dpy, sel->win);
-		}
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
 				continue;
-			XLowerWindow(dpy, c->twin);
 			XLowerWindow(dpy, c->win);
 		}
 	}

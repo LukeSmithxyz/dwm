@@ -196,7 +196,7 @@ configurerequest(XEvent *e) {
 		if(c->isfloat) {
 			resize(c, False, TopLeft);
 			if(!isvisible(c))
-				ban(c);
+				XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 		}
 		else
 			arrange();
@@ -230,7 +230,7 @@ enternotify(XEvent *e) {
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
-	if(((c = getclient(ev->window)) || (c = getctitle(ev->window))) && isvisible(c))
+	if((c = getclient(ev->window)) && isvisible(c))
 		focus(c);
 	else if(ev->window == root) {
 		issel = True;
@@ -247,8 +247,6 @@ expose(XEvent *e) {
 	if(ev->count == 0) {
 		if(barwin == ev->window)
 			drawstatus();
-		else if((c = getctitle(ev->window)))
-			drawclient(c);
 	}
 }
 
@@ -331,7 +329,6 @@ propertynotify(XEvent *e) {
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
-			resizetitle(c);
 			drawclient(c);
 		}
 	}
