@@ -120,7 +120,7 @@ drawstatus(void) {
 		dc.x += dc.w;
 	}
 	dc.w = bmw;
-	drawtext(mtext, dc.status, False, False);
+	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.status, False, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = bw - dc.w;

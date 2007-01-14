@@ -17,7 +17,7 @@
 
 /* extern */
 
-char stext[1024], mtext[32];
+char stext[256];
 Bool *seltag;
 int bx, by, bw, bh, bmw, masterd, screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int master, nmaster, ntags, numlockmask;
@@ -134,7 +134,7 @@ setup(void) {
 	sh = DisplayHeight(dpy, screen);
 	master = MASTER;
 	nmaster = NMASTER;
-	updatemodetext();
+	bmw = textw(TILESYMBOL) > textw(FLOATSYMBOL) ? textw(TILESYMBOL) : textw(FLOATSYMBOL);
 	/* bar */
 	bx = sx;
 	by = sy;

@@ -7,7 +7,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 
 #define DEFMODE			dotile		/* dofloat */
 #define FLOATSYMBOL		"><>"
-#define TILESYMBOL		"[%u]="		/* %u is replaced with nmaster */
+#define TILESYMBOL		"[]="
 
 #define FONT			"-*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*"
 #define NORMBGCOLOR		"#222"
