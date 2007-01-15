@@ -240,7 +240,6 @@ enternotify(XEvent *e) {
 
 static void
 expose(XEvent *e) {
-	Client *c;
 	XExposeEvent *ev = &e->xexpose;
 
 	if(ev->count == 0) {
