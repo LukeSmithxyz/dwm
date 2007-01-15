@@ -117,9 +117,7 @@ extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
 
 /* draw.c */
-extern void drawall(void);			/* draw all visible client titles and the bar */
 extern void drawstatus(void);			/* draw the bar */
-extern void drawclient(Client *c);		/* draw title and set border of c */
 extern unsigned long getcolor(const char *colstr);	/* return color of colstr */
 extern void setfont(const char *fontstr);	/* set the font for DC */
 extern unsigned int textw(const char *text);	/* return the width of text in px*/

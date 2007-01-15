@@ -90,7 +90,7 @@ focus(Client *c) {
 		sel = c;
 		if(old) {
 			grabbuttons(old, False);
-			drawclient(old);
+			XSetWindowBorder(dpy, old->win, dc.norm[ColBorder]);
 		}
 	}
 	if(c) {
@@ -98,11 +98,12 @@ focus(Client *c) {
 		c->snext = stack;
 		stack = c;
 		grabbuttons(c, True);
-		drawclient(c);
+		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	drawstatus();
 }
 
 Client *

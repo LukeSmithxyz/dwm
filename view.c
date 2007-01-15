@@ -200,7 +200,6 @@ restack(void) {
 			XLowerWindow(dpy, c->win);
 		}
 	}
-	drawall();
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }

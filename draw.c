@@ -98,15 +98,6 @@ drawtext(const char *text, unsigned long col[ColLast], Bool filledsquare, Bool e
 /* extern */
 
 void
-drawall(void) {
-	Client *c;
-
-	for(c = clients; c; c = getnext(c->next))
-		drawclient(c);
-	drawstatus();
-}
-
-void
 drawstatus(void) {
 	int i, x;
 
@@ -134,17 +125,6 @@ drawstatus(void) {
 		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm, False, False);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
-	XSync(dpy, False);
-}
-
-void
-drawclient(Client *c) {
-	if(c == sel && issel) {
-		drawstatus();
-		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
-		return;
-	}
-	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
 	XSync(dpy, False);
 }
 

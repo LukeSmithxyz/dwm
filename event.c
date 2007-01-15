@@ -235,7 +235,6 @@ enternotify(XEvent *e) {
 	else if(ev->window == root) {
 		issel = True;
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-		drawall();
 	}
 }
 
@@ -272,10 +271,8 @@ static void
 leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if((ev->window == root) && !ev->same_screen) {
+	if((ev->window == root) && !ev->same_screen)
 		issel = False;
-		drawall();
-	}
 }
 
 static void
@@ -329,7 +326,8 @@ propertynotify(XEvent *e) {
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
-			drawclient(c);
+			if(c == sel)
+				drawstatus();
 		}
 	}
 }
