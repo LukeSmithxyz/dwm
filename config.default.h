@@ -11,11 +11,11 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 
 #define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#dddddd"
-#define NORMBGCOLOR		"#333366"
-#define NORMFGCOLOR		"#cccccc"
-#define SELBORDERCOLOR		"#222222"
-#define SELBGCOLOR		"#666699"
-#define SELFGCOLOR		"#eeeeee"
+#define NORMBGCOLOR		"#eeeeee"
+#define NORMFGCOLOR		"#222222"
+#define SELBORDERCOLOR		"#ff0000"
+#define SELBGCOLOR		"#006699"
+#define SELFGCOLOR		"#ffffff"
 
 #define MASTER			600		/* per thousand */
 #define MODKEY			Mod1Mask
