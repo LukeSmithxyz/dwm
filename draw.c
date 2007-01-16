@@ -114,17 +114,17 @@ drawstatus(void) {
 	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.norm, False, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
-	dc.x = bw - dc.w;
+	dc.x = sw - dc.w;
 	if(dc.x < x) {
 		dc.x = x;
-		dc.w = bw - x;
+		dc.w = sw - x;
 	}
 	drawtext(stext, dc.norm, False, False);
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
 		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm, False, False);
 	}
-	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
+	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, sw, bh, 0, 0);
 	XSync(dpy, False);
 }
 

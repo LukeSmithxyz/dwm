@@ -90,7 +90,7 @@ struct Client {
 
 extern const char *tags[];			/* all tags */
 extern char stext[256];				/* status text */
-extern int bx, by, bw, bh, bmw;			/* bar geometry, bar mode label width */
+extern int bh, bmw;				/* bar height, bar mode label width */
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
 extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int master, nmaster;		/* master percent, number of master clients */
