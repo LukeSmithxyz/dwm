@@ -29,15 +29,6 @@ eprint(const char *errstr, ...) {
 	exit(EXIT_FAILURE);
 }
 
-void *
-erealloc(void *ptr, unsigned int size) {
-	void *res = realloc(ptr, size);
-
-	if(!res)
-		eprint("fatal: could not malloc() %u bytes\n", size);
-	return res;
-}
-
 void
 spawn(Arg *arg) {
 	static char *shell = NULL;

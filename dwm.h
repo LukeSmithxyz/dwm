@@ -143,7 +143,6 @@ extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
-extern void *erealloc(void *ptr, unsigned int size);	/* reallocates memory, exits on error */
 extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
 
 /* view.c */
