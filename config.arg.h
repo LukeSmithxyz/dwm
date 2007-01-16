@@ -24,7 +24,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 
 #define KEYS \
 static Key key[] = { \
-	/* modifier			key		function		argument */ \
+	/* modifier			key		function	argument */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		{ .cmd = "exec uxterm -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
@@ -33,11 +33,11 @@ static Key key[] = { \
 			"-sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"')\" && exec $exe" } }, \
 	{ MODKEY,			XK_j,		focusnext,	{ 0 } }, \
 	{ MODKEY,			XK_k,		focusprev,	{ 0 } }, \
-	{ MODKEY,			XK_i,		incnmaster,	{ .i = 1 } }, \
-	{ MODKEY,			XK_d,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY,			XK_Return,	zoom,		{ 0 } }, \
 	{ MODKEY,			XK_g,		resizemaster,	{ .i = 15 } }, \
 	{ MODKEY,			XK_s,		resizemaster,	{ .i = -15 } }, \
+	{ MODKEY,			XK_i,		incnmaster,	{ .i = 1 } }, \
+	{ MODKEY,			XK_d,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_0,		tag,		{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_1,		tag,		{ .i = 0 } }, \
 	{ MODKEY|ShiftMask,		XK_2,		tag,		{ .i = 1 } }, \
