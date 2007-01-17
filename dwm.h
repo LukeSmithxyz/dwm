@@ -37,7 +37,6 @@
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 /* other stuff used in different places */
-#define BORDERPX		1
 #define PROTODELWIN		1
 
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
