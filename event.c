@@ -234,9 +234,7 @@ enternotify(XEvent *e) {
 		focus(c);
 	else if(ev->window == root) {
 		issel = True;
-		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-		if(sel)
-			focus(sel);
+		focus(sel);
 	}
 }
 
@@ -273,8 +271,7 @@ leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->window == root) && !ev->same_screen) {
-		if(sel)
-			focus(NULL);
+		focus(NULL);
 		issel = False;
 	}
 }
