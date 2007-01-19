@@ -273,9 +273,9 @@ leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->window == root) && !ev->same_screen) {
-		issel = False;
 		if(sel)
-			XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
+			focus(NULL);
+		issel = False;
 	}
 }
 
