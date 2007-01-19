@@ -5,10 +5,10 @@
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 
+#define BORDERPX		1
 #define DEFMODE			dotile		/* dofloat */
 #define FLOATSYMBOL		"><>"
 #define TILESYMBOL		"[]="
-#define BORDERPX		1
 
 #define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#dddddd"
