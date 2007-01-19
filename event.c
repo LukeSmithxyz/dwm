@@ -236,7 +236,7 @@ enternotify(XEvent *e) {
 		issel = True;
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 		if(sel)
-			XSetWindowBorder(dpy, sel->win, dc.sel[ColBorder]);
+			focus(sel);
 	}
 }
 
