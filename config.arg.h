@@ -14,7 +14,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 #define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
-#define SELBORDERCOLOR		"#9cf"
+#define SELBORDERCOLOR		"#69c"
 #define SELBGCOLOR		"#555"
 #define SELFGCOLOR		"#fff"
 
