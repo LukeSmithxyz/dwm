@@ -44,10 +44,6 @@ enum { WMProtocols, WMDelete, WMLast };			/* default atoms */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 
-typedef enum {
-	TopLeft, TopRight, BotLeft, BotRight
-} Corner; /* window corners */
-
 typedef union {
 	const char *cmd;
 	int i;
@@ -110,7 +106,7 @@ extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-extern void resize(Client *c, Bool sizehints, Corner sticky); /* resize c*/
+extern void resize(Client *c, Bool sizehints);	/* resize c*/
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */

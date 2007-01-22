@@ -35,14 +35,16 @@ movemouse(Client *c) {
 	c->ismax = False;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
-		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
+		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask, &ev);
 		switch (ev.type) {
 		case ButtonRelease:
-			resize(c, True, TopLeft);
+			resize(c, True);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
+		case ConfigureRequest:
 		case Expose:
-			handler[Expose](&ev);
+		case MapRequest:
+			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
@@ -50,13 +52,13 @@ movemouse(Client *c) {
 			c->y = ocy + (ev.xmotion.y - y1);
 			if(abs(wax + c->x) < SNAP)
 				c->x = wax;
-			else if(abs((wax + waw) - (c->x + c->w)) < SNAP)
-				c->x = wax + waw - c->w - 2 * BORDERPX;
+			else if(abs((wax + waw) - (c->x + c->w + 2 * c->border)) < SNAP)
+				c->x = wax + waw - c->w - 2 * c->border;
 			if(abs(way - c->y) < SNAP)
 				c->y = way;
-			else if(abs((way + wah) - (c->y + c->h)) < SNAP)
-				c->y = way + wah - c->h - 2 * BORDERPX;
-			resize(c, False, TopLeft);
+			else if(abs((way + wah) - (c->y + c->h + 2 * c->border)) < SNAP)
+				c->y = way + wah - c->h - 2 * c->border;
+			resize(c, False);
 			break;
 		}
 	}
@@ -66,7 +68,6 @@ static void
 resizemouse(Client *c) {
 	int ocx, ocy;
 	int nw, nh;
-	Corner sticky;
 	XEvent ev;
 
 	ocx = c->x;
@@ -75,30 +76,26 @@ resizemouse(Client *c) {
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	c->ismax = False;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
 	for(;;) {
-		XMaskEvent(dpy, MOUSEMASK | ExposureMask, &ev);
+		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask , &ev);
 		switch(ev.type) {
 		case ButtonRelease:
-			resize(c, True, TopLeft);
+			resize(c, True);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
+		case ConfigureRequest:
 		case Expose:
-			handler[Expose](&ev);
+		case MapRequest:
+			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			if((nw = abs(ocx - ev.xmotion.x)))
-				c->w = nw;
-			if((nh = abs(ocy - ev.xmotion.y)))
-				c->h = nh;
-			c->x = (ocx <= ev.xmotion.x) ? ocx : ocx - c->w;
-			c->y = (ocy <= ev.xmotion.y) ? ocy : ocy - c->h;
-			if(ocx <= ev.xmotion.x)
-				sticky = (ocy <= ev.xmotion.y) ? TopLeft : BotLeft;
-			else
-				sticky = (ocy <= ev.xmotion.y) ? TopRight : BotRight;
-			resize(c, True, sticky);
+			nw = ev.xmotion.x - ocx - 2 * c->border + 1;
+			c->w = nw > 0 ? nw : 1;
+			nh = ev.xmotion.y - ocy - 2 * c->border + 1;
+			c->h = nh > 0 ? nh : 1;
+			resize(c, True);
 			break;
 		}
 	}
@@ -194,7 +191,7 @@ configurerequest(XEvent *e) {
 			configure(c);
 		XSync(dpy, False);
 		if(c->isfloat) {
-			resize(c, False, TopLeft);
+			resize(c, False);
 			if(!isvisible(c))
 				XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 		}
@@ -234,7 +231,8 @@ enternotify(XEvent *e) {
 		focus(c);
 	else if(ev->window == root) {
 		issel = True;
-		focus(sel);
+		for(c = stack; c && !isvisible(c); c = c->snext);
+		focus(c);
 	}
 }
 

@@ -41,7 +41,7 @@ static void
 cleanup(void) {
 	close(STDIN_FILENO);
 	while(stack) {
-		resize(stack, True, TopLeft);
+		resize(stack, True);
 		unmanage(stack);
 	}
 	if(dc.font.set)

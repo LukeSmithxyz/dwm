@@ -31,7 +31,7 @@ togglemax(Client *c) {
 		c->w = c->rw;
 		c->h = c->rh;
 	}
-	resize(c, True, TopLeft);
+	resize(c, True);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
@@ -56,7 +56,7 @@ dofloat(void) {
 
 	for(c = clients; c; c = c->next) {
 		if(isvisible(c)) {
-			resize(c, True, TopLeft);
+			resize(c, True);
 		}
 		else
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
@@ -84,7 +84,7 @@ dotile(void) {
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
 			if(c->isfloat) {
-				resize(c, True, TopLeft);
+				resize(c, True);
 				continue;
 			}
 			c->ismax = False;
@@ -105,7 +105,7 @@ dotile(void) {
 				else /* fallback if th < bh */
 					c->h = wah - 2 * BORDERPX;
 			}
-			resize(c, False, TopLeft);
+			resize(c, False);
 			i++;
 		}
 		else

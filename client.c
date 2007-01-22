@@ -79,19 +79,14 @@ configure(Client *c) {
 
 void
 focus(Client *c) {
-	Client *old;
+	Client *old = sel;
 
 	if(!issel || (c && !isvisible(c)))
 		return;
-	if(!sel)
-		sel = c;
-	else if(sel != c) {
-		old = sel;
-		sel = c;
-		if(old) {
-			grabbuttons(old, False);
-			XSetWindowBorder(dpy, old->win, dc.norm[ColBorder]);
-		}
+
+	if(old && old != c) {
+		grabbuttons(old, False);
+		XSetWindowBorder(dpy, old->win, dc.norm[ColBorder]);
 	}
 	if(c) {
 		detachstack(c);
@@ -103,6 +98,7 @@ focus(Client *c) {
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	sel = c;
 	drawstatus();
 }
 
@@ -134,20 +130,27 @@ manage(Window w, XWindowAttributes *wa) {
 	c = emallocz(sizeof(Client));
 	c->tags = emallocz(ntags * sizeof(Bool));
 	c->win = w;
-	c->border = 0;
 	c->x = wa->x;
 	c->y = wa->y;
 	c->w = wa->width;
 	c->h = wa->height;
-	updatesizehints(c);
-	if(c->x + c->w + 2 * BORDERPX > sw)
-		c->x = sw - c->w - 2 * BORDERPX;
-	if(c->x < sx)
+	if(c->w == sw && c->h == sh) {
+		c->border = 0;
 		c->x = sx;
-	if(c->y + c->h + 2 * BORDERPX > sh)
-		c->y = sh - c->h - 2 * BORDERPX;
-	if(c->h != sh && c->y < bh)
-		c->y = bh;
+		c->y = sy;
+	}
+	else {
+		c->border = BORDERPX;
+		if(c->x < wax)
+			c->x = wax;
+		if(c->y < way)
+			c->y = way;
+		if(c->x + c->w + 2 * c->border > wax + waw)
+			c->x = wax + waw - c->w - 2 * c->border;
+		if(c->y + c->h + 2 * c->border > way + wah)
+			c->y = way + wah - c->h - 2 * c->border;
+	}
+	updatesizehints(c);
 	c->proto = getproto(c->win);
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
@@ -170,9 +173,7 @@ manage(Window w, XWindowAttributes *wa) {
 }
 
 void
-resize(Client *c, Bool sizehints, Corner sticky) {
-	int bottom = c->y + c->h;
-	int right = c->x + c->w;
+resize(Client *c, Bool sizehints) {
 	XWindowChanges wc;
 
 	if(sizehints) {
@@ -189,27 +190,24 @@ resize(Client *c, Bool sizehints, Corner sticky) {
 		if(c->maxh && c->h > c->maxh)
 			c->h = c->maxh;
 	}
-	if(sticky == TopRight || sticky == BotRight)
-		c->x = right - c->w;
-	if(sticky == BotLeft || sticky == BotRight)
-		c->y = bottom - c->h;
+	if(c->w == sw && c->h == sh)
+		c->border = 0;
+	else
+		c->border = BORDERPX;
 	/* offscreen appearance fixes */
-	if(c->x + c->w < sx)
+	if(c->x + c->w + 2 * c->border < sx)
 		c->x = sx;
-	if(c->y + c->h < bh)
-		c->y = bh;
+	if(c->y + c->h + 2 * c->border < sy)
+		c->y = sy;
 	if(c->x > sw)
-		c->x = sw - c->w;
+		c->x = sw - c->w - 2 * c->border;
 	if(c->y > sh)
-		c->y = sh - c->h;
+		c->y = sh - c->h - 2 * c->border;
 	wc.x = c->x;
 	wc.y = c->y;
 	wc.width = c->w;
 	wc.height = c->h;
-	if(c->w == sw && c->h == sh)
-		wc.border_width = 0;
-	else
-		wc.border_width = BORDERPX;
+	wc.border_width = c->border;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
