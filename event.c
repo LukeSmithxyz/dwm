@@ -269,8 +269,8 @@ leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->window == root) && !ev->same_screen) {
-		focus(NULL);
 		issel = False;
+		focus(sel);
 	}
 }
 

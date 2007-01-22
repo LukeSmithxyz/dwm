@@ -81,7 +81,7 @@ void
 focus(Client *c) {
 	Client *old = sel;
 
-	if(!issel || (c && !isvisible(c)))
+	if(c && !isvisible(c))
 		return;
 
 	if(old && old != c) {
@@ -89,14 +89,18 @@ focus(Client *c) {
 		XSetWindowBorder(dpy, old->win, dc.norm[ColBorder]);
 	}
 	if(c) {
-		detachstack(c);
-		c->snext = stack;
-		stack = c;
-		grabbuttons(c, True);
-		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
-		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+		if(issel) {
+			detachstack(c);
+			c->snext = stack;
+			stack = c;
+			grabbuttons(c, True);
+			XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
+			XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+		}
+		else
+			XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
 	}
-	else
+	else if(issel)
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	sel = c;
 	drawstatus();
