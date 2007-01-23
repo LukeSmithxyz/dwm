@@ -81,7 +81,6 @@ void
 focus(Client *c) {
 	if(c && !isvisible(c))
 		return;
-
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
