@@ -23,7 +23,7 @@ int bh, bmw, screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int master, nmaster, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
-Bool issel = True;
+Bool activescreen = True;
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
@@ -156,7 +156,7 @@ setup(void) {
 	dc.gc = XCreateGC(dpy, root, 0, 0);
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
 	/* multihead support */
-	issel = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
+	activescreen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 }
 
 /*

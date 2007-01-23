@@ -93,7 +93,7 @@ extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern void (*arrange)(void);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, issel, *seltag;		/* seltag is array of Bool */
+extern Bool activescreen, running, *seltag;		/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */

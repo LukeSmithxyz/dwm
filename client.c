@@ -85,20 +85,22 @@ focus(Client *c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
 	}
-	sel = c;
-	if(!issel)
-		return;
 	if(c) {
 		detachstack(c);
 		c->snext = stack;
 		stack = c;
 		grabbuttons(c, True);
+	}
+	sel = c;
+	drawstatus();
+	if(!activescreen)
+		return;
+	if(sel) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-	drawstatus();
 }
 
 Client *

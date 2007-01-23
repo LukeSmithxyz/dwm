@@ -230,7 +230,7 @@ enternotify(XEvent *e) {
 	if((c = getclient(ev->window)) && isvisible(c))
 		focus(c);
 	else if(ev->window == root) {
-		issel = True;
+		activescreen = True;
 		for(c = stack; c && !isvisible(c); c = c->snext);
 		focus(c);
 	}
@@ -269,7 +269,7 @@ leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->window == root) && !ev->same_screen) {
-		issel = False;
+		activescreen = False;
 		focus(NULL);
 	}
 }
