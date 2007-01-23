@@ -270,7 +270,7 @@ leavenotify(XEvent *e) {
 
 	if((ev->window == root) && !ev->same_screen) {
 		issel = False;
-		focus(sel);
+		focus(NULL);
 	}
 }
 
