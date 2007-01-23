@@ -95,7 +95,7 @@ focus(Client *c) {
 	drawstatus();
 	if(!activescreen)
 		return;
-	if(sel) {
+	if(c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
@@ -157,6 +157,7 @@ manage(Window w, XWindowAttributes *wa) {
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
 	grabbuttons(c, False);
+	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
 	updatetitle(c);
 	settags(c, getclient(trans));
 	if(!c->isfloat)
