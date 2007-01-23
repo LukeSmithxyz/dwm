@@ -79,15 +79,16 @@ configure(Client *c) {
 
 void
 focus(Client *c) {
-	Client *old = sel;
-
 	if(c && !isvisible(c))
 		return;
 
-	if(old && old != c) {
-		grabbuttons(old, False);
-		XSetWindowBorder(dpy, old->win, dc.norm[ColBorder]);
+	if(sel && sel != c) {
+		grabbuttons(sel, False);
+		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
 	}
+	sel = c;
+	if(!issel)
+		return;
 	if(c) {
 		detachstack(c);
 		c->snext = stack;
@@ -96,9 +97,8 @@ focus(Client *c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
-	else if(issel)
+	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-	sel = c;
 	drawstatus();
 }
 
