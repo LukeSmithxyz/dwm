@@ -93,7 +93,7 @@ focus(Client *c) {
 	}
 	sel = c;
 	drawstatus();
-	if(!activescreen)
+	if(!selscreen)
 		return;
 	if(c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
