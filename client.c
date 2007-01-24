@@ -142,14 +142,14 @@ manage(Window w, XWindowAttributes *wa) {
 	}
 	else {
 		c->border = BORDERPX;
-		if(c->x < wax)
-			c->x = wax;
-		if(c->y < way)
-			c->y = way;
 		if(c->x + c->w + 2 * c->border > wax + waw)
 			c->x = wax + waw - c->w - 2 * c->border;
 		if(c->y + c->h + 2 * c->border > way + wah)
 			c->y = way + wah - c->h - 2 * c->border;
+		if(c->x < wax)
+			c->x = wax;
+		if(c->y < way)
+			c->y = way;
 	}
 	updatesizehints(c);
 	c->proto = getproto(c->win);
@@ -197,14 +197,14 @@ resize(Client *c, Bool sizehints) {
 	else
 		c->border = BORDERPX;
 	/* offscreen appearance fixes */
-	if(c->x + c->w + 2 * c->border < sx)
-		c->x = sx;
-	if(c->y + c->h + 2 * c->border < sy)
-		c->y = sy;
 	if(c->x > sw)
 		c->x = sw - c->w - 2 * c->border;
 	if(c->y > sh)
 		c->y = sh - c->h - 2 * c->border;
+	if(c->x + c->w + 2 * c->border < sx)
+		c->x = sx;
+	if(c->y + c->h + 2 * c->border < sy)
+		c->y = sy;
 	wc.x = c->x;
 	wc.y = c->y;
 	wc.width = c->w;
