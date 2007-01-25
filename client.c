@@ -178,6 +178,8 @@ void
 resize(Client *c, Bool sizehints) {
 	XWindowChanges wc;
 
+	if(c->w <= 0 || c->h <= 0)
+		return;
 	if(sizehints) {
 		if(c->incw)
 			c->w -= (c->w - c->basew) % c->incw;

@@ -98,11 +98,11 @@ dotile(void) {
 			else {  /* tile window */
 				c->x += mw;
 				c->w = tw - 2 * BORDERPX;
-				if(th > bh) {
+				if(th - 2 * BORDERPX > bh) {
 					c->y += (i - nmaster) * th;
 					c->h = th - 2 * BORDERPX;
 				}
-				else /* fallback if th < bh */
+				else /* fallback if th - 2 * BORDERPX < bh */
 					c->h = wah - 2 * BORDERPX;
 			}
 			resize(c, False);
@@ -149,7 +149,8 @@ focusprev(Arg *arg) {
 
 void
 incnmaster(Arg *arg) {
-	if((arrange == dofloat) || (nmaster + arg->i < 1) || (wah / (nmaster + arg->i) < bh))
+	if((arrange == dofloat) || (nmaster + arg->i < 1)
+		|| (wah / (nmaster + arg->i) - 2 * BORDERPX < bh))
 		return;
 	nmaster += arg->i;
 	if(sel)
@@ -173,7 +174,8 @@ resizemaster(Arg *arg) {
 	if(arg->i == 0)
 		master = MASTER;
 	else {
-		if(master + arg->i > 950 || master + arg->i < 50)
+		if(waw * (master + arg->i) / 1000 > waw - bh - 2 * BORDERPX
+			|| waw * (master + arg->i) / 1000 < bh + 2 * BORDERPX)
 			return;
 		master += arg->i;
 	}
