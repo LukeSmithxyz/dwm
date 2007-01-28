@@ -40,7 +40,7 @@
 #define PROTODELWIN		1
 
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
-enum { WMProtocols, WMDelete, WMLast };			/* default atoms */
+enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 

@@ -53,6 +53,13 @@ grabbuttons(Client *c, Bool focused) {
 				GrabModeAsync, GrabModeSync, None, None);
 }
 
+static void
+setclientstate(Client *c, long state) {
+	long data[] = {state, None};
+	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
+			PropModeReplace, (unsigned char *)data, 2);
+}
+
 static int
 xerrordummy(Display *dsply, XErrorEvent *ee) {
 	return 0;
@@ -169,6 +176,7 @@ manage(Window w, XWindowAttributes *wa) {
 	stack = clients = c;
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMapWindow(dpy, c->win);
+	setclientstate(c, NormalState);
 	if(isvisible(c))
 		focus(c);
 	arrange();
@@ -293,6 +301,7 @@ unmanage(Client *c) {
 		focus(nc);
 	}
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+	setclientstate(c, WithdrawnState);
 	free(c->tags);
 	free(c);
 	XSync(dpy, False);
