@@ -7,7 +7,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-/* static functions */
+/* static */
 
 static void
 detachstack(Client *c) {
@@ -65,7 +65,7 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 	return 0;
 }
 
-/* extern functions */
+/* extern */
 
 void
 configure(Client *c) {
