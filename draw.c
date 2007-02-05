@@ -35,7 +35,6 @@ drawtext(const char *text, unsigned long col[ColLast], Bool filledsquare, Bool e
 	unsigned int len, olen;
 	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
-	XPoint pt[5];
 
 	XSetForeground(dpy, dc.gc, col[ColBG]);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
@@ -74,24 +73,15 @@ drawtext(const char *text, unsigned long col[ColLast], Bool filledsquare, Bool e
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 	}
 	x = (h + 2) / 4;
+	r.x = dc.x + 1;
+	r.y = dc.y + 1;
 	if(filledsquare) {
-		r.x = dc.x + 1;
-		r.y = dc.y + 1;
 		r.width = r.height = x + 1;
 		XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 	else if(emptysquare) {
-		pt[0].x = dc.x + 1;
-		pt[0].y = dc.y + 1;
-		pt[1].x = x;
-		pt[1].y = 0;
-		pt[2].x = 0;
-		pt[2].y = x;
-		pt[3].x = -x;
-		pt[3].y = 0;
-		pt[4].x = 0;
-		pt[4].y = -x;
-		XDrawLines(dpy, dc.drawable, dc.gc, pt, 5, CoordModePrevious);
+		r.width = r.height = x;
+		XDrawRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	}
 }
 
