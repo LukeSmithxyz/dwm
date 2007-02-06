@@ -73,6 +73,7 @@ struct Client {
 	int x, y, w, h;
 	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
 	Bool isfloat, isfixed, ismax;

@@ -10,6 +10,13 @@
 /* static */
 
 static void
+closestpt(float *rx, float *ry, float x, float y, float grad) {
+	float u = (x * grad + y) / (grad * grad + 1);
+	*rx = u * grad;
+	*ry = u;
+}
+
+static void
 detachstack(Client *c) {
 	Client **tc;
 	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
@@ -184,15 +191,12 @@ manage(Window w, XWindowAttributes *wa) {
 
 void
 resize(Client *c, Bool sizehints) {
+	float dx, dy, min, max, actual;
 	XWindowChanges wc;
 
 	if(c->w <= 0 || c->h <= 0)
 		return;
 	if(sizehints) {
-		if(c->incw)
-			c->w -= (c->w - c->basew) % c->incw;
-		if(c->inch)
-			c->h -= (c->h - c->baseh) % c->inch;
 		if(c->minw && c->w < c->minw)
 			c->w = c->minw;
 		if(c->minh && c->h < c->minh)
@@ -201,6 +205,30 @@ resize(Client *c, Bool sizehints) {
 			c->w = c->maxw;
 		if(c->maxh && c->h > c->maxh)
 			c->h = c->maxh;
+		/* inspired by algorithm from fluxbox */
+		if(c->minay > 0 && c->maxay && (c->h - c->baseh) > 0) {
+			dx = (float)(c->w - c->basew);
+			dy = (float)(c->h - c->baseh);
+			min = (float)(c->minax) / (float)(c->minay);
+			max = (float)(c->maxax) / (float)(c->maxay);
+			actual = dx / dy;
+			if(max > 0 && min > 0 && actual > 0) {
+				if(actual < min) {
+					closestpt(&dx, &dy, dx, dy, min);
+					c->w = (int)dx + c->basew;
+					c->h = (int)dy + c->baseh;
+				}
+				else if(actual > max) {
+					closestpt(&dx, &dy, dx, dy, max);
+					c->w = (int)dx + c->basew;
+					c->h = (int)dy + c->baseh;
+				}
+			}
+		}
+		if(c->incw)
+			c->w -= (c->w - c->basew) % c->incw;
+		if(c->inch)
+			c->h -= (c->h - c->baseh) % c->inch;
 	}
 	if(c->w == sw && c->h == sh)
 		c->border = 0;
@@ -257,6 +285,14 @@ updatesizehints(Client *c) {
 	}
 	else
 		c->minw = c->minh = 0;
+	if(c->flags & PAspect) {
+		c->minax = size.min_aspect.x;
+		c->minay = size.min_aspect.y;
+		c->maxax = size.max_aspect.x;
+		c->maxay = size.max_aspect.y;
+	}
+	else
+		c->minax = c->minay = c->maxax = c->maxay = 0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh &&
 				c->maxw == c->minw && c->maxh == c->minh);
 }
