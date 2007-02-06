@@ -10,13 +10,6 @@
 /* static */
 
 static void
-closestpt(float *rx, float *ry, float x, float y, float grad) {
-	float u = (x * grad + y) / (grad * grad + 1);
-	*rx = u * grad;
-	*ry = u;
-}
-
-static void
 detachstack(Client *c) {
 	Client **tc;
 	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
@@ -191,7 +184,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 void
 resize(Client *c, Bool sizehints) {
-	float dx, dy, min, max, actual;
+	float actual, dx, dy, max, min, u;
 	XWindowChanges wc;
 
 	if(c->w <= 0 || c->h <= 0)
@@ -214,12 +207,14 @@ resize(Client *c, Bool sizehints) {
 			actual = dx / dy;
 			if(max > 0 && min > 0 && actual > 0) {
 				if(actual < min) {
-					closestpt(&dx, &dy, dx, dy, min);
+					dy = (dx * min + dy) / (min * min + 1);
+					dx = dy * min;
 					c->w = (int)dx + c->basew;
 					c->h = (int)dy + c->baseh;
 				}
 				else if(actual > max) {
-					closestpt(&dx, &dy, dx, dy, max);
+					dy = (dx * min + dy) / (max * max + 1);
+					dx = dy * min;
 					c->w = (int)dx + c->basew;
 					c->h = (int)dy + c->baseh;
 				}
