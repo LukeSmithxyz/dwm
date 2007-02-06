@@ -184,7 +184,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 void
 resize(Client *c, Bool sizehints) {
-	float actual, dx, dy, max, min, u;
+	float actual, dx, dy, max, min;
 	XWindowChanges wc;
 
 	if(c->w <= 0 || c->h <= 0)
