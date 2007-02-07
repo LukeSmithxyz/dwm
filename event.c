@@ -308,10 +308,6 @@ propertynotify(XEvent *e) {
 	if(ev->state == PropertyDelete)
 		return; /* ignore */
 	if((c = getclient(ev->window))) {
-		if(ev->atom == wmatom[WMProtocols]) {
-			c->proto = getproto(c->win);
-			return;
-		}
 		switch (ev->atom) {
 			default: break;
 			case XA_WM_TRANSIENT_FOR:

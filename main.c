@@ -172,24 +172,6 @@ xerrorstart(Display *dsply, XErrorEvent *ee) {
 
 /* extern */
 
-int
-getproto(Window w) {
-	int i, format, protos, status;
-	unsigned long extra, res;
-	Atom *protocols, real;
-
-	protos = 0;
-	status = XGetWindowProperty(dpy, w, wmatom[WMProtocols], 0L, 20L, False,
-			XA_ATOM, &real, &format, &res, &extra, (unsigned char **)&protocols);
-	if(status != Success || protocols == 0)
-		return protos;
-	for(i = 0; i < res; i++)
-		if(protocols[i] == wmatom[WMDelete])
-			protos |= PROTODELWIN;
-	free(protocols);
-	return protos;
-}
-
 void
 sendevent(Window w, Atom a, long value) {
 	XEvent e;

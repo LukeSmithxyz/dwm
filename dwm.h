@@ -36,8 +36,6 @@
 
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
-/* other stuff used in different places */
-#define PROTODELWIN		1
 
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
@@ -69,14 +67,13 @@ typedef struct {
 typedef struct Client Client;
 struct Client {
 	char name[256];
-	int proto;
 	int x, y, w, h;
 	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isfloat, isfixed, ismax;
+	Bool isfixed, isfloat, ismax;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -105,6 +102,7 @@ extern Window root, barwin;
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
+extern Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, Bool sizehints);	/* resize c*/
@@ -123,7 +121,6 @@ extern void grabkeys(void);			/* grab all keys defined in config.h */
 extern void procevent(void);			/* process pending X events */
 
 /* main.c */
-extern int getproto(Window w);			/* return protocol mask of WMProtocols property of w */
 extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */

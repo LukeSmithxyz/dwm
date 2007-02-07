@@ -120,11 +120,26 @@ getclient(Window w) {
 	return NULL;
 }
 
+Bool
+isprotodel(Client *c) {
+	int i, n;
+	Atom *protocols;
+	Bool ret = False;
+
+	if(XGetWMProtocols(dpy, c->win, &protocols, &n)) {
+		for(i = 0; !ret && i < n; i++)
+			if(protocols[i] == wmatom[WMDelete])
+				ret = True;
+		XFree(protocols);
+	}
+	return ret;
+}
+
 void
 killclient(Arg *arg) {
 	if(!sel)
 		return;
-	if(sel->proto & PROTODELWIN)
+	if(isprotodel(sel))
 		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]);
 	else
 		XKillClient(dpy, sel->win);
@@ -159,7 +174,6 @@ manage(Window w, XWindowAttributes *wa) {
 			c->y = way;
 	}
 	updatesizehints(c);
-	c->proto = getproto(c->win);
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
