@@ -18,11 +18,11 @@
 /* extern */
 
 char stext[256];
-Bool *seltag;
 int bh, bmw, screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int master, nmaster, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
+Bool *seltag;
 Bool selscreen = True;
 Client *clients = NULL;
 Client *sel = NULL;
