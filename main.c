@@ -141,15 +141,15 @@ setup(void) {
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask | ExposureMask;
-	barwin = XCreateWindow(dpy, root, sx, sy + sh - bh, sw, bh, 0, DefaultDepth(dpy, screen),
-			CopyFromParent, DefaultVisual(dpy, screen),
+	barwin = XCreateWindow(dpy, root, sx, sy + (TOPBAR ? 0 : sh - bh), sw, bh, 0,
+			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
 	/* windowarea */
 	wax = sx;
-	way = sy;
+	way = sy + (TOPBAR ? bh : 0);
 	wah = sh - bh;
 	waw = sw;
 	/* pixmap for everything */
