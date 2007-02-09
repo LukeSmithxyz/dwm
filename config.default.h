@@ -85,4 +85,6 @@ static Key key[] = { \
 static Rule rule[] = { \
 	/* class:instance:title regex	tags regex	isfloat */ \
 	{ "Gimp.*",			NULL,		True }, \
+	{ "MPlayer.*",			NULL,		True }, \
+	{ "Acroread.*",			NULL,		True }, \
 };
