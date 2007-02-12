@@ -207,7 +207,7 @@ restack(void) {
 
 void
 togglefloat(Arg *arg) {
-	if (!sel || arrange == dofloat)
+	if(!sel || arrange == dofloat)
 		return;
 	sel->isfloat = !sel->isfloat;
 	arrange();
