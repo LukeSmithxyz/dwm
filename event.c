@@ -293,11 +293,8 @@ maprequest(XEvent *e) {
 
 	if(!XGetWindowAttributes(dpy, ev->window, &wa))
 		return;
-	if(wa.override_redirect) {
-		XSelectInput(dpy, ev->window,
-				(StructureNotifyMask | PropertyChangeMask));
+	if(wa.override_redirect)
 		return;
-	}
 	if(!getclient(ev->window))
 		manage(ev->window, &wa);
 }
