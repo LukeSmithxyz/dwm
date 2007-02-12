@@ -85,6 +85,7 @@ resizemouse(Client *c) {
 			XWarpPointer(dpy, None, c->win, 0, 0, 0, 0,
 					c->w + c->border - 1, c->h + c->border - 1);
 			XUngrabPointer(dpy, CurrentTime);
+			while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 			return;
 		case ConfigureRequest:
 		case Expose:
