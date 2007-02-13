@@ -148,7 +148,7 @@ killclient(Arg *arg) {
 
 void
 manage(Window w, XWindowAttributes *wa) {
-	Client *c;
+	Client *c, *t;
 	Window trans;
 
 	c = emallocz(sizeof(Client));
@@ -181,9 +181,10 @@ manage(Window w, XWindowAttributes *wa) {
 	grabbuttons(c, False);
 	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
 	updatetitle(c);
-	settags(c, getclient(trans));
+	t = getclient(trans);
+	settags(c, t);
 	if(!c->isfloat)
-		c->isfloat = trans || c->isfixed;
+		c->isfloat = (t != 0) || c->isfixed;
 	if(clients)
 		clients->prev = c;
 	c->next = clients;
