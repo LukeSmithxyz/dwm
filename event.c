@@ -170,28 +170,32 @@ configurerequest(XEvent *e) {
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
 
-	wc.x = ev->x;
-	wc.y = ev->y;
-	wc.width = ev->width;
-	wc.height = ev->height;
-	wc.border_width = ev->border_width;
-	wc.sibling = ev->above;
-	wc.stack_mode = ev->detail;
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
-		if(ev->value_mask & CWBorderWidth)
-			c->border = ev->border_width;
+		c->border = (ev->value_mask & CWBorderWidth) ? ev->border_width : c->border;
 		if((!c->isfloat && (arrange != dofloat))
-			|| ((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight))))
-		{
+			|| ((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight))))
 			configure(c);
-			XSync(dpy, False);
-			return;
+		else {
+			c->x = (ev->value_mask & CWX) ? ev->x : c->x;
+			c->y = (ev->value_mask & CWY) ? ev->y : c->y;
+			c->w = (ev->value_mask & CWWidth) ? ev->width : c->w;
+			c->h = (ev->value_mask & CWHeight) ? ev->height : c->h;
+			resize(c, False);
+			if(!isvisible(c))
+				XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 		}
 	}
-	XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
-	if(c && !isvisible(c))
-		XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	else {
+		wc.x = ev->x;
+		wc.y = ev->y;
+		wc.width = ev->width;
+		wc.height = ev->height;
+		wc.border_width = ev->border_width;
+		wc.sibling = ev->above;
+		wc.stack_mode = ev->detail;
+		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
+	}
 	XSync(dpy, False);
 }
 
