@@ -156,8 +156,9 @@ buttonpress(XEvent *e) {
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
-		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat) &&
-				!c->isfixed) {
+		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat)
+				&& !c->isfixed)
+		{
 			restack();
 			resizemouse(c);
 		}
@@ -173,18 +174,19 @@ configurerequest(XEvent *e) {
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
 		c->border = (ev->value_mask & CWBorderWidth) ? ev->border_width : c->border;
-		if((!c->isfloat && (arrange != dofloat))
-			|| ((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight))))
-			configure(c);
-		else {
+		if(c->isfixed || c->isfloat || (arrange == dofloat)) {
 			c->x = (ev->value_mask & CWX) ? ev->x : c->x;
 			c->y = (ev->value_mask & CWY) ? ev->y : c->y;
 			c->w = (ev->value_mask & CWWidth) ? ev->width : c->w;
 			c->h = (ev->value_mask & CWHeight) ? ev->height : c->h;
+			if((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight)))
+				configure(c);
 			resize(c, False);
 			if(!isvisible(c))
 				XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 		}
+		else
+			configure(c);
 	}
 	else {
 		wc.x = ev->x;
