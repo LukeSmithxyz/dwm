@@ -69,19 +69,20 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 
 void
 configure(Client *c) {
-	XEvent synev;
+	XConfigureEvent ce;
 
-	synev.type = ConfigureNotify;
-	synev.xconfigure.display = dpy;
-	synev.xconfigure.event = c->win;
-	synev.xconfigure.window = c->win;
-	synev.xconfigure.x = c->x;
-	synev.xconfigure.y = c->y;
-	synev.xconfigure.width = c->w;
-	synev.xconfigure.height = c->h;
-	synev.xconfigure.border_width = c->border;
-	synev.xconfigure.above = None;
-	XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+	ce.type = ConfigureNotify;
+	ce.display = dpy;
+	ce.event = c->win;
+	ce.window = c->win;
+	ce.x = c->x;
+	ce.y = c->y;
+	ce.width = c->w;
+	ce.height = c->h;
+	ce.border_width = c->border;
+	ce.above = None;
+	ce.override_redirect = False;
+	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
 }
 
 void
