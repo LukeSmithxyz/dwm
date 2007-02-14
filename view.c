@@ -55,9 +55,8 @@ dofloat(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next) {
-		if(isvisible(c)) {
+		if(isvisible(c))
 			resize(c, True);
-		}
 		else
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	}
@@ -150,7 +149,7 @@ focusprev(Arg *arg) {
 void
 incnmaster(Arg *arg) {
 	if((arrange == dofloat) || (nmaster + arg->i < 1)
-		|| (wah / (nmaster + arg->i) <= 2 * BORDERPX))
+	|| (wah / (nmaster + arg->i) <= 2 * BORDERPX))
 		return;
 	nmaster += arg->i;
 	if(sel)
@@ -175,7 +174,7 @@ resizemaster(Arg *arg) {
 		master = MASTER;
 	else {
 		if(waw * (master + arg->i) / 1000 >= waw - 2 * BORDERPX
-			|| waw * (master + arg->i) / 1000 <= 2 * BORDERPX)
+		|| waw * (master + arg->i) / 1000 <= 2 * BORDERPX)
 			return;
 		master += arg->i;
 	}

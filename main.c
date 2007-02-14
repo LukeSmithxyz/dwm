@@ -69,9 +69,8 @@ scan(void) {
 	wins = NULL;
 	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
 		for(i = 0; i < num; i++) {
-			if(!XGetWindowAttributes(dpy, wins[i], &wa))
-				continue;
-			if(wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
+			if(!XGetWindowAttributes(dpy, wins[i], &wa)
+			|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
 				continue;
 			if(wa.map_state == IsViewable)
 				manage(wins[i], &wa);
@@ -104,12 +103,12 @@ setup(void) {
 	/* init modifier map */
 	numlockmask = 0;
 	modmap = XGetModifierMapping(dpy);
-	for (i = 0; i < 8; i++) {
+	for (i = 0; i < 8; i++)
 		for (j = 0; j < modmap->max_keypermod; j++) {
-			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+			if(modmap->modifiermap[i * modmap->max_keypermod + j]
+					== XKeysymToKeycode(dpy, XK_Num_Lock))
 				numlockmask = (1 << i);
 		}
-	}
 	XFreeModifiermap(modmap);
 	/* select for events */
 	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask

@@ -156,8 +156,8 @@ buttonpress(XEvent *e) {
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
-		else if(ev->button == Button3 && (arrange == dofloat || c->isfloat)
-				&& !c->isfixed)
+		else if(ev->button == Button3
+		&& (arrange == dofloat || c->isfloat) && !c->isfixed)
 		{
 			restack();
 			resizemouse(c);
@@ -184,7 +184,8 @@ configurerequest(XEvent *e) {
 				c->w = ev->width;
 			if(ev->value_mask & CWHeight)
 				c->h = ev->height;
-			if((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight)))
+			if((ev->value_mask & (CWX | CWY))
+			&& !(ev->value_mask & (CWWidth | CWHeight)))
 				configure(c);
 			resize(c, False);
 			if(!isvisible(c))
@@ -249,14 +250,13 @@ keypress(XEvent *e) {
 	XKeyEvent *ev = &e->xkey;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	for(i = 0; i < len; i++) {
+	for(i = 0; i < len; i++)
 		if(keysym == key[i].keysym
-			&& CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
+		&& CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
 		{
 			if(key[i].func)
 				key[i].func(&key[i].arg);
 		}
-	}
 }
 
 static void

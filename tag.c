@@ -78,10 +78,9 @@ settags(Client *c, Client *trans) {
 	Bool matched = trans != NULL;
 	XClassHint ch = { 0 };
 
-	if(matched) {
+	if(matched)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = trans->tags[i];
-	}
 	else {
 		XGetClassHint(dpy, c->win, &ch);
 		snprintf(prop, sizeof prop, "%s:%s:%s",

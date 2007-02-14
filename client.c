@@ -304,8 +304,8 @@ updatesizehints(Client *c) {
 	}
 	else
 		c->minax = c->minay = c->maxax = c->maxay = 0;
-	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh &&
-				c->maxw == c->minw && c->maxh == c->minh);
+	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh
+			&& c->maxw == c->minw && c->maxh == c->minh);
 }
 
 void
@@ -325,7 +325,7 @@ updatetitle(Client *c) {
 		strncpy(c->name, (char *)name.value, sizeof c->name);
 	else {
 		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
-				&& n > 0 && *list)
+		&& n > 0 && *list)
 		{
 			strncpy(c->name, *list, sizeof c->name);
 			XFreeStringList(list);
