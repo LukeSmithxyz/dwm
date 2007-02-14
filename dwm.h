@@ -73,7 +73,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isfixed, isfloat, ismax;
+	Bool isbanned, isfixed, isfloat, ismax;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -99,6 +99,7 @@ extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
+extern void ban(Client *c);			/* ban c */
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */

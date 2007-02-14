@@ -55,10 +55,12 @@ dofloat(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next) {
-		if(isvisible(c))
+		if(isvisible(c)) {
+			c->isbanned = False;
 			resize(c, True);
+		}
 		else
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+			ban(c);
 	}
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
@@ -82,6 +84,7 @@ dotile(void) {
 
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
+			c->isbanned = False;
 			if(c->isfloat) {
 				resize(c, True);
 				continue;
@@ -108,7 +111,7 @@ dotile(void) {
 			i++;
 		}
 		else
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+			ban(c);
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
 		focus(c);

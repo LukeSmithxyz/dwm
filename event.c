@@ -189,7 +189,7 @@ configurerequest(XEvent *e) {
 				configure(c);
 			resize(c, False);
 			if(!isvisible(c))
-				XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+				ban(c);
 		}
 		else
 			configure(c);
