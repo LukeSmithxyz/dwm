@@ -173,12 +173,17 @@ configurerequest(XEvent *e) {
 
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
-		c->border = (ev->value_mask & CWBorderWidth) ? ev->border_width : c->border;
+		if(ev->value_mask & CWBorderWidth)
+			c->border = ev->border_width;
 		if(c->isfixed || c->isfloat || (arrange == dofloat)) {
-			c->x = (ev->value_mask & CWX) ? ev->x : c->x;
-			c->y = (ev->value_mask & CWY) ? ev->y : c->y;
-			c->w = (ev->value_mask & CWWidth) ? ev->width : c->w;
-			c->h = (ev->value_mask & CWHeight) ? ev->height : c->h;
+			if(ev->value_mask & CWX)
+				c->x = ev->x;
+			if(ev->value_mask & CWY)
+				c->y = ev->y;
+			if(ev->value_mask & CWWidth)
+				c->w = ev->width;
+			if(ev->value_mask & CWHeight)
+				c->h = ev->height;
 			if((ev->value_mask & (CWX | CWY)) && !(ev->value_mask & (CWWidth | CWHeight)))
 				configure(c);
 			resize(c, False);
