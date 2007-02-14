@@ -87,8 +87,8 @@ static Key key[] = { \
 #define RULES \
 static Rule rule[] = { \
 	/* class:instance:title regex	tags regex	isfloat */ \
-	{ "Firefox.*",			"3",		False }, \
-	{ "Gimp.*",			NULL,		True }, \
-	{ "MPlayer.*",			NULL,		True }, \
-	{ "Acroread.*",			NULL,		True }, \
+	{ "Firefox",			"3",		False }, \
+	{ "Gimp",			NULL,		True }, \
+	{ "MPlayer",			NULL,		True }, \
+	{ "Acroread",			NULL,		True }, \
 };
