@@ -99,14 +99,14 @@ extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
-extern void ban(Client *c);			/* ban c */
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
 extern Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-extern void resize(Client *c, Bool sizehints);	/* resize c*/
+extern void resize(Client *c, int x, int y,
+		int w, int h, Bool sizehints);	/* resize c*/
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */

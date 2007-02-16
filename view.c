@@ -20,18 +20,14 @@ togglemax(Client *c) {
 		return;
 
 	if((c->ismax = !c->ismax)) {
-		c->rx = c->x; c->x = wax;
-		c->ry = c->y; c->y = way;
-		c->rw = c->w; c->w = waw - 2 * BORDERPX;
-		c->rh = c->h; c->h = wah - 2 * BORDERPX;
+		c->rx = c->x;
+		c->ry = c->y;
+		c->rw = c->w;
+		c->rh = c->h;
+		resize(c, wax, way, waw - 2 * BORDERPX, wah - 2 * BORDERPX, True);
 	}
-	else {
-		c->x = c->rx;
-		c->y = c->ry;
-		c->w = c->rw;
-		c->h = c->rh;
-	}
-	resize(c, True);
+	else
+		resize(c, c->rx, c->ry, c->rw, c->rh, True);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
@@ -56,11 +52,14 @@ dofloat(void) {
 
 	for(c = clients; c; c = c->next) {
 		if(isvisible(c)) {
+			if(c->isbanned)
+				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			resize(c, True);
 		}
-		else
-			ban(c);
+		else {
+			c->isbanned = True;
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+		}
 	}
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
@@ -71,7 +70,7 @@ dofloat(void) {
 
 void
 dotile(void) {
-	unsigned int i, n, mw, mh, tw, th;
+	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
@@ -84,34 +83,36 @@ dotile(void) {
 
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
+			if(c->isbanned)
+				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			if(c->isfloat) {
-				resize(c, True);
+			if(c->isfloat)
 				continue;
-			}
 			c->ismax = False;
-			c->x = wax;
-			c->y = way;
+			nx = wax;
+			ny = way;
 			if(i < nmaster) {
-				c->y += i * mh;
-				c->w = mw - 2 * BORDERPX;
-				c->h = mh - 2 * BORDERPX;
+				ny += i * mh;
+				nw = mw - 2 * BORDERPX;
+				nh = mh - 2 * BORDERPX;
 			}
 			else {  /* tile window */
-				c->x += mw;
-				c->w = tw - 2 * BORDERPX;
+				nx += mw;
+				nw = tw - 2 * BORDERPX;
 				if(th > 2 * BORDERPX) {
-					c->y += (i - nmaster) * th;
-					c->h = th - 2 * BORDERPX;
+					ny += (i - nmaster) * th;
+					nh = th - 2 * BORDERPX;
 				}
 				else /* fallback if th <= 2 * BORDERPX */
-					c->h = wah - 2 * BORDERPX;
+					nh = wah - 2 * BORDERPX;
 			}
-			resize(c, False);
+			resize(c, nx, ny, nw, nh, False);
 			i++;
 		}
-		else
-			ban(c);
+		else {
+			c->isbanned = True;
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+		}
 	if(!sel || !isvisible(sel)) {
 		for(c = stack; c && !isvisible(c); c = c->snext);
 		focus(c);

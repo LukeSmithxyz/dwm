@@ -158,6 +158,7 @@ void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t;
 	Window trans;
+	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
 	c->tags = emallocz(ntags * sizeof(Bool));
@@ -187,7 +188,10 @@ manage(Window w, XWindowAttributes *wa) {
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
 	grabbuttons(c, False);
+	wc.border_width = c->border;
+	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
+	configure(c); /* propagates border_width, if size doesn't change */
 	updatetitle(c);
 	t = getclient(trans);
 	settags(c, t);
@@ -198,7 +202,8 @@ manage(Window w, XWindowAttributes *wa) {
 	c->next = clients;
 	c->snext = stack;
 	stack = clients = c;
-	ban(c);
+	c->isbanned = True;
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
 	if(isvisible(c))
@@ -207,25 +212,25 @@ manage(Window w, XWindowAttributes *wa) {
 }
 
 void
-resize(Client *c, Bool sizehints) {
+resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	float actual, dx, dy, max, min;
 	XWindowChanges wc;
 
-	if(c->w <= 0 || c->h <= 0)
+	if(w <= 0 || h <= 0)
 		return;
 	if(sizehints) {
-		if(c->minw && c->w < c->minw)
-			c->w = c->minw;
-		if(c->minh && c->h < c->minh)
-			c->h = c->minh;
-		if(c->maxw && c->w > c->maxw)
-			c->w = c->maxw;
-		if(c->maxh && c->h > c->maxh)
-			c->h = c->maxh;
+		if(c->minw && w < c->minw)
+			w = c->minw;
+		if(c->minh && h < c->minh)
+			h = c->minh;
+		if(c->maxw && w > c->maxw)
+			w = c->maxw;
+		if(c->maxh && h > c->maxh)
+			h = c->maxh;
 		/* inspired by algorithm from fluxbox */
-		if(c->minay > 0 && c->maxay && (c->h - c->baseh) > 0) {
-			dx = (float)(c->w - c->basew);
-			dy = (float)(c->h - c->baseh);
+		if(c->minay > 0 && c->maxay && (h - c->baseh) > 0) {
+			dx = (float)(w - c->basew);
+			dy = (float)(h - c->baseh);
 			min = (float)(c->minax) / (float)(c->minay);
 			max = (float)(c->maxax) / (float)(c->maxay);
 			actual = dx / dy;
@@ -233,43 +238,45 @@ resize(Client *c, Bool sizehints) {
 				if(actual < min) {
 					dy = (dx * min + dy) / (min * min + 1);
 					dx = dy * min;
-					c->w = (int)dx + c->basew;
-					c->h = (int)dy + c->baseh;
+					w = (int)dx + c->basew;
+					h = (int)dy + c->baseh;
 				}
 				else if(actual > max) {
 					dy = (dx * min + dy) / (max * max + 1);
 					dx = dy * min;
-					c->w = (int)dx + c->basew;
-					c->h = (int)dy + c->baseh;
+					w = (int)dx + c->basew;
+					h = (int)dy + c->baseh;
 				}
 			}
 		}
 		if(c->incw)
-			c->w -= (c->w - c->basew) % c->incw;
+			w -= (w - c->basew) % c->incw;
 		if(c->inch)
-			c->h -= (c->h - c->baseh) % c->inch;
+			h -= (h - c->baseh) % c->inch;
 	}
-	if(c->w == sw && c->h == sh)
+	if(w == sw && h == sh)
 		c->border = 0;
 	else
 		c->border = BORDERPX;
 	/* offscreen appearance fixes */
-	if(c->x > sw)
-		c->x = sw - c->w - 2 * c->border;
-	if(c->y > sh)
-		c->y = sh - c->h - 2 * c->border;
-	if(c->x + c->w + 2 * c->border < sx)
-		c->x = sx;
-	if(c->y + c->h + 2 * c->border < sy)
-		c->y = sy;
-	wc.x = c->x;
-	wc.y = c->y;
-	wc.width = c->w;
-	wc.height = c->h;
-	wc.border_width = c->border;
-	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
-	configure(c);
-	XSync(dpy, False);
+	if(x > sw)
+		x = sw - w - 2 * c->border;
+	if(y > sh)
+		y = sh - h - 2 * c->border;
+	if(x + w + 2 * c->border < sx)
+		x = sx;
+	if(y + h + 2 * c->border < sy)
+		y = sy;
+	if(c->x != x || c->y != y || c->w != w || c->h != h) {
+		c->x = wc.x = x;
+		c->y = wc.y = y;
+		c->w = wc.width = w;
+		c->h = wc.height = h;
+		wc.border_width = c->border;
+		XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
+		configure(c);
+		XSync(dpy, False);
+	}
 }
 
 void

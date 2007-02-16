@@ -22,13 +22,13 @@ KEYS
 
 static void
 movemouse(Client *c) {
-	int x1, y1, ocx, ocy, di;
+	int x1, y1, ocx, ocy, di, nx, ny;
 	unsigned int dui;
 	Window dummy;
 	XEvent ev;
 
-	ocx = c->x;
-	ocy = c->y;
+	ocx = nx = c->x;
+	ocy = ny =  c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
@@ -38,7 +38,6 @@ movemouse(Client *c) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask, &ev);
 		switch (ev.type) {
 		case ButtonRelease:
-			resize(c, True);
 			XUngrabPointer(dpy, CurrentTime);
 			return;
 		case ConfigureRequest:
@@ -48,17 +47,17 @@ movemouse(Client *c) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			c->x = ocx + (ev.xmotion.x - x1);
-			c->y = ocy + (ev.xmotion.y - y1);
-			if(abs(wax + c->x) < SNAP)
-				c->x = wax;
-			else if(abs((wax + waw) - (c->x + c->w + 2 * c->border)) < SNAP)
-				c->x = wax + waw - c->w - 2 * c->border;
-			if(abs(way - c->y) < SNAP)
-				c->y = way;
-			else if(abs((way + wah) - (c->y + c->h + 2 * c->border)) < SNAP)
-				c->y = way + wah - c->h - 2 * c->border;
-			resize(c, False);
+			nx = ocx + (ev.xmotion.x - x1);
+			ny = ocy + (ev.xmotion.y - y1);
+			if(abs(wax + nx) < SNAP)
+				nx = wax;
+			else if(abs((wax + waw) - (nx + c->w + 2 * c->border)) < SNAP)
+				nx = wax + waw - c->w - 2 * c->border;
+			if(abs(way - ny) < SNAP)
+				ny = way;
+			else if(abs((way + wah) - (ny + c->h + 2 * c->border)) < SNAP)
+				ny = way + wah - c->h - 2 * c->border;
+			resize(c, nx, ny, c->w, c->h, False);
 			break;
 		}
 	}
@@ -81,7 +80,6 @@ resizemouse(Client *c) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask , &ev);
 		switch(ev.type) {
 		case ButtonRelease:
-			resize(c, True);
 			XWarpPointer(dpy, None, c->win, 0, 0, 0, 0,
 					c->w + c->border - 1, c->h + c->border - 1);
 			XUngrabPointer(dpy, CurrentTime);
@@ -94,11 +92,11 @@ resizemouse(Client *c) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			nw = ev.xmotion.x - ocx - 2 * c->border + 1;
-			c->w = nw > 0 ? nw : 1;
-			nh = ev.xmotion.y - ocy - 2 * c->border + 1;
-			c->h = nh > 0 ? nh : 1;
-			resize(c, True);
+			if((nw = ev.xmotion.x - ocx - 2 * c->border + 1) <= 0)
+				nw = 1;
+			if((nh = ev.xmotion.y - ocy - 2 * c->border + 1) <= 0)
+				nh = 1;
+			resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
 	}
@@ -187,7 +185,7 @@ configurerequest(XEvent *e) {
 			if((ev->value_mask & (CWX | CWY))
 			&& !(ev->value_mask & (CWWidth | CWHeight)))
 				configure(c);
-			resize(c, False);
+			resize(c, c->x, c->y, c->w, c->h, False);
 			if(!isvisible(c))
 				ban(c);
 		}
