@@ -55,6 +55,7 @@ dofloat(void) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
+			resize(c, c->x, c->y, c->w, c->h, True);
 		}
 		else {
 			c->isbanned = True;
