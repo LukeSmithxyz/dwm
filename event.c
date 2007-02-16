@@ -28,7 +28,7 @@ movemouse(Client *c) {
 	XEvent ev;
 
 	ocx = nx = c->x;
-	ocy = ny =  c->y;
+	ocy = ny = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
