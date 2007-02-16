@@ -31,18 +31,6 @@ static unsigned int len = 0;
 
 /* extern */
 
-Client *
-getnext(Client *c) {
-	for(; c && !isvisible(c); c = c->next);
-	return c;
-}
-
-Client *
-getprev(Client *c) {
-	for(; c && !isvisible(c); c = c->prev);
-	return c;
-}
-
 void
 initrregs(void) {
 	unsigned int i;

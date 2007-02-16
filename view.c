@@ -8,7 +8,7 @@
 
 static Client *
 nexttiled(Client *c) {
-	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
+	for(; c && (c->isfloat || !isvisible(c)); c = c->next);
 	return c;
 }
 
@@ -125,8 +125,9 @@ focusnext(Arg *arg) {
    
 	if(!sel)
 		return;
-	if(!(c = getnext(sel->next)))
-		c = getnext(clients);
+	for(c = sel->next; c && !isvisible(c); c = c->next);
+	if(!c)
+		for(c = clients; c && !isvisible(c); c = c->next);
 	if(c) {
 		focus(c);
 		restack();
@@ -139,9 +140,10 @@ focusprev(Arg *arg) {
 
 	if(!sel)
 		return;
-	if(!(c = getprev(sel->prev))) {
+	for(c = sel->prev; c && !isvisible(c); c = c->prev);
+	if(!c) {
 		for(c = clients; c && c->next; c = c->next);
-		c = getprev(c);
+		for(; c && !isvisible(c); c = c->prev);
 	}
 	if(c) {
 		focus(c);

@@ -128,8 +128,6 @@ extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* tag.c */
 extern void initrregs(void);			/* initialize regexps of rules defined in config.h */
-extern Client *getnext(Client *c);		/* returns next visible client */
-extern Client *getprev(Client *c);		/* returns previous visible client */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c with arg's index */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
