@@ -8,6 +8,20 @@
 void (*arrange)(void) = DEFMODE;
 
 void
+attach(Client *c) {
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
+}
+
+void
+attachstack(Client *c) {
+	c->snext = stack;
+	stack = c;
+}
+
+void
 dofloat(void) {
 	Client *c;
 
@@ -28,6 +42,24 @@ dofloat(void) {
 		focus(c);
 	}
 	restack();
+}
+
+void
+detach(Client *c) {
+	if(c->prev)
+		c->prev->next = c->next;
+	if(c->next)
+		c->next->prev = c->prev;
+	if(c == clients)
+		clients = c->next;
+	c->next = c->prev = NULL;
+}
+
+void
+detachstack(Client *c) {
+	Client **tc;
+	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
+	*tc = c->snext;
 }
 
 void
@@ -60,6 +92,16 @@ focusprev(Arg *arg) {
 		focus(c);
 		restack();
 	}
+}
+
+Client *
+getclient(Window w) {
+	Client *c;
+
+	for(c = clients; c; c = c->next)
+		if(c->win == w)
+			return c;
+	return NULL;
 }
 
 Bool

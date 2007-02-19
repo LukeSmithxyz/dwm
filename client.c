@@ -61,20 +61,6 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 /* extern */
 
 void
-attach(Client *c) {
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
-}
-
-void
-attachstack(Client *c) {
-	c->snext = stack;
-	stack = c;
-}
-
-void
 configure(Client *c) {
 	XConfigureEvent ce;
 
@@ -90,24 +76,6 @@ configure(Client *c) {
 	ce.above = None;
 	ce.override_redirect = False;
 	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
-}
-
-void
-detach(Client *c) {
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	if(c == clients)
-		clients = c->next;
-	c->next = c->prev = NULL;
-}
-
-void
-detachstack(Client *c) {
-	Client **tc;
-	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
-	*tc = c->snext;
 }
 
 void
@@ -133,16 +101,6 @@ focus(Client *c) {
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-}
-
-Client *
-getclient(Window w) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->win == w)
-			return c;
-	return NULL;
 }
 
 Bool
