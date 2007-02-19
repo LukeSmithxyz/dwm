@@ -72,7 +72,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isbanned, isfixed, isfloat, ismax;
+	Bool isbanned, isfixed, ismax, swimming;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -129,16 +129,15 @@ extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* screen.c */
 extern void compileregs(void);			/* initialize regexps of rules defined in config.h */
-extern void dofloat(void);			/* arranges all windows floating */
-extern void dotile(void);			/* arranges all windows tiled */
 extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
 extern void initlayouts(void);			/* initialize layout array */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
+extern void swim(void);				/* arranges all windows swimming */
 extern void tag(Arg *arg);			/* tags c with arg's index */
-extern void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */
+extern void toggleswimming(Arg *arg);		/* toggles focusesd client between swimming/and non-swimming state */
 extern void togglelayout(Arg *arg);		/* toggles layout */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */

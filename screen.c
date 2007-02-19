@@ -19,7 +19,7 @@ Layout *lt = NULL;
 typedef struct {
 	const char *prop;
 	const char *tags;
-	Bool isfloat;
+	Bool swimming;
 } Rule;
 
 typedef struct {
@@ -27,7 +27,6 @@ typedef struct {
 	regex_t *tagregex;
 } Regs;
 
-LAYOUTS
 TAGS
 RULES
 
@@ -35,60 +34,8 @@ static Regs *regs = NULL;
 static unsigned int nrules = 0;
 static unsigned int nlayouts = 0;
 
-/* extern */
-
-void
-compileregs(void) {
-	unsigned int i;
-	regex_t *reg;
-
-	if(regs)
-		return;
-	nrules = sizeof rule / sizeof rule[0];
-	regs = emallocz(nrules * sizeof(Regs));
-	for(i = 0; i < nrules; i++) {
-		if(rule[i].prop) {
-			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].prop, REG_EXTENDED))
-				free(reg);
-			else
-				regs[i].propregex = reg;
-		}
-		if(rule[i].tags) {
-			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].tags, REG_EXTENDED))
-				free(reg);
-			else
-				regs[i].tagregex = reg;
-		}
-	}
-}
-
-void
-dofloat(void) {
-	Client *c;
-
-	for(c = clients; c; c = c->next) {
-		if(isvisible(c)) {
-			if(c->isbanned)
-				XMoveWindow(dpy, c->win, c->x, c->y);
-			c->isbanned = False;
-			resize(c, c->x, c->y, c->w, c->h, True);
-		}
-		else {
-			c->isbanned = True;
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-		}
-	}
-	if(!sel || !isvisible(sel)) {
-		for(c = stack; c && !isvisible(c); c = c->snext);
-		focus(c);
-	}
-	restack();
-}
-
-void
-dotile(void) {
+static void
+tile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
 	Client *c;
 
@@ -105,7 +52,7 @@ dotile(void) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			if(c->isfloat)
+			if(c->swimming)
 				continue;
 			c->ismax = False;
 			nx = wax;
@@ -139,9 +86,40 @@ dotile(void) {
 	restack();
 }
 
+LAYOUTS
+
+/* extern */
+
+void
+compileregs(void) {
+	unsigned int i;
+	regex_t *reg;
+
+	if(regs)
+		return;
+	nrules = sizeof rule / sizeof rule[0];
+	regs = emallocz(nrules * sizeof(Regs));
+	for(i = 0; i < nrules; i++) {
+		if(rule[i].prop) {
+			reg = emallocz(sizeof(regex_t));
+			if(regcomp(reg, rule[i].prop, REG_EXTENDED))
+				free(reg);
+			else
+				regs[i].propregex = reg;
+		}
+		if(rule[i].tags) {
+			reg = emallocz(sizeof(regex_t));
+			if(regcomp(reg, rule[i].tags, REG_EXTENDED))
+				free(reg);
+			else
+				regs[i].tagregex = reg;
+		}
+	}
+}
+
 void
 incnmaster(Arg *arg) {
-	if((lt->arrange == dofloat) || (nmaster + arg->i < 1)
+	if((lt->arrange != tile) || (nmaster + arg->i < 1)
 	|| (wah / (nmaster + arg->i) <= 2 * BORDERPX))
 		return;
 	nmaster += arg->i;
@@ -176,7 +154,7 @@ isvisible(Client *c) {
 
 void
 resizemaster(Arg *arg) {
-	if(lt->arrange != dotile)
+	if(lt->arrange != tile)
 		return;
 	if(arg->i == 0)
 		master = MASTER;
@@ -197,10 +175,10 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->isfloat || lt->arrange == dofloat)
+	if(sel->swimming || lt->arrange == swim)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange != dofloat) {
-		if(!sel->isfloat)
+	if(lt->arrange != swim) {
+		if(!sel->swimming)
 			XLowerWindow(dpy, sel->win);
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
@@ -230,7 +208,7 @@ settags(Client *c, Client *trans) {
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; i < nrules; i++)
 			if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
-				c->isfloat = rule[i].isfloat;
+				c->swimming = rule[i].swimming;
 				for(j = 0; regs[i].tagregex && j < ntags; j++) {
 					if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
@@ -249,6 +227,29 @@ settags(Client *c, Client *trans) {
 }
 
 void
+swim(void) {
+	Client *c;
+
+	for(c = clients; c; c = c->next) {
+		if(isvisible(c)) {
+			if(c->isbanned)
+				XMoveWindow(dpy, c->win, c->x, c->y);
+			c->isbanned = False;
+			resize(c, c->x, c->y, c->w, c->h, True);
+		}
+		else {
+			c->isbanned = True;
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+		}
+	}
+	if(!sel || !isvisible(sel)) {
+		for(c = stack; c && !isvisible(c); c = c->snext);
+		focus(c);
+	}
+	restack();
+}
+
+void
 tag(Arg *arg) {
 	unsigned int i;
 
@@ -262,10 +263,10 @@ tag(Arg *arg) {
 }
 
 void
-togglefloat(Arg *arg) {
-	if(!sel || lt->arrange == dofloat)
+toggleswimming(Arg *arg) {
+	if(!sel || lt->arrange == swim)
 		return;
-	sel->isfloat = !sel->isfloat;
+	sel->swimming = !sel->swimming;
 	lt->arrange();
 }
 

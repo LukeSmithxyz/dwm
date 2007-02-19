@@ -8,8 +8,8 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 #define LAYOUTS \
 static Layout layout[] = { \
 	/* symbol		function */ \
-	{ "[]=",		dotile }, /* first entry is default */ \
-	{ "><>",		dofloat }, \
+	{ "[]=",		tile }, /* first entry is default */ \
+	{ "><>",		swim }, \
 };
 
 #define BORDERPX		1
@@ -64,7 +64,7 @@ static Key key[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	{ .i = 8 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
 	{ MODKEY,			XK_space,	togglelayout,	{ 0 } }, \
-	{ MODKEY|ShiftMask,		XK_space,	togglefloat,	{ 0 } }, \
+	{ MODKEY|ShiftMask,		XK_space,	toggleswimming,	{ 0 } }, \
 	{ MODKEY,			XK_0,		view,		{ .i = -1 } }, \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \
 	{ MODKEY,			XK_2,		view,		{ .i = 1 } }, \
@@ -89,7 +89,7 @@ static Key key[] = { \
 
 #define RULES \
 static Rule rule[] = { \
-	/* class:instance:title regex	tags regex	isfloat */ \
+	/* class:instance:title regex	tags regex	swimming */ \
 	{ "Firefox",			"3",		False }, \
 	{ "Gimp",			NULL,		True }, \
 	{ "MPlayer",			NULL,		True }, \

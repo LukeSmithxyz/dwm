@@ -253,8 +253,8 @@ manage(Window w, XWindowAttributes *wa) {
 	updatetitle(c);
 	for(t = clients; t && t->win != trans; t = t->next);
 	settags(c, t);
-	if(!c->isfloat)
-		c->isfloat = (t != NULL) || c->isfixed;
+	if(!c->swimming)
+		c->swimming = (t != NULL) || c->isfixed;
 	attach(c);
 	attachstack(c);
 	c->isbanned = True;
@@ -268,7 +268,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->isfloat || !isvisible(c)); c = c->next);
+	for(; c && (c->swimming || !isvisible(c)); c = c->next);
 	return c;
 }
 
@@ -440,7 +440,7 @@ zoom(Arg *arg) {
 
 	if(!sel)
 		return;
-	if(sel->isfloat || (lt->arrange == dofloat)) {
+	if(sel->swimming || (lt->arrange == swim)) {
 		togglemax(sel);
 		return;
 	}
