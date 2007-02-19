@@ -368,14 +368,3 @@ grabkeys(void) {
 				GrabModeAsync, GrabModeAsync);
 	}
 }
-
-void
-procevent(void) {
-	XEvent ev;
-
-	while(XPending(dpy)) {
-		XNextEvent(dpy, &ev);
-		if(handler[ev.type])
-			(handler[ev.type])(&ev); /* call handler */
-	}
-}

@@ -379,6 +379,7 @@ main(int argc, char *argv[]) {
 	char *p;
 	int r, xfd;
 	fd_set rd;
+	XEvent ev;
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
 		fputs("dwm-"VERSION", (C)opyright MMVI-MMVII Anselm R. Garbe\n", stdout);
@@ -411,7 +412,6 @@ main(int argc, char *argv[]) {
 
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
-	procevent();
 	readin = True;
 	while(running) {
 		FD_ZERO(&rd);
@@ -443,7 +443,11 @@ main(int argc, char *argv[]) {
 			drawstatus();
 		}
 		if(FD_ISSET(xfd, &rd))
-			procevent();
+			while(XPending(dpy)) {
+				XNextEvent(dpy, &ev);
+				if(handler[ev.type])
+					(handler[ev.type])(&ev); /* call handler */
+			}
 	}
 	cleanup();
 	XCloseDisplay(dpy);

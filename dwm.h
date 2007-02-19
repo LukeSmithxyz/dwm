@@ -115,7 +115,6 @@ extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is
 
 /* event.c */
 extern void grabkeys(void);			/* grab all keys defined in config.h */
-extern void procevent(void);			/* process pending X events */
 
 /* main.c */
 extern void drawstatus(void);			/* draw the bar */
