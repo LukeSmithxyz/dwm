@@ -2,16 +2,6 @@
  * See LICENSE file for license details.
  */
 
-#define TAGS \
-const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
-
-#define LAYOUTS \
-Layout layout[] = { \
-	/* symbol		function */ \
-	{ "[]=",		tile }, /* first entry is default */ \
-	{ "><>",		versatile }, \
-};
-
 #define BORDERPX		1
 #define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#dddddd"
@@ -26,6 +16,16 @@ Layout layout[] = { \
 #define NMASTER			1		/* clients in master area */
 #define SNAP			20		/* pixel */
 #define TOPBAR			True		/* False */
+
+#define TAGS \
+const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
+
+#define LAYOUTS \
+Layout layout[] = { \
+	/* symbol		function */ \
+	{ "[]=",		tile }, /* first entry is default */ \
+	{ "><>",		versatile }, \
+};
 
 #define KEYS \
 static Key key[] = { \
