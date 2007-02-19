@@ -240,24 +240,24 @@ manage(Window w, XWindowAttributes *wa) {
 			c->y = way;
 	}
 	updatesizehints(c);
-	XSelectInput(dpy, c->win,
+	XSelectInput(dpy, w,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
-	XGetTransientForHint(dpy, c->win, &trans);
+	XGetTransientForHint(dpy, w, &trans);
 	grabbuttons(c, False);
 	wc.border_width = c->border;
-	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
+	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
+	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatetitle(c);
-	for(t = clients; t && t->win != c->win; t = t->next);
+	for(t = clients; t && t->win != trans; t = t->next);
 	settags(c, t);
 	if(!c->isfloat)
-		c->isfloat = (t != 0) || c->isfixed;
+		c->isfloat = (t != NULL) || c->isfixed;
 	attach(c);
 	attachstack(c);
 	c->isbanned = True;
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-	XMapWindow(dpy, c->win);
+	XMoveWindow(dpy, w, c->x + 2 * sw, c->y);
+	XMapWindow(dpy, w);
 	setclientstate(c, NormalState);
 	if(isvisible(c))
 		focus(c);
