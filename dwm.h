@@ -127,10 +127,16 @@ extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to 
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* tag.c */
-extern void initrregs(void);			/* initialize regexps of rules defined in config.h */
+extern void compileregexps(void);		/* initialize regexps of rules defined in config.h */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c with arg's index */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
+
+/* tile.c */
+extern void dotile(void);			/* arranges all windows tiled */
+extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
+extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
+extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */
 
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
@@ -140,15 +146,12 @@ extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
 /* view.c */
 extern void detach(Client *c);			/* detaches c from global client list */
 extern void dofloat(void);			/* arranges all windows floating */
-extern void dotile(void);			/* arranges all windows tiled */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
-extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
+extern Client *nextmanaged(Client *c);		/* returns managed successor of c */
 extern void restack(void);			/* restores z layers of all clients */
 extern void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */
 extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void view(Arg *arg);			/* views the tag with arg's index */
-extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */

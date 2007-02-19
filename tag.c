@@ -32,7 +32,7 @@ static unsigned int len = 0;
 /* extern */
 
 void
-initrregs(void) {
+compileregexps(void) {
 	unsigned int i;
 	regex_t *reg;
 

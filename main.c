@@ -117,7 +117,7 @@ setup(void) {
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 	grabkeys();
-	initrregs();
+	compileregexps();
 	for(ntags = 0; tags[ntags]; ntags++);
 	seltag = emallocz(sizeof(Bool) * ntags);
 	seltag[0] = True;
