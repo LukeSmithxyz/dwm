@@ -381,15 +381,12 @@ main(int argc, char *argv[]) {
 	fd_set rd;
 	XEvent ev;
 
-	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
-		fputs("dwm-"VERSION", (C)opyright MMVI-MMVII Anselm R. Garbe\n", stdout);
-		exit(EXIT_SUCCESS);
-	}
+	if(argc == 2 && !strncmp("-v", argv[1], 3))
+		eprint("dwm-"VERSION", (C)opyright MMVI-MMVII Anselm R. Garbe\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 	setlocale(LC_CTYPE, "");
-	dpy = XOpenDisplay(0);
-	if(!dpy)
+	if(!(dpy = XOpenDisplay(0)))
 		eprint("dwm: cannot open display\n");
 	xfd = ConnectionNumber(dpy);
 	screen = DefaultScreen(dpy);
