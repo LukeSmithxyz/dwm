@@ -16,20 +16,20 @@ unsigned int nmaster = NMASTER;
 /* static */
 
 typedef struct {
-	const char *clpattern;
-	const char *tpattern;
+	const char *prop;
+	const char *tags;
 	Bool isfloat;
 } Rule;
 
 typedef struct {
-	regex_t *clregex;
-	regex_t *tregex;
-} RReg;
+	regex_t *propregex;
+	regex_t *tagregex;
+} Regexps;
 
 TAGS
 RULES
 
-static RReg *rreg = NULL;
+static Regexps *regexps = NULL;
 static unsigned int len = 0;
 
 static Client *
@@ -77,24 +77,24 @@ compileregexps(void) {
 	unsigned int i;
 	regex_t *reg;
 
-	if(rreg)
+	if(regexps)
 		return;
 	len = sizeof rule / sizeof rule[0];
-	rreg = emallocz(len * sizeof(RReg));
+	regexps = emallocz(len * sizeof(Regexps));
 	for(i = 0; i < len; i++) {
-		if(rule[i].clpattern) {
+		if(rule[i].prop) {
 			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].clpattern, REG_EXTENDED))
+			if(regcomp(reg, rule[i].prop, REG_EXTENDED))
 				free(reg);
 			else
-				rreg[i].clregex = reg;
+				regexps[i].propregex = reg;
 		}
-		if(rule[i].tpattern) {
+		if(rule[i].tags) {
 			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].tpattern, REG_EXTENDED))
+			if(regcomp(reg, rule[i].tags, REG_EXTENDED))
 				free(reg);
 			else
-				rreg[i].tregex = reg;
+				regexps[i].tagregex = reg;
 		}
 	}
 }
@@ -310,10 +310,10 @@ settags(Client *c, Client *trans) {
 				ch.res_class ? ch.res_class : "",
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; i < len; i++)
-			if(rreg[i].clregex && !regexec(rreg[i].clregex, prop, 1, &tmp, 0)) {
+			if(regexps[i].propregex && !regexec(regexps[i].propregex, prop, 1, &tmp, 0)) {
 				c->isfloat = rule[i].isfloat;
-				for(j = 0; rreg[i].tregex && j < ntags; j++) {
-					if(!regexec(rreg[i].tregex, tags[j], 1, &tmp, 0)) {
+				for(j = 0; regexps[i].tagregex && j < ntags; j++) {
+					if(!regexec(regexps[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
 						c->tags[j] = True;
 					}
