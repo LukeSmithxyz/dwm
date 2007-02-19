@@ -99,8 +99,15 @@ extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
+extern void attach(Client *c);			/* attaches c to global client list */
+extern void attachstack(Client *c);		/* attaches client to stack */
 extern void configure(Client *c);		/* send synthetic configure event */
+extern void detach(Client *c);			/* detaches c from global client list */
+extern void detachstack(Client *c);		/* detaches client from stack */
 extern void focus(Client *c);			/* focus c, c may be NULL */
+extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
+extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
+extern Client *getclient(Window w);		/* return client of w */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, int x, int y,
@@ -125,16 +132,9 @@ extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to 
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* manage.c */
-extern void attach(Client *c);			/* attaches c to global client list */
-extern void attachstack(Client *c);		/* attaches client to stack */
 extern void compileregexps(void);		/* initialize regexps of rules defined in config.h */
-extern void detach(Client *c);			/* detaches c from global client list */
-extern void detachstack(Client *c);		/* detaches client from stack */
 extern void dofloat(void);			/* arranges all windows floating */
 extern void dotile(void);			/* arranges all windows tiled */
-extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
-extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
-extern Client *getclient(Window w);		/* return client of w */
 extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */

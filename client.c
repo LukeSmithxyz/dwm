@@ -46,6 +46,21 @@ grabbuttons(Client *c, Bool focused) {
 				GrabModeAsync, GrabModeSync, None, None);
 }
 
+static Bool
+isprotodel(Client *c) {
+	int i, n;
+	Atom *protocols;
+	Bool ret = False;
+
+	if(XGetWMProtocols(dpy, c->win, &protocols, &n)) {
+		for(i = 0; !ret && i < n; i++)
+			if(protocols[i] == wmatom[WMDelete])
+				ret = True;
+		XFree(protocols);
+	}
+	return ret;
+}
+
 static void
 setclientstate(Client *c, long state) {
 	long data[] = {state, None};
@@ -59,6 +74,20 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 }
 
 /* extern */
+
+void
+attach(Client *c) {
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
+}
+
+void
+attachstack(Client *c) {
+	c->snext = stack;
+	stack = c;
+}
 
 void
 configure(Client *c) {
@@ -76,6 +105,24 @@ configure(Client *c) {
 	ce.above = None;
 	ce.override_redirect = False;
 	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
+}
+
+void
+detach(Client *c) {
+	if(c->prev)
+		c->prev->next = c->next;
+	if(c->next)
+		c->next->prev = c->prev;
+	if(c == clients)
+		clients = c->next;
+	c->next = c->prev = NULL;
+}
+
+void
+detachstack(Client *c) {
+	Client **tc;
+	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
+	*tc = c->snext;
 }
 
 void
@@ -103,19 +150,46 @@ focus(Client *c) {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 }
 
-Bool
-isprotodel(Client *c) {
-	int i, n;
-	Atom *protocols;
-	Bool ret = False;
-
-	if(XGetWMProtocols(dpy, c->win, &protocols, &n)) {
-		for(i = 0; !ret && i < n; i++)
-			if(protocols[i] == wmatom[WMDelete])
-				ret = True;
-		XFree(protocols);
+void
+focusnext(Arg *arg) {
+	Client *c;
+   
+	if(!sel)
+		return;
+	for(c = sel->next; c && !isvisible(c); c = c->next);
+	if(!c)
+		for(c = clients; c && !isvisible(c); c = c->next);
+	if(c) {
+		focus(c);
+		restack();
 	}
-	return ret;
+}
+
+void
+focusprev(Arg *arg) {
+	Client *c;
+
+	if(!sel)
+		return;
+	for(c = sel->prev; c && !isvisible(c); c = c->prev);
+	if(!c) {
+		for(c = clients; c && c->next; c = c->next);
+		for(; c && !isvisible(c); c = c->prev);
+	}
+	if(c) {
+		focus(c);
+		restack();
+	}
+}
+
+Client *
+getclient(Window w) {
+	Client *c;
+
+	for(c = clients; c; c = c->next)
+		if(c->win == w)
+			return c;
+	return NULL;
 }
 
 void

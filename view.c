@@ -59,20 +59,6 @@ togglemax(Client *c) {
 /* extern */
 
 void
-attach(Client *c) {
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
-}
-
-void
-attachstack(Client *c) {
-	c->snext = stack;
-	stack = c;
-}
-
-void
 compileregexps(void) {
 	unsigned int i;
 	regex_t *reg;
@@ -97,24 +83,6 @@ compileregexps(void) {
 				regexps[i].tagregex = reg;
 		}
 	}
-}
-
-void
-detach(Client *c) {
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	if(c == clients)
-		clients = c->next;
-	c->next = c->prev = NULL;
-}
-
-void
-detachstack(Client *c) {
-	Client **tc;
-	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
-	*tc = c->snext;
 }
 
 void
@@ -189,48 +157,6 @@ dotile(void) {
 		focus(c);
 	}
 	restack();
-}
-
-void
-focusnext(Arg *arg) {
-	Client *c;
-   
-	if(!sel)
-		return;
-	for(c = sel->next; c && !isvisible(c); c = c->next);
-	if(!c)
-		for(c = clients; c && !isvisible(c); c = c->next);
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
-void
-focusprev(Arg *arg) {
-	Client *c;
-
-	if(!sel)
-		return;
-	for(c = sel->prev; c && !isvisible(c); c = c->prev);
-	if(!c) {
-		for(c = clients; c && c->next; c = c->next);
-		for(; c && !isvisible(c); c = c->prev);
-	}
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
-Client *
-getclient(Window w) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->win == w)
-			return c;
-	return NULL;
 }
 
 void
