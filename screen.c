@@ -32,30 +32,6 @@ RULES
 static Regexps *regexps = NULL;
 static unsigned int len = 0;
 
-static Client *
-nextmanaged(Client *c) {
-	for(; c && (c->isfloat || !isvisible(c)); c = c->next);
-	return c;
-}
-
-static void
-togglemax(Client *c) {
-	XEvent ev;
-
-	if(c->isfixed)
-		return;
-	if((c->ismax = !c->ismax)) {
-		c->rx = c->x;
-		c->ry = c->y;
-		c->rw = c->w;
-		c->rh = c->h;
-		resize(c, wax, way, waw - 2 * BORDERPX, wah - 2 * BORDERPX, True);
-	}
-	else
-		resize(c, c->rx, c->ry, c->rw, c->rh, True);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-}
-
 /* extern */
 
 void
@@ -112,7 +88,7 @@ dotile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
 	Client *c;
 
-	for(n = 0, c = nextmanaged(clients); c; c = nextmanaged(c->next))
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 	/* window geoms */
 	mh = (n > nmaster) ? wah / nmaster : wah / (n > 0 ? n : 1);
@@ -209,7 +185,7 @@ restack(void) {
 	if(arrange != dofloat) {
 		if(!sel->isfloat)
 			XLowerWindow(dpy, sel->win);
-		for(c = nextmanaged(clients); c; c = nextmanaged(c->next)) {
+		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
 				continue;
 			XLowerWindow(dpy, c->win);
@@ -317,28 +293,5 @@ view(Arg *arg) {
 		seltag[i] = (arg->i == -1) ? True : False;
 	if(arg->i >= 0 && arg->i < ntags)
 		seltag[arg->i] = True;
-	arrange();
-}
-
-void
-zoom(Arg *arg) {
-	unsigned int n;
-	Client *c;
-
-	if(!sel)
-		return;
-	if(sel->isfloat || (arrange == dofloat)) {
-		togglemax(sel);
-		return;
-	}
-	for(n = 0, c = nextmanaged(clients); c; c = nextmanaged(c->next))
-		n++;
-
-	if((c = sel) == nextmanaged(clients))
-		if(!(c = nextmanaged(c->next)))
-			return;
-	detach(c);
-	attach(c);
-	focus(c);
 	arrange();
 }

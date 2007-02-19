@@ -99,22 +99,20 @@ extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
-extern void attach(Client *c);			/* attaches c to global client list */
-extern void attachstack(Client *c);		/* attaches client to stack */
 extern void configure(Client *c);		/* send synthetic configure event */
-extern void detach(Client *c);			/* detaches c from global client list */
-extern void detachstack(Client *c);		/* detaches client from stack */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern Client *getclient(Window w);		/* return client of w */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
+Client *nexttiled(Client *c);			/* returns tiled successor of c */
 extern void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize c*/
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
+extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */
 
 /* draw.c */
 extern void drawstatus(void);			/* draw the bar */
@@ -131,7 +129,7 @@ extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
-/* manage.c */
+/* screen.c */
 extern void compileregexps(void);		/* initialize regexps of rules defined in config.h */
 extern void dofloat(void);			/* arranges all windows floating */
 extern void dotile(void);			/* arranges all windows tiled */
@@ -146,9 +144,9 @@ extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/do
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void view(Arg *arg);			/* views the tag with arg's index */
-extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */
 
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
 extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
+

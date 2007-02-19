@@ -10,6 +10,19 @@
 /* static */
 
 static void
+attachstack(Client *c) {
+	c->snext = stack;
+	stack = c;
+}
+
+static void
+detachstack(Client *c) {
+	Client **tc;
+	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
+	*tc = c->snext;
+}
+
+static void
 grabbuttons(Client *c, Bool focused) {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
@@ -68,6 +81,24 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
+static void
+togglemax(Client *c) {
+	XEvent ev;
+
+	if(c->isfixed)
+		return;
+	if((c->ismax = !c->ismax)) {
+		c->rx = c->x;
+		c->ry = c->y;
+		c->rw = c->w;
+		c->rh = c->h;
+		resize(c, wax, way, waw - 2 * BORDERPX, wah - 2 * BORDERPX, True);
+	}
+	else
+		resize(c, c->rx, c->ry, c->rw, c->rh, True);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+}
+
 static int
 xerrordummy(Display *dsply, XErrorEvent *ee) {
 	return 0;
@@ -81,12 +112,6 @@ attach(Client *c) {
 		clients->prev = c;
 	c->next = clients;
 	clients = c;
-}
-
-void
-attachstack(Client *c) {
-	c->snext = stack;
-	stack = c;
 }
 
 void
@@ -116,13 +141,6 @@ detach(Client *c) {
 	if(c == clients)
 		clients = c->next;
 	c->next = c->prev = NULL;
-}
-
-void
-detachstack(Client *c) {
-	Client **tc;
-	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
-	*tc = c->snext;
 }
 
 void
@@ -254,6 +272,12 @@ manage(Window w, XWindowAttributes *wa) {
 	if(isvisible(c))
 		focus(c);
 	arrange();
+}
+
+Client *
+nexttiled(Client *c) {
+	for(; c && (c->isfloat || !isvisible(c)); c = c->next);
+	return c;
 }
 
 void
@@ -414,5 +438,28 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
+	arrange();
+}
+
+void
+zoom(Arg *arg) {
+	unsigned int n;
+	Client *c;
+
+	if(!sel)
+		return;
+	if(sel->isfloat || (arrange == dofloat)) {
+		togglemax(sel);
+		return;
+	}
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
+		n++;
+
+	if((c = sel) == nexttiled(clients))
+		if(!(c = nexttiled(c->next)))
+			return;
+	detach(c);
+	attach(c);
+	focus(c);
 	arrange();
 }
