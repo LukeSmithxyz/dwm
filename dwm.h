@@ -101,7 +101,6 @@ extern Window root, barwin;
 /* client.c */
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
-extern Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, int x, int y,
@@ -125,36 +124,31 @@ extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
-/* tag.c */
+/* manage.c */
+extern void attach(Client *c);			/* attaches c to global client list */
+extern void attachstack(Client *c);		/* attaches client to stack */
 extern void compileregexps(void);		/* initialize regexps of rules defined in config.h */
+extern void detach(Client *c);			/* detaches c from global client list */
+extern void detachstack(Client *c);		/* detaches client from stack */
+extern void dofloat(void);			/* arranges all windows floating */
+extern void dotile(void);			/* arranges all windows tiled */
+extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
+extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
+extern Client *getclient(Window w);		/* return client of w */
+extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
+extern Bool isvisible(Client *c);		/* returns True if client is visible */
+extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
+extern void restack(void);			/* restores z layers of all clients */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c with arg's index */
+extern void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */
+extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
-
-/* tile.c */
-extern void dotile(void);			/* arranges all windows tiled */
-extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
-extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
+extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
+extern void view(Arg *arg);			/* views the tag with arg's index */
 extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */
 
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
 extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
-
-/* view.c */
-extern void attach(Client *c);			/* attaches c to global client list */
-extern void attachstack(Client *c);		/* attaches client to stack */
-extern void dofloat(void);			/* arranges all windows floating */
-extern void detach(Client *c);			/* detaches c from global client list */
-extern void detachstack(Client *c);		/* detaches client from stack */
-extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
-extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
-extern Client *getclient(Window w);		/* return client of w */
-extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern Client *nextmanaged(Client *c);		/* returns managed successor of c */
-extern void restack(void);			/* restores z layers of all clients */
-extern void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */
-extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
-extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
-extern void view(Arg *arg);			/* views the tag with arg's index */
