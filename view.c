@@ -177,6 +177,8 @@ isvisible(Client *c) {
 
 void
 resizemaster(Arg *arg) {
+	if(arrange != dotile)
+		return;
 	if(arg->i == 0)
 		master = MASTER;
 	else {
