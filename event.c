@@ -165,7 +165,6 @@ buttonpress(XEvent *e) {
 
 static void
 configurerequest(XEvent *e) {
-	int x, y, w, h;
 	Client *c;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
@@ -175,21 +174,23 @@ configurerequest(XEvent *e) {
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
 		if(c->isfixed || c->isfloat || (arrange == dofloat)) {
-			x = (ev->value_mask & CWX) ? ev->x : c->x;
-			y = (ev->value_mask & CWY) ? ev->y : c->y;
-			w = (ev->value_mask & CWWidth) ? ev->width : c->w;
-			h = (ev->value_mask & CWHeight) ? ev->height : c->h;
+			if(ev->value_mask & CWX)
+				c->x = ev->x;
+			if(ev->value_mask & CWY)
+				c->y = ev->y;
+			if(ev->value_mask & CWWidth)
+				c->w = ev->width;
+			if(ev->value_mask & CWHeight)
+				c->h = ev->height;
 			if((ev->value_mask & (CWX | CWY))
 			&& !(ev->value_mask & (CWWidth | CWHeight)))
 			{
-				c->x = x;
-				c->y = y;
 				configure(c);
 				if(isvisible(c))
 					XMoveWindow(dpy, c->win, c->x, c->y);
 			}
 			else {
-				resize(c, x, y, w, h, False);
+				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 				if(!isvisible(c))
 					ban(c);
 			}
