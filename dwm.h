@@ -72,7 +72,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isbanned, isfixed, ismax, swimming;
+	Bool isbanned, isfixed, ismax, versatile;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -135,12 +135,12 @@ extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
-extern void swim(void);				/* arranges all windows swimming */
 extern void tag(Arg *arg);			/* tags c with arg's index */
-extern void toggleswimming(Arg *arg);		/* toggles focusesd client between swimming/and non-swimming state */
+extern void toggleversatile(Arg *arg);		/* toggles focusesd client between versatile/and non-versatile state */
 extern void togglelayout(Arg *arg);		/* toggles layout */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
+extern void versatile(void);			/* arranges all windows versatile */
 extern void view(Arg *arg);			/* views the tag with arg's index */
 
 /* util.c */

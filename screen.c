@@ -19,7 +19,7 @@ Layout *lt = NULL;
 typedef struct {
 	const char *prop;
 	const char *tags;
-	Bool swimming;
+	Bool versatile;
 } Rule;
 
 typedef struct {
@@ -52,7 +52,7 @@ tile(void) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			if(c->swimming)
+			if(c->versatile)
 				continue;
 			c->ismax = False;
 			nx = wax;
@@ -175,10 +175,10 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->swimming || lt->arrange == swim)
+	if(sel->versatile || lt->arrange == versatile)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange != swim) {
-		if(!sel->swimming)
+	if(lt->arrange != versatile) {
+		if(!sel->versatile)
 			XLowerWindow(dpy, sel->win);
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
@@ -208,7 +208,7 @@ settags(Client *c, Client *trans) {
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; i < nrules; i++)
 			if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
-				c->swimming = rule[i].swimming;
+				c->versatile = rule[i].versatile;
 				for(j = 0; regs[i].tagregex && j < ntags; j++) {
 					if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
@@ -227,29 +227,6 @@ settags(Client *c, Client *trans) {
 }
 
 void
-swim(void) {
-	Client *c;
-
-	for(c = clients; c; c = c->next) {
-		if(isvisible(c)) {
-			if(c->isbanned)
-				XMoveWindow(dpy, c->win, c->x, c->y);
-			c->isbanned = False;
-			resize(c, c->x, c->y, c->w, c->h, True);
-		}
-		else {
-			c->isbanned = True;
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-		}
-	}
-	if(!sel || !isvisible(sel)) {
-		for(c = stack; c && !isvisible(c); c = c->snext);
-		focus(c);
-	}
-	restack();
-}
-
-void
 tag(Arg *arg) {
 	unsigned int i;
 
@@ -259,14 +236,6 @@ tag(Arg *arg) {
 		sel->tags[i] = (arg->i == -1) ? True : False;
 	if(arg->i >= 0 && arg->i < ntags)
 		sel->tags[arg->i] = True;
-	lt->arrange();
-}
-
-void
-toggleswimming(Arg *arg) {
-	if(!sel || lt->arrange == swim)
-		return;
-	sel->swimming = !sel->swimming;
 	lt->arrange();
 }
 
@@ -299,6 +268,14 @@ togglelayout(Arg *arg) {
 }
 
 void
+toggleversatile(Arg *arg) {
+	if(!sel || lt->arrange == versatile)
+		return;
+	sel->versatile = !sel->versatile;
+	lt->arrange();
+}
+
+void
 toggleview(Arg *arg) {
 	unsigned int i;
 
@@ -307,6 +284,29 @@ toggleview(Arg *arg) {
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
 	lt->arrange();
+}
+
+void
+versatile(void) {
+	Client *c;
+
+	for(c = clients; c; c = c->next) {
+		if(isvisible(c)) {
+			if(c->isbanned)
+				XMoveWindow(dpy, c->win, c->x, c->y);
+			c->isbanned = False;
+			resize(c, c->x, c->y, c->w, c->h, True);
+		}
+		else {
+			c->isbanned = True;
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+		}
+	}
+	if(!sel || !isvisible(sel)) {
+		for(c = stack; c && !isvisible(c); c = c->snext);
+		focus(c);
+	}
+	restack();
 }
 
 void

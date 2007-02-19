@@ -6,13 +6,13 @@ dwm \- dynamic window manager
 .RB [ \-v ]
 .SH DESCRIPTION
 dwm is a dynamic window manager for X. It manages windows in tiling and
-swimming layouts. Either layout can be applied dynamically, optimizing the
+versatile layouts. Either layout can be applied dynamically, optimizing the
 environment for the application in use and the task performed.
 .P
 In tiling layout windows are managed in a master and stacking area. The master
 area contains the windows which currently need most attention, whereas the
-stacking area contains all other windows. In swimming layout windows can be
-resized and moved freely. Dialog windows are always managed swimming,
+stacking area contains all other windows. In versatile layout windows can be
+resized and moved freely. Dialog windows are always managed versatile,
 regardless of the layout applied.
 .P
 Windows are grouped by tags. Each window can be tagged with one or multiple
@@ -38,7 +38,7 @@ is read and displayed in the status text area.
 .TP
 .B Button1
 click on a tag label to display all windows with that tag, click on the layout
-label toggles between tiling and swimming layout.
+label toggles between tiling and versatile layout.
 .TP
 .B Button3
 click on a tag label adds/removes all windows with that tag to/from the view.
@@ -67,7 +67,7 @@ Focus next window.
 Focus previous window.
 .TP
 .B Mod1-Return
-Zooms/cycles current window to/from master area (tiling layout), toggles maximization of current window (swimming layout).
+Zooms/cycles current window to/from master area (tiling layout), toggles maximization of current window (versatile layout).
 .TP
 .B Mod1-g
 Grow master area (tiling layout only).
@@ -98,10 +98,10 @@ tag to/from current window.
 Close focused window.
 .TP
 .B Mod1-space
-Toggle between tiling and swimming layout (affects all windows).
+Toggle between tiling and versatile layout (affects all windows).
 .TP
 .B Mod1-Shift-space
-Toggle focused window between swimming and non-swimming state (tiling layout only).
+Toggle focused window between versatile and non-versatile state (tiling layout only).
 .TP
 .B Mod1-[1..n]
 View all windows with
@@ -121,13 +121,13 @@ Quit dwm.
 .SS Mouse commands
 .TP
 .B Mod1-Button1
-Move current window while dragging (swimming layout only).
+Move current window while dragging (versatile layout only).
 .TP
 .B Mod1-Button2
-Zooms/cycles current window to/from master area (tiling layout), toggles maximization of current window (swimming layout).
+Zooms/cycles current window to/from master area (tiling layout), toggles maximization of current window (versatile layout).
 .TP
 .B Mod1-Button3
-Resize current window while dragging (swimming layout only).
+Resize current window while dragging (versatile layout only).
 .SH CUSTOMIZATION
 dwm is customized by creating a custom config.h and (re)compiling the source
 code. This keeps it fast, secure and simple.
