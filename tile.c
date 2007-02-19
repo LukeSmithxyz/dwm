@@ -3,15 +3,17 @@
  */
 #include "dwm.h"
 
+unsigned int master = MASTER;
+unsigned int nmaster = NMASTER;
+
 /* static */
 
 static void
 togglemax(Client *c) {
 	XEvent ev;
-		
+
 	if(c->isfixed)
 		return;
-
 	if((c->ismax = !c->ismax)) {
 		c->rx = c->x;
 		c->ry = c->y;

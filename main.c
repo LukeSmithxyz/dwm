@@ -19,7 +19,7 @@
 
 char stext[256];
 int bh, bmw, screen, sx, sy, sw, sh, wax, way, waw, wah;
-unsigned int master, nmaster, ntags, numlockmask;
+unsigned int ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool *seltag;
@@ -133,8 +133,6 @@ setup(void) {
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	master = MASTER;
-	nmaster = NMASTER;
 	bmw = textw(TILESYMBOL) > textw(FLOATSYMBOL) ? textw(TILESYMBOL) : textw(FLOATSYMBOL);
 	/* bar */
 	dc.h = bh = dc.font.height + 2;
