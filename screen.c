@@ -83,6 +83,7 @@ dofloat(void) {
 	}
 	restack();
 }
+
 void
 dotile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;

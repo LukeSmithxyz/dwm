@@ -105,7 +105,7 @@ extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-Client *nexttiled(Client *c);			/* returns tiled successor of c */
+extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
 extern void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
