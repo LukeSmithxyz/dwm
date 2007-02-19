@@ -134,10 +134,10 @@ extern void initlayouts(void);			/* initialize layout array */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
+extern void setlayout(Arg *arg);		/* sets layout, -1 toggles */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c with arg's index */
 extern void toggleversatile(Arg *arg);		/* toggles focusesd client between versatile/and non-versatile state */
-extern void togglelayout(Arg *arg);		/* toggles layout */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void versatile(void);			/* arranges all windows versatile */

@@ -63,7 +63,7 @@ static Key key[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_8,		toggletag,	{ .i = 7 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	{ .i = 8 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
-	{ MODKEY,			XK_space,	togglelayout,	{ 0 } }, \
+	{ MODKEY,			XK_space,	setlayout,	{ .i = -1 } }, \
 	{ MODKEY|ShiftMask,		XK_space,	toggleversatile,{ 0 } }, \
 	{ MODKEY,			XK_0,		view,		{ .i = -1 } }, \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \

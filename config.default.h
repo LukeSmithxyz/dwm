@@ -58,8 +58,8 @@ static Key key[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_8,		toggletag,	{ .i = 7 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	{ .i = 8 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
-	{ MODKEY,			XK_space,	togglelayout,	{ 0 } }, \
-	{ MODKEY|ShiftMask,		XK_space,	toggleversatile	{ 0 } }, \
+	{ MODKEY,			XK_space,	setlayout,	{ .i = -1 } }, \
+	{ MODKEY|ShiftMask,		XK_space,	toggleversatile,{ 0 } }, \
 	{ MODKEY,			XK_0,		view,		{ .i = -1 } }, \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \
 	{ MODKEY,			XK_2,		view,		{ .i = 1 } }, \
@@ -86,7 +86,7 @@ static Key key[] = { \
  * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
 #define RULES \
 static Rule rule[] = { \
-	/* class:instance:title regex	tags regex	versatile */ \
+	/* class:instance:title regex	tags regex	isversatile */ \
 	{ "Gimp",			NULL,		True }, \
 	{ "MPlayer",			NULL,		True }, \
 	{ "Acroread",			NULL,		True }, \

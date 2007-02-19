@@ -140,7 +140,8 @@ buttonpress(XEvent *e) {
 		if(ev->x < x + blw)
 			switch(ev->button) {
 			case Button1:
-				togglelayout(NULL);
+				a.i = -1;
+				setlayout(&a);
 				break;
 			case Button4:
 				a.i = 1;

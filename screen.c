@@ -191,6 +191,28 @@ restack(void) {
 }
 
 void
+setlayout(Arg *arg) {
+	unsigned int i;
+
+	if(arg->i == -1) {
+		for(i = 0; i < nlayouts && lt != &layout[i]; i++);
+		if(i == nlayouts - 1)
+			lt = &layout[0];
+		else
+			lt = &layout[++i];
+	}
+	else {
+		if(arg->i < 0 || arg->i >= nlayouts)
+			return;
+		lt = &layout[arg->i];
+	}
+	if(sel)
+		lt->arrange();
+	else
+		drawstatus();
+}
+
+void
 settags(Client *c, Client *trans) {
 	char prop[512];
 	unsigned int i, j;
@@ -250,21 +272,6 @@ toggletag(Arg *arg) {
 	if(i == ntags)
 		sel->tags[arg->i] = True;
 	lt->arrange();
-}
-
-void
-togglelayout(Arg *arg) {
-	unsigned int i;
-
-	for(i = 0; i < nlayouts && lt != &layout[i]; i++);
-	if(i == nlayouts - 1)
-		lt = &layout[0];
-	else
-		lt = &layout[++i];
-	if(sel)
-		lt->arrange();
-	else
-		drawstatus();
 }
 
 void
