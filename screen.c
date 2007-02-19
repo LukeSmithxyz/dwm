@@ -9,9 +9,10 @@
 #include <sys/types.h>
 #include <X11/Xutil.h>
 
-void (*arrange)(void) = DEFMODE;
 unsigned int master = MASTER;
 unsigned int nmaster = NMASTER;
+unsigned int blw = 0;
+Layout *lt = NULL;
 
 /* static */
 
@@ -24,39 +25,41 @@ typedef struct {
 typedef struct {
 	regex_t *propregex;
 	regex_t *tagregex;
-} Regexps;
+} Regs;
 
+LAYOUTS
 TAGS
 RULES
 
-static Regexps *regexps = NULL;
-static unsigned int len = 0;
+static Regs *regs = NULL;
+static unsigned int nrules = 0;
+static unsigned int nlayouts = 0;
 
 /* extern */
 
 void
-compileregexps(void) {
+compileregs(void) {
 	unsigned int i;
 	regex_t *reg;
 
-	if(regexps)
+	if(regs)
 		return;
-	len = sizeof rule / sizeof rule[0];
-	regexps = emallocz(len * sizeof(Regexps));
-	for(i = 0; i < len; i++) {
+	nrules = sizeof rule / sizeof rule[0];
+	regs = emallocz(nrules * sizeof(Regs));
+	for(i = 0; i < nrules; i++) {
 		if(rule[i].prop) {
 			reg = emallocz(sizeof(regex_t));
 			if(regcomp(reg, rule[i].prop, REG_EXTENDED))
 				free(reg);
 			else
-				regexps[i].propregex = reg;
+				regs[i].propregex = reg;
 		}
 		if(rule[i].tags) {
 			reg = emallocz(sizeof(regex_t));
 			if(regcomp(reg, rule[i].tags, REG_EXTENDED))
 				free(reg);
 			else
-				regexps[i].tagregex = reg;
+				regs[i].tagregex = reg;
 		}
 	}
 }
@@ -138,14 +141,27 @@ dotile(void) {
 
 void
 incnmaster(Arg *arg) {
-	if((arrange == dofloat) || (nmaster + arg->i < 1)
+	if((lt->arrange == dofloat) || (nmaster + arg->i < 1)
 	|| (wah / (nmaster + arg->i) <= 2 * BORDERPX))
 		return;
 	nmaster += arg->i;
 	if(sel)
-		arrange();
+		lt->arrange();
 	else
 		drawstatus();
+}
+
+void
+initlayouts(void) {
+	unsigned int i, w;
+
+	lt = &layout[0];
+	nlayouts = sizeof layout / sizeof layout[0];
+	for(blw = i = 0; i < nlayouts; i++) {
+		w = textw(layout[i].symbol);
+		if(w > blw)
+			blw = w;
+	}
 }
 
 Bool
@@ -160,7 +176,7 @@ isvisible(Client *c) {
 
 void
 resizemaster(Arg *arg) {
-	if(arrange != dotile)
+	if(lt->arrange != dotile)
 		return;
 	if(arg->i == 0)
 		master = MASTER;
@@ -170,7 +186,7 @@ resizemaster(Arg *arg) {
 			return;
 		master += arg->i;
 	}
-	arrange();
+	lt->arrange();
 }
 
 void
@@ -181,9 +197,9 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->isfloat || arrange == dofloat)
+	if(sel->isfloat || lt->arrange == dofloat)
 		XRaiseWindow(dpy, sel->win);
-	if(arrange != dofloat) {
+	if(lt->arrange != dofloat) {
 		if(!sel->isfloat)
 			XLowerWindow(dpy, sel->win);
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
@@ -212,11 +228,11 @@ settags(Client *c, Client *trans) {
 		snprintf(prop, sizeof prop, "%s:%s:%s",
 				ch.res_class ? ch.res_class : "",
 				ch.res_name ? ch.res_name : "", c->name);
-		for(i = 0; i < len; i++)
-			if(regexps[i].propregex && !regexec(regexps[i].propregex, prop, 1, &tmp, 0)) {
+		for(i = 0; i < nrules; i++)
+			if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
 				c->isfloat = rule[i].isfloat;
-				for(j = 0; regexps[i].tagregex && j < ntags; j++) {
-					if(!regexec(regexps[i].tagregex, tags[j], 1, &tmp, 0)) {
+				for(j = 0; regs[i].tagregex && j < ntags; j++) {
+					if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
 						c->tags[j] = True;
 					}
@@ -242,15 +258,15 @@ tag(Arg *arg) {
 		sel->tags[i] = (arg->i == -1) ? True : False;
 	if(arg->i >= 0 && arg->i < ntags)
 		sel->tags[arg->i] = True;
-	arrange();
+	lt->arrange();
 }
 
 void
 togglefloat(Arg *arg) {
-	if(!sel || arrange == dofloat)
+	if(!sel || lt->arrange == dofloat)
 		return;
 	sel->isfloat = !sel->isfloat;
-	arrange();
+	lt->arrange();
 }
 
 void
@@ -263,14 +279,20 @@ toggletag(Arg *arg) {
 	for(i = 0; i < ntags && !sel->tags[i]; i++);
 	if(i == ntags)
 		sel->tags[arg->i] = True;
-	arrange();
+	lt->arrange();
 }
 
 void
-togglemode(Arg *arg) {
-	arrange = (arrange == dofloat) ? dotile : dofloat;
+togglelayout(Arg *arg) {
+	unsigned int i;
+
+	for(i = 0; i < nlayouts && lt != &layout[i]; i++);
+	if(i == nlayouts - 1)
+		lt = &layout[0];
+	else
+		lt = &layout[++i];
 	if(sel)
-		arrange();
+		lt->arrange();
 	else
 		drawstatus();
 }
@@ -283,7 +305,7 @@ toggleview(Arg *arg) {
 	for(i = 0; i < ntags && !seltag[i]; i++);
 	if(i == ntags)
 		seltag[arg->i] = True; /* cannot toggle last view */
-	arrange();
+	lt->arrange();
 }
 
 void
@@ -294,5 +316,5 @@ view(Arg *arg) {
 		seltag[i] = (arg->i == -1) ? True : False;
 	if(arg->i >= 0 && arg->i < ntags)
 		seltag[arg->i] = True;
-	arrange();
+	lt->arrange();
 }

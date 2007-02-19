@@ -24,9 +24,8 @@
  *
  * Keys and tagging rules are organized as arrays and defined in the config.h
  * file. These arrays are kept static in event.o and tag.o respectively,
- * because no other part of dwm needs access to them.  The current mode is
- * represented by the arrange() function pointer, which wether points to
- * dofloat() or dotile(). 
+ * because no other part of dwm needs access to them.  The current layout is
+ * represented by the lt pointer.
  *
  * To understand everything else, start reading main.c:main().
  */
@@ -81,21 +80,26 @@ struct Client {
 	Window win;
 };
 
+typedef struct {
+	const char *symbol;
+	void (*arrange)(void);
+} Layout;
+
 extern const char *tags[];			/* all tags */
 extern char stext[256];				/* status text */
-extern int bh, bmw;				/* bar height, bar mode label width */
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
 extern int wax, way, wah, waw;			/* windowarea geometry */
+extern unsigned int bh, blw;			/* bar height, bar layout label width */
 extern unsigned int master, nmaster;		/* master percent, number of master clients */
 extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern void (*arrange)(void);			/* arrange function, indicates mode  */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, selscreen, *seltag;	/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
 extern Display *dpy;
+extern Layout *lt;
 extern Window root, barwin;
 
 /* client.c */
@@ -124,17 +128,18 @@ extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to 
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* screen.c */
-extern void compileregexps(void);		/* initialize regexps of rules defined in config.h */
+extern void compileregs(void);			/* initialize regexps of rules defined in config.h */
 extern void dofloat(void);			/* arranges all windows floating */
 extern void dotile(void);			/* arranges all windows tiled */
 extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
+extern void initlayouts(void);			/* initialize layout array */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c with arg's index */
 extern void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */
-extern void togglemode(Arg *arg);		/* toggles global arrange function (dotile/dofloat) */
+extern void togglelayout(Arg *arg);		/* toggles layout */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
 extern void view(Arg *arg);			/* views the tag with arg's index */

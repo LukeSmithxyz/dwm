@@ -263,7 +263,7 @@ manage(Window w, XWindowAttributes *wa) {
 	setclientstate(c, NormalState);
 	if(isvisible(c))
 		focus(c);
-	arrange();
+	lt->arrange();
 }
 
 Client *
@@ -430,7 +430,7 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	arrange();
+	lt->arrange();
 }
 
 void
@@ -440,7 +440,7 @@ zoom(Arg *arg) {
 
 	if(!sel)
 		return;
-	if(sel->isfloat || (arrange == dofloat)) {
+	if(sel->isfloat || (lt->arrange == dofloat)) {
 		togglemax(sel);
 		return;
 	}
@@ -452,5 +452,5 @@ zoom(Arg *arg) {
 	detach(c);
 	attach(c);
 	focus(c);
-	arrange();
+	lt->arrange();
 }

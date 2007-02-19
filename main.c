@@ -18,8 +18,8 @@
 /* extern */
 
 char stext[256];
-int bh, bmw, screen, sx, sy, sw, sh, wax, way, waw, wah;
-unsigned int ntags, numlockmask;
+int screen, sx, sy, sw, sh, wax, way, waw, wah;
+unsigned int bh, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool running = True;
 Bool *seltag;
@@ -246,7 +246,7 @@ setup(void) {
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 	grabkeys();
-	compileregexps();
+	compileregs();
 	for(ntags = 0; tags[ntags]; ntags++);
 	seltag = emallocz(sizeof(Bool) * ntags);
 	seltag[0] = True;
@@ -262,7 +262,7 @@ setup(void) {
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	bmw = textw(TILESYMBOL) > textw(FLOATSYMBOL) ? textw(TILESYMBOL) : textw(FLOATSYMBOL);
+	initlayouts();
 	/* bar */
 	dc.h = bh = dc.font.height + 2;
 	wa.override_redirect = 1;
@@ -312,8 +312,8 @@ drawstatus(void) {
 			drawtext(tags[i], dc.norm, sel && sel->tags[i], isoccupied(i));
 		dc.x += dc.w;
 	}
-	dc.w = bmw;
-	drawtext(arrange == dofloat ? FLOATSYMBOL : TILESYMBOL, dc.norm, False, False);
+	dc.w = blw;
+	drawtext(lt->symbol, dc.norm, False, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = sw - dc.w;

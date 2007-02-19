@@ -5,9 +5,12 @@
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 
-#define DEFMODE			dotile		/* dofloat */
-#define FLOATSYMBOL		"><>"
-#define TILESYMBOL		"[]="
+#define LAYOUTS \
+static Layout layout[] = { \
+	/* symbol		function */ \
+	{ "[]=",		dotile }, /* first entry is default */ \
+	{ "><>",		dofloat }, \
+};
 
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*"
@@ -60,7 +63,7 @@ static Key key[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_8,		toggletag,	{ .i = 7 } }, \
 	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	{ .i = 8 } }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	{ 0 } }, \
-	{ MODKEY,			XK_space,	togglemode,	{ 0 } }, \
+	{ MODKEY,			XK_space,	togglelayout,	{ 0 } }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloat,	{ 0 } }, \
 	{ MODKEY,			XK_0,		view,		{ .i = -1 } }, \
 	{ MODKEY,			XK_1,		view,		{ .i = 0 } }, \

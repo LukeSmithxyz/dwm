@@ -137,10 +137,10 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
-		if(ev->x < x + bmw)
+		if(ev->x < x + blw)
 			switch(ev->button) {
 			case Button1:
-				togglemode(NULL);
+				togglelayout(NULL);
 				break;
 			case Button4:
 				a.i = 1;
@@ -156,14 +156,14 @@ buttonpress(XEvent *e) {
 		focus(c);
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
-		if(ev->button == Button1 && (arrange == dofloat || c->isfloat)) {
+		if(ev->button == Button1 && (lt->arrange == dofloat || c->isfloat)) {
 			restack();
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
 		else if(ev->button == Button3
-		&& (arrange == dofloat || c->isfloat) && !c->isfixed)
+		&& (lt->arrange == dofloat || c->isfloat) && !c->isfixed)
 		{
 			restack();
 			resizemouse(c);
@@ -181,7 +181,7 @@ configurerequest(XEvent *e) {
 		c->ismax = False;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-		if(c->isfixed || c->isfloat || (arrange == dofloat)) {
+		if(c->isfixed || c->isfloat || (lt->arrange == dofloat)) {
 			if(ev->value_mask & CWX)
 				c->x = ev->x;
 			if(ev->value_mask & CWY)
@@ -310,7 +310,7 @@ propertynotify(XEvent *e) {
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
 				if(!c->isfloat && (c->isfloat = (trans != 0)))
-					arrange();
+					lt->arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
 				updatesizehints(c);
