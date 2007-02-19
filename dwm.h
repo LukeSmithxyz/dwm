@@ -72,7 +72,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isbanned, isfixed, ismax, versatile;
+	Bool isbanned, isfixed, ismax, isversatile;
 	Bool *tags;
 	Client *next;
 	Client *prev;

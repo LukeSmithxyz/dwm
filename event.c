@@ -156,14 +156,14 @@ buttonpress(XEvent *e) {
 		focus(c);
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
-		if(ev->button == Button1 && (lt->arrange == versatile || c->versatile)) {
+		if(ev->button == Button1 && (lt->arrange == versatile || c->isversatile)) {
 			restack();
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
 		else if(ev->button == Button3
-		&& (lt->arrange == versatile || c->versatile) && !c->isfixed)
+		&& (lt->arrange == versatile || c->isversatile) && !c->isfixed)
 		{
 			restack();
 			resizemouse(c);
@@ -181,7 +181,7 @@ configurerequest(XEvent *e) {
 		c->ismax = False;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-		if(c->isfixed || c->versatile || (lt->arrange == versatile)) {
+		if(c->isfixed || c->isversatile || (lt->arrange == versatile)) {
 			if(ev->value_mask & CWX)
 				c->x = ev->x;
 			if(ev->value_mask & CWY)
@@ -309,7 +309,7 @@ propertynotify(XEvent *e) {
 			default: break;
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
-				if(!c->versatile && (c->versatile = (getclient(trans) != NULL)))
+				if(!c->isversatile && (c->isversatile = (getclient(trans) != NULL)))
 					lt->arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:

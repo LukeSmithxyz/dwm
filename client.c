@@ -253,8 +253,8 @@ manage(Window w, XWindowAttributes *wa) {
 	updatetitle(c);
 	for(t = clients; t && t->win != trans; t = t->next);
 	settags(c, t);
-	if(!c->versatile)
-		c->versatile = (t != NULL) || c->isfixed;
+	if(!c->isversatile)
+		c->isversatile = (t != NULL) || c->isfixed;
 	attach(c);
 	attachstack(c);
 	c->isbanned = True;
@@ -268,7 +268,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->versatile || !isvisible(c)); c = c->next);
+	for(; c && (c->isversatile || !isvisible(c)); c = c->next);
 	return c;
 }
 
@@ -440,7 +440,7 @@ zoom(Arg *arg) {
 
 	if(!sel)
 		return;
-	if(sel->versatile || (lt->arrange == versatile)) {
+	if(sel->isversatile || (lt->arrange == versatile)) {
 		togglemax(sel);
 		return;
 	}

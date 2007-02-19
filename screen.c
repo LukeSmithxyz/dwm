@@ -19,7 +19,7 @@ Layout *lt = NULL;
 typedef struct {
 	const char *prop;
 	const char *tags;
-	Bool versatile;
+	Bool isversatile;
 } Rule;
 
 typedef struct {
@@ -52,7 +52,7 @@ tile(void) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			if(c->versatile)
+			if(c->isversatile)
 				continue;
 			c->ismax = False;
 			nx = wax;
@@ -175,10 +175,10 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->versatile || lt->arrange == versatile)
+	if(sel->isversatile || lt->arrange == versatile)
 		XRaiseWindow(dpy, sel->win);
 	if(lt->arrange != versatile) {
-		if(!sel->versatile)
+		if(!sel->isversatile)
 			XLowerWindow(dpy, sel->win);
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
@@ -208,7 +208,7 @@ settags(Client *c, Client *trans) {
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; i < nrules; i++)
 			if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
-				c->versatile = rule[i].versatile;
+				c->isversatile = rule[i].isversatile;
 				for(j = 0; regs[i].tagregex && j < ntags; j++) {
 					if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
@@ -271,7 +271,7 @@ void
 toggleversatile(Arg *arg) {
 	if(!sel || lt->arrange == versatile)
 		return;
-	sel->versatile = !sel->versatile;
+	sel->isversatile = !sel->isversatile;
 	lt->arrange();
 }
 
