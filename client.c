@@ -18,6 +18,7 @@ attachstack(Client *c) {
 static void
 detachstack(Client *c) {
 	Client **tc;
+
 	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
 	*tc = c->snext;
 }
@@ -77,6 +78,7 @@ isprotodel(Client *c) {
 static void
 setclientstate(Client *c, long state) {
 	long data[] = {state, None};
+
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
 			PropModeReplace, (unsigned char *)data, 2);
 }
@@ -444,7 +446,6 @@ zoom(Arg *arg) {
 	}
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
 			return;
