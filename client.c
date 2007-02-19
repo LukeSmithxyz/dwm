@@ -68,14 +68,6 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 /* extern */
 
 void
-ban(Client *c) {
-	if(!c || c->isbanned)
-		return;
-	c->isbanned = True;
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-}
-
-void
 configure(Client *c) {
 	XConfigureEvent ce;
 

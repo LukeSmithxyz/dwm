@@ -184,16 +184,9 @@ configurerequest(XEvent *e) {
 				c->h = ev->height;
 			if((ev->value_mask & (CWX | CWY))
 			&& !(ev->value_mask & (CWWidth | CWHeight)))
-			{
 				configure(c);
-				if(isvisible(c))
-					XMoveWindow(dpy, c->win, c->x, c->y);
-			}
-			else {
+			if(isvisible(c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
-				if(!isvisible(c))
-					ban(c);
-			}
 		}
 		else
 			configure(c);
