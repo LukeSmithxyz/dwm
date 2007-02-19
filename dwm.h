@@ -103,28 +103,23 @@ extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
-extern Client *getclient(Window w);		/* return client of w */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 Client *nexttiled(Client *c);			/* returns tiled successor of c */
 extern void resize(Client *c, int x, int y,
-		int w, int h, Bool sizehints);	/* resize c*/
+		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
 extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */
-
-/* draw.c */
-extern void drawstatus(void);			/* draw the bar */
-extern unsigned long getcolor(const char *colstr);	/* return color of colstr */
-extern void setfont(const char *fontstr);	/* set the font for DC */
-extern unsigned int textw(const char *text);	/* return the width of text in px*/
 
 /* event.c */
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 extern void procevent(void);			/* process pending X events */
 
 /* main.c */
+extern void drawstatus(void);			/* draw the bar */
+extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */

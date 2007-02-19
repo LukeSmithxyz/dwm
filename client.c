@@ -200,16 +200,6 @@ focusprev(Arg *arg) {
 	}
 }
 
-Client *
-getclient(Window w) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->win == w)
-			return c;
-	return NULL;
-}
-
 void
 killclient(Arg *arg) {
 	if(!sel)
@@ -259,7 +249,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatetitle(c);
-	t = getclient(trans);
+	for(t = clients; t && t->win != c->win; t = t->next);
 	settags(c, t);
 	if(!c->isfloat)
 		c->isfloat = (t != 0) || c->isfixed;

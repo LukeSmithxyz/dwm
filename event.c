@@ -20,6 +20,14 @@ KEYS
 #define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 
+static Client *
+getclient(Window w) {
+	Client *c;
+
+	for(c = clients; c && c->win != w; c = c->next);
+	return c;
+}
+
 static void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di, nx, ny;
