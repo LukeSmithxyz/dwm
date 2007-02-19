@@ -8,17 +8,6 @@
 void (*arrange)(void) = DEFMODE;
 
 void
-detach(Client *c) {
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	if(c == clients)
-		clients = c->next;
-	c->next = c->prev = NULL;
-}
-
-void
 dofloat(void) {
 	Client *c;
 

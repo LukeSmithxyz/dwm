@@ -125,10 +125,7 @@ zoom(Arg *arg) {
 		if(!(c = nextmanaged(c->next)))
 			return;
 	detach(c);
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
+	attach(c);
 	focus(c);
 	arrange();
 }

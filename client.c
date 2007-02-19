@@ -10,13 +10,6 @@
 /* static */
 
 static void
-detachstack(Client *c) {
-	Client **tc;
-	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
-	*tc = c->snext;
-}
-
-static void
 grabbuttons(Client *c, Bool focused) {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
@@ -68,6 +61,20 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 /* extern */
 
 void
+attach(Client *c) {
+	if(clients)
+		clients->prev = c;
+	c->next = clients;
+	clients = c;
+}
+
+void
+attachstack(Client *c) {
+	c->snext = stack;
+	stack = c;
+}
+
+void
 configure(Client *c) {
 	XConfigureEvent ce;
 
@@ -86,6 +93,24 @@ configure(Client *c) {
 }
 
 void
+detach(Client *c) {
+	if(c->prev)
+		c->prev->next = c->next;
+	if(c->next)
+		c->next->prev = c->prev;
+	if(c == clients)
+		clients = c->next;
+	c->next = c->prev = NULL;
+}
+
+void
+detachstack(Client *c) {
+	Client **tc;
+	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
+	*tc = c->snext;
+}
+
+void
 focus(Client *c) {
 	if(c && !isvisible(c))
 		return;
@@ -95,8 +120,7 @@ focus(Client *c) {
 	}
 	if(c) {
 		detachstack(c);
-		c->snext = stack;
-		stack = c;
+		attachstack(c);
 		grabbuttons(c, True);
 	}
 	sel = c;
@@ -189,11 +213,8 @@ manage(Window w, XWindowAttributes *wa) {
 	settags(c, t);
 	if(!c->isfloat)
 		c->isfloat = (t != 0) || c->isfixed;
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	c->snext = stack;
-	stack = clients = c;
+	attach(c);
+	attachstack(c);
 	c->isbanned = True;
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMapWindow(dpy, c->win);

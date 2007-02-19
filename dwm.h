@@ -99,7 +99,11 @@ extern Display *dpy;
 extern Window root, barwin;
 
 /* client.c */
+extern void attach(Client *c);			/* attaches c to global client list */
+extern void attachstack(Client *c);		/* attaches client to stack */
 extern void configure(Client *c);		/* send synthetic configure event */
+extern void detach(Client *c);			/* detaches c from global client list */
+extern void detachstack(Client *c);		/* detaches client from stack */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern Client *getclient(Window w);		/* return client of w */
 extern Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
@@ -144,7 +148,6 @@ extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 *
 extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
 
 /* view.c */
-extern void detach(Client *c);			/* detaches c from global client list */
 extern void dofloat(void);			/* arranges all windows floating */
 extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
