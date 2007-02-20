@@ -62,7 +62,7 @@ cleanup(void) {
 }
 
 static unsigned long
-getcolor(const char *colstr) {
+initcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
@@ -72,27 +72,7 @@ getcolor(const char *colstr) {
 }
 
 static void
-scan(void) {
-	unsigned int i, num;
-	Window *wins, d1, d2;
-	XWindowAttributes wa;
-
-	wins = NULL;
-	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
-		for(i = 0; i < num; i++) {
-			if(!XGetWindowAttributes(dpy, wins[i], &wa)
-			|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
-				continue;
-			if(wa.map_state == IsViewable)
-				manage(wins[i], &wa);
-		}
-	}
-	if(wins)
-		XFree(wins);
-}
-
-static void
-setfont(const char *fontstr) {
+initfont(const char *fontstr) {
 	char *def, **missing;
 	int i, n;
 
@@ -130,6 +110,26 @@ setfont(const char *fontstr) {
 		dc.font.descent = dc.font.xfont->descent;
 	}
 	dc.font.height = dc.font.ascent + dc.font.descent;
+}
+
+static void
+scan(void) {
+	unsigned int i, num;
+	Window *wins, d1, d2;
+	XWindowAttributes wa;
+
+	wins = NULL;
+	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
+		for(i = 0; i < num; i++) {
+			if(!XGetWindowAttributes(dpy, wins[i], &wa)
+			|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
+				continue;
+			if(wa.map_state == IsViewable)
+				manage(wins[i], &wa);
+		}
+	}
+	if(wins)
+		XFree(wins);
 }
 
 static void
@@ -173,13 +173,13 @@ setup(void) {
 	seltag = emallocz(sizeof(Bool) * ntags);
 	seltag[0] = True;
 	/* style */
-	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
-	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
-	dc.norm[ColFG] = getcolor(NORMFGCOLOR);
-	dc.sel[ColBorder] = getcolor(SELBORDERCOLOR);
-	dc.sel[ColBG] = getcolor(SELBGCOLOR);
-	dc.sel[ColFG] = getcolor(SELFGCOLOR);
-	setfont(FONT);
+	dc.norm[ColBorder] = initcolor(NORMBORDERCOLOR);
+	dc.norm[ColBG] = initcolor(NORMBGCOLOR);
+	dc.norm[ColFG] = initcolor(NORMFGCOLOR);
+	dc.sel[ColBorder] = initcolor(SELBORDERCOLOR);
+	dc.sel[ColBG] = initcolor(SELBGCOLOR);
+	dc.sel[ColFG] = initcolor(SELFGCOLOR);
+	initfont(FONT);
 	/* geometry */
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
