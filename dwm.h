@@ -120,6 +120,15 @@ extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is
 /* event.c */
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 
+/* layout.c */
+extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
+extern void initlayouts(void);			/* initialize layout array */
+extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
+extern void restack(void);			/* restores z layers of all clients */
+extern void setlayout(Arg *arg);		/* sets layout, -1 toggles */
+extern void toggleversatile(Arg *arg);		/* toggles focusesd client between versatile/and non-versatile state */
+extern void versatile(void);			/* arranges all windows versatile */
+
 /* main.c */
 extern void drawstatus(void);			/* draw the bar */
 extern unsigned int textw(const char *text);	/* return the width of text in px*/
@@ -127,20 +136,13 @@ extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
-/* screen.c */
+/* tag.c */
 extern void compileregs(void);			/* initialize regexps of rules defined in config.h */
-extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
-extern void initlayouts(void);			/* initialize layout array */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
-extern void restack(void);			/* restores z layers of all clients */
-extern void setlayout(Arg *arg);		/* sets layout, -1 toggles */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
 extern void tag(Arg *arg);			/* tags c with arg's index */
-extern void toggleversatile(Arg *arg);		/* toggles focusesd client between versatile/and non-versatile state */
 extern void toggletag(Arg *arg);		/* toggles c tags with arg's index */
 extern void toggleview(Arg *arg);		/* toggles the tag with arg's index (in)visible */
-extern void versatile(void);			/* arranges all windows versatile */
 extern void view(Arg *arg);			/* views the tag with arg's index */
 
 /* util.c */
