@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC = client.c event.c layout.c main.c tag.c util.c
+SRC = client.c draw.c event.c layout.c main.c tag.c util.c
 OBJ = ${SRC:.c=.o}
 
 all: options dwm

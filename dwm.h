@@ -117,6 +117,12 @@ extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
 extern void zoom(Arg *arg);			/* zooms the focused client to master area, arg is ignored */
 
+/* draw.c */
+extern void drawstatus(void);			/* draw the bar */
+extern void drawtext(const char *text,
+		unsigned long col[ColLast]);	/* draw text */
+extern unsigned int textw(const char *text);	/* return the width of text in px*/
+
 /* event.c */
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 
@@ -130,10 +136,6 @@ extern void toggleversatile(Arg *arg);		/* toggles focusesd client between versa
 extern void versatile(void);			/* arranges all windows versatile */
 
 /* main.c */
-extern void drawstatus(void);			/* draw the bar */
-extern void drawtext(const char *text,
-		unsigned long col[ColLast]);	/* draw text */
-extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
