@@ -4,6 +4,7 @@
 #include "dwm.h"
 #include <regex.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <X11/Xutil.h>
 
 /* static */
