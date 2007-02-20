@@ -131,6 +131,8 @@ extern void versatile(void);			/* arranges all windows versatile */
 
 /* main.c */
 extern void drawstatus(void);			/* draw the bar */
+extern void drawtext(const char *text,
+		unsigned long col[ColLast]);	/* draw text */
 extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void quit(Arg *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
