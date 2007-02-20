@@ -6,17 +6,6 @@
 
 /* static */
 
-static unsigned int
-textnw(const char *text, unsigned int len) {
-	XRectangle r;
-
-	if(dc.font.set) {
-		XmbTextExtents(dc.font.set, text, len, NULL, &r);
-		return r.width;
-	}
-	return XTextWidth(dc.font.xfont, text, len);
-}
-
 static void
 drawsquare(Bool filled, Bool empty, unsigned long col[ColLast]) {
 	int x;
@@ -46,6 +35,17 @@ isoccupied(unsigned int t) {
 		if(c->tags[t])
 			return True;
 	return False;
+}
+
+static unsigned int
+textnw(const char *text, unsigned int len) {
+	XRectangle r;
+
+	if(dc.font.set) {
+		XmbTextExtents(dc.font.set, text, len, NULL, &r);
+		return r.width;
+	}
+	return XTextWidth(dc.font.xfont, text, len);
 }
 
 /* extern */
