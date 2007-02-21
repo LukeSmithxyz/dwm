@@ -152,5 +152,5 @@ extern void view(Arg *arg);			/* views the tag with arg's index */
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
-extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
+extern void spawn(Arg *arg);			/* forks a new subprocess with arg's cmd */
 
