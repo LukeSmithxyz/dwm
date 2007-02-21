@@ -87,7 +87,7 @@ typedef struct {
 
 extern const char *tags[];			/* all tags */
 extern char stext[256];				/* status text */
-extern int screen, sw, sh;			/* screen geometry */
+extern int screen, sx, sy, sw, sh;		/* screen geometry */
 extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int bh, blw;			/* bar height, bar layout label width */
 extern unsigned int master, nmaster;		/* master percent, number of master clients */
