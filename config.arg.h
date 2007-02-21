@@ -9,7 +9,7 @@
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
 #define SELBORDERCOLOR		"#69c"
-#define SELBGCOLOR		"#555"
+#define SELBGCOLOR		"#357"
 #define SELFGCOLOR		"#fff"
 #define TOPBAR			True		/* False */
 
