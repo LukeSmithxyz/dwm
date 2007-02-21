@@ -87,14 +87,14 @@ typedef struct {
 
 extern const char *tags[];			/* all tags */
 extern char stext[256];				/* status text */
-extern int screen, sx, sy, sw, sh;		/* screen geometry */
+extern int screen, sw, sh;			/* screen geometry */
 extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int bh, blw;			/* bar height, bar layout label width */
 extern unsigned int master, nmaster;		/* master percent, number of master clients */
 extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, selscreen, *seltag;	/* seltag is array of Bool */
+extern Bool selscreen, *seltag;			/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */

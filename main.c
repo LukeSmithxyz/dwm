@@ -18,10 +18,9 @@
 /* extern */
 
 char stext[256];
-int screen, sx, sy, sw, sh, wax, way, waw, wah;
+int screen, sw, sh, wax, way, waw, wah;
 unsigned int bh, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
-Bool running = True;
 Bool *seltag;
 Bool selscreen = True;
 Client *clients = NULL;
@@ -36,6 +35,7 @@ Window root, barwin;
 
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static Bool otherwm, readin;
+static Bool running = True;
 
 static void
 cleanup(void) {
@@ -181,7 +181,6 @@ setup(void) {
 	dc.sel[ColFG] = initcolor(SELFGCOLOR);
 	initfont(FONT);
 	/* geometry */
-	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	initlayouts();
@@ -190,15 +189,15 @@ setup(void) {
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask | ExposureMask;
-	barwin = XCreateWindow(dpy, root, sx, sy + (TOPBAR ? 0 : sh - bh), sw, bh, 0,
+	barwin = XCreateWindow(dpy, root, 0, (TOPBAR ? 0 : sh - bh), sw, bh, 0,
 			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
 	/* windowarea */
-	wax = sx;
-	way = sy + (TOPBAR ? bh : 0);
+	wax = 0;
+	way = (TOPBAR ? bh : 0);
 	wah = sh - bh;
 	waw = sw;
 	/* pixmap for everything */
