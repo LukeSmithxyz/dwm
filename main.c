@@ -325,12 +325,11 @@ main(int argc, char *argv[]) {
 			}
 			drawstatus();
 		}
-		if(FD_ISSET(xfd, &rd))
-			while(XPending(dpy)) {
-				XNextEvent(dpy, &ev);
-				if(handler[ev.type])
-					(handler[ev.type])(&ev); /* call handler */
-			}
+		while(XPending(dpy)) {
+			XNextEvent(dpy, &ev);
+			if(handler[ev.type])
+				(handler[ev.type])(&ev); /* call handler */
+		}
 	}
 	cleanup();
 	XCloseDisplay(dpy);
