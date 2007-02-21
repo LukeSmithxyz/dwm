@@ -42,7 +42,7 @@ static Layout layout[] = { \
 static Key key[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		{ .cmd = "exec uxterm -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" } }, \
+		{ .cmd = "exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" } }, \
 	{ MODKEY,			XK_p,		spawn, \
 		{ .cmd = "exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
 			" | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' " \
