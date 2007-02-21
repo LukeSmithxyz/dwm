@@ -8,7 +8,7 @@
 #define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
-#define SELBORDERCOLOR		"#69c"
+#define SELBORDERCOLOR		"#8c8"
 #define SELBGCOLOR		"#555"
 #define SELFGCOLOR		"#fff"
 #define TOPBAR			True		/* False */
