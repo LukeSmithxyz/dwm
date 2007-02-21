@@ -105,13 +105,11 @@ extern Window root, barwin;
 /* client.c */
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void focus(Client *c);			/* focus c, c may be NULL */
-extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
-extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern void killclient(Arg *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
 extern void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
+extern void toggleversatile(Arg *arg);		/* toggles focused client between versatile/and non-versatile state */
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
@@ -127,12 +125,14 @@ extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
+extern void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
+extern void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 extern void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
 extern void initlayouts(void);			/* initialize layout array */
+extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
 extern void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 extern void restack(void);			/* restores z layers of all clients */
 extern void setlayout(Arg *arg);		/* sets layout, -1 toggles */
-extern void toggleversatile(Arg *arg);		/* toggles focusesd client between versatile/and non-versatile state */
 extern void versatile(void);			/* arranges all windows versatile */
 
 /* main.c */

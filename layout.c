@@ -69,6 +69,38 @@ LAYOUTS
 /* extern */
 
 void
+focusnext(Arg *arg) {
+	Client *c;
+   
+	if(!sel)
+		return;
+	for(c = sel->next; c && !isvisible(c); c = c->next);
+	if(!c)
+		for(c = clients; c && !isvisible(c); c = c->next);
+	if(c) {
+		focus(c);
+		restack();
+	}
+}
+
+void
+focusprev(Arg *arg) {
+	Client *c;
+
+	if(!sel)
+		return;
+	for(c = sel->prev; c && !isvisible(c); c = c->prev);
+	if(!c) {
+		for(c = clients; c && c->next; c = c->next);
+		for(; c && !isvisible(c); c = c->prev);
+	}
+	if(c) {
+		focus(c);
+		restack();
+	}
+}
+
+void
 incnmaster(Arg *arg) {
 	if((lt->arrange != tile) || (nmaster + arg->i < 1)
 	|| (wah / (nmaster + arg->i) <= 2 * BORDERPX))
@@ -91,6 +123,12 @@ initlayouts(void) {
 		if(w > blw)
 			blw = w;
 	}
+}
+
+Client *
+nexttiled(Client *c) {
+	for(; c && (c->isversatile || !isvisible(c)); c = c->next);
+	return c;
 }
 
 void
@@ -151,14 +189,6 @@ setlayout(Arg *arg) {
 		lt->arrange();
 	else
 		drawstatus();
-}
-
-void
-toggleversatile(Arg *arg) {
-	if(!sel || lt->arrange == versatile)
-		return;
-	sel->isversatile = !sel->isversatile;
-	lt->arrange();
 }
 
 void

@@ -171,38 +171,6 @@ focus(Client *c) {
 }
 
 void
-focusnext(Arg *arg) {
-	Client *c;
-   
-	if(!sel)
-		return;
-	for(c = sel->next; c && !isvisible(c); c = c->next);
-	if(!c)
-		for(c = clients; c && !isvisible(c); c = c->next);
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
-void
-focusprev(Arg *arg) {
-	Client *c;
-
-	if(!sel)
-		return;
-	for(c = sel->prev; c && !isvisible(c); c = c->prev);
-	if(!c) {
-		for(c = clients; c && c->next; c = c->next);
-		for(; c && !isvisible(c); c = c->prev);
-	}
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
-void
 killclient(Arg *arg) {
 	if(!sel)
 		return;
@@ -264,12 +232,6 @@ manage(Window w, XWindowAttributes *wa) {
 	if(isvisible(c))
 		focus(c);
 	lt->arrange();
-}
-
-Client *
-nexttiled(Client *c) {
-	for(; c && (c->isversatile || !isvisible(c)); c = c->next);
-	return c;
 }
 
 void
@@ -338,6 +300,14 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		configure(c);
 		XSync(dpy, False);
 	}
+}
+
+void
+toggleversatile(Arg *arg) {
+	if(!sel || lt->arrange == versatile)
+		return;
+	sel->isversatile = !sel->isversatile;
+	lt->arrange();
 }
 
 void
