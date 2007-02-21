@@ -4,7 +4,7 @@
 
 /* appearance */
 #define BORDERPX		1
-#define FONT			"-*-terminus-medium-r-*-*-12-*-*-*-*-*-*-*"
+#define FONT			"-*-proggyclean-medium-r-*-*-13-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
