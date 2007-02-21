@@ -2,6 +2,7 @@
  * See LICENSE file for license details.
  */
 
+/* appearance */
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#333"
@@ -10,23 +11,33 @@
 #define SELBORDERCOLOR		"#69c"
 #define SELBGCOLOR		"#555"
 #define SELFGCOLOR		"#fff"
-
-#define MASTER			600		/* per thousand */
-#define MODKEY			Mod1Mask
-#define NMASTER			1		/* clients in master area */
-#define SNAP			40		/* pixel */
 #define TOPBAR			True		/* False */
 
+/* behavior */
+#define SNAP			40		/* pixel */
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
+#define RULES \
+static Rule rule[] = { \
+	/* class:instance:title regex	tags regex	isversatile */ \
+	{ "Firefox",			"3",		False }, \
+	{ "Gimp",			NULL,		True }, \
+	{ "MPlayer",			NULL,		True }, \
+	{ "Acroread",			NULL,		True }, \
+};
 
+/* layout(s) */
 #define LAYOUTS \
 static Layout layout[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		versatile }, \
 };
+#define MASTER			600		/* per thousand */
+#define NMASTER			1		/* clients in master area */
 
+/* key definitions */
+#define MODKEY			Mod1Mask
 #define KEYS \
 static Key key[] = { \
 	/* modifier			key		function	argument */ \
@@ -85,13 +96,4 @@ static Key key[] = { \
 	{ MODKEY|ControlMask,		XK_8,		toggleview,	{ .i = 7 } }, \
 	{ MODKEY|ControlMask,		XK_9,		toggleview,	{ .i = 8 } }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
-};
-
-#define RULES \
-static Rule rule[] = { \
-	/* class:instance:title regex	tags regex	isversatile */ \
-	{ "Firefox",			"3",		False }, \
-	{ "Gimp",			NULL,		True }, \
-	{ "MPlayer",			NULL,		True }, \
-	{ "Acroread",			NULL,		True }, \
 };

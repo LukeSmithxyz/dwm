@@ -2,6 +2,7 @@
  * See LICENSE file for license details.
  */
 
+/* appearance */
 #define BORDERPX		1
 #define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#dddddd"
@@ -10,23 +11,34 @@
 #define SELBORDERCOLOR		"#ff0000"
 #define SELBGCOLOR		"#006699"
 #define SELFGCOLOR		"#ffffff"
-
-#define MASTER			600		/* per thousand */
-#define MODKEY			Mod1Mask
-#define NMASTER			1		/* clients in master area */
-#define SNAP			20		/* pixel */
 #define TOPBAR			True		/* False */
 
+/* behavior */
+#define SNAP			20		/* pixel */
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
+/* Query class:instance:title for regex matching info with following command:
+ * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
+#define RULES \
+static Rule rule[] = { \
+	/* class:instance:title regex	tags regex	isversatile */ \
+	{ "Gimp",			NULL,		True }, \
+	{ "MPlayer",			NULL,		True }, \
+	{ "Acroread",			NULL,		True }, \
+};
 
+/* layout(s) */
 #define LAYOUTS \
-Layout layout[] = { \
+static Layout layout[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		versatile }, \
 };
+#define MASTER			600		/* per thousand */
+#define NMASTER			1		/* clients in master area */
 
+/* key definitions */
+#define MODKEY			Mod1Mask
 #define KEYS \
 static Key key[] = { \
 	/* modifier			key		function	argument */ \
@@ -80,14 +92,4 @@ static Key key[] = { \
 	{ MODKEY|ControlMask,		XK_8,		toggleview,	{ .i = 7 } }, \
 	{ MODKEY|ControlMask,		XK_9,		toggleview,	{ .i = 8 } }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		{ 0 } }, \
-};
-
-/* Query class:instance:title for regex matching info with following command:
- * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
-#define RULES \
-static Rule rule[] = { \
-	/* class:instance:title regex	tags regex	isversatile */ \
-	{ "Gimp",			NULL,		True }, \
-	{ "MPlayer",			NULL,		True }, \
-	{ "Acroread",			NULL,		True }, \
 };
