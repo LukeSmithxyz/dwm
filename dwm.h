@@ -119,8 +119,7 @@ extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
-extern void focusnext(const char *arg);		/* focuses next visible client, arg is ignored  */
-extern void focusprev(const char *arg);		/* focuses previous visible client, arg is ignored */
+extern void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
 extern void incmasterw(const char *arg);	/* increments the master width with arg's index value */
 extern void incnmaster(const char *arg);	/* increments nmaster with arg's index value */
 extern void initlayouts(void);			/* initialize layout array */

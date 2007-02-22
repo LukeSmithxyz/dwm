@@ -70,30 +70,26 @@ LAYOUTS
 /* extern */
 
 void
-focusnext(const char *arg) {
+focusclient(const char *arg) {
 	Client *c;
    
-	if(!sel)
+	if(!sel || !arg)
 		return;
-	for(c = sel->next; c && !isvisible(c); c = c->next);
-	if(!c)
-		for(c = clients; c && !isvisible(c); c = c->next);
-	if(c) {
-		focus(c);
-		restack();
-	}
-}
-
-void
-focusprev(const char *arg) {
-	Client *c;
-
-	if(!sel)
+	switch(atoi(arg)) {
+	default:
 		return;
-	for(c = sel->prev; c && !isvisible(c); c = c->prev);
-	if(!c) {
-		for(c = clients; c && c->next; c = c->next);
-		for(; c && !isvisible(c); c = c->prev);
+	case 1:
+		for(c = sel->next; c && !isvisible(c); c = c->next);
+		if(!c)
+			for(c = clients; c && !isvisible(c); c = c->next);
+		break;
+	case -1:
+		for(c = sel->prev; c && !isvisible(c); c = c->prev);
+		if(!c) {
+			for(c = clients; c && c->next; c = c->next);
+			for(; c && !isvisible(c); c = c->prev);
+		}
+		break;
 	}
 	if(c) {
 		focus(c);

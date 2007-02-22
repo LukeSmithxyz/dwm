@@ -48,8 +48,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_i,		incnmaster,	"1" }, \
 	{ MODKEY,			XK_g,		incmasterw,	"15" }, \
 	{ MODKEY,			XK_s,		incmasterw,	"-15" }, \
-	{ MODKEY,			XK_Tab,		focusnext,	NULL }, \
-	{ MODKEY|ShiftMask,		XK_Tab,		focusprev,	NULL }, \
+	{ MODKEY,			XK_Tab,		focusclient,	"1" }, \
+	{ MODKEY|ShiftMask,		XK_Tab,		focusclient,	"-1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	toggleversatile,NULL }, \
