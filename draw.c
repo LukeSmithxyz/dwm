@@ -7,6 +7,24 @@
 /* static */
 
 static void
+drawcaret(unsigned long col[ColLast]) {
+	int x;
+	XGCValues gcv;
+	XPoint pt[3];
+
+	gcv.foreground = col[ColFG];
+	XChangeGC(dpy, dc.gc, GCForeground, &gcv);
+	x = (dc.font.ascent + dc.font.descent) / 2;
+	pt[0].x = dc.x + 1;
+	pt[0].y = dc.y + 1 + x;
+	pt[1].x = 0;
+	pt[1].y = -x;
+	pt[2].x = x;
+	pt[2].y = 0;
+	XDrawLines(dpy, dc.drawable, dc.gc, pt, 3, CoordModePrevious);
+}
+
+static void
 drawsquare(Bool filled, Bool empty, unsigned long col[ColLast]) {
 	int x;
 	XGCValues gcv;
@@ -79,7 +97,13 @@ drawstatus(void) {
 	drawtext(stext, dc.norm);
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
-		drawtext(sel ? sel->name : NULL, sel ? dc.sel : dc.norm);
+		if(sel) {
+			drawtext(sel->name, dc.sel);
+			if(sel->isversatile)
+				drawcaret(dc.sel);
+		}
+		else
+			drawtext(NULL, dc.norm);
 	}
 	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, sw, bh, 0, 0);
 	XSync(dpy, False);
