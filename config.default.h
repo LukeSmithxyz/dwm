@@ -33,7 +33,7 @@ static Layout layout[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		untile }, \
 };
-#define MASTERWIDTH		600		/* master width per thousand */
+#define MASTERWIDTH		640		/* master width per thousand */
 #define NMASTER			1		/* clients in master area */
 #define SNAP			20		/* untiled snap pixel */
 
@@ -46,8 +46,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_d,		incnmaster,	"-1" }, \
 	{ MODKEY,			XK_i,		incnmaster,	"1" }, \
-	{ MODKEY,			XK_g,		incmasterw,	"15" }, \
-	{ MODKEY,			XK_s,		incmasterw,	"-15" }, \
+	{ MODKEY,			XK_g,		incmasterw,	"32" }, \
+	{ MODKEY,			XK_s,		incmasterw,	"-32" }, \
 	{ MODKEY,			XK_Tab,		focusclient,	"1" }, \
 	{ MODKEY|ShiftMask,		XK_Tab,		focusclient,	"-1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
