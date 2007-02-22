@@ -108,7 +108,7 @@ tag(const char *arg) {
 	if(!sel)
 		return;
 	for(i = 0; i < ntags; i++)
-		sel->tags[i] = arg ? False : True;
+		sel->tags[i] = arg != NULL;
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
@@ -135,7 +135,7 @@ toggleview(const char *arg) {
 
 	i = arg ? atoi(arg) : 0;
 	seltag[i] = !seltag[i];
-	for(j = 0; j < ntags && !seltag[j]; i++);
+	for(j = 0; j < ntags && !seltag[j]; j++);
 	if(j == ntags)
 		seltag[i] = True; /* cannot toggle last view */
 	lt->arrange();
@@ -146,7 +146,7 @@ view(const char *arg) {
 	int i;
 
 	for(i = 0; i < ntags; i++)
-		seltag[i] = arg ? False : True;
+		seltag[i] = arg != NULL;
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		seltag[i] = True;

@@ -120,11 +120,17 @@ incmasterw(const char *arg) {
 
 void
 incnmaster(const char *arg) {
-	int i = arg ? atoi(arg) : 0;
-	if((lt->arrange != tile) || (nmaster + i < 1)
-	|| (wah / (nmaster + i) <= 2 * BORDERPX))
-		return;
-	nmaster += i;
+	int i;
+
+	if(!arg)
+		nmaster = NMASTER;
+	else {
+		i = atoi(arg);
+		if((lt->arrange != tile) || (nmaster + i < 1)
+		|| (wah / (nmaster + i) <= 2 * BORDERPX))
+			return;
+		nmaster += i;
+	}
 	if(sel)
 		lt->arrange();
 	else
@@ -175,7 +181,7 @@ restack(void) {
 
 void
 setlayout(const char *arg) {
-	unsigned int i;
+	int i;
 
 	if(!arg) {
 		for(i = 0; i < nlayouts && lt != &layout[i]; i++);
