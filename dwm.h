@@ -102,7 +102,9 @@ extern Layout *lt;
 extern Window root, barwin;
 
 /* client.c */
+extern void attach(Client *c);			/* attaches c to global client list */
 extern void configure(Client *c);		/* send synthetic configure event */
+extern void detach(Client *c);			/* detaches c from global client list */
 extern void focus(Client *c);			/* focus c, c may be NULL */
 extern void killclient(Arg arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
