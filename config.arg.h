@@ -18,7 +18,7 @@
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 #define RULES \
 static Rule rule[] = { \
-	/* class:instance:title regex	tags regex	isversatile */ \
+	/* class:instance:title regex	tags regex	isuntiled */ \
 	{ "Firefox",			"3",		False }, \
 	{ "Gimp",			NULL,		True }, \
 	{ "MPlayer",			NULL,		True }, \
@@ -30,11 +30,11 @@ static Rule rule[] = { \
 static Layout layout[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
-	{ "><>",		versatile }, \
+	{ "><>",		untile }, \
 };
 #define MASTERWIDTH		600		/* master width per thousand */
 #define NMASTER			1		/* clients in master area */
-#define SNAP			40		/* versatile snap pixel */
+#define SNAP			40		/* untiled snap pixel */
 
 /* key definitions */
 #define MODKEY			Mod1Mask
@@ -56,7 +56,7 @@ static Key key[] = { \
 	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
-	{ MODKEY|ShiftMask,		XK_space,	toggleversatile,NULL }, \
+	{ MODKEY|ShiftMask,		XK_space,	toggletiled,	NULL }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL }, \
 	{ MODKEY,			XK_0,		view,		NULL }, \
 	{ MODKEY,			XK_1,		view,		"0" }, \

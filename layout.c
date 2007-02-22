@@ -31,7 +31,7 @@ tile(void) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			if(c->isversatile)
+			if(c->isuntiled)
 				continue;
 			c->ismax = False;
 			nx = wax;
@@ -148,7 +148,7 @@ initlayouts(void) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->isversatile || !isvisible(c)); c = c->next);
+	for(; c && (c->isuntiled || !isvisible(c)); c = c->next);
 	return c;
 }
 
@@ -160,10 +160,10 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->isversatile || lt->arrange == versatile)
+	if(sel->isuntiled || lt->arrange == untile)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange != versatile) {
-		if(!sel->isversatile)
+	if(lt->arrange != untile) {
+		if(!sel->isuntiled)
 			XLowerWindow(dpy, sel->win);
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
@@ -202,7 +202,7 @@ void
 togglemax(const char *arg) {
 	XEvent ev;
 
-	if(!sel || (lt->arrange != versatile && !sel->isversatile) || sel->isfixed)
+	if(!sel || (lt->arrange != untile && !sel->isuntiled) || sel->isfixed)
 		return;
 	if((sel->ismax = !sel->ismax)) {
 		sel->rx = sel->x;
@@ -218,7 +218,7 @@ togglemax(const char *arg) {
 }
 
 void
-versatile(void) {
+untile(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next) {
@@ -245,7 +245,7 @@ zoom(const char *arg) {
 	unsigned int n;
 	Client *c;
 
-	if(!sel || lt->arrange != tile || sel->isversatile)
+	if(!sel || lt->arrange != tile || sel->isuntiled)
 		return;
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;

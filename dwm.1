@@ -5,14 +5,14 @@ dwm \- dynamic window manager
 .B dwm
 .RB [ \-v ]
 .SH DESCRIPTION
-dwm is a dynamic window manager for X. It manages windows in tiling and
-versatile layouts. Either layout can be applied dynamically, optimizing the
+dwm is a dynamic window manager for X. It manages windows in tiled and
+untiled layouts. Either layout can be applied dynamically, optimizing the
 environment for the application in use and the task performed.
 .P
-In tiling layout windows are managed in a master and stacking area. The master
+In tiled layout windows are managed in a master and stacking area. The master
 area contains the windows which currently need most attention, whereas the
-stacking area contains all other windows. In versatile layout windows can be
-resized and moved freely. Dialog windows are always managed versatile,
+stacking area contains all other windows. In untiled layout windows can be
+resized and moved freely. Dialog windows are always managed untiled,
 regardless of the layout applied.
 .P
 Windows are grouped by tags. Each window can be tagged with one or multiple
@@ -20,8 +20,8 @@ tags. Selecting certain tags displays all windows with these tags.
 .P
 dwm contains a small status bar which displays all available tags, the layout,
 the title of the focused window, and the text read from standard input. A
-versatile window is indicated with an empty square and a maximized
-versatile window is indicated with a filled square before the windows
+untiled window is indicated with an empty square and a maximized
+untiled window is indicated with a filled square before the windows
 title.  The selected tags are indicated with a different color. The tags of
 the focused window are indicated with a filled square in the top left
 corner.  The tags which are applied to one or more windows are indicated
@@ -40,7 +40,7 @@ is read and displayed in the status text area.
 .TP
 .B Button1
 click on a tag label to display all windows with that tag, click on the layout
-label toggles between tiling and versatile layout.
+label toggles between tiled and untiled layout.
 .TP
 .B Button3
 click on a tag label adds/removes all windows with that tag to/from the view.
@@ -57,7 +57,7 @@ Start
 .BR xterm (1).
 .TP
 .B Mod1-Return
-Zooms/cycles current window to/from master area (tiling layout only).
+Zooms/cycles current window to/from master area (tiled layout only).
 .TP
 .B Mod1-Tab
 Focus next window.
@@ -66,19 +66,19 @@ Focus next window.
 Focus previous window.
 .TP
 .B Mod1-g
-Increase master area width (tiling layout only).
+Increase master area width (tiled layout only).
 .TP
 .B Mod1-s
-Decrease master area width (tiling layout only).
+Decrease master area width (tiled layout only).
 .TP
 .B Mod1-i
-Increase the number of windows in the master area (tiling layout only).
+Increase the number of windows in the master area (tiled layout only).
 .TP
 .B Mod1-d
-Decrease the number of windows in the master area (tiling layout only).
+Decrease the number of windows in the master area (tiled layout only).
 .TP
 .B Mod1-m
-Toggles maximization of current window (versatile layout only).
+Toggles maximization of current window (untiled layout only).
 .TP
 .B Mod1-Shift-[1..n]
 Apply
@@ -97,10 +97,10 @@ tag to/from current window.
 Close focused window.
 .TP
 .B Mod1-space
-Toggle between tiling and versatile layout (affects all windows).
+Toggle between tiled and untiled layout (affects all windows).
 .TP
 .B Mod1-Shift-space
-Toggle focused window between versatile and non-versatile state (tiling layout only).
+Toggle focused window between untiled and non-untiled state (tiled layout only).
 .TP
 .B Mod1-[1..n]
 View all windows with
@@ -120,13 +120,13 @@ Quit dwm.
 .SS Mouse commands
 .TP
 .B Mod1-Button1
-Move current window while dragging (versatile layout only).
+Move current window while dragging (untiled layout only).
 .TP
 .B Mod1-Button2
-Zooms/cycles current window to/from master area (tiling layout only).
+Zooms/cycles current window to/from master area (tiled layout only).
 .TP
 .B Mod1-Button3
-Resize current window while dragging (versatile layout only).
+Resize current window while dragging (untiled layout only).
 .SH CUSTOMIZATION
 dwm is customized by creating a custom config.h and (re)compiling the source
 code. This keeps it fast, secure and simple.

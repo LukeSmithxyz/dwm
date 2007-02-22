@@ -203,8 +203,8 @@ manage(Window w, XWindowAttributes *wa) {
 	updatetitle(c);
 	for(t = clients; t && t->win != trans; t = t->next);
 	settags(c, t);
-	if(!c->isversatile)
-		c->isversatile = (t != NULL) || c->isfixed;
+	if(!c->isuntiled)
+		c->isuntiled = (t != NULL) || c->isfixed;
 	attach(c);
 	attachstack(c);
 	c->isbanned = True;
@@ -285,10 +285,10 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-toggleversatile(const char *arg) {
-	if(!sel || lt->arrange == versatile)
+toggletiled(const char *arg) {
+	if(!sel || lt->arrange == untile)
 		return;
-	sel->isversatile = !sel->isversatile;
+	sel->isuntiled = !sel->isuntiled;
 	lt->arrange();
 }
 

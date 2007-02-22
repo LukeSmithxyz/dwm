@@ -67,7 +67,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isbanned, isfixed, ismax, isversatile;
+	Bool isbanned, isfixed, ismax, isuntiled;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -105,7 +105,7 @@ extern void killclient(const char *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-extern void toggleversatile(const char *arg);	/* toggles focused client between versatile/and non-versatile state */
+extern void toggletiled(const char *arg);	/* toggles focused client between tiled/untiled state */
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
@@ -126,8 +126,8 @@ extern void initlayouts(void);			/* initialize layout array */
 extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
 extern void restack(void);			/* restores z layers of all clients */
 extern void setlayout(const char *arg);		/* sets layout, -1 toggles */
-extern void togglemax(const char *arg);		/* toggles maximization of versatile client */
-extern void versatile(void);			/* arranges all windows versatile */
+extern void togglemax(const char *arg);		/* toggles maximization of untiled client */
+extern void untile(void);			/* arranges all windows untiled */
 extern void zoom(const char *arg);		/* zooms the focused client to master area, arg is ignored */
 
 /* main.c */
