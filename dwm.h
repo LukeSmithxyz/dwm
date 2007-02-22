@@ -42,20 +42,18 @@ enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 
 typedef struct {
-	int ascent;
-	int descent;
-	int height;
-	XFontSet set;
-	XFontStruct *xfont;
-} Fnt;
-
-typedef struct {
 	int x, y, w, h;
 	unsigned long norm[ColLast];
 	unsigned long sel[ColLast];
 	Drawable drawable;
-	Fnt font;
 	GC gc;
+	struct Fnt {
+		int ascent;
+		int descent;
+		int height;
+		XFontSet set;
+		XFontStruct *xfont;
+	} font;
 } DC; /* draw context */
 
 typedef struct Client Client;
