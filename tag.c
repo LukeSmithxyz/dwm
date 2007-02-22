@@ -102,49 +102,53 @@ settags(Client *c, Client *trans) {
 }
 
 void
-tag(Arg arg) {
-	unsigned int i;
+tag(const char *arg) {
+	int i;
 
 	if(!sel)
 		return;
 	for(i = 0; i < ntags; i++)
-		sel->tags[i] = (arg.i == -1) ? True : False;
-	if(arg.i >= 0 && arg.i < ntags)
-		sel->tags[arg.i] = True;
+		sel->tags[i] = arg ? False : True;
+	i = arg ? atoi(arg) : 0;
+	if(i >= 0 && i < ntags)
+		sel->tags[i] = True;
 	lt->arrange();
 }
 
 void
-toggletag(Arg arg) {
-	unsigned int i;
+toggletag(const char *arg) {
+	int i, j;
 
 	if(!sel)
 		return;
-	sel->tags[arg.i] = !sel->tags[arg.i];
-	for(i = 0; i < ntags && !sel->tags[i]; i++);
-	if(i == ntags)
-		sel->tags[arg.i] = True;
+	i = arg ? atoi(arg) : 0;
+	sel->tags[i] = !sel->tags[i];
+	for(j = 0; j < ntags && !sel->tags[j]; j++);
+	if(j == ntags)
+		sel->tags[i] = True;
 	lt->arrange();
 }
 
 void
-toggleview(Arg arg) {
-	unsigned int i;
+toggleview(const char *arg) {
+	int i, j;
 
-	seltag[arg.i] = !seltag[arg.i];
-	for(i = 0; i < ntags && !seltag[i]; i++);
-	if(i == ntags)
-		seltag[arg.i] = True; /* cannot toggle last view */
+	i = arg ? atoi(arg) : 0;
+	seltag[i] = !seltag[i];
+	for(j = 0; j < ntags && !seltag[j]; i++);
+	if(j == ntags)
+		seltag[i] = True; /* cannot toggle last view */
 	lt->arrange();
 }
 
 void
-view(Arg arg) {
-	unsigned int i;
+view(const char *arg) {
+	int i;
 
 	for(i = 0; i < ntags; i++)
-		seltag[i] = (arg.i == -1) ? True : False;
-	if(arg.i >= 0 && arg.i < ntags)
-		seltag[arg.i] = True;
+		seltag[i] = arg ? False : True;
+	i = arg ? atoi(arg) : 0;
+	if(i >= 0 && i < ntags)
+		seltag[i] = True;
 	lt->arrange();
 }

@@ -69,7 +69,7 @@ LAYOUTS
 /* extern */
 
 void
-focusnext(Arg arg) {
+focusnext(const char *arg) {
 	Client *c;
    
 	if(!sel)
@@ -84,7 +84,7 @@ focusnext(Arg arg) {
 }
 
 void
-focusprev(Arg arg) {
+focusprev(const char *arg) {
 	Client *c;
 
 	if(!sel)
@@ -101,26 +101,29 @@ focusprev(Arg arg) {
 }
 
 void
-incmasterw(Arg arg) {
+incmasterw(const char *arg) {
+	int i;
 	if(lt->arrange != tile)
 		return;
-	if(arg.i == 0)
+	if(!arg)
 		masterw = MASTERWIDTH;
 	else {
-		if(waw * (masterw + arg.i) / 1000 >= waw - 2 * BORDERPX
-		|| waw * (masterw + arg.i) / 1000 <= 2 * BORDERPX)
+		i = atoi(arg);
+		if(waw * (masterw + i) / 1000 >= waw - 2 * BORDERPX
+		|| waw * (masterw + i) / 1000 <= 2 * BORDERPX)
 			return;
-		masterw += arg.i;
+		masterw += i;
 	}
 	lt->arrange();
 }
 
 void
-incnmaster(Arg arg) {
-	if((lt->arrange != tile) || (nmaster + arg.i < 1)
-	|| (wah / (nmaster + arg.i) <= 2 * BORDERPX))
+incnmaster(const char *arg) {
+	int i = arg ? atoi(arg) : 0;
+	if((lt->arrange != tile) || (nmaster + i < 1)
+	|| (wah / (nmaster + i) <= 2 * BORDERPX))
 		return;
-	nmaster += arg.i;
+	nmaster += i;
 	if(sel)
 		lt->arrange();
 	else
@@ -170,10 +173,10 @@ restack(void) {
 }
 
 void
-setlayout(Arg arg) {
+setlayout(const char *arg) {
 	unsigned int i;
 
-	if(arg.i == -1) {
+	if(!arg) {
 		for(i = 0; i < nlayouts && lt != &layout[i]; i++);
 		if(i == nlayouts - 1)
 			lt = &layout[0];
@@ -181,9 +184,10 @@ setlayout(Arg arg) {
 			lt = &layout[++i];
 	}
 	else {
-		if(arg.i < 0 || arg.i >= nlayouts)
+		i = atoi(arg);
+		if(i < 0 || i >= nlayouts)
 			return;
-		lt = &layout[arg.i];
+		lt = &layout[i];
 	}
 	if(sel)
 		lt->arrange();
@@ -192,7 +196,7 @@ setlayout(Arg arg) {
 }
 
 void
-togglemax(Arg arg) {
+togglemax(const char *arg) {
 	XEvent ev;
 
 	if(!sel || (lt->arrange != versatile && !sel->isversatile) || sel->isfixed)
@@ -234,7 +238,7 @@ versatile(void) {
 }
 
 void
-zoom(Arg arg) {
+zoom(const char *arg) {
 	unsigned int n;
 	Client *c;
 

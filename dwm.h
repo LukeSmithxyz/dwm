@@ -41,11 +41,6 @@ enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 
-typedef union {
-	const char *cmd;
-	int i;
-} Arg; /* argument type */
-
 typedef struct {
 	int ascent;
 	int descent;
@@ -106,11 +101,11 @@ extern void attach(Client *c);			/* attaches c to global client list */
 extern void configure(Client *c);		/* send synthetic configure event */
 extern void detach(Client *c);			/* detaches c from global client list */
 extern void focus(Client *c);			/* focus c, c may be NULL */
-extern void killclient(Arg arg);		/* kill c nicely */
+extern void killclient(const char *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-extern void toggleversatile(Arg arg);		/* toggles focused client between versatile/and non-versatile state */
+extern void toggleversatile(const char *arg);		/* toggles focused client between versatile/and non-versatile state */
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
@@ -125,19 +120,19 @@ extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
-extern void focusnext(Arg arg);		/* focuses next visible client, arg is ignored  */
-extern void focusprev(Arg arg);		/* focuses previous visible client, arg is ignored */
-extern void incmasterw(Arg arg);		/* increments the master width with arg's index value */
-extern void incnmaster(Arg arg);		/* increments nmaster with arg's index value */
+extern void focusnext(const char *arg);		/* focuses next visible client, arg is ignored  */
+extern void focusprev(const char *arg);		/* focuses previous visible client, arg is ignored */
+extern void incmasterw(const char *arg);		/* increments the master width with arg's index value */
+extern void incnmaster(const char *arg);		/* increments nmaster with arg's index value */
 extern void initlayouts(void);			/* initialize layout array */
 extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
 extern void restack(void);			/* restores z layers of all clients */
-extern void setlayout(Arg arg);		/* sets layout, -1 toggles */
-extern void togglemax(Arg arg);			/* toggles maximization of versatile client */
+extern void setlayout(const char *arg);		/* sets layout, -1 toggles */
+extern void togglemax(const char *arg);			/* toggles maximization of versatile client */
 extern void versatile(void);			/* arranges all windows versatile */
 
 /* main.c */
-extern void quit(Arg arg);			/* quit dwm nicely */
+extern void quit(const char *arg);			/* quit dwm nicely */
 extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
@@ -145,14 +140,14 @@ extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 extern void compileregs(void);			/* initialize regexps of rules defined in config.h */
 extern Bool isvisible(Client *c);		/* returns True if client is visible */
 extern void settags(Client *c, Client *trans);	/* sets tags of c */
-extern void tag(Arg arg);			/* tags c with arg's index */
-extern void toggletag(Arg arg);		/* toggles c tags with arg's index */
-extern void toggleview(Arg arg);		/* toggles the tag with arg's index (in)visible */
-extern void view(Arg arg);			/* views the tag with arg's index */
-extern void zoom(Arg arg);			/* zooms the focused client to master area, arg is ignored */
+extern void tag(const char *arg);			/* tags c with arg's index */
+extern void toggletag(const char *arg);		/* toggles c tags with arg's index */
+extern void toggleview(const char *arg);		/* toggles the tag with arg's index (in)visible */
+extern void view(const char *arg);			/* views the tag with arg's index */
+extern void zoom(const char *arg);			/* zooms the focused client to master area, arg is ignored */
 
 /* util.c */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
-extern void spawn(Arg arg);			/* forks a new subprocess with arg's cmd */
+extern void spawn(const char *arg);			/* forks a new subprocess with arg's cmd */
 

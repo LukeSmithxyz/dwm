@@ -2,6 +2,7 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -11,8 +12,8 @@
 typedef struct {
 	unsigned long mod;
 	KeySym keysym;
-	void (*func)(Arg arg);
-	Arg arg;
+	void (*func)(const char *arg);
+	const char *arg;
 } Key;
 
 KEYS
@@ -112,27 +113,29 @@ resizemouse(Client *c) {
 
 static void
 buttonpress(XEvent *e) {
-	int x;
-	Arg a;
+	static char arg[8];
+	int i, x;
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
+	arg[0] = 0;
 	if(barwin == ev->window) {
 		x = 0;
-		for(a.i = 0; a.i < ntags; a.i++) {
-			x += textw(tags[a.i]);
+		for(i = 0; i < ntags; i++) {
+			x += textw(tags[i]);
 			if(ev->x < x) {
+				snprintf(arg, sizeof arg, "%d", i);
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
-						tag(a);
+						tag(arg);
 					else
-						view(a);
+						view(arg);
 				}
 				else if(ev->button == Button3) {
 					if(ev->state & MODKEY)
-						toggletag(a);
+						toggletag(arg);
 					else
-						toggleview(a);
+						toggleview(arg);
 				}
 				return;
 			}
@@ -140,8 +143,7 @@ buttonpress(XEvent *e) {
 		if(ev->x < x + blw)
 			switch(ev->button) {
 			case Button1:
-				a.i = -1;
-				setlayout(a);
+				setlayout("-1");
 				break;
 			}
 	}
@@ -154,7 +156,7 @@ buttonpress(XEvent *e) {
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
-			zoom(a);
+			zoom(NULL);
 		else if(ev->button == Button3
 		&& (lt->arrange == versatile || c->isversatile) && !c->isfixed)
 		{

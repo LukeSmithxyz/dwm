@@ -153,7 +153,7 @@ focus(Client *c) {
 }
 
 void
-killclient(Arg arg) {
+killclient(const char *arg) {
 	if(!sel)
 		return;
 	if(isprotodel(sel))
@@ -285,7 +285,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-toggleversatile(Arg arg) {
+toggleversatile(const char *arg) {
 	if(!sel || lt->arrange == versatile)
 		return;
 	sel->isversatile = !sel->isversatile;
