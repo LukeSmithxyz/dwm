@@ -143,14 +143,6 @@ buttonpress(XEvent *e) {
 				a.i = -1;
 				setlayout(a);
 				break;
-			case Button4:
-				a.i = 1;
-				incnmaster(a);
-				break;
-			case Button5:
-				a.i = -1;
-				incnmaster(a);
-				break;
 			}
 	}
 	else if((c = getclient(ev->window))) {
