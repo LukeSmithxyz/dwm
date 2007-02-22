@@ -206,6 +206,7 @@ togglemax(Arg arg) {
 	}
 	else
 		resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
+	drawstatus();
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
