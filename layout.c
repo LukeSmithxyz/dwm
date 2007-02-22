@@ -195,7 +195,7 @@ void
 togglemax(Arg arg) {
 	XEvent ev;
 
-	if(!sel || !sel->isversatile || sel->isfixed || lt->arrange != versatile)
+	if(!sel || (lt->arrange != versatile && !sel->isversatile) || sel->isfixed)
 		return;
 	if((sel->ismax = !sel->ismax)) {
 		sel->rx = sel->x;
