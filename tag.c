@@ -108,7 +108,7 @@ tag(const char *arg) {
 	if(!sel)
 		return;
 	for(i = 0; i < ntags; i++)
-		sel->tags[i] = arg != NULL;
+		sel->tags[i] = arg == NULL;
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
@@ -146,7 +146,7 @@ view(const char *arg) {
 	int i;
 
 	for(i = 0; i < ntags; i++)
-		seltag[i] = arg != NULL;
+		seltag[i] = arg == NULL;
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		seltag[i] = True;
