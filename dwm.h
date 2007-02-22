@@ -41,21 +41,6 @@ enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 
-typedef struct {
-	int x, y, w, h;
-	unsigned long norm[ColLast];
-	unsigned long sel[ColLast];
-	Drawable drawable;
-	GC gc;
-	struct Fnt {
-		int ascent;
-		int descent;
-		int height;
-		XFontSet set;
-		XFontStruct *xfont;
-	} font;
-} DC; /* draw context */
-
 typedef struct Client Client;
 struct Client {
 	char name[256];
@@ -72,6 +57,21 @@ struct Client {
 	Client *snext;
 	Window win;
 };
+
+typedef struct {
+	int x, y, w, h;
+	unsigned long norm[ColLast];
+	unsigned long sel[ColLast];
+	Drawable drawable;
+	GC gc;
+	struct {
+		int ascent;
+		int descent;
+		int height;
+		XFontSet set;
+		XFontStruct *xfont;
+	} font;
+} DC; /* draw context */
 
 typedef struct {
 	const char *symbol;
