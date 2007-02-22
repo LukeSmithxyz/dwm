@@ -32,9 +32,9 @@ static Layout layout[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		untile }, \
 };
-#define MASTERWIDTH		640		/* master width per thousand */
+#define MASTERWIDTH		600		/* master width per thousand */
 #define NMASTER			1		/* clients in master area */
-#define SNAP			40		/* untiled snap pixel */
+#define SNAP			32		/* snap pixel */
 
 /* key definitions */
 #define MODKEY			Mod1Mask

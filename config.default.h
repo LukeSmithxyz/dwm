@@ -35,7 +35,7 @@ static Layout layout[] = { \
 };
 #define MASTERWIDTH		640		/* master width per thousand */
 #define NMASTER			1		/* clients in master area */
-#define SNAP			20		/* untiled snap pixel */
+#define SNAP			32		/* snap pixel */
 
 /* key definitions */
 #define MODKEY			Mod1Mask
