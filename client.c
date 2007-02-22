@@ -203,8 +203,8 @@ manage(Window w, XWindowAttributes *wa) {
 	updatetitle(c);
 	for(t = clients; t && t->win != trans; t = t->next);
 	settags(c, t);
-	if(!c->isuntiled)
-		c->isuntiled = (t != NULL) || c->isfixed;
+	if(!c->isfloating)
+		c->isfloating = (t != NULL) || c->isfixed;
 	attach(c);
 	attachstack(c);
 	c->isbanned = True;
@@ -285,10 +285,10 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-toggletiled(const char *arg) {
-	if(!sel || lt->arrange == untile)
+togglefloating(const char *arg) {
+	if(!sel || lt->arrange == floating)
 		return;
-	sel->isuntiled = !sel->isuntiled;
+	sel->isfloating = !sel->isfloating;
 	lt->arrange();
 }
 

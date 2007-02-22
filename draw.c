@@ -81,7 +81,7 @@ drawstatus(void) {
 		dc.x = x;
 		if(sel) {
 			drawtext(sel->name, dc.sel);
-			drawsquare(sel->ismax, sel->isuntiled, dc.sel);
+			drawsquare(sel->ismax, sel->isfloating, dc.sel);
 		}
 		else
 			drawtext(NULL, dc.norm);

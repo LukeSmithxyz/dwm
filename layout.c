@@ -31,7 +31,7 @@ tile(void) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
-			if(c->isuntiled)
+			if(c->isfloating)
 				continue;
 			c->ismax = False;
 			nx = wax;
@@ -68,6 +68,29 @@ tile(void) {
 LAYOUTS
 
 /* extern */
+
+void
+floating(void) {
+	Client *c;
+
+	for(c = clients; c; c = c->next) {
+		if(isvisible(c)) {
+			if(c->isbanned)
+				XMoveWindow(dpy, c->win, c->x, c->y);
+			c->isbanned = False;
+			resize(c, c->x, c->y, c->w, c->h, True);
+		}
+		else {
+			c->isbanned = True;
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+		}
+	}
+	if(!sel || !isvisible(sel)) {
+		for(c = stack; c && !isvisible(c); c = c->snext);
+		focus(c);
+	}
+	restack();
+}
 
 void
 focusclient(const char *arg) {
@@ -144,7 +167,7 @@ initlayouts(void) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->isuntiled || !isvisible(c)); c = c->next);
+	for(; c && (c->isfloating || !isvisible(c)); c = c->next);
 	return c;
 }
 
@@ -156,10 +179,10 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->isuntiled || lt->arrange == untile)
+	if(sel->isfloating || lt->arrange == floating)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange != untile) {
-		if(!sel->isuntiled)
+	if(lt->arrange != floating) {
+		if(!sel->isfloating)
 			XLowerWindow(dpy, sel->win);
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
@@ -198,7 +221,7 @@ void
 togglemax(const char *arg) {
 	XEvent ev;
 
-	if(!sel || (lt->arrange != untile && !sel->isuntiled) || sel->isfixed)
+	if(!sel || (lt->arrange != floating && !sel->isfloating) || sel->isfixed)
 		return;
 	if((sel->ismax = !sel->ismax)) {
 		sel->rx = sel->x;
@@ -214,34 +237,11 @@ togglemax(const char *arg) {
 }
 
 void
-untile(void) {
-	Client *c;
-
-	for(c = clients; c; c = c->next) {
-		if(isvisible(c)) {
-			if(c->isbanned)
-				XMoveWindow(dpy, c->win, c->x, c->y);
-			c->isbanned = False;
-			resize(c, c->x, c->y, c->w, c->h, True);
-		}
-		else {
-			c->isbanned = True;
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-		}
-	}
-	if(!sel || !isvisible(sel)) {
-		for(c = stack; c && !isvisible(c); c = c->snext);
-		focus(c);
-	}
-	restack();
-}
-
-void
 zoom(const char *arg) {
 	unsigned int n;
 	Client *c;
 
-	if(!sel || lt->arrange != tile || sel->isuntiled)
+	if(!sel || lt->arrange != tile || sel->isfloating)
 		return;
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;

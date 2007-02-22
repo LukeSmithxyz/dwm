@@ -20,7 +20,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
  * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
 #define RULES \
 static Rule rule[] = { \
-	/* class:instance:title regex	tags regex	isuntiled */ \
+	/* class:instance:title regex	tags regex	isfloating */ \
 	{ "Gimp",			NULL,		True }, \
 	{ "MPlayer",			NULL,		True }, \
 	{ "Acroread",			NULL,		True }, \
@@ -31,7 +31,7 @@ static Rule rule[] = { \
 static Layout layout[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
-	{ "><>",		untile }, \
+	{ "><>",		floating }, \
 };
 #define MASTERWIDTH		640		/* master width per thousand */
 #define NMASTER			1		/* clients in master area */
@@ -52,7 +52,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Tab,		focusclient,	"-1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
-	{ MODKEY|ShiftMask,		XK_space,	toggletiled,	NULL }, \
+	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL }, \
 	{ MODKEY,			XK_0,		view,		NULL }, \
 	{ MODKEY,			XK_1,		view,		"0" }, \

@@ -50,7 +50,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	unsigned int border;
-	Bool isbanned, isfixed, ismax, isuntiled;
+	Bool isbanned, isfixed, ismax, isfloating;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -103,7 +103,7 @@ extern void killclient(const char *arg);		/* kill c nicely */
 extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 extern void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-extern void toggletiled(const char *arg);	/* toggles focused client between tiled/untiled state */
+extern void togglefloating(const char *arg);	/* toggles focused client between floating/tiled state */
 extern void updatesizehints(Client *c);		/* update the size hint variables of c */
 extern void updatetitle(Client *c);		/* update the name of c */
 extern void unmanage(Client *c);		/* destroy c */
@@ -117,6 +117,7 @@ extern unsigned int textw(const char *text);	/* return the width of text in px*/
 extern void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
+extern void floating(void);			/* arranges all windows floating */
 extern void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
 extern void incmasterw(const char *arg);	/* increments the master width with arg's index value */
 extern void incnmaster(const char *arg);	/* increments nmaster with arg's index value */
@@ -124,8 +125,7 @@ extern void initlayouts(void);			/* initialize layout array */
 extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
 extern void restack(void);			/* restores z layers of all clients */
 extern void setlayout(const char *arg);		/* sets layout, -1 toggles */
-extern void togglemax(const char *arg);		/* toggles maximization of untiled client */
-extern void untile(void);			/* arranges all windows untiled */
+extern void togglemax(const char *arg);		/* toggles maximization of floating client */
 extern void zoom(const char *arg);		/* zooms the focused client to master area, arg is ignored */
 
 /* main.c */

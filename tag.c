@@ -12,7 +12,7 @@
 typedef struct {
 	const char *prop;
 	const char *tags;
-	Bool isuntiled;
+	Bool isfloating;
 } Rule;
 
 typedef struct {
@@ -83,7 +83,7 @@ settags(Client *c, Client *trans) {
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; i < nrules; i++)
 			if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
-				c->isuntiled = rule[i].isuntiled;
+				c->isfloating = rule[i].isfloating;
 				for(j = 0; regs[i].tagregex && j < ntags; j++) {
 					if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
