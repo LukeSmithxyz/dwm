@@ -11,7 +11,7 @@
 typedef struct {
 	unsigned long mod;
 	KeySym keysym;
-	void (*func)(Arg *arg);
+	void (*func)(Arg arg);
 	Arg arg;
 } Key;
 
@@ -124,15 +124,15 @@ buttonpress(XEvent *e) {
 			if(ev->x < x) {
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
-						tag(&a);
+						tag(a);
 					else
-						view(&a);
+						view(a);
 				}
 				else if(ev->button == Button3) {
 					if(ev->state & MODKEY)
-						toggletag(&a);
+						toggletag(a);
 					else
-						toggleview(&a);
+						toggleview(a);
 				}
 				return;
 			}
@@ -141,15 +141,15 @@ buttonpress(XEvent *e) {
 			switch(ev->button) {
 			case Button1:
 				a.i = -1;
-				setlayout(&a);
+				setlayout(a);
 				break;
 			case Button4:
 				a.i = 1;
-				incnmaster(&a);
+				incnmaster(a);
 				break;
 			case Button5:
 				a.i = -1;
-				incnmaster(&a);
+				incnmaster(a);
 				break;
 			}
 	}
@@ -162,7 +162,7 @@ buttonpress(XEvent *e) {
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
-			zoom(NULL);
+			zoom(a);
 		else if(ev->button == Button3
 		&& (lt->arrange == versatile || c->isversatile) && !c->isfixed)
 		{
@@ -261,7 +261,7 @@ keypress(XEvent *e) {
 		&& CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
 		{
 			if(key[i].func)
-				key[i].func(&key[i].arg);
+				key[i].func(key[i].arg);
 		}
 }
 

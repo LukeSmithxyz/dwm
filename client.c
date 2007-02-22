@@ -83,24 +83,6 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
-static void
-togglemax(Client *c) {
-	XEvent ev;
-
-	if(c->isfixed)
-		return;
-	if((c->ismax = !c->ismax)) {
-		c->rx = c->x;
-		c->ry = c->y;
-		c->rw = c->w;
-		c->rh = c->h;
-		resize(c, wax, way, waw - 2 * BORDERPX, wah - 2 * BORDERPX, True);
-	}
-	else
-		resize(c, c->rx, c->ry, c->rw, c->rh, True);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-}
-
 static int
 xerrordummy(Display *dsply, XErrorEvent *ee) {
 	return 0;
@@ -171,7 +153,7 @@ focus(Client *c) {
 }
 
 void
-killclient(Arg *arg) {
+killclient(Arg arg) {
 	if(!sel)
 		return;
 	if(isprotodel(sel))
@@ -303,7 +285,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-toggleversatile(Arg *arg) {
+toggleversatile(Arg arg) {
 	if(!sel || lt->arrange == versatile)
 		return;
 	sel->isversatile = !sel->isversatile;
@@ -400,27 +382,5 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	lt->arrange();
-}
-
-void
-zoom(Arg *arg) {
-	unsigned int n;
-	Client *c;
-
-	if(!sel)
-		return;
-	if(sel->isversatile || (lt->arrange == versatile)) {
-		togglemax(sel);
-		return;
-	}
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
-		n++;
-	if((c = sel) == nexttiled(clients))
-		if(!(c = nexttiled(c->next)))
-			return;
-	detach(c);
-	attach(c);
-	focus(c);
 	lt->arrange();
 }

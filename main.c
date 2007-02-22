@@ -236,7 +236,7 @@ sendevent(Window w, Atom a, long value) {
 }
 
 void
-quit(Arg *arg) {
+quit(Arg arg) {
 	readin = running = False;
 }
 

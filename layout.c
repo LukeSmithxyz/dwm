@@ -3,14 +3,14 @@
  */
 #include "dwm.h"
 
-unsigned int master = MASTER;
-unsigned int nmaster = NMASTER;
 unsigned int blw = 0;
 Layout *lt = NULL;
 
 /* static */
 
 static unsigned int nlayouts = 0;
+static unsigned int masterw = MASTERWIDTH;
+static unsigned int nmaster = NMASTER;
 
 static void
 tile(void) {
@@ -21,7 +21,7 @@ tile(void) {
 		n++;
 	/* window geoms */
 	mh = (n > nmaster) ? wah / nmaster : wah / (n > 0 ? n : 1);
-	mw = (n > nmaster) ? (waw * master) / 1000 : waw;
+	mw = (n > nmaster) ? (waw * masterw) / 1000 : waw;
 	th = (n > nmaster) ? wah / (n - nmaster) : 0;
 	tw = waw - mw;
 
@@ -69,7 +69,7 @@ LAYOUTS
 /* extern */
 
 void
-focusnext(Arg *arg) {
+focusnext(Arg arg) {
 	Client *c;
    
 	if(!sel)
@@ -84,7 +84,7 @@ focusnext(Arg *arg) {
 }
 
 void
-focusprev(Arg *arg) {
+focusprev(Arg arg) {
 	Client *c;
 
 	if(!sel)
@@ -101,11 +101,26 @@ focusprev(Arg *arg) {
 }
 
 void
-incnmaster(Arg *arg) {
-	if((lt->arrange != tile) || (nmaster + arg->i < 1)
-	|| (wah / (nmaster + arg->i) <= 2 * BORDERPX))
+incmasterw(Arg arg) {
+	if(lt->arrange != tile)
 		return;
-	nmaster += arg->i;
+	if(arg.i == 0)
+		masterw = MASTERWIDTH;
+	else {
+		if(waw * (masterw + arg.i) / 1000 >= waw - 2 * BORDERPX
+		|| waw * (masterw + arg.i) / 1000 <= 2 * BORDERPX)
+			return;
+		masterw += arg.i;
+	}
+	lt->arrange();
+}
+
+void
+incnmaster(Arg arg) {
+	if((lt->arrange != tile) || (nmaster + arg.i < 1)
+	|| (wah / (nmaster + arg.i) <= 2 * BORDERPX))
+		return;
+	nmaster += arg.i;
 	if(sel)
 		lt->arrange();
 	else
@@ -132,21 +147,6 @@ nexttiled(Client *c) {
 }
 
 void
-resizemaster(Arg *arg) {
-	if(lt->arrange != tile)
-		return;
-	if(arg->i == 0)
-		master = MASTER;
-	else {
-		if(waw * (master + arg->i) / 1000 >= waw - 2 * BORDERPX
-		|| waw * (master + arg->i) / 1000 <= 2 * BORDERPX)
-			return;
-		master += arg->i;
-	}
-	lt->arrange();
-}
-
-void
 restack(void) {
 	Client *c;
 	XEvent ev;
@@ -170,10 +170,10 @@ restack(void) {
 }
 
 void
-setlayout(Arg *arg) {
+setlayout(Arg arg) {
 	unsigned int i;
 
-	if(arg->i == -1) {
+	if(arg.i == -1) {
 		for(i = 0; i < nlayouts && lt != &layout[i]; i++);
 		if(i == nlayouts - 1)
 			lt = &layout[0];
@@ -181,14 +181,32 @@ setlayout(Arg *arg) {
 			lt = &layout[++i];
 	}
 	else {
-		if(arg->i < 0 || arg->i >= nlayouts)
+		if(arg.i < 0 || arg.i >= nlayouts)
 			return;
-		lt = &layout[arg->i];
+		lt = &layout[arg.i];
 	}
 	if(sel)
 		lt->arrange();
 	else
 		drawstatus();
+}
+
+void
+togglemax(Arg arg) {
+	XEvent ev;
+
+	if(!sel || !sel->isversatile || sel->isfixed || lt->arrange != versatile)
+		return;
+	if((sel->ismax = !sel->ismax)) {
+		sel->rx = sel->x;
+		sel->ry = sel->y;
+		sel->rw = sel->w;
+		sel->rh = sel->h;
+		resize(sel, wax, way, waw - 2 * BORDERPX, wah - 2 * BORDERPX, True);
+	}
+	else
+		resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
@@ -212,4 +230,22 @@ versatile(void) {
 		focus(c);
 	}
 	restack();
+}
+
+void
+zoom(Arg arg) {
+	unsigned int n;
+	Client *c;
+
+	if(!sel || lt->arrange != tile || sel->isversatile)
+		return;
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
+		n++;
+	if((c = sel) == nexttiled(clients))
+		if(!(c = nexttiled(c->next)))
+			return;
+	detach(c);
+	attach(c);
+	focus(c);
+	lt->arrange();
 }

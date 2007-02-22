@@ -30,12 +30,12 @@ eprint(const char *errstr, ...) {
 }
 
 void
-spawn(Arg *arg) {
+spawn(Arg arg) {
 	static char *shell = NULL;
 
 	if(!shell && !(shell = getenv("SHELL")))
 		shell = "/bin/sh";
-	if(!arg->cmd)
+	if(!arg.cmd)
 		return;
 	/* The double-fork construct avoids zombie processes and keeps the code
 	 * clean from stupid signal handlers. */
@@ -44,8 +44,8 @@ spawn(Arg *arg) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
-			execl(shell, shell, "-c", arg->cmd, (char *)NULL);
-			fprintf(stderr, "dwm: execl '%s -c %s'", shell, arg->cmd);
+			execl(shell, shell, "-c", arg.cmd, (char *)NULL);
+			fprintf(stderr, "dwm: execl '%s -c %s'", shell, arg.cmd);
 			perror(" failed");
 		}
 		exit(0);
