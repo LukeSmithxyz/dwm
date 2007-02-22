@@ -42,6 +42,7 @@ static Layout layout[] = { \
 #define KEYS \
 static Key key[] = { \
 	/* modifier			key		function	argument */ \
+	{ MODKEY|ShiftMask,		XK_Return,	spawn,		{ .cmd = "exec xterm" } }, \
 	{ MODKEY,			XK_space,	setlayout,	{ .i = -1 } }, \
 	{ MODKEY,			XK_d,		incnmaster,	{ .i = -1 } }, \
 	{ MODKEY,			XK_i,		incnmaster,	{ .i = 1 } }, \
