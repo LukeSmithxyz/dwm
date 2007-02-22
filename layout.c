@@ -2,6 +2,7 @@
  * See LICENSE file for license details.
  */
 #include "dwm.h"
+#include <stdlib.h>
 
 unsigned int blw = 0;
 Layout *lt = NULL;

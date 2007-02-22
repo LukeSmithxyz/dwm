@@ -113,29 +113,29 @@ resizemouse(Client *c) {
 
 static void
 buttonpress(XEvent *e) {
-	static char arg[8];
-	int i, x;
+	static char buf[32];
+	unsigned int i, x;
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	arg[0] = 0;
+	buf[0] = 0;
 	if(barwin == ev->window) {
 		x = 0;
 		for(i = 0; i < ntags; i++) {
 			x += textw(tags[i]);
 			if(ev->x < x) {
-				snprintf(arg, sizeof arg, "%d", i);
+				snprintf(buf, sizeof buf, "%d", i);
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
-						tag(arg);
+						tag(buf);
 					else
-						view(arg);
+						view(buf);
 				}
 				else if(ev->button == Button3) {
 					if(ev->state & MODKEY)
-						toggletag(arg);
+						toggletag(buf);
 					else
-						toggleview(arg);
+						toggleview(buf);
 				}
 				return;
 			}
@@ -143,7 +143,7 @@ buttonpress(XEvent *e) {
 		if(ev->x < x + blw)
 			switch(ev->button) {
 			case Button1:
-				setlayout("-1");
+				setlayout(NULL);
 				break;
 			}
 	}
