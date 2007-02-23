@@ -43,7 +43,7 @@ static Key key[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY,			XK_p,		spawn, \
 		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
-		" '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
+		" -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		"exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
