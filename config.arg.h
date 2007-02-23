@@ -47,10 +47,10 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		"exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
-	{ MODKEY,			XK_d,		incnmaster,	"-1" }, \
-	{ MODKEY,			XK_i,		incnmaster,	"1" }, \
 	{ MODKEY,			XK_h,		incmasterw,	"-32" }, \
 	{ MODKEY,			XK_l,		incmasterw,	"32" }, \
+	{ MODKEY|ShiftMask,		XK_j,		incnmaster,	"1" }, \
+	{ MODKEY|ShiftMask,		XK_k,		incnmaster,	"-1" }, \
 	{ MODKEY,			XK_j,		focusclient,	"1" }, \
 	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
