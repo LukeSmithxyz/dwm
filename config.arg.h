@@ -42,11 +42,10 @@ static Layout layout[] = { \
 static Key key[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY,			XK_p,		spawn, \
-		"exe=\"$(lsx `echo $PATH | sed 's/:/ /g'` | sort -u " \
-		" | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' " \
-		"-sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"')\" && exec $exe" }, \
+		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
+		" '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		"exec urxvtcd -tr -bg '#292929' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
+		"exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_d,		incnmaster,	"-1" }, \
 	{ MODKEY,			XK_i,		incnmaster,	"1" }, \

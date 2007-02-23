@@ -43,13 +43,14 @@ static Layout layout[] = { \
 static Key key[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn,		"exec xterm" }, \
+	{ MODKEY,			XK_p,		spawn, 		"exe=`dmenu_path | dmenu` && exec $exe" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_d,		incnmaster,	"-1" }, \
 	{ MODKEY,			XK_i,		incnmaster,	"1" }, \
-	{ MODKEY,			XK_g,		incmasterw,	"32" }, \
-	{ MODKEY,			XK_s,		incmasterw,	"-32" }, \
-	{ MODKEY,			XK_Tab,		focusclient,	"1" }, \
-	{ MODKEY|ShiftMask,		XK_Tab,		focusclient,	"-1" }, \
+	{ MODKEY,			XK_l,		incmasterw,	"32" }, \
+	{ MODKEY,			XK_h,		incmasterw,	"-32" }, \
+	{ MODKEY,			XK_j,		focusclient,	"1" }, \
+	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \
