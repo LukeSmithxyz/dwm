@@ -33,7 +33,7 @@ static Layout layout[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
 };
-#define MASTERWIDTH		640		/* master width per thousand */
+#define MASTERWIDTH		600		/* master width per thousand */
 #define NMASTER			1		/* clients in master area */
 #define SNAP			32		/* snap pixel */
 
