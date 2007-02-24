@@ -13,7 +13,7 @@
 #define SELFGCOLOR		"#ffffff"
 #define TOPBAR			True		/* False */
 
-/* behavior */
+/* tagging */
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 /* Query class:instance:title for regex matching info with following command:
