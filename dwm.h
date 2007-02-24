@@ -78,72 +78,72 @@ typedef struct {
 	void (*arrange)(void);
 } Layout;
 
-extern const char *tags[];			/* all tags */
-extern char stext[256];				/* status text */
-extern int screen, sx, sy, sw, sh;		/* screen geometry */
-extern int wax, way, wah, waw;			/* windowarea geometry */
-extern unsigned int bh, blw;			/* bar height, bar layout label width */
-extern unsigned int ntags, numlockmask;		/* number of tags, dynamic lock mask */
-extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool selscreen, *seltag;			/* seltag is array of Bool */
-extern Client *clients, *sel, *stack;		/* global client list and stack */
-extern Cursor cursor[CurLast];
-extern DC dc;					/* global draw context */
-extern Display *dpy;
-extern Layout *lt;
-extern Window root, barwin;
+extern const char *tags[];		/* all tags */
+char stext[256];			/* status text */
+int screen, sx, sy, sw, sh;		/* screen geometry */
+int wax, way, wah, waw;			/* windowarea geometry */
+unsigned int bh, blw;			/* bar height, bar layout label width */
+unsigned int ntags, numlockmask;	/* number of tags, dynamic lock mask */
+void (*handler[LASTEvent])(XEvent *);	/* event handler */
+Atom wmatom[WMLast], netatom[NetLast];
+Bool selscreen, *seltag;		/* seltag is array of Bool */
+Client *clients, *sel, *stack;		/* global client list and stack */
+Cursor cursor[CurLast];
+DC dc;					/* global draw context */
+Display *dpy;
+Layout *lt;
+Window root, barwin;
 
 /* client.c */
-extern void attach(Client *c);			/* attaches c to global client list */
-extern void configure(Client *c);		/* send synthetic configure event */
-extern void detach(Client *c);			/* detaches c from global client list */
-extern void focus(Client *c);			/* focus c, c may be NULL */
-extern void killclient(const char *arg);		/* kill c nicely */
-extern void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-extern void resize(Client *c, int x, int y,
+void attach(Client *c);			/* attaches c to global client list */
+void configure(Client *c);		/* send synthetic configure event */
+void detach(Client *c);			/* detaches c from global client list */
+void focus(Client *c);			/* focus c, c may be NULL */
+void killclient(const char *arg);		/* kill c nicely */
+void manage(Window w, XWindowAttributes *wa);	/* manage new client */
+void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-extern void togglefloating(const char *arg);	/* toggles focused client between floating/tiled state */
-extern void updatesizehints(Client *c);		/* update the size hint variables of c */
-extern void updatetitle(Client *c);		/* update the name of c */
-extern void unmanage(Client *c);		/* destroy c */
+void togglefloating(const char *arg);	/* toggles focused client between floating/tiled state */
+void updatesizehints(Client *c);		/* update the size hint variables of c */
+void updatetitle(Client *c);		/* update the name of c */
+void unmanage(Client *c);		/* destroy c */
 
 /* draw.c */
-extern void drawstatus(void);			/* draw the bar */
-extern void drawtext(const char *text, unsigned long col[ColLast]);	/* draw text */
-extern unsigned int textw(const char *text);	/* return the width of text in px*/
+void drawstatus(void);			/* draw the bar */
+void drawtext(const char *text, unsigned long col[ColLast]);	/* draw text */
+unsigned int textw(const char *text);	/* return the width of text in px*/
 
 /* event.c */
-extern void grabkeys(void);			/* grab all keys defined in config.h */
+void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
-extern void floating(void);			/* arranges all windows floating */
-extern void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
-extern void incmasterw(const char *arg);	/* increments the master width with arg's index value */
-extern void incnmaster(const char *arg);	/* increments nmaster with arg's index value */
-extern void initlayouts(void);			/* initialize layout array */
-extern Client *nexttiled(Client *c);		/* returns tiled successor of c */
-extern void restack(void);			/* restores z layers of all clients */
-extern void setlayout(const char *arg);		/* sets layout, -1 toggles */
-extern void togglemax(const char *arg);		/* toggles maximization of floating client */
-extern void zoom(const char *arg);		/* zooms the focused client to master area, arg is ignored */
+void floating(void);			/* arranges all windows floating */
+void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
+void incmasterw(const char *arg);	/* increments the master width with arg's index value */
+void incnmaster(const char *arg);	/* increments nmaster with arg's index value */
+void initlayouts(void);			/* initialize layout array */
+Client *nexttiled(Client *c);		/* returns tiled successor of c */
+void restack(void);			/* restores z layers of all clients */
+void setlayout(const char *arg);		/* sets layout, -1 toggles */
+void togglemax(const char *arg);		/* toggles maximization of floating client */
+void zoom(const char *arg);		/* zooms the focused client to master area, arg is ignored */
 
 /* main.c */
-extern void quit(const char *arg);		/* quit dwm nicely */
-extern void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
-extern int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
+void quit(const char *arg);		/* quit dwm nicely */
+void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
+int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* tag.c */
-extern void compileregs(void);			/* initialize regexps of rules defined in config.h */
-extern Bool isvisible(Client *c);		/* returns True if client is visible */
-extern void settags(Client *c, Client *trans);	/* sets tags of c */
-extern void tag(const char *arg);		/* tags c with arg's index */
-extern void toggletag(const char *arg);		/* toggles c tags with arg's index */
-extern void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
-extern void view(const char *arg);		/* views the tag with arg's index */
+void compileregs(void);			/* initialize regexps of rules defined in config.h */
+Bool isvisible(Client *c);		/* returns True if client is visible */
+void settags(Client *c, Client *trans);	/* sets tags of c */
+void tag(const char *arg);		/* tags c with arg's index */
+void toggletag(const char *arg);		/* toggles c tags with arg's index */
+void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
+void view(const char *arg);		/* views the tag with arg's index */
 
 /* util.c */
-extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
-extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
-extern void spawn(const char *arg);		/* forks a new subprocess with arg's cmd */
+void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
+void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
+void spawn(const char *arg);		/* forks a new subprocess with arg's cmd */
 
