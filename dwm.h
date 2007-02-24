@@ -146,4 +146,3 @@ void view(const char *arg);		/* views the tag with arg's index */
 void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
 void spawn(const char *arg);		/* forks a new subprocess with arg's cmd */
-
