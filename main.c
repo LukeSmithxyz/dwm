@@ -222,20 +222,6 @@ xerrorstart(Display *dsply, XErrorEvent *ee) {
 /* extern */
 
 void
-sendevent(Window w, Atom a, long value) {
-	XEvent e;
-
-	e.type = ClientMessage;
-	e.xclient.window = w;
-	e.xclient.message_type = a;
-	e.xclient.format = 32;
-	e.xclient.data.l[0] = value;
-	e.xclient.data.l[1] = CurrentTime;
-	XSendEvent(dpy, w, False, NoEventMask, &e);
-	XSync(dpy, False);
-}
-
-void
 quit(const char *arg) {
 	readin = running = False;
 }

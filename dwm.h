@@ -130,7 +130,6 @@ void zoom(const char *arg);		/* zooms the focused client to master area, arg is 
 
 /* main.c */
 void quit(const char *arg);		/* quit dwm nicely */
-void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* tag.c */

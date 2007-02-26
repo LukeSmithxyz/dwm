@@ -154,10 +154,19 @@ focus(Client *c) {
 
 void
 killclient(const char *arg) {
+	XEvent ev;
+
 	if(!sel)
 		return;
-	if(isprotodel(sel))
-		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]);
+	if(isprotodel(sel)) {
+		ev.type = ClientMessage;
+		ev.xclient.window = sel->win;
+		ev.xclient.message_type = wmatom[WMProtocols];
+		ev.xclient.format = 32;
+		ev.xclient.data.l[0] = wmatom[WMDelete];
+		ev.xclient.data.l[1] = CurrentTime;
+		XSendEvent(dpy, sel->win, False, NoEventMask, &ev);
+	}
 	else
 		XKillClient(dpy, sel->win);
 }
