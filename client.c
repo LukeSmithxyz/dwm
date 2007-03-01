@@ -227,12 +227,33 @@ manage(Window w, XWindowAttributes *wa) {
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
-	float actual, dx, dy, max, min;
+	float dx, dy, max, min, ratio;
 	XWindowChanges wc;
 
 	if(w <= 0 || h <= 0)
 		return;
 	if(sizehints) {
+		if(c->minay > 0 && c->maxay && (h - c->baseh) > 0) {
+			dx = (float)(w - c->basew);
+			dy = (float)(h - c->baseh);
+			min = (float)(c->minax) / (float)(c->minay);
+			max = (float)(c->maxax) / (float)(c->maxay);
+			ratio = dx / dy;
+			if(max > 0 && min > 0 && ratio > 0) {
+				if(ratio < min) {
+					dy = (dx * min + dy) / (min * min + 1);
+					dx = dy * min;
+					w = (int)dx + c->basew;
+					h = (int)dy + c->baseh;
+				}
+				else if(ratio > max) {
+					dy = (dx * min + dy) / (max * max + 1);
+					dx = dy * min;
+					w = (int)dx + c->basew;
+					h = (int)dy + c->baseh;
+				}
+			}
+		}
 		if(c->minw && w < c->minw)
 			w = c->minw;
 		if(c->minh && h < c->minh)
@@ -241,28 +262,6 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 			w = c->maxw;
 		if(c->maxh && h > c->maxh)
 			h = c->maxh;
-		/* inspired by algorithm from fluxbox */
-		if(c->minay > 0 && c->maxay && (h - c->baseh) > 0) {
-			dx = (float)(w - c->basew);
-			dy = (float)(h - c->baseh);
-			min = (float)(c->minax) / (float)(c->minay);
-			max = (float)(c->maxax) / (float)(c->maxay);
-			actual = dx / dy;
-			if(max > 0 && min > 0 && actual > 0) {
-				if(actual < min) {
-					dy = (dx * min + dy) / (min * min + 1);
-					dx = dy * min;
-					w = (int)dx + c->basew;
-					h = (int)dy + c->baseh;
-				}
-				else if(actual > max) {
-					dy = (dx * min + dy) / (max * max + 1);
-					dx = dy * min;
-					w = (int)dx + c->basew;
-					h = (int)dy + c->baseh;
-				}
-			}
-		}
 		if(c->incw)
 			w -= (w - c->basew) % c->incw;
 		if(c->inch)
@@ -313,6 +312,10 @@ updatesizehints(Client *c) {
 		c->basew = size.base_width;
 		c->baseh = size.base_height;
 	}
+	else if(c->flags & PMinSize) {
+		c->basew = size.min_width;
+		c->baseh = size.min_height;
+	}
 	else
 		c->basew = c->baseh = 0;
 	if(c->flags & PResizeInc) {
@@ -331,16 +334,20 @@ updatesizehints(Client *c) {
 		c->minw = size.min_width;
 		c->minh = size.min_height;
 	}
+	else if(c->flags & PBaseSize) {
+		c->minw = size.base_width;
+		c->minh = size.base_height;
+	}
 	else
 		c->minw = c->minh = 0;
 	if(c->flags & PAspect) {
 		c->minax = size.min_aspect.x;
-		c->minay = size.min_aspect.y;
 		c->maxax = size.max_aspect.x;
+		c->minay = size.min_aspect.y;
 		c->maxay = size.max_aspect.y;
 	}
 	else
-		c->minax = c->minay = c->maxax = c->maxay = 0;
+		c->minax = c->maxax = c->minay = c->maxay = 0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh
 			&& c->maxw == c->minw && c->maxh == c->minh);
 }
