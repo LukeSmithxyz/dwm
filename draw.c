@@ -95,7 +95,6 @@ drawtext(const char *text, unsigned long col[ColLast]) {
 	int x, y, w, h;
 	static char buf[256];
 	unsigned int len, olen;
-	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
 	XSetForeground(dpy, dc.gc, col[ColBG]);
@@ -124,16 +123,11 @@ drawtext(const char *text, unsigned long col[ColLast]) {
 	}
 	if(w > dc.w)
 		return; /* too long */
-	gcv.foreground = col[ColFG];
-	if(dc.font.set) {
-		XChangeGC(dpy, dc.gc, GCForeground, &gcv);
+	XSetForeground(dpy, dc.gc, col[ColFG]);
+	if(dc.font.set)
 		XmbDrawString(dpy, dc.drawable, dc.font.set, dc.gc, x, y, buf, len);
-	}
-	else {
-		gcv.font = dc.font.xfont->fid;
-		XChangeGC(dpy, dc.gc, GCForeground | GCFont, &gcv);
+	else
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
-	}
 }
 
 unsigned int

@@ -205,6 +205,8 @@ setup(void) {
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
+	if(!dc.font.set)
+		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 	/* multihead support */
 	selscreen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 }
