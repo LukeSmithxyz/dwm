@@ -233,7 +233,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	if(w <= 0 || h <= 0)
 		return;
 	if(sizehints) {
-		if(c->minay > 0 && c->maxay && (h - c->baseh) > 0) {
+		if(c->minay > 0 && c->maxay > 0 && (h - c->baseh) > 0) {
 			dx = (float)(w - c->basew);
 			dy = (float)(h - c->baseh);
 			min = (float)(c->minax) / (float)(c->minay);
@@ -267,6 +267,8 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		if(c->inch)
 			h -= (h - c->baseh) % c->inch;
 	}
+	if(w <= 0 || h <= 0)
+		return;
 	if(w == sw && h == sh)
 		c->border = 0;
 	else
