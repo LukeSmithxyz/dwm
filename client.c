@@ -173,8 +173,9 @@ killclient(const char *arg) {
 
 void
 manage(Window w, XWindowAttributes *wa) {
-	Client *c, *t;
+	Client *c, *t = NULL;
 	Window trans;
+	Status rettrans;
 	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
@@ -203,17 +204,17 @@ manage(Window w, XWindowAttributes *wa) {
 	updatesizehints(c);
 	XSelectInput(dpy, w,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
-	XGetTransientForHint(dpy, w, &trans);
 	grabbuttons(c, False);
 	wc.border_width = c->border;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatetitle(c);
-	for(t = clients; t && t->win != trans; t = t->next);
+	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
+		for(t = clients; t && t->win != trans; t = t->next);
 	settags(c, t);
 	if(!c->isfloating)
-		c->isfloating = (t != NULL) || c->isfixed;
+		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
 	attachstack(c);
 	c->isbanned = True;
