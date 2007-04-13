@@ -174,6 +174,8 @@ configurerequest(XEvent *e) {
 
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
+		if(ev->value_mask & CWBorderWidth)
+			c->border = ev->border_width;
 		if(c->isfixed || c->isfloating || (lt->arrange == floating)) {
 			if(ev->value_mask & CWX)
 				c->x = ev->x;
@@ -190,11 +192,9 @@ configurerequest(XEvent *e) {
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else {
-			if(ev->value_mask & CWBorderWidth)
-				c->border = ev->border_width;
 			configure(c);
-			c->border = BORDERPX;
 		}
+		c->border = BORDERPX;
 	}
 	else {
 		wc.x = ev->x;
