@@ -1,5 +1,5 @@
 # dwm - dynamic window manager
-#   (C)opyright MMVI-MMVII Anselm R. Garbe
+# © 2006-2007 Anselm R. Garbe, Sander van Dijk
 
 include config.mk
 

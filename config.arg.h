@@ -1,6 +1,6 @@
-/* (C)opyright MMVI-MMVII Anselm R. Garbe <garbeam at gmail dot com>
- * See LICENSE file for license details.
- */
+/* © 2006-2007 Anselm R. Garbe <garbeam at gmail dot com>
+ * © 2006-2007 Sander van Dijk <a dot h dot vandijk at gmail dot com>
+ * See LICENSE file for license details. */
 
 /* appearance */
 #define BORDERPX		1

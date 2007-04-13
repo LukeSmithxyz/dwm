@@ -1,4 +1,5 @@
-/* © 2004-2007 Anselm R. Garbe <garbeam at gmail dot com>
+/* © 2006-2007 Anselm R. Garbe <garbeam at gmail dot com>
+ * © 2006-2007 Sander van Dijk <a dot h dot vandijk at gmail dot com>
  * See LICENSE file for license details. */
 #include "dwm.h"
 #include <errno.h>
@@ -254,7 +255,7 @@ main(int argc, char *argv[]) {
 	XEvent ev;
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3))
-		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe\n");
+		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe, Sander van Dijk\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 	setlocale(LC_CTYPE, "");
