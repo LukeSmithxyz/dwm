@@ -1,7 +1,5 @@
-/* (C)opyright MMVI-MMVII Anselm R. Garbe <garbeam at gmail dot com>
- * See LICENSE file for license details.
- */
-
+/* © 2004-2007 Anselm R. Garbe <garbeam at gmail dot com>
+ * See LICENSE file for license details. */
 #include "dwm.h"
 #include <errno.h>
 #include <locale.h>
@@ -256,7 +254,7 @@ main(int argc, char *argv[]) {
 	XEvent ev;
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3))
-		eprint("dwm-"VERSION", (C)opyright MMVI-MMVII Anselm R. Garbe\n");
+		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 	setlocale(LC_CTYPE, "");

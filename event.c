@@ -1,6 +1,5 @@
-/* (C)opyright MMVI-MMVII Anselm R. Garbe <garbeam at gmail dot com>
- * See LICENSE file for license details.
- */
+/* © 2004-2007 Anselm R. Garbe <garbeam at gmail dot com>
+ * See LICENSE file for license details. */
 #include "dwm.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -174,8 +173,6 @@ configurerequest(XEvent *e) {
 
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
-		if(ev->value_mask & CWBorderWidth)
-			c->border = ev->border_width;
 		if(c->isfixed || c->isfloating || (lt->arrange == floating)) {
 			if(ev->value_mask & CWX)
 				c->x = ev->x;
@@ -191,8 +188,12 @@ configurerequest(XEvent *e) {
 			if(isvisible(c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
-		else
+		else {
+			if(ev->value_mask & CWBorderWidth)
+				c->border = ev->border_width;
 			configure(c);
+			c->border = BORDERPX;
+		}
 	}
 	else {
 		wc.x = ev->x;

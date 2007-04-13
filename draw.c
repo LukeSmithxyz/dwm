@@ -1,6 +1,5 @@
-/* (C)opyright MMVI-MMVII Anselm R. Garbe <garbeam at gmail dot com>
- * See LICENSE file for license details.
- */
+/* © 2004-2007 Anselm R. Garbe <garbeam at gmail dot com>
+ * See LICENSE file for license details. */
 #include "dwm.h"
 #include <string.h>
 
