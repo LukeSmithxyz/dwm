@@ -191,10 +191,8 @@ configurerequest(XEvent *e) {
 			if(isvisible(c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
-		else {
+		else
 			configure(c);
-		}
-		c->border = BORDERPX;
 	}
 	else {
 		wc.x = ev->x;

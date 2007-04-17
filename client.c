@@ -185,13 +185,12 @@ manage(Window w, XWindowAttributes *wa) {
 	c->y = wa->y;
 	c->w = wa->width;
 	c->h = wa->height;
+	c->border = wa->border_width;
 	if(c->w == sw && c->h == sh) {
-		c->border = 0;
 		c->x = sx;
 		c->y = sy;
 	}
 	else {
-		c->border = BORDERPX;
 		if(c->x + c->w + 2 * c->border > wax + waw)
 			c->x = wax + waw - c->w - 2 * c->border;
 		if(c->y + c->h + 2 * c->border > way + wah)
@@ -205,7 +204,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, w,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	grabbuttons(c, False);
-	wc.border_width = c->border;
+	wc.border_width = BORDERPX;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
@@ -270,10 +269,6 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	}
 	if(w <= 0 || h <= 0)
 		return;
-	if(w == sw && h == sh)
-		c->border = 0;
-	else
-		c->border = BORDERPX;
 	/* offscreen appearance fixes */
 	if(x > sw)
 		x = sw - w - 2 * c->border;

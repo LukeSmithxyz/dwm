@@ -38,18 +38,18 @@ tile(void) {
 			ny = way;
 			if(i < nmaster) {
 				ny += i * mh;
-				nw = mw - 2 * BORDERPX;
-				nh = mh - 2 * BORDERPX;
+				nw = mw - 2 * c->border;
+				nh = mh - 2 * c->border;
 			}
 			else {  /* tile window */
 				nx += mw;
-				nw = tw - 2 * BORDERPX;
-				if(th > 2 * BORDERPX) {
+				nw = tw - 2 * c->border;
+				if(th > 2 * c->border) {
 					ny += (i - nmaster) * th;
-					nh = th - 2 * BORDERPX;
+					nh = th - 2 * c->border;
 				}
-				else /* fallback if th <= 2 * BORDERPX */
-					nh = wah - 2 * BORDERPX;
+				else /* fallback if th <= 2 * c->border */
+					nh = wah - 2 * c->border;
 			}
 			resize(c, nx, ny, nw, nh, False);
 			i++;
@@ -125,7 +125,7 @@ incmasterw(const char *arg) {
 		masterw = MASTERWIDTH;
 	else {
 		i = atoi(arg);
-		if(waw * (masterw + i) / 1000 >= waw - 2 * BORDERPX
+		if(waw * (masterw + i) / 1000 >= waw - 2 * BORDERPX 
 		|| waw * (masterw + i) / 1000 <= 2 * BORDERPX)
 			return;
 		masterw += i;
