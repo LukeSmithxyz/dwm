@@ -50,7 +50,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags; 
-	unsigned int border;
+	unsigned int border, oldborder;
 	Bool isbanned, isfixed, ismax, isfloating;
 	Bool *tags;
 	Client *next;

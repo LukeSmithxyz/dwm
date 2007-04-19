@@ -81,7 +81,7 @@ initfont(const char *fontstr) {
 	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
 	if(missing) {
 		while(n--)
-			fprintf(stderr, "missing fontset: %s\n", missing[n]);
+			fprintf(stderr, "dwm: missing fontset: %s\n", missing[n]);
 		XFreeStringList(missing);
 	}
 	if(dc.font.set) {

@@ -185,9 +185,11 @@ manage(Window w, XWindowAttributes *wa) {
 	c->y = wa->y;
 	c->w = wa->width;
 	c->h = wa->height;
+	c->oldborder = wa->border_width;
 	if(c->w == sw && c->h == sh) {
 		c->x = sx;
 		c->y = sy;
+		c->border = wa->border_width;
 	}
 	else {
 		if(c->x + c->w + 2 * c->border > wax + waw)
@@ -198,15 +200,16 @@ manage(Window w, XWindowAttributes *wa) {
 			c->x = wax;
 		if(c->y < way)
 			c->y = way;
+		c->border = BORDERPX;
 	}
+	wc.border_width = c->border;
+	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
+	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
+	configure(c); /* propagates border_width, if size doesn't change */
 	updatesizehints(c);
 	XSelectInput(dpy, w,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	grabbuttons(c, False);
-	c->border = wc.border_width = (c->w == sw && c->h == sh) ? wa->border_width : BORDERPX;
-	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
-	configure(c); /* propagates border_width, if size doesn't change */
 	updatetitle(c);
 	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
 		for(t = clients; t && t->win != trans; t = t->next);
@@ -378,10 +381,13 @@ updatetitle(Client *c) {
 void
 unmanage(Client *c) {
 	Client *nc;
+	XWindowChanges wc;
 
+	wc.border_width = c->oldborder;
 	/* The server grab construct avoids race conditions. */
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
+	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
 	detach(c);
 	detachstack(c);
 	if(sel == c) {
