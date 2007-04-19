@@ -203,7 +203,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, w,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	grabbuttons(c, False);
-	c->border = wc.border_width = BORDERPX;
+	c->border = wc.border_width = (c->w == sw && c->h == sh) ? wa->border_width : BORDERPX;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
