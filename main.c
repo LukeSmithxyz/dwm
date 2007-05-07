@@ -163,9 +163,10 @@ setup(void) {
 	XFreeModifiermap(modmap);
 	/* select for events */
 	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
-		| EnterWindowMask | LeaveWindowMask;
+		| EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	compileregs();
 	for(ntags = 0; tags[ntags]; ntags++);

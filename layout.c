@@ -46,7 +46,10 @@ tile(void) {
 				nw = tw - 2 * c->border;
 				if(th > 2 * c->border) {
 					ny += (i - nmaster) * th;
-					nh = th - 2 * c->border;
+					if(i == n - 1)
+						nh = wah - ny - 2 * c->border;
+					else
+						nh = th - 2 * c->border;
 				}
 				else /* fallback if th <= 2 * c->border */
 					nh = wah - 2 * c->border;
