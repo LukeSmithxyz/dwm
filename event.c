@@ -209,9 +209,7 @@ configurerequest(XEvent *e) {
 
 static void
 configurenotify(XEvent *e) {
-	Client *c;
 	XConfigureEvent *ev = &e->xconfigure;
-	XWindowChanges wc;
 
 	if (ev->window == root && (ev->width != sw || ev->height != sh)) {
 		sw = ev->width;
