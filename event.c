@@ -185,6 +185,10 @@ configurerequest(XEvent *e) {
 				c->w = ev->width;
 			if(ev->value_mask & CWHeight)
 				c->h = ev->height;
+			if((c->x + c->w) > sw && c->isfloating)
+				c->x = sw / 2 - c->w / 2; /* center in x direction */
+			if((c->y + c->h) > sh && c->isfloating)
+				c->y = sh / 2 - c->h / 2; /* center in y direction */
 			if((ev->value_mask & (CWX | CWY))
 			&& !(ev->value_mask & (CWWidth | CWHeight)))
 				configure(c);
