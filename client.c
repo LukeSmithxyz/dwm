@@ -365,16 +365,18 @@ updatetitle(Client *c) {
 		XGetWMName(dpy, c->win, &name);
 	if(!name.nitems)
 		return;
-	if(name.encoding == XA_STRING)
-		strncpy(c->name, (char *)name.value, sizeof c->name);
+	if(name.encoding == XA_STRING) {
+		strncpy(c->name, (char *)name.value, sizeof c->name - 1);
+	}
 	else {
 		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
 		&& n > 0 && *list)
 		{
-			strncpy(c->name, *list, sizeof c->name);
+			strncpy(c->name, *list, sizeof c->name - 1);
 			XFreeStringList(list);
 		}
 	}
+	c->name[sizeof c->name - 1] = '\0';
 	XFree(name.value);
 }
 
