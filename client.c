@@ -365,9 +365,8 @@ updatetitle(Client *c) {
 		XGetWMName(dpy, c->win, &name);
 	if(!name.nitems)
 		return;
-	if(name.encoding == XA_STRING) {
+	if(name.encoding == XA_STRING)
 		strncpy(c->name, (char *)name.value, sizeof c->name - 1);
-	}
 	else {
 		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
 		&& n > 0 && *list)
