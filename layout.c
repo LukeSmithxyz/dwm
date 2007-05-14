@@ -61,10 +61,8 @@ tile(void) {
 			c->isbanned = True;
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 		}
-	if(!sel || !isvisible(sel)) {
-		for(c = stack; c && !isvisible(c); c = c->snext);
-		focus(c);
-	}
+	if(!sel || !isvisible(sel)) 
+		focustopvisible();
 	restack();
 }
 
@@ -88,10 +86,8 @@ floating(void) {
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 		}
 	}
-	if(!sel || !isvisible(sel)) {
-		for(c = stack; c && !isvisible(c); c = c->snext);
-		focus(c);
-	}
+	if(!sel || !isvisible(sel))
+		focustopvisible();
 	restack();
 }
 
@@ -241,13 +237,10 @@ togglemax(const char *arg) {
 
 void
 zoom(const char *arg) {
-	unsigned int n;
 	Client *c;
 
 	if(!sel || lt->arrange != tile || sel->isfloating)
 		return;
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
-		n++;
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
 			return;

@@ -247,8 +247,7 @@ enternotify(XEvent *e) {
 		focus(c);
 	else if(ev->window == root) {
 		selscreen = True;
-		for(c = stack; c && !isvisible(c); c = c->snext);
-		focus(c);
+		focustopvisible();
 	}
 }
 

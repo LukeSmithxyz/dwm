@@ -100,11 +100,12 @@ void attach(Client *c);			/* attaches c to global client list */
 void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c, c may be NULL */
-void killclient(const char *arg);		/* kill c nicely */
+void focustopvisible(void);	    /* focus top visible window on stack */
+void killclient(const char *arg);		/* kill sel  nicely */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-void togglefloating(const char *arg);	/* toggles focused client between floating/tiled state */
+void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
 void updatesizehints(Client *c);		/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
 void unmanage(Client *c);		/* destroy c */
@@ -137,8 +138,8 @@ int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 void compileregs(void);			/* initialize regexps of rules defined in config.h */
 Bool isvisible(Client *c);		/* returns True if client is visible */
 void settags(Client *c, Client *trans);	/* sets tags of c */
-void tag(const char *arg);		/* tags c with arg's index */
-void toggletag(const char *arg);		/* toggles c tags with arg's index */
+void tag(const char *arg);		/* tags sel with arg's index */
+void toggletag(const char *arg);		/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
 void view(const char *arg);		/* views the tag with arg's index */
 

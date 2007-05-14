@@ -153,6 +153,14 @@ focus(Client *c) {
 }
 
 void
+focustopvisible(void) {
+	Client *c;
+
+	for(c = stack; c && !isvisible(c); c = c->snext);
+	focus(c);
+}
+
+void
 killclient(const char *arg) {
 	XEvent ev;
 
@@ -391,10 +399,8 @@ unmanage(Client *c) {
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
 	detach(c);
 	detachstack(c);
-	if(sel == c) {
-		for(nc = stack; nc && !isvisible(nc); nc = nc->snext);
-		focus(nc);
-	}
+	if(sel == c)
+		focustopvisible();
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
 	free(c->tags);
