@@ -389,7 +389,6 @@ updatetitle(Client *c) {
 
 void
 unmanage(Client *c) {
-	Client *nc;
 	XWindowChanges wc;
 
 	wc.border_width = c->oldborder;
