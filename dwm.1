@@ -146,3 +146,11 @@ you can use JDK 1.4 (which doesn't contain the XToolkit/XAWT backend) or you
 can set the following environment variable (to use the older Motif
 backend instead):
 .BR AWT_TOOLKIT=MToolkit .
+.P
+Recent GTK 2.10.9+ versions contain a broken
+.BR Save\-As
+file dialog implementation,
+which requests to reconfigure its window size in an endless loop. However, its
+window is still respondable during this state, so you can simply ignore the flicker
+until a new GTK version appears, which will fix this bug, approximately
+GTK 2.10.12+ versions.
