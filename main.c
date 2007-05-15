@@ -245,6 +245,9 @@ updatebarpos(void) {
 		XMoveWindow(dpy, barwin, sx, sy - bh);
 		break;
 	}
+	XRaiseWindow(dpy, barwin);
+	XSync(dpy, False);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are
