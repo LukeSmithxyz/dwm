@@ -194,6 +194,7 @@ setup(void) {
 			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
+	bpos = BARPOS;
 	updatebarpos();
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
