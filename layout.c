@@ -218,7 +218,12 @@ setlayout(const char *arg) {
 
 void
 togglebar(const char *arg) {
-	bpos = (bpos == BarOff) ? BARPOS : BarOff;
+	if(bpos == BarOff) {
+		if((bpos = BARPOS) == BarOff)
+			bpos = BarTop;
+	}
+	else
+		bpos = BarOff;
 	updatebarpos();
 	lt->arrange();
 }
