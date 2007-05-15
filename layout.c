@@ -217,6 +217,12 @@ setlayout(const char *arg) {
 }
 
 void
+togglebar(const char *arg) {
+	bpos = (bpos == BarOff) ? BARPOS : BarOff;
+	updatebarpos();
+}
+
+void
 togglemax(const char *arg) {
 	XEvent ev;
 

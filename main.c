@@ -18,7 +18,7 @@
 
 char stext[256];
 int screen, sx, sy, sw, sh, wax, way, waw, wah;
-unsigned int bh, ntags, numlockmask;
+unsigned int bh, bpos, ntags, numlockmask;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool *seltag;
 Bool selscreen = True;
@@ -190,17 +190,13 @@ setup(void) {
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask | ExposureMask;
-	barwin = XCreateWindow(dpy, root, sx, sy + (TOPBAR ? 0 : sh - bh), sw, bh, 0,
+	barwin = XCreateWindow(dpy, root, sx, sy - bh, sw, bh, 0,
 			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
+	updatebarpos();
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
-	/* windowarea */
-	wax = sx;
-	way = sy + (TOPBAR ? bh : 0);
-	wah = sh - bh;
-	waw = sw;
 	/* pixmap for everything */
 	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
@@ -226,6 +222,28 @@ xerrorstart(Display *dsply, XErrorEvent *ee) {
 void
 quit(const char *arg) {
 	readin = running = False;
+}
+
+void
+updatebarpos(void) {
+	wax = sx;
+	way = sy;
+	wah = sh;
+	waw = sw;
+	switch(bpos) {
+	case BarTop:
+		wah -= bh;
+		way += bh;
+		XMoveWindow(dpy, barwin, sx, sy);
+		break;
+	case BarBot:
+		wah -= bh;
+		XMoveWindow(dpy, barwin, sx, sy + wah);
+		break;
+	case BarOff:
+		XMoveWindow(dpy, barwin, sx, sy - bh);
+	}
+	lt->arrange();
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are

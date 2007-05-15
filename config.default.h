@@ -3,6 +3,7 @@
  * See LICENSE file for license details. */
 
 /* appearance */
+#define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#dddddd"
@@ -11,7 +12,6 @@
 #define SELBORDERCOLOR		"#ff0000"
 #define SELBGCOLOR		"#006699"
 #define SELFGCOLOR		"#ffffff"
-#define TOPBAR			True		/* False */
 
 /* tagging */
 #define TAGS \
@@ -45,6 +45,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn,		"exec xterm" }, \
 	{ MODKEY,			XK_p,		spawn, 		"exe=`dmenu_path | dmenu` && exec $exe" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
+	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_h,		incmasterw,	"-32" }, \
 	{ MODKEY,			XK_l,		incmasterw,	"32" }, \
 	{ MODKEY|ShiftMask,		XK_j,		incnmaster,	"1" }, \

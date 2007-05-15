@@ -37,10 +37,11 @@
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 
-enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
-enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
+enum { BarTop, BarBot, BarOff };			/* bar position */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
+enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
+enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
 
 typedef struct Client Client;
 struct Client {
@@ -83,7 +84,7 @@ extern const char *tags[];		/* all tags */
 char stext[256];			/* status text */
 int screen, sx, sy, sw, sh;		/* screen geometry */
 int wax, way, wah, waw;			/* windowarea geometry */
-unsigned int bh, blw;			/* bar height, bar layout label width */
+unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
 unsigned int ntags, numlockmask;	/* number of tags, dynamic lock mask */
 void (*handler[LASTEvent])(XEvent *);	/* event handler */
 Atom wmatom[WMLast], netatom[NetLast];
@@ -100,13 +101,13 @@ void attach(Client *c);			/* attaches c to global client list */
 void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c, c may be NULL */
-void focustopvisible(void);	    /* focus top visible window on stack */
-void killclient(const char *arg);		/* kill sel  nicely */
+void focustopvisible(void);		/* focus top visible window on stack */
+void killclient(const char *arg);	/* kill sel  nicely */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
 void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
-void updatesizehints(Client *c);		/* update the size hint variables of c */
+void updatesizehints(Client *c);	/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
 void unmanage(Client *c);		/* destroy c */
 
@@ -126,11 +127,13 @@ void incnmaster(const char *arg);	/* increments nmaster with arg's index value *
 void initlayouts(void);			/* initialize layout array */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */
-void setlayout(const char *arg);		/* sets layout, -1 toggles */
-void togglemax(const char *arg);		/* toggles maximization of floating client */
+void setlayout(const char *arg);	/* sets layout, -1 toggles */
+void togglebar(const char *arg);	/* shows/hides the bar */
+void togglemax(const char *arg);	/* toggles maximization of floating client */
 void zoom(const char *arg);		/* zooms the focused client to master area, arg is ignored */
 
 /* main.c */
+void updatebarpos(void);		/* updates the bar position */
 void quit(const char *arg);		/* quit dwm nicely */
 int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
@@ -139,7 +142,7 @@ void compileregs(void);			/* initialize regexps of rules defined in config.h */
 Bool isvisible(Client *c);		/* returns True if client is visible */
 void settags(Client *c, Client *trans);	/* sets tags of c */
 void tag(const char *arg);		/* tags sel with arg's index */
-void toggletag(const char *arg);		/* toggles sel tags with arg's index */
+void toggletag(const char *arg);	/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
 void view(const char *arg);		/* views the tag with arg's index */
 

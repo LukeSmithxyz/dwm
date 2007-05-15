@@ -3,6 +3,7 @@
  * See LICENSE file for license details. */
 
 /* appearance */
+#define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-pixelcarnage monospace-*-r-*-*-14-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#333"
@@ -11,7 +12,6 @@
 #define SELBORDERCOLOR		"#8c8"
 #define SELBGCOLOR		"#555"
 #define SELFGCOLOR		"#fff"
-#define TOPBAR			True		/* False */
 
 /* tagging */
 #define TAGS \
@@ -47,6 +47,7 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
 		"exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
+	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_h,		incmasterw,	"-32" }, \
 	{ MODKEY,			XK_l,		incmasterw,	"32" }, \
 	{ MODKEY|ShiftMask,		XK_j,		incnmaster,	"1" }, \
