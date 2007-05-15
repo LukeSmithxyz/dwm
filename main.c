@@ -227,6 +227,8 @@ quit(const char *arg) {
 
 void
 updatebarpos(void) {
+	XEvent ev;
+
 	wax = sx;
 	way = sy;
 	wah = sh;
