@@ -220,6 +220,7 @@ void
 togglebar(const char *arg) {
 	bpos = (bpos == BarOff) ? BARPOS : BarOff;
 	updatebarpos();
+	lt->arrange();
 }
 
 void

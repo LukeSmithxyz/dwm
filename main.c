@@ -190,7 +190,7 @@ setup(void) {
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask | ExposureMask;
-	barwin = XCreateWindow(dpy, root, sx, sy - bh, sw, bh, 0,
+	barwin = XCreateWindow(dpy, root, sx, sy, sw, bh, 0,
 			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
@@ -232,7 +232,7 @@ updatebarpos(void) {
 	wah = sh;
 	waw = sw;
 	switch(bpos) {
-	case BarTop:
+	default:
 		wah -= bh;
 		way += bh;
 		XMoveWindow(dpy, barwin, sx, sy);
@@ -243,8 +243,8 @@ updatebarpos(void) {
 		break;
 	case BarOff:
 		XMoveWindow(dpy, barwin, sx, sy - bh);
+		break;
 	}
-	lt->arrange();
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are
