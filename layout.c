@@ -189,7 +189,6 @@ restack(void) {
 			XLowerWindow(dpy, c->win);
 		}
 	}
-	XRaiseWindow(dpy, barwin);
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
