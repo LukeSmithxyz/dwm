@@ -247,7 +247,7 @@ void
 zoom(const char *arg) {
 	Client *c;
 
-	if(!sel || lt->arrange != tile || sel->isfloating)
+	if(!sel || lt->arrange == floating || sel->isfloating)
 		return;
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
