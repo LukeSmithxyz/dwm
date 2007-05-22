@@ -198,11 +198,9 @@ setlayout(const char *arg) {
 	int i;
 
 	if(!arg) {
-		for(i = 0; i < nlayouts && lt != &layout[i]; i++);
-		if(i == nlayouts - 1)
-			lt = &layout[0];
-		else
-			lt = &layout[++i];
+		lt++;
+		if(lt == layout + nlayouts)
+			lt = layout;
 	}
 	else {
 		i = atoi(arg);
