@@ -278,7 +278,7 @@ main(int argc, char *argv[]) {
 	fd_set rd;
 	XEvent ev;
 
-	if(argc == 2 && !strncmp("-v", argv[1], 3))
+	if(argc == 2 && !strcmp("-v", argv[1]))
 		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe, Sander van Dijk\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
