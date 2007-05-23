@@ -127,7 +127,7 @@ void incnmaster(const char *arg);	/* increments nmaster with arg's index value *
 void initlayouts(void);			/* initialize layout array */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */
-void setlayout(const char *arg);	/* sets layout, -1 toggles */
+void setlayout(const char *arg);	/* sets layout, NULL means next layout */
 void togglebar(const char *arg);	/* shows/hides the bar */
 void togglemax(const char *arg);	/* toggles maximization of floating client */
 void zoom(const char *arg);		/* zooms the focused client to master area, arg is ignored */
