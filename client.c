@@ -304,7 +304,7 @@ void
 togglefloating(const char *arg) {
 	if(!sel || lt->arrange == floating)
 		return;
-	sel->isfloating = !sel->isfloating;
+	sel->isfloating = !sel->isfloating || sel->isfixed;
 	lt->arrange();
 }
 
