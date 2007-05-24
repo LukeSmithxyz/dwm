@@ -15,7 +15,7 @@ static unsigned int nmaster = NMASTER;
 
 static void
 tile(void) {
-	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th, remainder;
+	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
@@ -24,7 +24,6 @@ tile(void) {
 	mh = (n > nmaster) ? wah / nmaster : wah / (n > 0 ? n : 1);
 	mw = (n > nmaster) ? (waw * masterw) / 1000 : waw;
 	th = (n > nmaster) ? wah / (n - nmaster) : 0;
-	remainder = (n > nmaster) ? wah - th * (n - nmaster) : 0;
 	tw = waw - mw;
 
 	for(i = 0, c = clients; c; c = c->next)
@@ -40,16 +39,20 @@ tile(void) {
 			if(i < nmaster) {
 				ny += i * mh;
 				nw = mw - 2 * c->border;
-				nh = mh - 2 * c->border;
+				nh = mh;
+				if(i + 1 == nmaster) /* remainder */
+					nh = wah - mh * i;
+				nh -= 2 * c->border;
 			}
 			else {  /* tile window */
 				nx += mw;
 				nw = tw - 2 * c->border;
 				if(th > 2 * c->border) {
 					ny += (i - nmaster) * th;
-					nh = th - 2 * c->border;
-					if (i == n - 1)
-						nh += remainder;
+					nh = th;
+					if(i + 1 == n) /* remainder */
+						nh = wah - th * (i - nmaster);
+					nh -= 2 * c->border;
 				}
 				else /* fallback if th <= 2 * c->border */
 					nh = wah - 2 * c->border;
