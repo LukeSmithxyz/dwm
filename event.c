@@ -218,11 +218,10 @@ configurenotify(XEvent *e) {
 	if (ev->window == root && (ev->width != sw || ev->height != sh)) {
 		sw = ev->width;
 		sh = ev->height;
-		wah = sh - bh;
-		waw = sw;
 		XFreePixmap(dpy, dc.drawable);
 		dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 		XResizeWindow(dpy, barwin, sw, bh);
+		updatebarpos();
 		lt->arrange();
 	}
 }
