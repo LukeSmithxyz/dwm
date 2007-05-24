@@ -40,7 +40,7 @@ tile(void) {
 				ny += i * mh;
 				nw = mw - 2 * c->border;
 				nh = mh;
-				if(i + 1 == nmaster) /* remainder */
+				if(i + 1 == (n < nmaster ? n : nmaster)) /* remainder */
 					nh = wah - mh * i;
 				nh -= 2 * c->border;
 			}
