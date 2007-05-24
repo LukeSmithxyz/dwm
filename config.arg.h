@@ -9,7 +9,7 @@
 #define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
-#define SELBORDERCOLOR		"#8c8"
+#define SELBORDERCOLOR		"#248"
 #define SELBGCOLOR		"#555"
 #define SELFGCOLOR		"#fff"
 
