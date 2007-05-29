@@ -1,6 +1,7 @@
 /* © 2006-2007 Anselm R. Garbe <garbeam at gmail dot com>
  * © 2006-2007 Sander van Dijk <a dot h dot vandijk at gmail dot com>
  * © 2007 Premysl Hruby <dfenze at gmail dot com>
+ * © 2007 Szabolcs Nagy <nszabolcs at gmail dot com>
  * See LICENSE file for license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
