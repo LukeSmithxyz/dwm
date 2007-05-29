@@ -281,7 +281,7 @@ main(int argc, char *argv[]) {
 	XEvent ev;
 
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe, Sander van Dijk\n");
+		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe, Sander van Dijk, Premysl Hruby, Szabolcs Nagy\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 	setlocale(LC_CTYPE, "");
