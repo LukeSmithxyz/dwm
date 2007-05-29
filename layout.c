@@ -14,6 +14,22 @@ static unsigned int masterw = MASTERWIDTH;
 static unsigned int nmaster = NMASTER;
 
 static void
+ban(Client *c) {
+	if (c->isbanned)
+		return;
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	c->isbanned = True;
+}
+
+static void
+unban(Client *c) {
+	if (!c->isbanned)
+		return;
+	XMoveWindow(dpy, c->win, c->x, c->y);
+	c->isbanned = False;
+}
+
+static void
 tile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
 	Client *c;
@@ -28,9 +44,7 @@ tile(void) {
 
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
-			if(c->isbanned)
-				XMoveWindow(dpy, c->win, c->x, c->y);
-			c->isbanned = False;
+			unban(c);
 			if(c->isfloating)
 				continue;
 			c->ismax = False;
@@ -60,12 +74,9 @@ tile(void) {
 			resize(c, nx, ny, nw, nh, False);
 			i++;
 		}
-		else {
-			c->isbanned = True;
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-		}
-	if(!sel || !isvisible(sel)) 
-		focustopvisible();
+		else
+			ban(c);
+	focus(NULL);
 	restack();
 }
 
@@ -77,20 +88,16 @@ void
 floating(void) {
 	Client *c;
 
-	for(c = clients; c; c = c->next) {
+	for(c = clients; c; c = c->next)
 		if(isvisible(c)) {
 			if(c->isbanned)
 				XMoveWindow(dpy, c->win, c->x, c->y);
 			c->isbanned = False;
 			resize(c, c->x, c->y, c->w, c->h, True);
 		}
-		else {
-			c->isbanned = True;
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-		}
-	}
-	if(!sel || !isvisible(sel))
-		focustopvisible();
+		else
+			ban(c);
+	focus(NULL);
 	restack();
 }
 

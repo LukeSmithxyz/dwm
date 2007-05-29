@@ -129,8 +129,8 @@ detach(Client *c) {
 
 void
 focus(Client *c) {
-	if(c && !isvisible(c))
-		return;
+	if( !c && selscreen || c && !isvisible(c))
+		for(c = stack; c && !isvisible(c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -150,14 +150,6 @@ focus(Client *c) {
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-}
-
-void
-focustopvisible(void) {
-	Client *c;
-
-	for(c = stack; c && !isvisible(c); c = c->snext);
-	focus(c);
 }
 
 void
@@ -230,8 +222,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XMoveWindow(dpy, w, c->x + 2 * sw, c->y);
 	XMapWindow(dpy, w);
 	setclientstate(c, NormalState);
-	if(isvisible(c))
-		focus(c);
+	focus(c);
 	lt->arrange();
 }
 
@@ -401,7 +392,7 @@ unmanage(Client *c) {
 	detach(c);
 	detachstack(c);
 	if(sel == c)
-		focustopvisible();
+		focus(NULL);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
 	free(c->tags);

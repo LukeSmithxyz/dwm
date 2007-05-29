@@ -100,8 +100,7 @@ Window root, barwin;
 void attach(Client *c);			/* attaches c to global client list */
 void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
-void focus(Client *c);			/* focus c, c may be NULL */
-void focustopvisible(void);		/* focus top visible window on stack */
+void focus(Client *c);			/* focus c if visible && !NULL, or focus top visible */
 void killclient(const char *arg);	/* kill sel  nicely */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,

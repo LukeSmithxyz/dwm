@@ -242,11 +242,11 @@ enternotify(XEvent *e) {
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
-	if((c = getclient(ev->window)) && isvisible(c))
+	if(c = getclient(ev->window))
 		focus(c);
 	else if(ev->window == root) {
 		selscreen = True;
-		focustopvisible();
+		focus(NULL);
 	}
 }
 
