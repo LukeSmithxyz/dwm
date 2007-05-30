@@ -243,7 +243,7 @@ togglemax(const char *arg) {
 		sel->ry = sel->y;
 		sel->rw = sel->w;
 		sel->rh = sel->h;
-		resize(sel, wax, way, waw - 2 * BORDERPX, wah - 2 * BORDERPX, True);
+		resize(sel, wax, way, waw - 2 * sel->border, wah - 2 * sel->border, True);
 	}
 	else
 		resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
