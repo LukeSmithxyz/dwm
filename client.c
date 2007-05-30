@@ -131,7 +131,7 @@ detach(Client *c) {
 
 void
 focus(Client *c) {
-	if( !c && selscreen || c && !isvisible(c))
+	if((!c && selscreen)|| (c && !isvisible(c)))
 		for(c = stack; c && !isvisible(c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
