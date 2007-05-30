@@ -1,9 +1,4 @@
-/* © 2006-2007 Anselm R. Garbe <garbeam at gmail dot com>
- * © 2006-2007 Sander van Dijk <a dot h dot vandijk at gmail dot com>
- * © 2006-2007 Jukka Salmi <jukka at salmi dot ch>
- * © 2007 Premysl Hruby <dfenze at gmail dot com>
- * © 2007 Szabolcs Nagy <nszabolcs at gmail dot com>
- * See LICENSE file for license details. */
+/* See LICENSE file for copyright and license details. */
 
 /* appearance */
 #define BARPOS			BarTop /* BarBot, BarOff */
