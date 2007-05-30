@@ -1,5 +1,6 @@
 /* © 2006-2007 Anselm R. Garbe <garbeam at gmail dot com>
  * © 2006-2007 Sander van Dijk <a dot h dot vandijk at gmail dot com>
+ * © 2006-2007 Jukka Salmi <jukka at salmi dot ch>
  * © 2007 Premysl Hruby <dfenze at gmail dot com>
  * © 2007 Szabolcs Nagy <nszabolcs at gmail dot com>
  * See LICENSE file for license details. */
@@ -281,7 +282,7 @@ main(int argc, char *argv[]) {
 	XEvent ev;
 
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		eprint("dwm-"VERSION", © 2004-2007 Anselm R. Garbe, Sander van Dijk, Premysl Hruby, Szabolcs Nagy\n");
+		eprint("dwm-"VERSION", © 2006-2007 A. R. Garbe, S. van Dijk, J. Salmi, P. Hruby, S. Nagy\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 	setlocale(LC_CTYPE, "");
