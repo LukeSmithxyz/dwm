@@ -78,21 +78,21 @@ typedef struct {
 	void (*arrange)(void);
 } Layout;
 
-extern const char *tags[];		/* all tags */
-char stext[256];			/* status text */
-int screen, sx, sy, sw, sh;		/* screen geometry */
-int wax, way, wah, waw;			/* windowarea geometry */
-unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
-unsigned int ntags, numlockmask;	/* number of tags, dynamic lock mask */
-void (*handler[LASTEvent])(XEvent *);	/* event handler */
-Atom wmatom[WMLast], netatom[NetLast];
-Bool selscreen, *seltag;		/* seltag is array of Bool */
-Client *clients, *sel, *stack;		/* global client list and stack */
-Cursor cursor[CurLast];
-DC dc;					/* global draw context */
-Display *dpy;
-Layout *lt;
-Window root, barwin;
+extern const char *tags[];			/* all tags */
+extern char stext[256];				/* status text */
+extern int screen, sx, sy, sw, sh;		/* screen geometry */
+extern int wax, way, wah, waw;			/* windowarea geometry */
+extern unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
+extern unsigned int ntags, numlockmask;		/* number of tags, numlock mask */
+extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
+extern Atom wmatom[WMLast], netatom[NetLast];
+extern Bool selscreen, *seltag;			/* seltag is array of Bool */
+extern Client *clients, *sel, *stack;		/* global client list and stack */
+extern Cursor cursor[CurLast];
+extern DC dc;					/* global draw context */
+extern Display *dpy;
+extern Layout *lt;
+extern Window root, barwin;
 
 /* client.c */
 void attach(Client *c);			/* attaches c to global client list */
