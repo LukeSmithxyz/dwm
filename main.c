@@ -38,8 +38,7 @@ static void
 cleanup(void) {
 	close(STDIN_FILENO);
 	while(stack) {
-		if(stack->isbanned)
-			XMoveWindow(dpy, stack->win, stack->x, stack->y);
+		unban(stack);
 		unmanage(stack);
 	}
 	if(dc.font.set)

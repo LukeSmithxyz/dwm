@@ -88,9 +88,7 @@ floating(void) {
 
 	for(c = clients; c; c = c->next)
 		if(isvisible(c)) {
-			if(c->isbanned)
-				XMoveWindow(dpy, c->win, c->x, c->y);
-			c->isbanned = False;
+			unban(c);
 			resize(c, c->x, c->y, c->w, c->h, True);
 		}
 		else

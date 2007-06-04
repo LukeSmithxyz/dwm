@@ -216,8 +216,7 @@ manage(Window w, XWindowAttributes *wa) {
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
 	attachstack(c);
-	c->isbanned = True;
-	XMoveWindow(dpy, w, c->x + 2 * sw, c->y);
+	ban(c);
 	XMapWindow(dpy, w);
 	setclientstate(c, NormalState);
 	focus(c);
