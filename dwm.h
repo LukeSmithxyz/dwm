@@ -96,6 +96,7 @@ extern Window root, barwin;
 
 /* client.c */
 void attach(Client *c);			/* attaches c to global client list */
+void ban(Client *c);			/* bans c */
 void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c if visible && !NULL, or focus top visible */
@@ -104,9 +105,10 @@ void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
 void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
+void unban(Client *c);			/* unbans c */
+void unmanage(Client *c);		/* destroy c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
-void unmanage(Client *c);		/* destroy c */
 
 /* draw.c */
 void drawstatus(void);			/* draw the bar */

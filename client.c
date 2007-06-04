@@ -97,6 +97,14 @@ attach(Client *c) {
 }
 
 void
+ban(Client *c) {
+	if (c->isbanned)
+		return;
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	c->isbanned = True;
+}
+
+void
 configure(Client *c) {
 	XConfigureEvent ce;
 
@@ -299,6 +307,37 @@ togglefloating(const char *arg) {
 }
 
 void
+unban(Client *c) {
+	if (!c->isbanned)
+		return;
+	XMoveWindow(dpy, c->win, c->x, c->y);
+	c->isbanned = False;
+}
+
+void
+unmanage(Client *c) {
+	XWindowChanges wc;
+
+	wc.border_width = c->oldborder;
+	/* The server grab construct avoids race conditions. */
+	XGrabServer(dpy);
+	XSetErrorHandler(xerrordummy);
+	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
+	detach(c);
+	detachstack(c);
+	if(sel == c)
+		focus(NULL);
+	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+	setclientstate(c, WithdrawnState);
+	free(c->tags);
+	free(c);
+	XSync(dpy, False);
+	XSetErrorHandler(xerror);
+	XUngrabServer(dpy);
+	lt->arrange();
+}
+
+void
 updatesizehints(Client *c) {
 	long msize;
 	XSizeHints size;
@@ -375,27 +414,4 @@ updatetitle(Client *c) {
 	}
 	c->name[sizeof c->name - 1] = '\0';
 	XFree(name.value);
-}
-
-void
-unmanage(Client *c) {
-	XWindowChanges wc;
-
-	wc.border_width = c->oldborder;
-	/* The server grab construct avoids race conditions. */
-	XGrabServer(dpy);
-	XSetErrorHandler(xerrordummy);
-	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
-	detach(c);
-	detachstack(c);
-	if(sel == c)
-		focus(NULL);
-	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	setclientstate(c, WithdrawnState);
-	free(c->tags);
-	free(c);
-	XSync(dpy, False);
-	XSetErrorHandler(xerror);
-	XUngrabServer(dpy);
-	lt->arrange();
 }

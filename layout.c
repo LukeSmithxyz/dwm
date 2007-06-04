@@ -12,22 +12,6 @@ static unsigned int masterw = MASTERWIDTH;
 static unsigned int nmaster = NMASTER;
 
 static void
-ban(Client *c) {
-	if (c->isbanned)
-		return;
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-	c->isbanned = True;
-}
-
-static void
-unban(Client *c) {
-	if (!c->isbanned)
-		return;
-	XMoveWindow(dpy, c->win, c->x, c->y);
-	c->isbanned = False;
-}
-
-static void
 tile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
 	Client *c;
