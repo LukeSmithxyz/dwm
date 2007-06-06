@@ -164,6 +164,7 @@ void
 restack(void) {
 	Client *c;
 	XEvent ev;
+	XWindowChanges wc;
 
 	drawstatus();
 	if(!sel)
@@ -171,12 +172,17 @@ restack(void) {
 	if(sel->isfloating || lt->arrange == floating)
 		XRaiseWindow(dpy, sel->win);
 	if(lt->arrange != floating) {
-		if(!sel->isfloating)
-			XLowerWindow(dpy, sel->win);
+		wc.stack_mode = Below;
+		wc.sibling = barwin;
+		if(!sel->isfloating) {
+			XConfigureWindow(dpy, sel->win, CWSibling | CWStackMode, &wc);
+			wc.sibling = sel->win;
+		}
 		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
 			if(c == sel)
 				continue;
-			XLowerWindow(dpy, c->win);
+			XConfigureWindow(dpy, c->win, CWSibling | CWStackMode, &wc);
+			wc.sibling = c->win;
 		}
 	}
 	XSync(dpy, False);
