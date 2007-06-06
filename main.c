@@ -16,7 +16,9 @@
 
 char stext[256];
 int screen, sx, sy, sw, sh, wax, way, waw, wah;
-unsigned int bh, bpos, ntags, numlockmask;
+unsigned int bh, ntags;
+unsigned int bpos = BARPOS;
+unsigned int numlockmask = 0;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool *seltag;
 Bool selscreen = True;
@@ -149,7 +151,6 @@ setup(void) {
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 	/* init modifier map */
-	numlockmask = 0;
 	modmap = XGetModifierMapping(dpy);
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < modmap->max_keypermod; j++) {
@@ -191,7 +192,6 @@ setup(void) {
 			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
-	bpos = BARPOS;
 	updatebarpos();
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
