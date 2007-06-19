@@ -225,19 +225,6 @@ configurenotify(XEvent *e) {
 }
 
 static void
-createnotify(XEvent *e) {
-	static XWindowAttributes wa;
-	XCreateWindowEvent *ev = &e->xcreatewindow;
-
-	if(!XGetWindowAttributes(dpy, ev->window, &wa))
-		return;
-	if(wa.override_redirect)
-		return;
-	if(!getclient(ev->window) && (wa.map_state == IsViewable))
-		manage(ev->window, &wa);
-}
-
-static void
 destroynotify(XEvent *e) {
 	Client *c;
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
@@ -363,7 +350,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ConfigureRequest] = configurerequest,
 	[ConfigureNotify] = configurenotify,
-/*	[CreateNotify] = createnotify, */
 	[DestroyNotify] = destroynotify,
 	[EnterNotify] = enternotify,
 	[LeaveNotify] = leavenotify,
