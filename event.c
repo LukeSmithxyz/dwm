@@ -301,8 +301,7 @@ maprequest(XEvent *e) {
 
 	if(!XGetWindowAttributes(dpy, ev->window, &wa))
 		return;
-	fprintf(stderr, "does the window suck? %s\n", wa.map_state == IsViewable ? "no" : "yes");
-	if(wa.override_redirect || wa.map_state != IsViewable)
+	if(wa.override_redirect)
 		return;
 	if(!getclient(ev->window))
 		manage(ev->window, &wa);
