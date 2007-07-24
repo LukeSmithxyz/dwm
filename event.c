@@ -144,6 +144,10 @@ buttonpress(XEvent *e) {
 				setlayout(NULL);
 				break;
 			}
+		else if(ev->button == Button4)
+			focusclient("-1");
+		else if(ev->button == Button5)
+			focusclient("1");
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
