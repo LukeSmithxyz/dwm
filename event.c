@@ -135,6 +135,10 @@ buttonpress(XEvent *e) {
 					else
 						toggleview(buf);
 				}
+				else if(ev->button == Button4)
+					shiftview("-1");
+				else if(ev->button == Button5)
+					shiftview("1");
 				return;
 			}
 		}

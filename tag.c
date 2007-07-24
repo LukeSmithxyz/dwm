@@ -99,6 +99,24 @@ settags(Client *c, Client *trans) {
 			c->tags[i] = seltag[i];
 }
 
+void 
+shiftview(const char *arg) {
+	int i, j;
+
+	for(i = 0; !seltag[i]; i++);
+	for(j = i + 1; j < ntags && !seltag[j]; j++);
+	if(j < ntags)
+		return; /* more then one tag selected */
+	seltag[i] = False;
+	i += arg ? atoi(arg) : 0;
+	if(i < 0)
+		i = ntags - 1;
+	else if(i >= ntags)
+		i = 0;
+	seltag[i] = True;
+	lt->arrange();
+}
+
 void
 tag(const char *arg) {
 	int i;
