@@ -106,7 +106,7 @@ shiftview(const char *arg) {
 	for(i = 0; !seltag[i]; i++);
 	for(j = i + 1; j < ntags && !seltag[j]; j++);
 	if(j < ntags)
-		return; /* more then one tag selected */
+		return; /* more than one tag selected */
 	seltag[i] = False;
 	i += arg ? atoi(arg) : 0;
 	if(i < 0)

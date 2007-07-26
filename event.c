@@ -142,12 +142,8 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
-		if(ev->x < x + blw)
-			switch(ev->button) {
-			case Button1:
-				setlayout(NULL);
-				break;
-			}
+		if(ev->x < x + blw && ev->button == Button1)
+			setlayout(NULL);
 		else if(ev->button == Button4)
 			focusclient("-1");
 		else if(ev->button == Button5)
