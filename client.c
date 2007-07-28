@@ -226,6 +226,7 @@ manage(Window w, XWindowAttributes *wa) {
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
 	attachstack(c);
+	setclientstate(c, IconicState);
 	c->isbanned = True;
 	focus(c);
 	lt->arrange();
