@@ -98,10 +98,12 @@ attach(Client *c) {
 
 void
 ban(Client *c) {
-	if (c->isbanned)
+	if(c->isbanned)
 		return;
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	XUnmapWindow(dpy, c->win);
+	setclientstate(c, IconicState);
 	c->isbanned = True;
+	c->unmapped++;
 }
 
 void
@@ -135,7 +137,7 @@ detach(Client *c) {
 
 void
 focus(Client *c) {
-	if((!c && selscreen)|| (c && !isvisible(c)))
+	if((!c && selscreen) || (c && !isvisible(c)))
 		for(c = stack; c && !isvisible(c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
@@ -224,9 +226,7 @@ manage(Window w, XWindowAttributes *wa) {
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
 	attachstack(c);
-	ban(c);
-	XMapWindow(dpy, w);
-	setclientstate(c, NormalState);
+	c->isbanned = True;
 	focus(c);
 	lt->arrange();
 }
@@ -308,9 +308,10 @@ togglefloating(const char *arg) {
 
 void
 unban(Client *c) {
-	if (!c->isbanned)
+	if(!c->isbanned)
 		return;
-	XMoveWindow(dpy, c->win, c->x, c->y);
+	XMapWindow(dpy, c->win);
+	setclientstate(c, NormalState);
 	c->isbanned = False;
 }
 

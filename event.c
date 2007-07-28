@@ -336,8 +336,10 @@ unmapnotify(XEvent *e) {
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
-	if((c = getclient(ev->window)))
-		unmanage(c);
+	if((c = getclient(ev->window)) && (ev->event == root)) {
+		if(ev->send_event || c->unmapped-- == 0)
+			unmanage(c);
+	}
 }
 
 /* extern */
