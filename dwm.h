@@ -144,7 +144,6 @@ void tag(const char *arg);		/* tags sel with arg's index */
 void toggletag(const char *arg);	/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
 void view(const char *arg);		/* views the tag with arg's index */
-void shiftview(const char *arg);        /* views next(1)/previous(-1) tag */
 
 /* util.c */
 void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */

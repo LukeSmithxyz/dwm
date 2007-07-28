@@ -16,7 +16,7 @@ typedef struct {
 
 KEYS
 
-#define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
+#define CLEANMASK(mask)		(mask & ~(numlockmask | LockMask))
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 
 static Client *
@@ -135,19 +135,11 @@ buttonpress(XEvent *e) {
 					else
 						toggleview(buf);
 				}
-				else if(ev->button == Button4)
-					shiftview("-1");
-				else if(ev->button == Button5)
-					shiftview("1");
 				return;
 			}
 		}
-		if(ev->x < x + blw && ev->button == Button1)
+		if((ev->x < x + blw) && ev->button == Button1)
 			setlayout(NULL);
-		else if(ev->button == Button4)
-			focusclient("-1");
-		else if(ev->button == Button5)
-			focusclient("1");
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
