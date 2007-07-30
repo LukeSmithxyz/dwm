@@ -311,6 +311,7 @@ void
 unban(Client *c) {
 	if(!c->isbanned)
 		return;
+	XMoveWindow(dpy, c->win, c->x, c->y); /* some windows require this */
 	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
 	c->isbanned = False;
