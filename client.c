@@ -226,6 +226,7 @@ manage(Window w, XWindowAttributes *wa) {
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
 	attachstack(c);
+	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
 	setclientstate(c, IconicState);
 	c->isbanned = True;
 	focus(c);
@@ -311,7 +312,6 @@ void
 unban(Client *c) {
 	if(!c->isbanned)
 		return;
-	XMoveWindow(dpy, c->win, c->x, c->y); /* some windows require this */
 	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
 	c->isbanned = False;
