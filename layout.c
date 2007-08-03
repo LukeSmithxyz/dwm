@@ -12,7 +12,7 @@ static double ratio = RATIO;
 static unsigned int nlayouts = 0;
 static unsigned int nmaster = NMASTER;
 
-static double // simple pow()
+static double /* simple pow() */
 spow(double x, double y)
 {
 	if(y == 0)
