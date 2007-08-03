@@ -31,9 +31,9 @@ static Layout layout[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
 };
-#define MASTERWIDTH		600		/* master width per thousand */
-#define NMASTER			1		/* clients in master area */
-#define SNAP			32		/* snap pixel */
+#define NMASTER			1	/* clients in master area */
+#define RATIO			.8	/* ratio of tile */
+#define SNAP			32	/* snap pixel */
 
 /* key definitions */
 #define MODKEY			Mod1Mask
@@ -44,8 +44,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_p,		spawn, 		"exe=`dmenu_path | dmenu` && exec $exe" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
-	{ MODKEY,			XK_h,		incmasterw,	"-32" }, \
-	{ MODKEY,			XK_l,		incmasterw,	"32" }, \
+	{ MODKEY,			XK_h,		incratio,	".1" }, \
+	{ MODKEY,			XK_l,		incratio,	"-.1" }, \
 	{ MODKEY|ShiftMask,		XK_j,		incnmaster,	"1" }, \
 	{ MODKEY|ShiftMask,		XK_k,		incnmaster,	"-1" }, \
 	{ MODKEY,			XK_j,		focusclient,	"1" }, \

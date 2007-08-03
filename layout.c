@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include "dwm.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 unsigned int blw = 0;
@@ -7,53 +8,79 @@ Layout *lt = NULL;
 
 /* static */
 
+static double ratio = RATIO;
 static unsigned int nlayouts = 0;
-static unsigned int masterw = MASTERWIDTH;
 static unsigned int nmaster = NMASTER;
+
+static double // simple pow()
+spow(double x, double y)
+{
+	if(y == 0)
+		return 1;
+	while(--y)
+		x *= x;
+	return x;
+}
 
 static void
 tile(void) {
-	unsigned int i, n, nx, ny, nw, nh, mw, mh, tw, th;
+	double mscale = 0, tscale = 0, sum = 0;
+	unsigned int i, n, nx, ny, nw, nh, mw, tw;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-	/* window geoms */
-	mh = (n > nmaster) ? wah / nmaster : wah / (n > 0 ? n : 1);
-	mw = (n > nmaster) ? (waw * masterw) / 1000 : waw;
-	th = (n > nmaster) ? wah / (n - nmaster) : 0;
+
+	mw = (n <= nmaster) ? waw :  waw / (1 + ratio);
 	tw = waw - mw;
 
+	if(n > 0) {
+		if(n < nmaster) {
+			for(i = 0; i < n; i++)
+				sum += spow(ratio, i);
+			mscale = wah / sum;
+		}
+		else {
+			for(i = 0; i < nmaster; i++)
+				sum += spow(ratio, i);
+			mscale = wah / sum;
+			for(sum = 0, i = 0; i < (n - nmaster); i++)
+				sum += spow(ratio, i);
+			tscale = wah / sum;
+		}
+	}
+	nx = wax;
+	ny = way;
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
 			unban(c);
 			if(c->isfloating)
 				continue;
 			c->ismax = False;
-			nx = wax;
-			ny = way;
-			if(i < nmaster) {
-				ny += i * mh;
+			if(i < nmaster) { /* master window */
 				nw = mw - 2 * c->border;
-				nh = mh;
-				if(i + 1 == (n < nmaster ? n : nmaster)) /* remainder */
-					nh = wah - mh * i;
-				nh -= 2 * c->border;
+				if(i + 1 == n || i + 1 == nmaster)
+					nh = (way + wah) - ny - (2 * c->border);
+				else
+					nh = (mscale * spow(ratio, i)) - (2 * c->border);
 			}
-			else {  /* tile window */
-				nx += mw;
-				nw = tw - 2 * c->border;
-				if(th > 2 * c->border) {
-					ny += (i - nmaster) * th;
-					nh = th;
-					if(i + 1 == n) /* remainder */
-						nh = wah - th * (i - nmaster);
-					nh -= 2 * c->border;
+			else { /* tile window */
+				if(i == nmaster) {
+					ny = way;
+					nx = wax + mw;
 				}
-				else /* fallback if th <= 2 * c->border */
-					nh = wah - 2 * c->border;
+				nw = tw - 2 * c->border;
+				if(i + 1 == n)
+					nh = (way + wah) - ny - (2 * c->border);
+				else
+					nh = (tscale * spow(ratio, i - nmaster)) - (2 * c->border);
+			}
+			if(nh < bh) {
+				nh = bh;
+				ny = way + wah - nh;
 			}
 			resize(c, nx, ny, nw, nh, False);
+			ny += nh;
 			i++;
 		}
 		else
@@ -106,18 +133,19 @@ focusclient(const char *arg) {
 }
 
 void
-incmasterw(const char *arg) {
-	int i;
+incratio(const char *arg) {
+	double delta;
+
 	if(lt->arrange != tile)
 		return;
 	if(!arg)
-		masterw = MASTERWIDTH;
+		ratio = RATIO;
 	else {
-		i = atoi(arg);
-		if(waw * (masterw + i) / 1000 >= waw - 2 * BORDERPX 
-		|| waw * (masterw + i) / 1000 <= 2 * BORDERPX)
-			return;
-		masterw += i;
+		if(1 == sscanf(arg, "%lf", &delta)) {
+			if(delta + ratio < .1 || delta + ratio > 1.9)
+				return;
+			ratio += delta;
+		}
 	}
 	lt->arrange();
 }

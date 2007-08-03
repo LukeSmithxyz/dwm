@@ -44,6 +44,7 @@ enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
 typedef struct Client Client;
 struct Client {
 	char name[256];
+	float scale;
 	int x, y, w, h;
 	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
@@ -122,7 +123,7 @@ void grabkeys(void);			/* grab all keys defined in config.h */
 /* layout.c */
 void floating(void);			/* arranges all windows floating */
 void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
-void incmasterw(const char *arg);	/* increments the master width with arg's index value */
+void incratio(const char *arg);		/* increments the tile ratio with arg's value */
 void incnmaster(const char *arg);	/* increments nmaster with arg's index value */
 void initlayouts(void);			/* initialize layout array */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
