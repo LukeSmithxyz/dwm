@@ -13,24 +13,6 @@ static double vratio = VRATIO;
 static unsigned int nlayouts = 0;
 static unsigned int nmaster = NMASTER;
 
-static void
-incratio(const char *arg, double *ratio, double def) {
-	double delta;
-
-	if(lt->arrange != tile)
-		return;
-	if(!arg)
-		*ratio = def;
-	else {
-		if(1 == sscanf(arg, "%lf", &delta)) {
-			if(delta + (*ratio) < .1 || delta + (*ratio) > 1.9)
-				return;
-			*ratio += delta;
-		}
-	}
-	lt->arrange();
-}
-
 static double /* simple pow() */
 spow(double x, double y)
 {
@@ -109,6 +91,24 @@ tile(void) {
 }
 
 LAYOUTS
+
+static void
+incratio(const char *arg, double *ratio, double def) {
+	double delta;
+
+	if(lt->arrange != tile)
+		return;
+	if(!arg)
+		*ratio = def;
+	else {
+		if(1 == sscanf(arg, "%lf", &delta)) {
+			if(delta + (*ratio) < .1 || delta + (*ratio) > 1.9)
+				return;
+			*ratio += delta;
+		}
+	}
+	lt->arrange();
+}
 
 /* extern */
 
