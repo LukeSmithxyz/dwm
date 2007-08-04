@@ -8,9 +8,28 @@ Layout *lt = NULL;
 
 /* static */
 
-static double ratio = RATIO;
+static double hratio = HRATIO;
+static double vratio = VRATIO;
 static unsigned int nlayouts = 0;
 static unsigned int nmaster = NMASTER;
+
+static void
+incratio(const char *arg, double *ratio, double def) {
+	double delta;
+
+	if(lt->arrange != tile)
+		return;
+	if(!arg)
+		*ratio = def;
+	else {
+		if(1 == sscanf(arg, "%lf", &delta)) {
+			if(delta + (*ratio) < .1 || delta + (*ratio) > 1.9)
+				return;
+			*ratio += delta;
+		}
+	}
+	lt->arrange();
+}
 
 static double /* simple pow() */
 spow(double x, double y)
@@ -31,21 +50,21 @@ tile(void) {
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
-	mw = (n <= nmaster) ? waw :  waw / (1 + ratio);
+	mw = (n <= nmaster) ? waw :  waw / (1 + hratio);
 	tw = waw - mw;
 
 	if(n > 0) {
 		if(n < nmaster) {
 			for(i = 0; i < n; i++)
-				sum += spow(ratio, i);
+				sum += spow(vratio, i);
 			mscale = wah / sum;
 		}
 		else {
 			for(i = 0; i < nmaster; i++)
-				sum += spow(ratio, i);
+				sum += spow(vratio, i);
 			mscale = wah / sum;
 			for(sum = 0, i = 0; i < (n - nmaster); i++)
-				sum += spow(ratio, i);
+				sum += spow(vratio, i);
 			tscale = wah / sum;
 		}
 	}
@@ -62,7 +81,7 @@ tile(void) {
 				if(i + 1 == n || i + 1 == nmaster)
 					nh = (way + wah) - ny - (2 * c->border);
 				else
-					nh = (mscale * spow(ratio, i)) - (2 * c->border);
+					nh = (mscale * spow(vratio, i)) - (2 * c->border);
 			}
 			else { /* tile window */
 				if(i == nmaster) {
@@ -73,7 +92,7 @@ tile(void) {
 				if(i + 1 == n)
 					nh = (way + wah) - ny - (2 * c->border);
 				else
-					nh = (tscale * spow(ratio, i - nmaster)) - (2 * c->border);
+					nh = (tscale * spow(vratio, i - nmaster)) - (2 * c->border);
 			}
 			if(nh < bh) {
 				nh = bh;
@@ -133,21 +152,13 @@ focusclient(const char *arg) {
 }
 
 void
-incratio(const char *arg) {
-	double delta;
+inchratio(const char *arg) {
+	incratio(arg, &hratio, HRATIO);
+}
 
-	if(lt->arrange != tile)
-		return;
-	if(!arg)
-		ratio = RATIO;
-	else {
-		if(1 == sscanf(arg, "%lf", &delta)) {
-			if(delta + ratio < .1 || delta + ratio > 1.9)
-				return;
-			ratio += delta;
-		}
-	}
-	lt->arrange();
+void
+incvratio(const char *arg) {
+	incratio(arg, &vratio, VRATIO);
 }
 
 void
