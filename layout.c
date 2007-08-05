@@ -43,7 +43,7 @@ tile(void) {
 				sum += spow(vratio, i);
 			mscale = wah / sum;
 			if(vratio >= 1)
-				mmaxtile = bh > (mscale * spow(vratio, 0));
+				mmaxtile = bh > mscale;
 			else
 				mmaxtile = bh > (mscale * spow(vratio, n - 1));
 		}
@@ -55,8 +55,8 @@ tile(void) {
 				sum += spow(vratio, i);
 			sscale = wah / sum;
 			if(vratio >= 1) {
-				mmaxtile = bh > (mscale * spow(vratio, 0));
-				smaxtile = bh > (sscale * spow(vratio, 0));
+				mmaxtile = bh > mscale;
+				smaxtile = bh > sscale;
 			}
 			else {
 				mmaxtile = bh > (mscale * spow(vratio, nmaster - 1));
