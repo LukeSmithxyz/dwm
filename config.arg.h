@@ -32,7 +32,7 @@ static Layout layout[] = { \
 };
 #define NMASTER			1	/* clients in master area */
 #define HRATIO			.8	/* horizontal ratio of tile */
-#define VRATIO			.8	/* vertical ratio of tile */
+#define VRATIO			.9	/* vertical ratio of tile */
 #define SNAP			32	/* snap pixel */
 
 /* key definitions */
@@ -47,14 +47,14 @@ static Key key[] = { \
 		"exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
-	{ MODKEY,			XK_h,		incvratio,	".1" }, \
-	{ MODKEY,			XK_h,		inchratio,	".1" }, \
-	{ MODKEY,			XK_l,		incvratio,	"-.1" }, \
-	{ MODKEY,			XK_l,		inchratio,	"-.1" }, \
-	{ MODKEY|ShiftMask,		XK_j,		incnmaster,	"1" }, \
-	{ MODKEY|ShiftMask,		XK_k,		incnmaster,	"-1" }, \
+	{ MODKEY,			XK_h,		incnmaster,	"1" }, \
+	{ MODKEY,			XK_l,		incnmaster,	"-1" }, \
 	{ MODKEY,			XK_j,		focusclient,	"1" }, \
 	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
+	{ MODKEY|ShiftMask,		XK_h,		inchratio,	".1" }, \
+	{ MODKEY|ShiftMask,		XK_l,		inchratio,	"-.1" }, \
+	{ MODKEY|ShiftMask,		XK_j,		incvratio,	"-.1" }, \
+	{ MODKEY|ShiftMask,		XK_k,		incvratio,	".1" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \

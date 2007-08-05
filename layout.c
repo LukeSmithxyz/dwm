@@ -25,21 +25,27 @@ spow(double x, double y)
 
 static void
 tile(void) {
-	double mscale = 0, tscale = 0, sum = 0;
+	Bool mmaxtile = False, smaxtile = False; /* fallback tiling */
+	double mscale = 0, sscale = 0, sum = 0;
 	unsigned int i, n, nx, ny, nw, nh, mw, tw;
 	Client *c;
 
+	/* preparation */
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
-
+	nx = wax;
+	ny = way;
 	mw = (n <= nmaster) ? waw :  waw / (1 + hratio);
 	tw = waw - mw;
-
 	if(n > 0) {
-		if(n < nmaster) {
+		if(n <= nmaster) {
 			for(i = 0; i < n; i++)
 				sum += spow(vratio, i);
 			mscale = wah / sum;
+			if(vratio >= 1)
+				mmaxtile = bh > (mscale * spow(vratio, 0));
+			else
+				mmaxtile = bh > (mscale * spow(vratio, n - 1));
 		}
 		else {
 			for(i = 0; i < nmaster; i++)
@@ -47,11 +53,18 @@ tile(void) {
 			mscale = wah / sum;
 			for(sum = 0, i = 0; i < (n - nmaster); i++)
 				sum += spow(vratio, i);
-			tscale = wah / sum;
+			sscale = wah / sum;
+			if(vratio >= 1) {
+				mmaxtile = bh > (mscale * spow(vratio, 0));
+				smaxtile = bh > (sscale * spow(vratio, 0));
+			}
+			else {
+				mmaxtile = bh > (mscale * spow(vratio, nmaster - 1));
+				smaxtile = bh > (sscale * spow(vratio, n - nmaster - 1));
+			}
 		}
 	}
-	nx = wax;
-	ny = way;
+	/* tiling */
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
 			unban(c);
@@ -60,25 +73,29 @@ tile(void) {
 			c->ismax = False;
 			if(i < nmaster) { /* master window */
 				nw = mw - 2 * c->border;
-				if(i + 1 == n || i + 1 == nmaster)
-					nh = (way + wah) - ny - (2 * c->border);
+				if(mmaxtile) {
+					ny = way;
+					nh = wah - 2 * c->border;
+				}
+				else if(i + 1 == (n < nmaster ? n : nmaster))
+					nh = (way + wah) - ny - 2 * c->border;
 				else
-					nh = (mscale * spow(vratio, i)) - (2 * c->border);
+					nh = (mscale * spow(vratio, i)) - 2 * c->border;
 			}
 			else { /* tile window */
+				nw = tw - 2 * c->border;
 				if(i == nmaster) {
 					ny = way;
 					nx = wax + mw;
 				}
-				nw = tw - 2 * c->border;
-				if(i + 1 == n)
-					nh = (way + wah) - ny - (2 * c->border);
+				if(smaxtile) {
+					ny = way;
+					nh = wah - 2 * c->border;
+				}
+				else if(i + 1 == n)
+					nh = (way + wah) - ny - 2 * c->border;
 				else
-					nh = (tscale * spow(vratio, i - nmaster)) - (2 * c->border);
-			}
-			if(nh < bh) {
-				nh = bh;
-				ny = way + wah - nh;
+					nh = (sscale * spow(vratio, i - nmaster)) - 2 * c->border;
 			}
 			resize(c, nx, ny, nw, nh, False);
 			ny += nh;
