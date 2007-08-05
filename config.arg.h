@@ -7,7 +7,7 @@
 #define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#222"
 #define NORMFGCOLOR		"#ccc"
-#define SELBORDERCOLOR		"#8c8"
+#define SELBORDERCOLOR		"#59a"
 #define SELBGCOLOR		"#555"
 #define SELFGCOLOR		"#fff"
 
@@ -44,7 +44,7 @@ static Key key[] = { \
 		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
 		" -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		"exec urxvtcd -tr -bg '#222' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
+		"exec urxvtcd -tr -bg '#111' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_h,		incnmaster,	"1" }, \
