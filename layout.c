@@ -8,130 +8,18 @@ Layout *lt = NULL;
 
 /* static */
 
-static double hratio = HRATIO;
-static double vratio = VRATIO;
 static unsigned int nlayouts = 0;
-static unsigned int nmaster = NMASTER;
-
-static double /* simple pow() */
-spow(double x, double y)
-{
-	if(y == 0)
-		return 1;
-	while(--y)
-		x *= x;
-	return x;
-}
-
-static void
-tile(void) {
-	Bool mmaxtile = False, smaxtile = False; /* fallback tiling */
-	double mscale = 0, sscale = 0, sum = 0;
-	unsigned int i, n, nx, ny, nw, nh, mw, tw;
-	Client *c;
-
-	/* preparation */
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
-		n++;
-	nx = wax;
-	ny = way;
-	mw = (n <= nmaster) ? waw :  waw / (1 + hratio);
-	tw = waw - mw;
-	if(n > 0) {
-		if(n <= nmaster) {
-			for(i = 0; i < n; i++)
-				sum += spow(vratio, i);
-			mscale = wah / sum;
-			if(vratio >= 1)
-				mmaxtile = bh > mscale;
-			else
-				mmaxtile = bh > (mscale * spow(vratio, n - 1));
-		}
-		else {
-			for(i = 0; i < nmaster; i++)
-				sum += spow(vratio, i);
-			mscale = wah / sum;
-			for(sum = 0, i = 0; i < (n - nmaster); i++)
-				sum += spow(vratio, i);
-			sscale = wah / sum;
-			if(vratio >= 1) {
-				mmaxtile = bh > mscale;
-				smaxtile = bh > sscale;
-			}
-			else {
-				mmaxtile = bh > (mscale * spow(vratio, nmaster - 1));
-				smaxtile = bh > (sscale * spow(vratio, n - nmaster - 1));
-			}
-		}
-	}
-	/* tiling */
-	for(i = 0, c = clients; c; c = c->next)
-		if(isvisible(c)) {
-			unban(c);
-			if(c->isfloating)
-				continue;
-			c->ismax = False;
-			if(i < nmaster) { /* master window */
-				nw = mw - 2 * c->border;
-				if(mmaxtile) {
-					ny = way;
-					nh = wah - 2 * c->border;
-				}
-				else if(i + 1 == (n < nmaster ? n : nmaster))
-					nh = (way + wah) - ny - 2 * c->border;
-				else
-					nh = (mscale * spow(vratio, i)) - 2 * c->border;
-			}
-			else { /* tile window */
-				nw = tw - 2 * c->border;
-				if(i == nmaster) {
-					ny = way;
-					nx = wax + mw;
-				}
-				if(smaxtile) {
-					ny = way;
-					nh = wah - 2 * c->border;
-				}
-				else if(i + 1 == n)
-					nh = (way + wah) - ny - 2 * c->border;
-				else
-					nh = (sscale * spow(vratio, i - nmaster)) - 2 * c->border;
-			}
-			resize(c, nx, ny, nw, nh, False);
-			ny += nh;
-			i++;
-		}
-		else
-			ban(c);
-	focus(NULL);
-	restack();
-}
 
 LAYOUTS
-
-static void
-incratio(const char *arg, double *ratio, double def) {
-	double delta;
-
-	if(lt->arrange != tile)
-		return;
-	if(!arg)
-		*ratio = def;
-	else {
-		if(1 == sscanf(arg, "%lf", &delta)) {
-			if(delta + (*ratio) < .1 || delta + (*ratio) > 1.9)
-				return;
-			*ratio += delta;
-		}
-	}
-	lt->arrange();
-}
 
 /* extern */
 
 void
-floating(void) {
+floating(const char *arg) {
 	Client *c;
+
+	if(lt->arrange != floating)
+		return;
 
 	for(c = clients; c; c = c->next)
 		if(isvisible(c)) {
@@ -166,35 +54,6 @@ focusclient(const char *arg) {
 		focus(c);
 		restack();
 	}
-}
-
-void
-inchratio(const char *arg) {
-	incratio(arg, &hratio, HRATIO);
-}
-
-void
-incvratio(const char *arg) {
-	incratio(arg, &vratio, VRATIO);
-}
-
-void
-incnmaster(const char *arg) {
-	int i;
-
-	if(!arg)
-		nmaster = NMASTER;
-	else {
-		i = atoi(arg);
-		if((lt->arrange != tile) || (nmaster + i < 1)
-		|| (wah / (nmaster + i) <= 2 * BORDERPX))
-			return;
-		nmaster += i;
-	}
-	if(sel)
-		lt->arrange();
-	else
-		drawstatus();
 }
 
 void
@@ -261,9 +120,68 @@ setlayout(const char *arg) {
 		lt = &layout[i];
 	}
 	if(sel)
-		lt->arrange();
+		lt->arrange(NULL);
 	else
 		drawstatus();
+}
+
+void
+tile(const char *arg) {
+	static double master = MASTER;
+	double delta;
+	unsigned int i, n, nx, ny, nw, nh, mw, th;
+	Client *c;
+
+	if(lt->arrange != tile)
+		return;
+
+	/* arg handling, manipulate master */
+	if(arg && (1 == sscanf(arg, "%lf", &delta))) {
+		if(delta + master > 0.1 && delta + master < 0.9)
+			master += delta;
+	}
+
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
+		n++;
+
+	/* window geoms */
+	mw = (n == 1) ? waw : master * waw;
+	th = (n > 1) ? wah / (n - 1) : 0;
+	if(n > 1 && th < bh)
+		th = wah;
+
+	nx = wax;
+	ny = way;
+	for(i = 0, c = clients; c; c = c->next)
+		if(isvisible(c)) {
+			unban(c);
+			if(c->isfloating)
+				continue;
+			c->ismax = False;
+			if(i == 0) { /* master */
+				nw = mw - 2 * c->border;
+				nh = wah - 2 * c->border;
+			}
+			else {  /* tile window */
+				if(i == 1) {
+					ny = way;
+					nx += mw;
+				}
+				nw = waw - mw - 2 * c->border;
+				if(i + 1 == n) /* remainder */
+					nh = (way + wah) - ny - 2 * c->border;
+				else
+					nh = th - 2 * c->border;
+			}
+			resize(c, nx, ny, nw, nh, False);
+			if(n > 1 && th != wah)
+				ny += nh;
+			i++;
+		}
+		else
+			ban(c);
+	focus(NULL);
+	restack();
 }
 
 void
@@ -273,7 +191,7 @@ togglebar(const char *arg) {
 	else
 		bpos = BarOff;
 	updatebarpos();
-	lt->arrange();
+	lt->arrange(NULL);
 }
 
 void
@@ -307,5 +225,5 @@ zoom(const char *arg) {
 	detach(c);
 	attach(c);
 	focus(c);
-	lt->arrange();
+	lt->arrange(NULL);
 }

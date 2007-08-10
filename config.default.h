@@ -25,15 +25,14 @@ static Rule rule[] = { \
 };
 
 /* layout(s) */
+void tile(const char *arg);		/* arranges all windows tiled */
 #define LAYOUTS \
 static Layout layout[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
 };
-#define NMASTER			1	/* clients in master area */
-#define HRATIO			.8	/* horizontal ratio of tile */
-#define VRATIO			1	/* vertical ratio of tile */
+#define MASTER			0.6	/* 0.1 .. 0.9 */
 #define SNAP			32	/* snap pixel */
 
 /* key definitions */
@@ -45,14 +44,10 @@ static Key key[] = { \
 	{ MODKEY,			XK_p,		spawn, 		"exe=`dmenu_path | dmenu` && exec $exe" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
-	{ MODKEY,			XK_h,		incnmaster,	"1" }, \
-	{ MODKEY,			XK_l,		incnmaster,	"-1" }, \
+	{ MODKEY,			XK_h,		tile,		"-0.05" }, \
 	{ MODKEY,			XK_j,		focusclient,	"1" }, \
 	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
-	{ MODKEY|ShiftMask,		XK_h,		inchratio,	".1" }, \
-	{ MODKEY|ShiftMask,		XK_l,		inchratio,	"-.1" }, \
-	{ MODKEY|ShiftMask,		XK_j,		incvratio,	"-.1" }, \
-	{ MODKEY|ShiftMask,		XK_k,		incvratio,	".1" }, \
+	{ MODKEY,			XK_l,		tile,		"0.05" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \
