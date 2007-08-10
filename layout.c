@@ -175,7 +175,7 @@ tile(const char *arg) {
 			}
 			resize(c, nx, ny, nw, nh, False);
 			if(n > 1 && th != wah)
-				ny += nh;
+				ny += nh + 2 * c->border;
 			i++;
 		}
 		else
