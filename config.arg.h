@@ -24,7 +24,8 @@ static Rule rule[] = { \
 };
 
 /* layout(s) */
-void tile(const char *arg);		/* arranges all windows tiled */
+#include "tile.h"
+#include "float.h"
 #define LAYOUTS \
 static Layout layout[] = { \
 	/* symbol		function */ \
@@ -46,10 +47,10 @@ static Key key[] = { \
 		"exec urxvtcd -tr -bg '#111' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
-	{ MODKEY,			XK_h,		tile,		"-0.05" }, \
 	{ MODKEY,			XK_j,		focusclient,	"1" }, \
 	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
-	{ MODKEY,			XK_l,		tile,		"0.05" }, \
+	{ MODKEY,			XK_h,		incmaster,	"-0.05" }, \
+	{ MODKEY,			XK_l,		incmaster,	"0.05" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \

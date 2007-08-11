@@ -216,7 +216,7 @@ configurenotify(XEvent *e) {
 		dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 		XResizeWindow(dpy, barwin, sw, bh);
 		updatebarpos();
-		lt->arrange(NULL);
+		lt->arrange();
 	}
 }
 
@@ -317,7 +317,7 @@ propertynotify(XEvent *e) {
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
 				if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
-					lt->arrange(NULL);
+					lt->arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
 				updatesizehints(c);

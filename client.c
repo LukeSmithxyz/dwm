@@ -230,7 +230,7 @@ manage(Window w, XWindowAttributes *wa) {
 	setclientstate(c, IconicState);
 	c->isbanned = True;
 	focus(c);
-	lt->arrange(NULL);
+	lt->arrange();
 }
 
 void
@@ -305,7 +305,7 @@ togglefloating(const char *arg) {
 	sel->isfloating = !sel->isfloating;
 	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-	lt->arrange(NULL);
+	lt->arrange();
 }
 
 void
@@ -337,7 +337,7 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	lt->arrange(NULL);
+	lt->arrange();
 }
 
 void
