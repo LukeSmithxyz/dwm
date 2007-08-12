@@ -4,23 +4,22 @@
 
 /* static */
 
-static double master = MASTER;
+static double mwfact = MWFACT;
 
 /* extern */
 
 void
-incmaster(const char *arg) {
+addtomwfact(const char *arg) {
 	double delta;
 
 	if(lt->arrange != tile)
 		return;
 
-	/* arg handling, manipulate master */
+	/* arg handling, manipulate mwfact */
 	if(arg && (1 == sscanf(arg, "%lf", &delta))) {
-		if(delta + master > 0.1 && delta + master < 0.9)
-			master += delta;
+		if(delta + mwfact > 0.1 && delta + mwfact < 0.9)
+			mwfact += delta;
 	}
-
 	lt->arrange();
 }
 
@@ -33,7 +32,7 @@ tile(void) {
 		n++;
 
 	/* window geoms */
-	mw = (n == 1) ? waw : master * waw;
+	mw = (n == 1) ? waw : mwfact * waw;
 	th = (n > 1) ? wah / (n - 1) : 0;
 	if(n > 1 && th < bh)
 		th = wah;

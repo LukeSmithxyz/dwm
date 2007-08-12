@@ -32,7 +32,7 @@ static Layout layout[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
 };
-#define MASTER			0.6	/* 0.1 .. 0.9 */
+#define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define SNAP			32	/* snap pixel */
 
 /* key definitions */
@@ -49,8 +49,8 @@ static Key key[] = { \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_j,		focusclient,	"1" }, \
 	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
-	{ MODKEY,			XK_h,		incmaster,	"-0.05" }, \
-	{ MODKEY,			XK_l,		incmaster,	"0.05" }, \
+	{ MODKEY,			XK_h,		addtomwfact,	"-0.05" }, \
+	{ MODKEY,			XK_l,		addtomwfact,	"0.05" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \
