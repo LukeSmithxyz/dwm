@@ -3,8 +3,8 @@ VERSION = 4.4
 
 # Customize below to fit your system
 
-# layouts
-SRC = float.c tile.c
+# additional layouts beside floating
+SRC = tile.c
 
 # paths
 PREFIX = /usr/local

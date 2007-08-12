@@ -26,7 +26,6 @@ static Rule rule[] = { \
 
 /* layout(s) */
 #include "tile.h"
-#include "float.h"
 #define LAYOUTS \
 static Layout layout[] = { \
 	/* symbol		function */ \

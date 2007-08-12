@@ -120,12 +120,14 @@ unsigned int textw(const char *text);	/* return the width of text in px*/
 void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
+void floating(void);			/* arranges all windows floating, fallback layout  */
 void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
 void initlayouts(void);			/* initialize layout array */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */
 void setlayout(const char *arg);	/* sets layout, NULL means next layout */
 void togglebar(const char *arg);	/* shows/hides the bar */
+void togglemax(const char *arg);	/* toggles maximization of floating client */
 
 /* main.c */
 void updatebarpos(void);		/* updates the bar position */
