@@ -81,7 +81,7 @@ extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
 extern unsigned int ntags, numlockmask;		/* number of tags, numlock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern Atom wmatom[WMLast], netatom[NetLast];
+extern Atom dwmtags, wmatom[WMLast], netatom[NetLast];
 extern Bool selscreen, *seltag;			/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];

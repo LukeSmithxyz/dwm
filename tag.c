@@ -3,6 +3,8 @@
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
 /* static */
@@ -23,6 +25,7 @@ RULES
 
 static Regs *regs = NULL;
 static unsigned int nrules = 0;
+static char prop[512];
 
 /* extern */
 
@@ -65,16 +68,32 @@ isvisible(Client *c) {
 
 void
 settags(Client *c, Client *trans) {
-	char prop[512];
 	unsigned int i, j;
 	regmatch_t tmp;
 	Bool matched = trans != NULL;
 	XClassHint ch = { 0 };
+	XTextProperty name;
 
-	if(matched)
+	if(matched) {
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = trans->tags[i];
+		return;
+	}
 	else {
+		/* check if window has set a property */
+		name.nitems = 0;
+		XGetTextProperty(dpy, c->win, &name, dwmtags);
+		if(name.nitems && name.encoding == XA_STRING) {
+			strncpy(prop, (char *)name.value, sizeof prop - 1);
+			prop[sizeof prop - 1] = '\0';
+			XFree(name.value);
+			for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
+				if((c->tags[i] = prop[i] == '+'))
+					matched = True;
+		}
+		if(matched)
+			return;
+		/* rule matching */
 		XGetClassHint(dpy, c->win, &ch);
 		snprintf(prop, sizeof prop, "%s:%s:%s",
 				ch.res_class ? ch.res_class : "",
@@ -110,6 +129,12 @@ tag(const char *arg) {
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
+	if(sel) {
+		for(i = 0; i < ntags && i < sizeof prop - 1; i++)
+			prop[i] = sel->tags[i] ? '+' : '-';
+		prop[i] = '\0';
+		XChangeProperty(dpy, sel->win, dwmtags, XA_STRING, 8, PropModeReplace, (unsigned char *)prop, i);
+	}
 	arrange();
 }
 

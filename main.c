@@ -19,7 +19,7 @@ int screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int bh, ntags;
 unsigned int bpos = BARPOS;
 unsigned int numlockmask = 0;
-Atom wmatom[WMLast], netatom[NetLast];
+Atom dwmtags, wmatom[WMLast], netatom[NetLast];
 Bool *seltag;
 Bool selscreen = True;
 Client *clients = NULL;
@@ -139,6 +139,7 @@ setup(void) {
 	XSetWindowAttributes wa;
 
 	/* init atoms */
+	dwmtags = XInternAtom(dpy, "__DWM_TAGS", False);
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);

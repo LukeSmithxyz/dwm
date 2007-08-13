@@ -2,6 +2,8 @@
 #include "dwm.h"
 #include <stdlib.h>
 
+/* static */
+
 typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
@@ -10,10 +12,8 @@ typedef struct {
 unsigned int blw = 0;
 static Layout *lt = NULL;
 
-/* static */
-
 static void
-floating(void) {
+floating(void) { /* default floating layout */
 	Client *c;
 
 	for(c = clients; c; c = c->next)
