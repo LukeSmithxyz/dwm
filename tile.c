@@ -12,7 +12,7 @@ void
 addtomwfact(const char *arg) {
 	double delta;
 
-	if(isarrange(tile))
+	if(!isarrange(tile))
 		return;
 
 	/* arg handling, manipulate mwfact */
