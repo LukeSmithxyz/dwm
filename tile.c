@@ -39,31 +39,28 @@ tile(void) {
 
 	nx = wax;
 	ny = way;
-	for(i = 0, c = clients; c; c = c->next)
-		if(isvisible(c)) {
-			if(c->isfloating)
-				continue;
-			c->ismax = False;
-			if(i == 0) { /* master */
-				nw = mw - 2 * c->border;
-				nh = wah - 2 * c->border;
-			}
-			else {  /* tile window */
-				if(i == 1) {
-					ny = way;
-					nx += mw;
-				}
-				nw = waw - mw - 2 * c->border;
-				if(i + 1 == n) /* remainder */
-					nh = (way + wah) - ny - 2 * c->border;
-				else
-					nh = th - 2 * c->border;
-			}
-			resize(c, nx, ny, nw, nh, False);
-			if(n > 1 && th != wah)
-				ny += nh + 2 * c->border;
-			i++;
+	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next)) {
+		c->ismax = False;
+		if(i == 0) { /* master */
+			nw = mw - 2 * c->border;
+			nh = wah - 2 * c->border;
 		}
+		else {  /* tile window */
+			if(i == 1) {
+				ny = way;
+				nx += mw;
+			}
+			nw = waw - mw - 2 * c->border;
+			if(i + 1 == n) /* remainder */
+				nh = (way + wah) - ny - 2 * c->border;
+			else
+				nh = th - 2 * c->border;
+		}
+		resize(c, nx, ny, nw, nh, False);
+		if(n > 1 && th != wah)
+			ny += nh + 2 * c->border;
+		i++;
+	}
 }
 
 void
