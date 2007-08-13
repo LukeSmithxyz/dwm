@@ -2,10 +2,24 @@
 #include "dwm.h"
 #include <stdlib.h>
 
+typedef struct {
+	const char *symbol;
+	void (*arrange)(void);
+} Layout;
+
 unsigned int blw = 0;
-Layout *lt = NULL;
+static Layout *lt = NULL;
 
 /* static */
+
+static void
+floating(void) {
+	Client *c;
+
+	for(c = clients; c; c = c->next)
+		if(isvisible(c))
+			resize(c, c->x, c->y, c->w, c->h, True);
+}
 
 static unsigned int nlayouts = 0;
 
@@ -14,19 +28,15 @@ LAYOUTS
 /* extern */
 
 void
-floating(void) {
+arrange(void) {
 	Client *c;
 
-	if(lt->arrange != floating)
-		return;
-
 	for(c = clients; c; c = c->next)
-		if(isvisible(c)) {
+		if(isvisible(c))
 			unban(c);
-			resize(c, c->x, c->y, c->w, c->h, True);
-		}
 		else
 			ban(c);
+	lt->arrange();
 	focus(NULL);
 	restack();
 }
@@ -53,6 +63,23 @@ focusclient(const char *arg) {
 		focus(c);
 		restack();
 	}
+}
+
+const char *
+getsymbol(void)
+{
+	return lt->symbol;
+}
+
+Bool
+isfloating(void) {
+	return lt->arrange == floating;
+}
+
+Bool
+isarrange(void (*func)())
+{
+	return func == lt->arrange;
 }
 
 void
@@ -119,7 +146,7 @@ setlayout(const char *arg) {
 		lt = &layout[i];
 	}
 	if(sel)
-		lt->arrange();
+		arrange();
 	else
 		drawstatus();
 }
@@ -131,7 +158,7 @@ togglebar(const char *arg) {
 	else
 		bpos = BarOff;
 	updatebarpos();
-	lt->arrange();
+	arrange();
 }
 
 void

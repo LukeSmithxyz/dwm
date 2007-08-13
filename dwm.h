@@ -74,11 +74,6 @@ typedef struct {
 	} font;
 } DC; /* draw context */
 
-typedef struct {
-	const char *symbol;
-	void (*arrange)(void);
-} Layout;
-
 extern const char *tags[];			/* all tags */
 extern char stext[256];				/* status text */
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
@@ -92,7 +87,6 @@ extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
 extern Display *dpy;
-extern Layout *lt;
 extern Window root, barwin;
 
 /* client.c */
@@ -120,8 +114,11 @@ unsigned int textw(const char *text);	/* return the width of text in px*/
 void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
-void floating(void);			/* arranges all windows floating, fallback layout  */
+void arrange(void);			/* arranges all windows depending on the layout in use */
 void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
+const char *getsymbol(void);		/* returns True  symbol of enabled layout */
+Bool isfloating(void);			/* returns True if floating layout is enabled */
+Bool isarrange(void (*func)());		/* returns True if func is the layout function in use */
 void initlayouts(void);			/* initialize layout array */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */

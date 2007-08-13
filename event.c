@@ -145,14 +145,14 @@ buttonpress(XEvent *e) {
 		focus(c);
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
-		if(ev->button == Button1 && (lt->arrange == floating || c->isfloating)) {
+		if(ev->button == Button1 && (isfloating() || c->isfloating)) {
 			restack();
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
 		else if(ev->button == Button3
-		&& (lt->arrange == floating || c->isfloating) && !c->isfixed)
+		&& (isfloating() || c->isfloating) && !c->isfixed)
 		{
 			restack();
 			resizemouse(c);
@@ -170,7 +170,7 @@ configurerequest(XEvent *e) {
 		c->ismax = False;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-		if(c->isfixed || c->isfloating || (lt->arrange == floating)) {
+		if(c->isfixed || c->isfloating || isfloating()) {
 			if(ev->value_mask & CWX)
 				c->x = ev->x;
 			if(ev->value_mask & CWY)
@@ -216,7 +216,7 @@ configurenotify(XEvent *e) {
 		dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 		XResizeWindow(dpy, barwin, sw, bh);
 		updatebarpos();
-		lt->arrange();
+		arrange();
 	}
 }
 
@@ -317,7 +317,7 @@ propertynotify(XEvent *e) {
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
 				if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
-					lt->arrange();
+					arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
 				updatesizehints(c);

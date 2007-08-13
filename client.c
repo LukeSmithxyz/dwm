@@ -230,13 +230,14 @@ manage(Window w, XWindowAttributes *wa) {
 	setclientstate(c, IconicState);
 	c->isbanned = True;
 	focus(c);
-	lt->arrange();
+	arrange();
 }
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	double dx, dy, max, min, ratio;
 	XWindowChanges wc; 
+
 	if(sizehints) {
 		if(c->minay > 0 && c->maxay > 0 && (h - c->baseh) > 0 && (w - c->basew) > 0) {
 			dx = (double)(w - c->basew);
@@ -297,12 +298,12 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 void
 togglefloating(const char *arg) {
-	if(!sel || lt->arrange == floating)
+	if(!sel || isfloating())
 		return;
 	sel->isfloating = !sel->isfloating;
 	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-	lt->arrange();
+	arrange();
 }
 
 void
@@ -334,7 +335,7 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	lt->arrange();
+	arrange();
 }
 
 void

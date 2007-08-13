@@ -12,7 +12,7 @@ void
 addtomwfact(const char *arg) {
 	double delta;
 
-	if(lt->arrange != tile)
+	if(isarrange(tile))
 		return;
 
 	/* arg handling, manipulate mwfact */
@@ -20,7 +20,7 @@ addtomwfact(const char *arg) {
 		if(delta + mwfact > 0.1 && delta + mwfact < 0.9)
 			mwfact += delta;
 	}
-	lt->arrange();
+	arrange();
 }
 
 void
@@ -41,7 +41,6 @@ tile(void) {
 	ny = way;
 	for(i = 0, c = clients; c; c = c->next)
 		if(isvisible(c)) {
-			unban(c);
 			if(c->isfloating)
 				continue;
 			c->ismax = False;
@@ -65,17 +64,13 @@ tile(void) {
 				ny += nh + 2 * c->border;
 			i++;
 		}
-		else
-			ban(c);
-	focus(NULL);
-	restack();
 }
 
 void
 zoom(const char *arg) {
 	Client *c;
 
-	if(!sel || lt->arrange == floating || sel->isfloating)
+	if(!sel || !isarrange(tile) || sel->isfloating)
 		return;
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
@@ -83,5 +78,5 @@ zoom(const char *arg) {
 	detach(c);
 	attach(c);
 	focus(c);
-	lt->arrange();
+	arrange();
 }

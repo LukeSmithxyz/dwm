@@ -66,7 +66,7 @@ drawstatus(void) {
 		dc.x += dc.w;
 	}
 	dc.w = blw;
-	drawtext(lt->symbol, dc.norm);
+	drawtext(getsymbol(), dc.norm);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = sw - dc.w;
