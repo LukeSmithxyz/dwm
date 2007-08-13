@@ -27,6 +27,18 @@ static Regs *regs = NULL;
 static unsigned int nrules = 0;
 static char prop[512];
 
+static void
+persisttags(Client *c)
+{
+	unsigned int i;
+
+	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
+		prop[i] = c->tags[i] ? '+' : '-';
+	prop[i] = '\0';
+	XChangeProperty(dpy, c->win, dwmtags, XA_STRING, 8,
+			PropModeReplace, (unsigned char *)prop, i);
+}
+
 /* extern */
 
 void
@@ -77,7 +89,6 @@ settags(Client *c, Client *trans) {
 	if(matched) {
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = trans->tags[i];
-		return;
 	}
 	else {
 		/* check if window has set a property */
@@ -91,8 +102,8 @@ settags(Client *c, Client *trans) {
 				if((c->tags[i] = prop[i] == '+'))
 					matched = True;
 		}
-		if(matched)
-			return;
+	}
+	if(!matched) {
 		/* rule matching */
 		XGetClassHint(dpy, c->win, &ch);
 		snprintf(prop, sizeof prop, "%s:%s:%s",
@@ -116,6 +127,7 @@ settags(Client *c, Client *trans) {
 	if(!matched)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = seltag[i];
+	persisttags(c);
 }
 
 void
@@ -129,12 +141,8 @@ tag(const char *arg) {
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
-	if(sel) {
-		for(i = 0; i < ntags && i < sizeof prop - 1; i++)
-			prop[i] = sel->tags[i] ? '+' : '-';
-		prop[i] = '\0';
-		XChangeProperty(dpy, sel->win, dwmtags, XA_STRING, 8, PropModeReplace, (unsigned char *)prop, i);
-	}
+	if(sel)
+		persisttags(sel);
 	arrange();
 }
 
@@ -149,6 +157,8 @@ toggletag(const char *arg) {
 	for(j = 0; j < ntags && !sel->tags[j]; j++);
 	if(j == ntags)
 		sel->tags[i] = True;
+	if(sel)
+		persisttags(sel);
 	arrange();
 }
 
