@@ -235,17 +235,14 @@ manage(Window w, XWindowAttributes *wa) {
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
-	float dx, dy, max, min, ratio;
-	XWindowChanges wc;
-
-	if(w <= 0 || h <= 0)
-		return;
+	double dx, dy, max, min, ratio;
+	XWindowChanges wc; 
 	if(sizehints) {
-		if(c->minay > 0 && c->maxay > 0 && (h - c->baseh) > 0) {
-			dx = (float)(w - c->basew);
-			dy = (float)(h - c->baseh);
-			min = (float)(c->minax) / (float)(c->minay);
-			max = (float)(c->maxax) / (float)(c->maxay);
+		if(c->minay > 0 && c->maxay > 0 && (h - c->baseh) > 0 && (w - c->basew) > 0) {
+			dx = (double)(w - c->basew);
+			dy = (double)(h - c->baseh);
+			min = (double)(c->minax) / (double)(c->minay);
+			max = (double)(c->maxax) / (double)(c->maxay);
 			ratio = dx / dy;
 			if(max > 0 && min > 0 && ratio > 0) {
 				if(ratio < min) {
@@ -274,9 +271,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 			w -= (w - c->basew) % c->incw;
 		if(c->inch)
 			h -= (h - c->baseh) % c->inch;
+		if(w <= 0 || h <= 0)
+			return;
 	}
-	if(w <= 0 || h <= 0)
-		return;
 	/* offscreen appearance fixes */
 	if(x > sw)
 		x = sw - w - 2 * c->border;
