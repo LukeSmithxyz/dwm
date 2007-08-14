@@ -272,9 +272,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 			w -= (w - c->basew) % c->incw;
 		if(c->inch)
 			h -= (h - c->baseh) % c->inch;
-		if(w <= 0 || h <= 0)
-			return;
 	}
+	if(w <= 0 || h <= 0)
+		return;
 	/* offscreen appearance fixes */
 	if(x > sw)
 		x = sw - w - 2 * c->border;
