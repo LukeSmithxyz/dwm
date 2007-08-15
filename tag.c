@@ -144,8 +144,7 @@ tag(const char *arg) {
 	i = arg ? atoi(arg) : 0;
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
-	if(sel)
-		persistconfig(sel);
+	persistconfig(sel);
 	arrange();
 }
 
@@ -154,8 +153,10 @@ togglefloating(const char *arg) {
 	if(!sel || isfloating())
 		return;
 	sel->isfloating = !sel->isfloating;
-	if(sel->isfloating)
+	if(sel->isfloating) {
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
+		persistconfig(sel);
+	}
 	arrange();
 }
 
@@ -170,8 +171,7 @@ toggletag(const char *arg) {
 	for(j = 0; j < ntags && !sel->tags[j]; j++);
 	if(j == ntags)
 		sel->tags[i] = True;
-	if(sel)
-		persistconfig(sel);
+	persistconfig(sel);
 	arrange();
 }
 
