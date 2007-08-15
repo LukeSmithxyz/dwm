@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
 /* static */
 
@@ -226,7 +227,7 @@ destroynotify(XEvent *e) {
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
 	if((c = getclient(ev->window)))
-		unmanage(c);
+		unmanage(c, WithdrawnState);
 }
 
 static void
@@ -338,7 +339,7 @@ unmapnotify(XEvent *e) {
 
 	if((c = getclient(ev->window)) && (ev->event == root)) {
 		if(ev->send_event || c->unmapped-- == 0)
-			unmanage(c);
+			unmanage(c, WithdrawnState);
 	}
 }
 

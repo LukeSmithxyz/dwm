@@ -81,7 +81,7 @@ extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
 extern unsigned int ntags, numlockmask;		/* number of tags, numlock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern Atom dwmtags, wmatom[WMLast], netatom[NetLast];
+extern Atom dwmconfig, wmatom[WMLast], netatom[NetLast];
 extern Bool selscreen, *seltag;			/* seltag is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
@@ -99,9 +99,8 @@ void killclient(const char *arg);	/* kill sel  nicely */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
 void unban(Client *c);			/* unbans c */
-void unmanage(Client *c);		/* destroy c */
+void unmanage(Client *c, long state);	/* unmanage c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
 
@@ -136,6 +135,7 @@ void compileregs(void);			/* initialize regexps of rules defined in config.h */
 Bool isvisible(Client *c);		/* returns True if client is visible */
 void settags(Client *c, Client *trans);	/* sets tags of c */
 void tag(const char *arg);		/* tags sel with arg's index */
+void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
 void toggletag(const char *arg);	/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
 void view(const char *arg);		/* views the tag with arg's index */

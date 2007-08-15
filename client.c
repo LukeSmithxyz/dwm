@@ -297,16 +297,6 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-togglefloating(const char *arg) {
-	if(!sel || isfloating())
-		return;
-	sel->isfloating = !sel->isfloating;
-	if(sel->isfloating)
-		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-	arrange();
-}
-
-void
 unban(Client *c) {
 	if(!c->isbanned)
 		return;
@@ -316,7 +306,7 @@ unban(Client *c) {
 }
 
 void
-unmanage(Client *c) {
+unmanage(Client *c, long state) {
 	XWindowChanges wc;
 
 	wc.border_width = c->oldborder;
@@ -329,7 +319,7 @@ unmanage(Client *c) {
 	if(sel == c)
 		focus(NULL);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	setclientstate(c, WithdrawnState);
+	setclientstate(c, state);
 	free(c->tags);
 	free(c);
 	XSync(dpy, False);

@@ -28,14 +28,15 @@ static unsigned int nrules = 0;
 static char prop[512];
 
 static void
-persisttags(Client *c)
-{
+persistconfig(Client *c) {
 	unsigned int i;
 
 	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
-		prop[i] = c->tags[i] ? '+' : '-';
+		prop[i] = c->tags[i] ? '1' : '0';
+	if(i < sizeof prop - 1)
+		prop[i++] = c->isfloating ? '1' : '0';
 	prop[i] = '\0';
-	XChangeProperty(dpy, c->win, dwmtags, XA_STRING, 8,
+	XChangeProperty(dpy, c->win, dwmconfig, XA_STRING, 8,
 			PropModeReplace, (unsigned char *)prop, i);
 }
 
@@ -93,14 +94,16 @@ settags(Client *c, Client *trans) {
 	else {
 		/* check if window has set a property */
 		name.nitems = 0;
-		XGetTextProperty(dpy, c->win, &name, dwmtags);
+		XGetTextProperty(dpy, c->win, &name, dwmconfig);
 		if(name.nitems && name.encoding == XA_STRING) {
 			strncpy(prop, (char *)name.value, sizeof prop - 1);
 			prop[sizeof prop - 1] = '\0';
 			XFree(name.value);
 			for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
-				if((c->tags[i] = prop[i] == '+'))
+				if((c->tags[i] = prop[i] == '1'))
 					matched = True;
+			if(i < sizeof prop - 1 && prop[i] != '\0')
+				c->isfloating = prop[i] == '1';
 		}
 	}
 	if(!matched) {
@@ -127,7 +130,7 @@ settags(Client *c, Client *trans) {
 	if(!matched)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = seltag[i];
-	persisttags(c);
+	persistconfig(c);
 }
 
 void
@@ -142,7 +145,17 @@ tag(const char *arg) {
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
 	if(sel)
-		persisttags(sel);
+		persistconfig(sel);
+	arrange();
+}
+
+void
+togglefloating(const char *arg) {
+	if(!sel || isfloating())
+		return;
+	sel->isfloating = !sel->isfloating;
+	if(sel->isfloating)
+		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
 	arrange();
 }
 
@@ -158,7 +171,7 @@ toggletag(const char *arg) {
 	if(j == ntags)
 		sel->tags[i] = True;
 	if(sel)
-		persisttags(sel);
+		persistconfig(sel);
 	arrange();
 }
 

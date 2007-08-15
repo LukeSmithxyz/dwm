@@ -11,6 +11,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
+#include <X11/Xutil.h>
 
 /* extern */
 
@@ -19,7 +20,7 @@ int screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int bh, ntags;
 unsigned int bpos = BARPOS;
 unsigned int numlockmask = 0;
-Atom dwmtags, wmatom[WMLast], netatom[NetLast];
+Atom dwmconfig, wmatom[WMLast], netatom[NetLast];
 Bool *seltag;
 Bool selscreen = True;
 Client *clients = NULL;
@@ -41,7 +42,7 @@ cleanup(void) {
 	close(STDIN_FILENO);
 	while(stack) {
 		unban(stack);
-		unmanage(stack);
+		unmanage(stack, NormalState);
 	}
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
@@ -139,7 +140,7 @@ setup(void) {
 	XSetWindowAttributes wa;
 
 	/* init atoms */
-	dwmtags = XInternAtom(dpy, "__DWM_TAGS", False);
+	dwmconfig = XInternAtom(dpy, "_DWM_CONFIG", False);
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
