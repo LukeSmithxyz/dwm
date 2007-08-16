@@ -17,7 +17,7 @@ const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 /* Query class:instance:title for regex matching info with following command:
  * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
 #define RULES \
-static Rule rule[] = { \
+static Rule rules[] = { \
 	/* class:instance:title regex	tags regex	isfloating */ \
 	{ "Gimp",			NULL,		True }, \
 	{ "MPlayer",			NULL,		True }, \
@@ -27,7 +27,7 @@ static Rule rule[] = { \
 /* layout(s) */
 #include "tile.h"
 #define LAYOUTS \
-static Layout layout[] = { \
+static Layout layouts[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
@@ -38,7 +38,7 @@ static Layout layout[] = { \
 /* key definitions */
 #define MODKEY			Mod1Mask
 #define KEYS \
-Key key[] = { \
+Key keys[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn,		"exec xterm" }, \
 	{ MODKEY,			XK_p,		spawn, 		"exe=`dmenu_path | dmenu` && exec $exe" }, \

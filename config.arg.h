@@ -15,7 +15,7 @@
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
 #define RULES \
-static Rule rule[] = { \
+static Rule rules[] = { \
 	/* class:instance:title regex	tags regex	isfloating */ \
 	{ "Firefox",			"3",		False }, \
 	{ "Gimp",			NULL,		True }, \
@@ -26,7 +26,7 @@ static Rule rule[] = { \
 /* layout(s) */
 #include "tile.h"
 #define LAYOUTS \
-static Layout layout[] = { \
+static Layout layouts[] = { \
 	/* symbol		function */ \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
@@ -37,7 +37,7 @@ static Layout layout[] = { \
 /* key definitions */
 #define MODKEY			Mod1Mask
 #define KEYS \
-Key key[] = { \
+Key keys[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY,			XK_p,		spawn, \
 		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \

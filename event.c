@@ -252,18 +252,18 @@ expose(XEvent *e) {
 static void
 keypress(XEvent *e) {
 	KEYS
-	unsigned int len = sizeof key / sizeof key[0];
+	unsigned int len = sizeof keys / sizeof keys[0];
 	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
 
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++)
-		if(keysym == key[i].keysym
-		&& CLEANMASK(key[i].mod) == CLEANMASK(ev->state))
+		if(keysym == keys[i].keysym
+		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state))
 		{
-			if(key[i].func)
-				key[i].func(key[i].arg);
+			if(keys[i].func)
+				keys[i].func(keys[i].arg);
 		}
 }
 
@@ -358,20 +358,20 @@ void (*handler[LASTEvent]) (XEvent *) = {
 void
 grabkeys(void) {
 	KEYS
-	unsigned int len = sizeof key / sizeof key[0];
+	unsigned int len = sizeof keys / sizeof keys[0];
 	unsigned int i;
 	KeyCode code;
 
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	for(i = 0; i < len; i++) {
-		code = XKeysymToKeycode(dpy, key[i].keysym);
-		XGrabKey(dpy, code, key[i].mod, root, True,
+		code = XKeysymToKeycode(dpy, keys[i].keysym);
+		XGrabKey(dpy, code, keys[i].mod, root, True,
 				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, key[i].mod | LockMask, root, True,
+		XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, key[i].mod | numlockmask, root, True,
+		XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
 				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, key[i].mod | numlockmask | LockMask, root, True,
+		XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
 	}
 }

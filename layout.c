@@ -94,10 +94,10 @@ void
 initlayouts(void) {
 	unsigned int i, w;
 
-	lt = &layout[0];
-	nlayouts = sizeof layout / sizeof layout[0];
+	lt = &layouts[0];
+	nlayouts = sizeof layouts / sizeof layouts[0];
 	for(blw = i = 0; i < nlayouts; i++) {
-		w = textw(layout[i].symbol);
+		w = textw(layouts[i].symbol);
 		if(w > blw)
 			blw = w;
 	}
@@ -144,14 +144,14 @@ setlayout(const char *arg) {
 
 	if(!arg) {
 		lt++;
-		if(lt == layout + nlayouts)
-			lt = layout;
+		if(lt == layouts + nlayouts)
+			lt = layouts;
 	}
 	else {
 		i = atoi(arg);
 		if(i < 0 || i >= nlayouts)
 			return;
-		lt = &layout[i];
+		lt = &layouts[i];
 	}
 	if(sel)
 		arrange();

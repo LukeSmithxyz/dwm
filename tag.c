@@ -59,19 +59,19 @@ compileregs(void) {
 
 	if(regs)
 		return;
-	nrules = sizeof rule / sizeof rule[0];
+	nrules = sizeof rules / sizeof rules[0];
 	regs = emallocz(nrules * sizeof(Regs));
 	for(i = 0; i < nrules; i++) {
-		if(rule[i].prop) {
+		if(rules[i].prop) {
 			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].prop, REG_EXTENDED))
+			if(regcomp(reg, rules[i].prop, REG_EXTENDED))
 				free(reg);
 			else
 				regs[i].propregex = reg;
 		}
-		if(rule[i].tags) {
+		if(rules[i].tags) {
 			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rule[i].tags, REG_EXTENDED))
+			if(regcomp(reg, rules[i].tags, REG_EXTENDED))
 				free(reg);
 			else
 				regs[i].tagregex = reg;
@@ -124,7 +124,7 @@ settags(Client *c, Client *trans) {
 				ch.res_name ? ch.res_name : "", c->name);
 		for(i = 0; i < nrules; i++)
 			if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
-				c->isfloating = rule[i].isfloating;
+				c->isfloating = rules[i].isfloating;
 				for(j = 0; regs[i].tagregex && j < ntags; j++) {
 					if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 						matched = True;
