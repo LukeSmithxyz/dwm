@@ -16,7 +16,9 @@ addtomwfact(const char *arg) {
 		return;
 
 	/* arg handling, manipulate mwfact */
-	if(arg && (1 == sscanf(arg, "%lf", &delta))) {
+	if(arg == NULL)
+		mwfact = MWFACT;
+	else if(1 == sscanf(arg, "%lf", &delta)) {
 		if(delta + mwfact > 0.1 && delta + mwfact < 0.9)
 			mwfact += delta;
 	}
