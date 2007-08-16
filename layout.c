@@ -42,22 +42,30 @@ arrange(void) {
 }
 
 void
-focusclient(const char *arg) {
+focusnext(const char *arg) {
 	Client *c;
-   
-	if(!sel || !arg)
+
+	if(!sel)
 		return;
-	if(atoi(arg) < 0) {
-		for(c = sel->prev; c && !isvisible(c); c = c->prev);
-		if(!c) {
-			for(c = clients; c && c->next; c = c->next);
-			for(; c && !isvisible(c); c = c->prev);
-		}
+	for(c = sel->next; c && !isvisible(c); c = c->next);
+	if(!c)
+		for(c = clients; c && !isvisible(c); c = c->next);
+	if(c) {
+		focus(c);
+		restack();
 	}
-	else {
-		for(c = sel->next; c && !isvisible(c); c = c->next);
-		if(!c)
-			for(c = clients; c && !isvisible(c); c = c->next);
+}
+
+void
+focusprev(const char *arg) {
+	Client *c;
+
+	if(!sel)
+		return;
+	for(c = sel->prev; c && !isvisible(c); c = c->prev);
+	if(!c) {
+		for(c = clients; c && c->next; c = c->next);
+		for(; c && !isvisible(c); c = c->prev);
 	}
 	if(c) {
 		focus(c);

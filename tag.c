@@ -40,6 +40,16 @@ persistconfig(Client *c) {
 			PropModeReplace, (unsigned char *)prop, i);
 }
 
+static unsigned int
+idxoftag(const char *tag) {
+	unsigned int i;
+
+	for(i = 0; i < ntags; i++)
+		if(tags[i] == tag)
+			return i;
+	return 0;
+}
+
 /* extern */
 
 void
@@ -135,13 +145,13 @@ settags(Client *c, Client *trans) {
 
 void
 tag(const char *arg) {
-	int i;
+	unsigned int i;
 
 	if(!sel)
 		return;
 	for(i = 0; i < ntags; i++)
 		sel->tags[i] = arg == NULL;
-	i = arg ? atoi(arg) : 0;
+	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
 	persistconfig(sel);
@@ -162,11 +172,11 @@ togglefloating(const char *arg) {
 
 void
 toggletag(const char *arg) {
-	int i, j;
+	unsigned int i, j;
 
 	if(!sel)
 		return;
-	i = arg ? atoi(arg) : 0;
+	i = idxoftag(arg);
 	sel->tags[i] = !sel->tags[i];
 	for(j = 0; j < ntags && !sel->tags[j]; j++);
 	if(j == ntags)
@@ -177,9 +187,9 @@ toggletag(const char *arg) {
 
 void
 toggleview(const char *arg) {
-	int i, j;
+	unsigned int i, j;
 
-	i = arg ? atoi(arg) : 0;
+	i = idxoftag(arg);
 	seltag[i] = !seltag[i];
 	for(j = 0; j < ntags && !seltag[j]; j++);
 	if(j == ntags)
@@ -189,11 +199,11 @@ toggleview(const char *arg) {
 
 void
 view(const char *arg) {
-	int i;
+	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
 		seltag[i] = arg == NULL;
-	i = arg ? atoi(arg) : 0;
+	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		seltag[i] = True;
 	arrange();

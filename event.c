@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 #include "dwm.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -14,8 +13,6 @@ typedef struct {
 	void (*func)(const char *arg);
 	const char *arg;
 } Key;
-
-KEYS
 
 #define CLEANMASK(mask)		(mask & ~(numlockmask | LockMask))
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
@@ -112,29 +109,26 @@ resizemouse(Client *c) {
 
 static void
 buttonpress(XEvent *e) {
-	static char buf[32];
 	unsigned int i, x;
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	buf[0] = 0;
 	if(barwin == ev->window) {
 		x = 0;
 		for(i = 0; i < ntags; i++) {
 			x += textw(tags[i]);
 			if(ev->x < x) {
-				snprintf(buf, sizeof buf, "%d", i);
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
-						tag(buf);
+						tag(tags[i]);
 					else
-						view(buf);
+						view(tags[i]);
 				}
 				else if(ev->button == Button3) {
 					if(ev->state & MODKEY)
-						toggletag(buf);
+						toggletag(tags[i]);
 					else
-						toggleview(buf);
+						toggleview(tags[i]);
 				}
 				return;
 			}
@@ -257,7 +251,8 @@ expose(XEvent *e) {
 
 static void
 keypress(XEvent *e) {
-	static unsigned int len = sizeof key / sizeof key[0];
+	KEYS
+	unsigned int len = sizeof key / sizeof key[0];
 	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
@@ -362,7 +357,8 @@ void (*handler[LASTEvent]) (XEvent *) = {
 
 void
 grabkeys(void) {
-	static unsigned int len = sizeof key / sizeof key[0];
+	KEYS
+	unsigned int len = sizeof key / sizeof key[0];
 	unsigned int i;
 	KeyCode code;
 

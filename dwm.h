@@ -114,7 +114,8 @@ void grabkeys(void);			/* grab all keys defined in config.h */
 
 /* layout.c */
 void arrange(void);			/* arranges all windows depending on the layout in use */
-void focusclient(const char *arg);	/* focuses next(1)/previous(-1) visible client */
+void focusnext(const char *arg);	/* focuses next visible client */
+void focusprev(const char *arg);	/* focuses prev visible client */
 const char *getsymbol(void);		/* returns symbol of enabled layout */
 Bool isfloating(void);			/* returns True if floating layout is enabled */
 Bool isarrange(void (*func)());		/* returns True if func is the layout function in use */

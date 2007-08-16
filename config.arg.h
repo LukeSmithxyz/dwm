@@ -37,7 +37,7 @@ static Layout layout[] = { \
 /* key definitions */
 #define MODKEY			Mod1Mask
 #define KEYS \
-static Key key[] = { \
+Key key[] = { \
 	/* modifier			key		function	argument */ \
 	{ MODKEY,			XK_p,		spawn, \
 		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
@@ -46,8 +46,8 @@ static Key key[] = { \
 		"exec urxvtcd -tr -bg '#111' -fg '#eee' -cr '#eee' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
-	{ MODKEY,			XK_j,		focusclient,	"1" }, \
-	{ MODKEY,			XK_k,		focusclient,	"-1" }, \
+	{ MODKEY,			XK_j,		focusnext,	NULL }, \
+	{ MODKEY,			XK_k,		focusprev,	NULL }, \
 	{ MODKEY,			XK_h,		addtomwfact,	"-0.05" }, \
 	{ MODKEY,			XK_l,		addtomwfact,	"0.05" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
@@ -55,42 +55,42 @@ static Key key[] = { \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL }, \
 	{ MODKEY,			XK_0,		view,		NULL }, \
-	{ MODKEY,			XK_1,		view,		"0" }, \
-	{ MODKEY,			XK_2,		view,		"1" }, \
-	{ MODKEY,			XK_3,		view,		"2" }, \
-	{ MODKEY,			XK_4,		view,		"3" }, \
-	{ MODKEY,			XK_5,		view,		"4" }, \
-	{ MODKEY,			XK_6,		view,		"5" }, \
-	{ MODKEY,			XK_7,		view,		"6" }, \
-	{ MODKEY,			XK_8,		view,		"7" }, \
-	{ MODKEY,			XK_9,		view,		"8" }, \
-	{ MODKEY|ControlMask,		XK_1,		toggleview,	"0" }, \
-	{ MODKEY|ControlMask,		XK_2,		toggleview,	"1" }, \
-	{ MODKEY|ControlMask,		XK_3,		toggleview,	"2" }, \
-	{ MODKEY|ControlMask,		XK_4,		toggleview,	"3" }, \
-	{ MODKEY|ControlMask,		XK_5,		toggleview,	"4" }, \
-	{ MODKEY|ControlMask,		XK_6,		toggleview,	"5" }, \
-	{ MODKEY|ControlMask,		XK_7,		toggleview,	"6" }, \
-	{ MODKEY|ControlMask,		XK_8,		toggleview,	"7" }, \
-	{ MODKEY|ControlMask,		XK_9,		toggleview,	"8" }, \
+	{ MODKEY,			XK_1,		view,		tags[0] }, \
+	{ MODKEY,			XK_2,		view,		tags[1] }, \
+	{ MODKEY,			XK_3,		view,		tags[2] }, \
+	{ MODKEY,			XK_4,		view,		tags[3] }, \
+	{ MODKEY,			XK_5,		view,		tags[4] }, \
+	{ MODKEY,			XK_6,		view,		tags[5] }, \
+	{ MODKEY,			XK_7,		view,		tags[6] }, \
+	{ MODKEY,			XK_8,		view,		tags[7] }, \
+	{ MODKEY,			XK_9,		view,		tags[8] }, \
+	{ MODKEY|ControlMask,		XK_1,		toggleview,	tags[0] }, \
+	{ MODKEY|ControlMask,		XK_2,		toggleview,	tags[1] }, \
+	{ MODKEY|ControlMask,		XK_3,		toggleview,	tags[2] }, \
+	{ MODKEY|ControlMask,		XK_4,		toggleview,	tags[3] }, \
+	{ MODKEY|ControlMask,		XK_5,		toggleview,	tags[4] }, \
+	{ MODKEY|ControlMask,		XK_6,		toggleview,	tags[5] }, \
+	{ MODKEY|ControlMask,		XK_7,		toggleview,	tags[6] }, \
+	{ MODKEY|ControlMask,		XK_8,		toggleview,	tags[7] }, \
+	{ MODKEY|ControlMask,		XK_9,		toggleview,	tags[8] }, \
 	{ MODKEY|ShiftMask,		XK_0,		tag,		NULL }, \
-	{ MODKEY|ShiftMask,		XK_1,		tag,		"0" }, \
-	{ MODKEY|ShiftMask,		XK_2,		tag,		"1" }, \
-	{ MODKEY|ShiftMask,		XK_3,		tag,		"2" }, \
-	{ MODKEY|ShiftMask,		XK_4,		tag,		"3" }, \
-	{ MODKEY|ShiftMask,		XK_5,		tag,		"4" }, \
-	{ MODKEY|ShiftMask,		XK_6,		tag,		"5" }, \
-	{ MODKEY|ShiftMask,		XK_7,		tag,		"6" }, \
-	{ MODKEY|ShiftMask,		XK_8,		tag,		"7" }, \
-	{ MODKEY|ShiftMask,		XK_9,		tag,		"8" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_1,		toggletag,	"0" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_2,		toggletag,	"1" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_3,		toggletag,	"2" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_4,		toggletag,	"3" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_5,		toggletag,	"4" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_6,		toggletag,	"5" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_7,		toggletag,	"6" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_8,		toggletag,	"7" }, \
-	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	"8" }, \
+	{ MODKEY|ShiftMask,		XK_1,		tag,		tags[0] }, \
+	{ MODKEY|ShiftMask,		XK_2,		tag,		tags[1] }, \
+	{ MODKEY|ShiftMask,		XK_3,		tag,		tags[2] }, \
+	{ MODKEY|ShiftMask,		XK_4,		tag,		tags[3] }, \
+	{ MODKEY|ShiftMask,		XK_5,		tag,		tags[4] }, \
+	{ MODKEY|ShiftMask,		XK_6,		tag,		tags[5] }, \
+	{ MODKEY|ShiftMask,		XK_7,		tag,		tags[6] }, \
+	{ MODKEY|ShiftMask,		XK_8,		tag,		tags[7] }, \
+	{ MODKEY|ShiftMask,		XK_9,		tag,		tags[8] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_1,		toggletag,	tags[0] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_2,		toggletag,	tags[1] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_3,		toggletag,	tags[2] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_4,		toggletag,	tags[3] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_5,		toggletag,	tags[4] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_6,		toggletag,	tags[5] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_7,		toggletag,	tags[6] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_8,		toggletag,	tags[7] }, \
+	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	tags[8] }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		NULL }, \
 };
