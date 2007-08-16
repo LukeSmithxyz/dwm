@@ -227,9 +227,7 @@ manage(Window w, XWindowAttributes *wa) {
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
-	setclientstate(c, IconicState);
-	c->isbanned = True;
-	focus(c);
+	ban(c);
 	arrange();
 }
 
@@ -325,7 +323,8 @@ unmanage(Client *c, long state) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	arrange();
+	if(state != NormalState)
+		arrange();
 }
 
 void
