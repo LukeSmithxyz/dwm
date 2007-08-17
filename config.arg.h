@@ -48,8 +48,8 @@ Key keys[] = { \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_j,		focusnext,	NULL }, \
 	{ MODKEY,			XK_k,		focusprev,	NULL }, \
-	{ MODKEY,			XK_h,		addtomwfact,	"-0.05" }, \
-	{ MODKEY,			XK_l,		addtomwfact,	"0.05" }, \
+	{ MODKEY,			XK_h,		setmwfact,	"-0.05" }, \
+	{ MODKEY,			XK_l,		setmwfact,	"+0.05" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \

@@ -9,18 +9,24 @@ static double mwfact = MWFACT;
 /* extern */
 
 void
-addtomwfact(const char *arg) {
-	double delta;
+setmwfact(const char *arg) {
+	double delta, newfact;
 
 	if(!isarrange(tile))
 		return;
-
 	/* arg handling, manipulate mwfact */
 	if(arg == NULL)
 		mwfact = MWFACT;
 	else if(1 == sscanf(arg, "%lf", &delta)) {
-		if(delta + mwfact > 0.1 && delta + mwfact < 0.9)
-			mwfact += delta;
+		if(arg[0] != '+' && arg[0] != '-')
+			newfact = delta;
+		else
+			newfact = mwfact + delta;
+		if(newfact < 0.1)
+			newfact = 0.1;
+		else if(newfact > 0.9)
+			newfact = 0.9;
+		mwfact = newfact;
 	}
 	arrange();
 }
