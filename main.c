@@ -21,7 +21,7 @@ unsigned int bh, ntags;
 unsigned int bpos = BARPOS;
 unsigned int numlockmask = 0;
 Atom dwmconfig, wmatom[WMLast], netatom[NetLast];
-Bool *seltag;
+Bool *seltags;
 Bool selscreen = True;
 Client *clients = NULL;
 Client *sel = NULL;
@@ -57,7 +57,7 @@ cleanup(void) {
 	XFreeCursor(dpy, cursor[CurMove]);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
-	free(seltag);
+	free(seltags);
 }
 
 static unsigned long
@@ -170,8 +170,8 @@ setup(void) {
 	grabkeys();
 	compileregs();
 	for(ntags = 0; tags[ntags]; ntags++);
-	seltag = emallocz(sizeof(Bool) * ntags);
-	seltag[0] = True;
+	seltags = emallocz(sizeof(Bool) * ntags);
+	seltags[0] = True;
 	/* style */
 	dc.norm[ColBorder] = initcolor(NORMBORDERCOLOR);
 	dc.norm[ColBG] = initcolor(NORMBGCOLOR);

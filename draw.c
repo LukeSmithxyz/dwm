@@ -55,7 +55,7 @@ drawstatus(void) {
 	dc.x = dc.y = 0;
 	for(i = 0; i < ntags; i++) {
 		dc.w = textw(tags[i]);
-		if(seltag[i]) {
+		if(seltags[i]) {
 			drawtext(tags[i], dc.sel);
 			drawsquare(sel && sel->tags[i], isoccupied(i), dc.sel);
 		}

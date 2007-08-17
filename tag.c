@@ -84,7 +84,7 @@ isvisible(Client *c) {
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
-		if(c->tags[i] && seltag[i])
+		if(c->tags[i] && seltags[i])
 			return True;
 	return False;
 }
@@ -139,7 +139,7 @@ settags(Client *c, Client *trans) {
 	}
 	if(!matched)
 		for(i = 0; i < ntags; i++)
-			c->tags[i] = seltag[i];
+			c->tags[i] = seltags[i];
 	persistconfig(c);
 }
 
@@ -190,10 +190,10 @@ toggleview(const char *arg) {
 	unsigned int i, j;
 
 	i = idxoftag(arg);
-	seltag[i] = !seltag[i];
-	for(j = 0; j < ntags && !seltag[j]; j++);
+	seltags[i] = !seltags[i];
+	for(j = 0; j < ntags && !seltags[j]; j++);
 	if(j == ntags)
-		seltag[i] = True; /* cannot toggle last view */
+		seltags[i] = True; /* cannot toggle last view */
 	arrange();
 }
 
@@ -202,9 +202,9 @@ view(const char *arg) {
 	unsigned int i;
 
 	for(i = 0; i < ntags; i++)
-		seltag[i] = arg == NULL;
+		seltags[i] = arg == NULL;
 	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
-		seltag[i] = True;
+		seltags[i] = True;
 	arrange();
 }

@@ -82,7 +82,7 @@ extern unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar p
 extern unsigned int ntags, numlockmask;		/* number of tags, numlock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern Atom dwmconfig, wmatom[WMLast], netatom[NetLast];
-extern Bool selscreen, *seltag;			/* seltag is array of Bool */
+extern Bool selscreen, *seltags;		/* seltags is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern DC dc;					/* global draw context */
