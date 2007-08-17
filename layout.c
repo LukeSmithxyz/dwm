@@ -10,7 +10,7 @@ typedef struct {
 } Layout;
 
 unsigned int blw = 0;
-static Layout *lt = NULL;
+static unsigned int sellayout = 0; /* default */
 
 static void
 floating(void) { /* default floating layout */
@@ -36,7 +36,7 @@ arrange(void) {
 			unban(c);
 		else
 			ban(c);
-	lt->arrange();
+	layouts[sellayout].arrange();
 	focus(NULL);
 	restack();
 }
@@ -76,25 +76,25 @@ focusprev(const char *arg) {
 const char *
 getsymbol(void)
 {
-	return lt->symbol;
+	return layouts[sellayout].symbol;
 }
 
 Bool
 isfloating(void) {
-	return lt->arrange == floating;
+	return layouts[sellayout].arrange == floating;
 }
 
 Bool
 isarrange(void (*func)())
 {
-	return func == lt->arrange;
+	return func == layouts[sellayout].arrange;
 }
 
 void
 initlayouts(void) {
 	unsigned int i, w;
 
-	lt = &layouts[0];
+	/* TODO deserialize sellayout if present */
 	nlayouts = sizeof layouts / sizeof layouts[0];
 	for(blw = i = 0; i < nlayouts; i++) {
 		w = textw(layouts[i].symbol);
@@ -118,9 +118,9 @@ restack(void) {
 	drawstatus();
 	if(!sel)
 		return;
-	if(sel->isfloating || lt->arrange == floating)
+	if(sel->isfloating || isfloating())
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange != floating) {
+	if(!isfloating()) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		if(!sel->isfloating) {
@@ -143,15 +143,14 @@ setlayout(const char *arg) {
 	int i;
 
 	if(!arg) {
-		lt++;
-		if(lt == layouts + nlayouts)
-			lt = layouts;
+		if(++sellayout == nlayouts)
+			sellayout = 0;;
 	}
 	else {
 		i = atoi(arg);
 		if(i < 0 || i >= nlayouts)
 			return;
-		lt = &layouts[i];
+		sellayout = i;
 	}
 	if(sel)
 		arrange();
@@ -173,7 +172,7 @@ void
 togglemax(const char *arg) {
 	XEvent ev;
 
-	if(!sel || (lt->arrange != floating && !sel->isfloating) || sel->isfixed)
+	if(!sel || (!isfloating() && !sel->isfloating) || sel->isfixed)
 		return;
 	if((sel->ismax = !sel->ismax)) {
 		sel->rx = sel->x;
