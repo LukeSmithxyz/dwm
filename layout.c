@@ -1,6 +1,9 @@
 /* See LICENSE file for copyright and license details. */
 #include "dwm.h"
 #include <stdlib.h>
+#include <string.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
 /* static */
 
@@ -10,6 +13,7 @@ typedef struct {
 } Layout;
 
 unsigned int blw = 0;
+static char prop[128];
 static unsigned int ltidx = 0; /* default */
 
 static void
@@ -103,6 +107,28 @@ initlayouts(void) {
 	}
 }
 
+void
+loaddwmprops(void) {
+	unsigned int i;
+	XTextProperty name;
+
+	/* check if window has set a property */
+	name.nitems = 0;
+	XGetTextProperty(dpy, root, &name, dwmprops);
+	if(name.nitems && name.encoding == XA_STRING) {
+		strncpy(prop, (char *)name.value, sizeof prop - 1);
+		prop[sizeof prop - 1] = '\0';
+		XFree(name.value);
+		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
+			seltags[i] = prop[i] == '1';
+		if(i < sizeof prop - 1 && prop[i] != '\0') {
+			i = prop[i] - '0';
+			if(i < nlayouts)
+				ltidx = i;
+		}
+	}
+}
+
 Client *
 nexttiled(Client *c) {
 	for(; c && (c->isfloating || !isvisible(c)); c = c->next);
@@ -139,6 +165,19 @@ restack(void) {
 }
 
 void
+savedwmprops(void) {
+	unsigned int i;
+
+	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
+		prop[i] = seltags[i] ? '1' : '0';
+	if(i < sizeof prop - 1)
+		prop[i++] = (char)ltidx;
+	prop[i] = '\0';
+	XChangeProperty(dpy, root, dwmprops, XA_STRING, 8,
+			PropModeReplace, (unsigned char *)prop, i);
+}
+
+void
 setlayout(const char *arg) {
 	int i;
 
@@ -156,6 +195,7 @@ setlayout(const char *arg) {
 		arrange();
 	else
 		drawstatus();
+	savedwmprops();
 }
 
 void

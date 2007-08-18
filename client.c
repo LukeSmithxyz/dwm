@@ -7,7 +7,7 @@
 
 /* static */
 
-static char config[128];
+static char prop[128];
 
 static void
 attachstack(Client *c) {
@@ -182,23 +182,23 @@ killclient(const char *arg) {
 }
 
 Bool
-loadconfig(Client *c) {
+loadprops(Client *c) {
 	unsigned int i;
 	Bool result = False;
 	XTextProperty name;
 
 	/* check if window has set a property */
 	name.nitems = 0;
-	XGetTextProperty(dpy, c->win, &name, dwmconfig);
+	XGetTextProperty(dpy, c->win, &name, dwmprops);
 	if(name.nitems && name.encoding == XA_STRING) {
-		strncpy(config, (char *)name.value, sizeof config - 1);
-		config[sizeof config - 1] = '\0';
+		strncpy(prop, (char *)name.value, sizeof prop - 1);
+		prop[sizeof prop - 1] = '\0';
 		XFree(name.value);
-		for(i = 0; i < ntags && i < sizeof config - 1 && config[i] != '\0'; i++)
-			if((c->tags[i] = config[i] == '1'))
+		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
+			if((c->tags[i] = prop[i] == '1'))
 				result = True;
-		if(i < sizeof config - 1 && config[i] != '\0')
-			c->isfloating = config[i] == '1';
+		if(i < sizeof prop - 1 && prop[i] != '\0')
+			c->isfloating = prop[i] == '1';
 	}
 	return result;
 }
@@ -249,11 +249,11 @@ manage(Window w, XWindowAttributes *wa) {
 	if(t)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = t->tags[i];
-	if(!loadconfig(c))
+	if(!loadprops(c))
 		applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
-	saveconfig(c);
+	saveprops(c);
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
@@ -325,16 +325,16 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-saveconfig(Client *c) {
+saveprops(Client *c) {
 	unsigned int i;
 
-	for(i = 0; i < ntags && i < sizeof config - 1; i++)
-		config[i] = c->tags[i] ? '1' : '0';
-	if(i < sizeof config - 1)
-		config[i++] = c->isfloating ? '1' : '0';
-	config[i] = '\0';
-	XChangeProperty(dpy, c->win, dwmconfig, XA_STRING, 8,
-			PropModeReplace, (unsigned char *)config, i);
+	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
+		prop[i] = c->tags[i] ? '1' : '0';
+	if(i < sizeof prop - 1)
+		prop[i++] = c->isfloating ? '1' : '0';
+	prop[i] = '\0';
+	XChangeProperty(dpy, c->win, dwmprops, XA_STRING, 8,
+			PropModeReplace, (unsigned char *)prop, i);
 }
 
 void

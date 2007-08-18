@@ -3,8 +3,6 @@
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
 /* static */
@@ -118,7 +116,7 @@ tag(const char *arg) {
 	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
-	saveconfig(sel);
+	saveprops(sel);
 	arrange();
 }
 
@@ -129,7 +127,7 @@ togglefloating(const char *arg) {
 	sel->isfloating = !sel->isfloating;
 	if(sel->isfloating) {
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-		saveconfig(sel);
+		saveprops(sel);
 	}
 	arrange();
 }
@@ -145,7 +143,7 @@ toggletag(const char *arg) {
 	for(j = 0; j < ntags && !sel->tags[j]; j++);
 	if(j == ntags)
 		sel->tags[i] = True;
-	saveconfig(sel);
+	saveprops(sel);
 	arrange();
 }
 
@@ -158,6 +156,7 @@ toggleview(const char *arg) {
 	for(j = 0; j < ntags && !seltags[j]; j++);
 	if(j == ntags)
 		seltags[i] = True; /* cannot toggle last view */
+	savedwmprops();
 	arrange();
 }
 
@@ -170,5 +169,6 @@ view(const char *arg) {
 	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		seltags[i] = True;
+	savedwmprops();
 	arrange();
 }

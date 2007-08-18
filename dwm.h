@@ -81,7 +81,7 @@ extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
 extern unsigned int ntags, numlockmask;		/* number of tags, numlock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern Atom dwmconfig, wmatom[WMLast], netatom[NetLast];
+extern Atom dwmprops, wmatom[WMLast], netatom[NetLast];
 extern Bool selscreen, *seltags;		/* seltags is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
@@ -96,11 +96,11 @@ void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c if visible && !NULL, or focus top visible */
 void killclient(const char *arg);	/* kill sel  nicely */
-Bool loadconfig(Client *c);		/* loads client properties */
+Bool loadprops(Client *c);		/* loads client properties */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-void saveconfig(Client *c);		/* saves client properties */
+void saveprops(Client *c);		/* saves client properties */
 void unban(Client *c);			/* unbans c */
 void unmanage(Client *c, long state);	/* unmanage c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
@@ -122,8 +122,10 @@ const char *getsymbol(void);		/* returns symbol of enabled layout */
 Bool isfloating(void);			/* returns True if floating layout is enabled */
 Bool isarrange(void (*func)());		/* returns True if func is the layout function in use */
 void initlayouts(void);			/* initialize layout array */
+void loaddwmprops(void);		/* loads dwm properties */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */
+void savedwmprops(void);		/* saves dwm properties */
 void setlayout(const char *arg);	/* sets layout, NULL means next layout */
 void togglebar(const char *arg);	/* shows/hides the bar */
 void togglemax(const char *arg);	/* toggles maximization of floating client */
