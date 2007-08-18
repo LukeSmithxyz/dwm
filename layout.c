@@ -10,7 +10,7 @@ typedef struct {
 } Layout;
 
 unsigned int blw = 0;
-static unsigned int sellayout = 0; /* default */
+static unsigned int ltidx = 0; /* default */
 
 static void
 floating(void) { /* default floating layout */
@@ -36,7 +36,7 @@ arrange(void) {
 			unban(c);
 		else
 			ban(c);
-	layouts[sellayout].arrange();
+	layouts[ltidx].arrange();
 	focus(NULL);
 	restack();
 }
@@ -76,25 +76,25 @@ focusprev(const char *arg) {
 const char *
 getsymbol(void)
 {
-	return layouts[sellayout].symbol;
+	return layouts[ltidx].symbol;
 }
 
 Bool
 isfloating(void) {
-	return layouts[sellayout].arrange == floating;
+	return layouts[ltidx].arrange == floating;
 }
 
 Bool
 isarrange(void (*func)())
 {
-	return func == layouts[sellayout].arrange;
+	return func == layouts[ltidx].arrange;
 }
 
 void
 initlayouts(void) {
 	unsigned int i, w;
 
-	/* TODO deserialize sellayout if present */
+	/* TODO deserialize ltidx if present */
 	nlayouts = sizeof layouts / sizeof layouts[0];
 	for(blw = i = 0; i < nlayouts; i++) {
 		w = textw(layouts[i].symbol);
@@ -143,14 +143,14 @@ setlayout(const char *arg) {
 	int i;
 
 	if(!arg) {
-		if(++sellayout == nlayouts)
-			sellayout = 0;;
+		if(++ltidx == nlayouts)
+			ltidx = 0;;
 	}
 	else {
 		i = atoi(arg);
 		if(i < 0 || i >= nlayouts)
 			return;
-		sellayout = i;
+		ltidx = i;
 	}
 	if(sel)
 		arrange();

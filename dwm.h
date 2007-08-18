@@ -96,9 +96,11 @@ void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c if visible && !NULL, or focus top visible */
 void killclient(const char *arg);	/* kill sel  nicely */
+Bool loadconfig(Client *c);		/* loads client properties */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
+void saveconfig(Client *c);		/* saves client properties */
 void unban(Client *c);			/* unbans c */
 void unmanage(Client *c, long state);	/* unmanage c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
@@ -132,9 +134,9 @@ void quit(const char *arg);		/* quit dwm nicely */
 int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* tag.c */
+void applyrules(Client *c);		/* applies rules to c */
 void compileregs(void);			/* initialize regexps of rules defined in config.h */
 Bool isvisible(Client *c);		/* returns True if client is visible */
-void settags(Client *c, Client *trans);	/* sets tags of c */
 void tag(const char *arg);		/* tags sel with arg's index */
 void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
 void toggletag(const char *arg);	/* toggles sel tags with arg's index */

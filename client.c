@@ -7,6 +7,8 @@
 
 /* static */
 
+static char config[128];
+
 static void
 attachstack(Client *c) {
 	c->snext = stack;
@@ -179,8 +181,31 @@ killclient(const char *arg) {
 		XKillClient(dpy, sel->win);
 }
 
+Bool
+loadconfig(Client *c) {
+	unsigned int i;
+	Bool result = False;
+	XTextProperty name;
+
+	/* check if window has set a property */
+	name.nitems = 0;
+	XGetTextProperty(dpy, c->win, &name, dwmconfig);
+	if(name.nitems && name.encoding == XA_STRING) {
+		strncpy(config, (char *)name.value, sizeof config - 1);
+		config[sizeof config - 1] = '\0';
+		XFree(name.value);
+		for(i = 0; i < ntags && i < sizeof config - 1 && config[i] != '\0'; i++)
+			if((c->tags[i] = config[i] == '1'))
+				result = True;
+		if(i < sizeof config - 1 && config[i] != '\0')
+			c->isfloating = config[i] == '1';
+	}
+	return result;
+}
+
 void
 manage(Window w, XWindowAttributes *wa) {
+	unsigned int i;
 	Client *c, *t = NULL;
 	Window trans;
 	Status rettrans;
@@ -221,9 +246,14 @@ manage(Window w, XWindowAttributes *wa) {
 	updatetitle(c);
 	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
 		for(t = clients; t && t->win != trans; t = t->next);
-	settags(c, t);
+	if(t)
+		for(i = 0; i < ntags; i++)
+			c->tags[i] = t->tags[i];
+	if(!loadconfig(c))
+		applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
+	saveconfig(c);
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
@@ -292,6 +322,19 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		configure(c);
 		XSync(dpy, False);
 	}
+}
+
+void
+saveconfig(Client *c) {
+	unsigned int i;
+
+	for(i = 0; i < ntags && i < sizeof config - 1; i++)
+		config[i] = c->tags[i] ? '1' : '0';
+	if(i < sizeof config - 1)
+		config[i++] = c->isfloating ? '1' : '0';
+	config[i] = '\0';
+	XChangeProperty(dpy, c->win, dwmconfig, XA_STRING, 8,
+			PropModeReplace, (unsigned char *)config, i);
 }
 
 void
