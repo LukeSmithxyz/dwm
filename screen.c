@@ -60,7 +60,7 @@ setdwmprops(void) {
 	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
 		prop[i] = seltags[i] ? '1' : '0';
 	if(i < sizeof prop - 1)
-		prop[i++] = (char)ltidx;
+		prop[i++] = (char)ltidx + '0';
 	prop[i] = '\0';
 	XChangeProperty(dpy, root, dwmprops, XA_STRING, 8,
 			PropModeReplace, (unsigned char *)prop, i);
@@ -223,8 +223,8 @@ getdwmprops(void) {
 		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
 			seltags[i] = prop[i] == '1';
 		if(i < sizeof prop - 1 && prop[i] != '\0') {
-			if(prop[i] < nlayouts)
-				ltidx = prop[i];
+			if((unsigned int)(prop[i] - '0') < nlayouts)
+				ltidx = prop[i] - '0';
 		}
 	}
 }
