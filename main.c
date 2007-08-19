@@ -253,32 +253,6 @@ quit(const char *arg) {
 	readin = running = False;
 }
 
-void
-updatebarpos(void) {
-	XEvent ev;
-
-	wax = sx;
-	way = sy;
-	wah = sh;
-	waw = sw;
-	switch(bpos) {
-	default:
-		wah -= bh;
-		way += bh;
-		XMoveWindow(dpy, barwin, sx, sy);
-		break;
-	case BarBot:
-		wah -= bh;
-		XMoveWindow(dpy, barwin, sx, sy + wah);
-		break;
-	case BarOff:
-		XMoveWindow(dpy, barwin, sx, sy - bh);
-		break;
-	}
-	XSync(dpy, False);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-}
-
 /* There's no way to check accesses to destroyed windows, thus those cases are
  * ignored (especially on UnmapNotify's).  Other types of errors call Xlibs
  * default error handler, which may call exit.

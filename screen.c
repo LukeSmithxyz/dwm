@@ -370,6 +370,32 @@ toggleview(const char *arg) {
 }
 
 void
+updatebarpos(void) {
+	XEvent ev;
+
+	wax = sx;
+	way = sy;
+	wah = sh;
+	waw = sw;
+	switch(bpos) {
+	default:
+		wah -= bh;
+		way += bh;
+		XMoveWindow(dpy, barwin, sx, sy);
+		break;
+	case BarBot:
+		wah -= bh;
+		XMoveWindow(dpy, barwin, sx, sy + wah);
+		break;
+	case BarOff:
+		XMoveWindow(dpy, barwin, sx, sy - bh);
+		break;
+	}
+	XSync(dpy, False);
+	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+}
+
+void
 view(const char *arg) {
 	unsigned int i;
 

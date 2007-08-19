@@ -117,8 +117,7 @@ void grabkeys(void);			/* grab all keys defined in config.h */
 /* main.c */
 Bool gettextprop(Window w, Atom atom,
 		char *text, unsigned int size); /* return text property, UTF-8 compliant */
-void updatebarpos(void);		/* updates the bar position */
-void quit(const char *arg);		/* quit dwm nicely */
+void quit(const char *arg);			/* quit dwm nicely */
 int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
 /* screen.c */
@@ -142,6 +141,7 @@ void togglefloating(const char *arg);	/* toggles sel between floating/tiled stat
 void togglemax(const char *arg);	/* toggles maximization of floating client */
 void toggletag(const char *arg);	/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
+void updatebarpos(void);		/* updates the bar position */
 void view(const char *arg);		/* views the tag with arg's index */
 
 /* util.c */
