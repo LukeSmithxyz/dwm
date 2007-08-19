@@ -39,7 +39,7 @@ enum { BarTop, BarBot, BarOff };			/* bar position */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
-enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
+enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
 typedef struct Client Client;
 struct Client {
@@ -131,6 +131,8 @@ void togglebar(const char *arg);	/* shows/hides the bar */
 void togglemax(const char *arg);	/* toggles maximization of floating client */
 
 /* main.c */
+Bool gettextprop(Window w, Atom atom,
+		char *text, unsigned int size); /* return text property, UTF-8 compliant */
 void updatebarpos(void);		/* updates the bar position */
 void quit(const char *arg);		/* quit dwm nicely */
 int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */

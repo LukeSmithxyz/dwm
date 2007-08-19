@@ -185,15 +185,8 @@ Bool
 loadprops(Client *c) {
 	unsigned int i;
 	Bool result = False;
-	XTextProperty name;
 
-	/* check if window has set a property */
-	name.nitems = 0;
-	XGetTextProperty(dpy, c->win, &name, dwmprops);
-	if(name.nitems && name.encoding == XA_STRING) {
-		strncpy(prop, (char *)name.value, sizeof prop - 1);
-		prop[sizeof prop - 1] = '\0';
-		XFree(name.value);
+	if(gettextprop(c->win, dwmprops, prop, sizeof prop)) {
 		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
 			if((c->tags[i] = prop[i] == '1'))
 				result = True;
@@ -424,27 +417,6 @@ updatesizehints(Client *c) {
 
 void
 updatetitle(Client *c) {
-	char **list = NULL;
-	int n;
-	XTextProperty name;
-
-	name.nitems = 0;
-	c->name[0] = 0;
-	XGetTextProperty(dpy, c->win, &name, netatom[NetWMName]);
-	if(!name.nitems)
-		XGetWMName(dpy, c->win, &name);
-	if(!name.nitems)
-		return;
-	if(name.encoding == XA_STRING)
-		strncpy(c->name, (char *)name.value, sizeof c->name - 1);
-	else {
-		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
-		&& n > 0 && *list)
-		{
-			strncpy(c->name, *list, sizeof c->name - 1);
-			XFreeStringList(list);
-		}
-	}
-	c->name[sizeof c->name - 1] = '\0';
-	XFree(name.value);
+	if(!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
+		gettextprop(c->win, wmatom[WMName], c->name, sizeof c->name);
 }

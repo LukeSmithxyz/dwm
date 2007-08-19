@@ -98,7 +98,6 @@ void
 initlayouts(void) {
 	unsigned int i, w;
 
-	/* TODO deserialize ltidx if present */
 	nlayouts = sizeof layouts / sizeof layouts[0];
 	for(blw = i = 0; i < nlayouts; i++) {
 		w = textw(layouts[i].symbol);
@@ -110,21 +109,13 @@ initlayouts(void) {
 void
 loaddwmprops(void) {
 	unsigned int i;
-	XTextProperty name;
 
-	/* check if window has set a property */
-	name.nitems = 0;
-	XGetTextProperty(dpy, root, &name, dwmprops);
-	if(name.nitems && name.encoding == XA_STRING) {
-		strncpy(prop, (char *)name.value, sizeof prop - 1);
-		prop[sizeof prop - 1] = '\0';
-		XFree(name.value);
+	if(gettextprop(root, dwmprops, prop, sizeof prop)) {
 		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
 			seltags[i] = prop[i] == '1';
 		if(i < sizeof prop - 1 && prop[i] != '\0') {
-			i = prop[i];
-			if(i < nlayouts)
-				ltidx = i;
+			if(prop[i] < nlayouts)
+				ltidx = prop[i];
 		}
 	}
 }

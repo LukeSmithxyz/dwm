@@ -143,6 +143,7 @@ setup(void) {
 	dwmprops = XInternAtom(dpy, "_DWM_PROPERTIES", False);
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	wmatom[WMName] = XInternAtom(dpy, "WM_NAME", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
@@ -219,6 +220,33 @@ xerrorstart(Display *dsply, XErrorEvent *ee) {
 }
 
 /* extern */
+
+Bool
+gettextprop(Window w, Atom atom, char *text, unsigned int size) {
+	char **list = NULL;
+	int n;
+	XTextProperty name;
+
+	if(!text || size == 0)
+		return False;
+	text[0] = '\0';
+	XGetTextProperty(dpy, w, &name, atom);
+	if(!name.nitems)
+		return False;
+	if(name.encoding == XA_STRING)
+		strncpy(text, (char *)name.value, size - 1);
+	else {
+		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
+		&& n > 0 && *list)
+		{
+			strncpy(text, *list, size - 1);
+			XFreeStringList(list);
+		}
+	}
+	text[size - 1] = '\0';
+	XFree(name.value);
+	return True;
+}
 
 void
 quit(const char *arg) {
