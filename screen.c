@@ -28,7 +28,7 @@ typedef struct {
 TAGS
 RULES
 
-static char prop[512];
+static char buf[512];
 static unsigned int nrules = 0;
 static unsigned int nlayouts = 0;
 static unsigned int ltidx = 0; /* default */
@@ -57,13 +57,13 @@ static void
 setdwmprops(void) {
 	unsigned int i;
 
-	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
-		prop[i] = seltags[i] ? '1' : '0';
-	if(i < sizeof prop - 1)
-		prop[i++] = (char)ltidx + '0';
-	prop[i] = '\0';
+	for(i = 0; i < ntags && i < sizeof buf - 1; i++)
+		buf[i] = seltags[i] ? '1' : '0';
+	if(i < sizeof buf - 1)
+		buf[i++] = (char)ltidx + '0';
+	buf[i] = '\0';
 	XChangeProperty(dpy, root, dwmprops, XA_STRING, 8,
-			PropModeReplace, (unsigned char *)prop, i);
+			PropModeReplace, (unsigned char *)buf, i);
 }
 
 LAYOUTS
@@ -81,11 +81,11 @@ applyrules(Client *c) {
 
 	/* rule matching */
 	XGetClassHint(dpy, c->win, &ch);
-	snprintf(prop, sizeof prop, "%s:%s:%s",
+	snprintf(buf, sizeof buf, "%s:%s:%s",
 			ch.res_class ? ch.res_class : "",
 			ch.res_name ? ch.res_name : "", c->name);
 	for(i = 0; i < nrules; i++)
-		if(regs[i].propregex && !regexec(regs[i].propregex, prop, 1, &tmp, 0)) {
+		if(regs[i].propregex && !regexec(regs[i].propregex, buf, 1, &tmp, 0)) {
 			c->isfloating = rules[i].isfloating;
 			for(j = 0; regs[i].tagregex && j < ntags; j++) {
 				if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
@@ -219,12 +219,12 @@ void
 getdwmprops(void) {
 	unsigned int i;
 
-	if(gettextprop(root, dwmprops, prop, sizeof prop)) {
-		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
-			seltags[i] = prop[i] == '1';
-		if(i < sizeof prop - 1 && prop[i] != '\0') {
-			if((unsigned int)(prop[i] - '0') < nlayouts)
-				ltidx = prop[i] - '0';
+	if(gettextprop(root, dwmprops, buf, sizeof buf)) {
+		for(i = 0; i < ntags && i < sizeof buf - 1 && buf[i] != '\0'; i++)
+			seltags[i] = buf[i] == '1';
+		if(i < sizeof buf - 1 && buf[i] != '\0') {
+			if((unsigned int)(buf[i] - '0') < nlayouts)
+				ltidx = buf[i] - '0';
 		}
 	}
 }

@@ -7,7 +7,7 @@
 
 /* static */
 
-static char prop[128];
+static char buf[128];
 
 static void
 attachstack(Client *c) {
@@ -186,12 +186,12 @@ getprops(Client *c) {
 	unsigned int i;
 	Bool result = False;
 
-	if(gettextprop(c->win, dwmprops, prop, sizeof prop)) {
-		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
-			if((c->tags[i] = prop[i] == '1'))
+	if(gettextprop(c->win, dwmprops, buf, sizeof buf)) {
+		for(i = 0; i < ntags && i < sizeof buf - 1 && buf[i] != '\0'; i++)
+			if((c->tags[i] = buf[i] == '1'))
 				result = True;
-		if(i < sizeof prop - 1 && prop[i] != '\0')
-			c->isfloating = prop[i] == '1';
+		if(i < sizeof buf - 1 && buf[i] != '\0')
+			c->isfloating = buf[i] == '1';
 	}
 	return result;
 }
@@ -321,13 +321,13 @@ void
 setprops(Client *c) {
 	unsigned int i;
 
-	for(i = 0; i < ntags && i < sizeof prop - 1; i++)
-		prop[i] = c->tags[i] ? '1' : '0';
-	if(i < sizeof prop - 1)
-		prop[i++] = c->isfloating ? '1' : '0';
-	prop[i] = '\0';
+	for(i = 0; i < ntags && i < sizeof buf - 1; i++)
+		buf[i] = c->tags[i] ? '1' : '0';
+	if(i < sizeof buf - 1)
+		buf[i++] = c->isfloating ? '1' : '0';
+	buf[i] = '\0';
 	XChangeProperty(dpy, c->win, dwmprops, XA_STRING, 8,
-			PropModeReplace, (unsigned char *)prop, i);
+			PropModeReplace, (unsigned char *)buf, i);
 }
 
 void
