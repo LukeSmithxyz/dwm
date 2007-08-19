@@ -182,7 +182,7 @@ killclient(const char *arg) {
 }
 
 Bool
-loadprops(Client *c) {
+getprops(Client *c) {
 	unsigned int i;
 	Bool result = False;
 
@@ -242,11 +242,11 @@ manage(Window w, XWindowAttributes *wa) {
 	if(t)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = t->tags[i];
-	if(!loadprops(c))
+	if(!getprops(c))
 		applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
-	saveprops(c);
+	setprops(c);
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
@@ -318,7 +318,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-saveprops(Client *c) {
+setprops(Client *c) {
 	unsigned int i;
 
 	for(i = 0; i < ntags && i < sizeof prop - 1; i++)

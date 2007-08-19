@@ -96,11 +96,11 @@ void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c if visible && !NULL, or focus top visible */
 void killclient(const char *arg);	/* kill sel  nicely */
-Bool loadprops(Client *c);		/* loads client properties */
+Bool getprops(Client *c);		/* gets client properties */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-void saveprops(Client *c);		/* saves client properties */
+void setprops(Client *c);		/* sets client properties */
 void unban(Client *c);			/* unbans c */
 void unmanage(Client *c, long state);	/* unmanage c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
@@ -114,22 +114,6 @@ unsigned int textw(const char *text);	/* return the width of text in px*/
 /* event.c */
 void grabkeys(void);			/* grab all keys defined in config.h */
 
-/* layout.c */
-void arrange(void);			/* arranges all windows depending on the layout in use */
-void focusnext(const char *arg);	/* focuses next visible client */
-void focusprev(const char *arg);	/* focuses prev visible client */
-const char *getsymbol(void);		/* returns symbol of enabled layout */
-Bool isfloating(void);			/* returns True if floating layout is enabled */
-Bool isarrange(void (*func)());		/* returns True if func is the layout function in use */
-void initlayouts(void);			/* initialize layout array */
-void loaddwmprops(void);		/* loads dwm properties */
-Client *nexttiled(Client *c);		/* returns tiled successor of c */
-void restack(void);			/* restores z layers of all clients */
-void savedwmprops(void);		/* saves dwm properties */
-void setlayout(const char *arg);	/* sets layout, NULL means next layout */
-void togglebar(const char *arg);	/* shows/hides the bar */
-void togglemax(const char *arg);	/* toggles maximization of floating client */
-
 /* main.c */
 Bool gettextprop(Window w, Atom atom,
 		char *text, unsigned int size); /* return text property, UTF-8 compliant */
@@ -137,12 +121,25 @@ void updatebarpos(void);		/* updates the bar position */
 void quit(const char *arg);		/* quit dwm nicely */
 int xerror(Display *dsply, XErrorEvent *ee);	/* dwm's X error handler */
 
-/* tag.c */
+/* screen.c */
 void applyrules(Client *c);		/* applies rules to c */
+void arrange(void);			/* arranges all windows depending on the layout in use */
 void compileregs(void);			/* initialize regexps of rules defined in config.h */
+void focusnext(const char *arg);	/* focuses next visible client */
+void focusprev(const char *arg);	/* focuses prev visible client */
+const char *getsymbol(void);		/* returns symbol of enabled layout */
+void initlayouts(void);			/* initialize layout array */
+Bool isarrange(void (*func)());		/* returns True if func is the layout function in use */
+Bool isfloating(void);			/* returns True if floating layout is enabled */
 Bool isvisible(Client *c);		/* returns True if client is visible */
+void getdwmprops(void);			/* gets dwm properties */
+Client *nexttiled(Client *c);		/* returns tiled successor of c */
+void restack(void);			/* restores z layers of all clients */
+void setlayout(const char *arg);	/* sets layout, NULL means next layout */
 void tag(const char *arg);		/* tags sel with arg's index */
+void togglebar(const char *arg);	/* shows/hides the bar */
 void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
+void togglemax(const char *arg);	/* toggles maximization of floating client */
 void toggletag(const char *arg);	/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
 void view(const char *arg);		/* views the tag with arg's index */
