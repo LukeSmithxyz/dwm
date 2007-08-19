@@ -122,7 +122,7 @@ loaddwmprops(void) {
 		for(i = 0; i < ntags && i < sizeof prop - 1 && prop[i] != '\0'; i++)
 			seltags[i] = prop[i] == '1';
 		if(i < sizeof prop - 1 && prop[i] != '\0') {
-			i = prop[i] - '0';
+			i = prop[i];
 			if(i < nlayouts)
 				ltidx = i;
 		}
