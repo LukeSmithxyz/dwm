@@ -221,7 +221,7 @@ destroynotify(XEvent *e) {
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
 	if((c = getclient(ev->window)))
-		unmanage(c, WithdrawnState);
+		unmanage(c);
 }
 
 static void
@@ -332,10 +332,8 @@ unmapnotify(XEvent *e) {
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
-	if((c = getclient(ev->window)) && (ev->event == root)) {
-		if(ev->send_event || c->unmapped-- == 0)
-			unmanage(c, WithdrawnState);
-	}
+	if((c = getclient(ev->window)))
+		unmanage(c);
 }
 
 /* extern */

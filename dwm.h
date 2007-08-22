@@ -48,7 +48,6 @@ struct Client {
 	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
-	int unmapped;
 	long flags; 
 	unsigned int border, oldborder;
 	Bool isbanned, isfixed, ismax, isfloating;
@@ -81,7 +80,7 @@ extern int wax, way, wah, waw;			/* windowarea geometry */
 extern unsigned int bh, blw, bpos;		/* bar height, bar layout label width, bar position */
 extern unsigned int ntags, numlockmask;		/* number of tags, numlock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
-extern Atom dwmprops, wmatom[WMLast], netatom[NetLast];
+extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool selscreen, *seltags;		/* seltags is array of Bool */
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
@@ -96,13 +95,11 @@ void configure(Client *c);		/* send synthetic configure event */
 void detach(Client *c);			/* detaches c from global client list */
 void focus(Client *c);			/* focus c if visible && !NULL, or focus top visible */
 void killclient(const char *arg);	/* kill sel  nicely */
-Bool getprops(Client *c);		/* gets client properties */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
 void resize(Client *c, int x, int y,
 		int w, int h, Bool sizehints);	/* resize with given coordinates c*/
-void setprops(Client *c);		/* sets client properties */
 void unban(Client *c);			/* unbans c */
-void unmanage(Client *c, long state);	/* unmanage c */
+void unmanage(Client *c);		/* unmanage c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
 
@@ -131,7 +128,6 @@ void initlayouts(void);			/* initialize layout array */
 Bool isarrange(void (*func)());		/* returns True if func is the layout function in use */
 Bool isfloating(void);			/* returns True if floating layout is enabled */
 Bool isvisible(Client *c);		/* returns True if client is visible */
-void getdwmprops(void);			/* gets dwm properties */
 Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */
 void setlayout(const char *arg);	/* sets layout, NULL means next layout */

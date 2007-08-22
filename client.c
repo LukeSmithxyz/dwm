@@ -1,13 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 #include "dwm.h"
 #include <stdlib.h>
-#include <string.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
 /* static */
-
-static char buf[128];
 
 static void
 attachstack(Client *c) {
@@ -102,10 +99,8 @@ void
 ban(Client *c) {
 	if(c->isbanned)
 		return;
-	XUnmapWindow(dpy, c->win);
-	setclientstate(c, IconicState);
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	c->isbanned = True;
-	c->unmapped++;
 }
 
 void
@@ -181,21 +176,6 @@ killclient(const char *arg) {
 		XKillClient(dpy, sel->win);
 }
 
-Bool
-getprops(Client *c) {
-	unsigned int i;
-	Bool result = False;
-
-	if(gettextprop(c->win, dwmprops, buf, sizeof buf)) {
-		for(i = 0; i < ntags && i < sizeof buf - 1 && buf[i] != '\0'; i++)
-			if((c->tags[i] = buf[i] == '1'))
-				result = True;
-		if(i < sizeof buf - 1 && buf[i] != '\0')
-			c->isfloating = buf[i] == '1';
-	}
-	return result;
-}
-
 void
 manage(Window w, XWindowAttributes *wa) {
 	unsigned int i;
@@ -242,15 +222,14 @@ manage(Window w, XWindowAttributes *wa) {
 	if(t)
 		for(i = 0; i < ntags; i++)
 			c->tags[i] = t->tags[i];
-	if(!getprops(c))
-		applyrules(c);
+	applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
-	setprops(c);
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
 	ban(c);
+	XMapWindow(dpy, c->win);
 	arrange();
 }
 
@@ -318,29 +297,15 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-setprops(Client *c) {
-	unsigned int i;
-
-	for(i = 0; i < ntags && i < sizeof buf - 1; i++)
-		buf[i] = c->tags[i] ? '1' : '0';
-	if(i < sizeof buf - 1)
-		buf[i++] = c->isfloating ? '1' : '0';
-	buf[i] = '\0';
-	XChangeProperty(dpy, c->win, dwmprops, XA_STRING, 8,
-			PropModeReplace, (unsigned char *)buf, i);
-}
-
-void
 unban(Client *c) {
 	if(!c->isbanned)
 		return;
-	XMapWindow(dpy, c->win);
-	setclientstate(c, NormalState);
+	XMoveWindow(dpy, c->win, c->x, c->y);
 	c->isbanned = False;
 }
 
 void
-unmanage(Client *c, long state) {
+unmanage(Client *c) {
 	XWindowChanges wc;
 
 	wc.border_width = c->oldborder;
@@ -353,14 +318,13 @@ unmanage(Client *c, long state) {
 	if(sel == c)
 		focus(NULL);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	setclientstate(c, state);
+	setclientstate(c, WithdrawnState);
 	free(c->tags);
 	free(c);
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	if(state != NormalState)
-		arrange();
+	arrange();
 }
 
 void

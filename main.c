@@ -20,7 +20,7 @@ int screen, sx, sy, sw, sh, wax, way, waw, wah;
 unsigned int bh, ntags;
 unsigned int bpos = BARPOS;
 unsigned int numlockmask = 0;
-Atom dwmprops, wmatom[WMLast], netatom[NetLast];
+Atom wmatom[WMLast], netatom[NetLast];
 Bool *seltags;
 Bool selscreen = True;
 Client *clients = NULL;
@@ -42,7 +42,7 @@ cleanup(void) {
 	close(STDIN_FILENO);
 	while(stack) {
 		unban(stack);
-		unmanage(stack, NormalState);
+		unmanage(stack);
 	}
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
@@ -165,7 +165,6 @@ setup(void) {
 	XSetWindowAttributes wa;
 
 	/* init atoms */
-	dwmprops = XInternAtom(dpy, "_DWM_PROPERTIES", False);
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	wmatom[WMName] = XInternAtom(dpy, "WM_NAME", False);
@@ -231,7 +230,6 @@ setup(void) {
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 	/* multihead support */
 	selscreen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
-	getdwmprops();
 }
 
 /*

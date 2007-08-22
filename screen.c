@@ -3,8 +3,6 @@
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
 /* static */
@@ -28,7 +26,6 @@ typedef struct {
 TAGS
 RULES
 
-static char buf[512];
 static unsigned int nrules = 0;
 static unsigned int nlayouts = 0;
 static unsigned int ltidx = 0; /* default */
@@ -53,19 +50,6 @@ floating(void) { /* default floating layout */
 			resize(c, c->x, c->y, c->w, c->h, True);
 }
 
-static void
-setdwmprops(void) {
-	unsigned int i;
-
-	for(i = 0; i < ntags && i < sizeof buf - 1; i++)
-		buf[i] = seltags[i] ? '1' : '0';
-	if(i < sizeof buf - 1)
-		buf[i++] = (char)ltidx + '0';
-	buf[i] = '\0';
-	XChangeProperty(dpy, root, dwmprops, XA_STRING, 8,
-			PropModeReplace, (unsigned char *)buf, i);
-}
-
 LAYOUTS
 
 /* extern */
@@ -74,6 +58,7 @@ unsigned int blw = 0;
 
 void
 applyrules(Client *c) {
+	static char buf[512];
 	unsigned int i, j;
 	regmatch_t tmp;
 	Bool matched = False;
@@ -215,20 +200,6 @@ isvisible(Client *c) {
 	return False;
 }
 
-void
-getdwmprops(void) {
-	unsigned int i;
-
-	if(gettextprop(root, dwmprops, buf, sizeof buf)) {
-		for(i = 0; i < ntags && i < sizeof buf - 1 && buf[i] != '\0'; i++)
-			seltags[i] = buf[i] == '1';
-		if(i < sizeof buf - 1 && buf[i] != '\0') {
-			if((unsigned int)(buf[i] - '0') < nlayouts)
-				ltidx = buf[i] - '0';
-		}
-	}
-}
-
 Client *
 nexttiled(Client *c) {
 	for(; c && (c->isfloating || !isvisible(c)); c = c->next);
@@ -266,15 +237,17 @@ restack(void) {
 
 void
 setlayout(const char *arg) {
-	int i;
+	unsigned int i;
 
 	if(!arg) {
 		if(++ltidx == nlayouts)
 			ltidx = 0;;
 	}
 	else {
-		i = atoi(arg);
-		if(i < 0 || i >= nlayouts)
+		for(i = 0; i < nlayouts; i++)
+			if(arg == layouts[i].symbol)
+				break;
+		if(i == nlayouts)
 			return;
 		ltidx = i;
 	}
@@ -282,7 +255,6 @@ setlayout(const char *arg) {
 		arrange();
 	else
 		drawstatus();
-	setdwmprops();
 }
 
 void
@@ -296,7 +268,6 @@ tag(const char *arg) {
 	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		sel->tags[i] = True;
-	setprops(sel);
 	arrange();
 }
 
@@ -315,10 +286,8 @@ togglefloating(const char *arg) {
 	if(!sel || isfloating())
 		return;
 	sel->isfloating = !sel->isfloating;
-	if(sel->isfloating) {
+	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-		setprops(sel);
-	}
 	arrange();
 }
 
@@ -352,7 +321,6 @@ toggletag(const char *arg) {
 	for(j = 0; j < ntags && !sel->tags[j]; j++);
 	if(j == ntags)
 		sel->tags[i] = True;
-	setprops(sel);
 	arrange();
 }
 
@@ -365,7 +333,6 @@ toggleview(const char *arg) {
 	for(j = 0; j < ntags && !seltags[j]; j++);
 	if(j == ntags)
 		seltags[i] = True; /* cannot toggle last view */
-	setdwmprops();
 	arrange();
 }
 
@@ -404,6 +371,5 @@ view(const char *arg) {
 	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		seltags[i] = True;
-	setdwmprops();
 	arrange();
 }
