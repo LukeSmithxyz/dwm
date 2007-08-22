@@ -3,6 +3,7 @@
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <X11/Xutil.h>
 
 /* static */
@@ -245,7 +246,7 @@ setlayout(const char *arg) {
 	}
 	else {
 		for(i = 0; i < nlayouts; i++)
-			if(arg == layouts[i].symbol)
+			if(!strcmp(arg, layouts[i].symbol))
 				break;
 		if(i == nlayouts)
 			return;
