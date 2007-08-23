@@ -1,7 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include "dwm.h"
 #include <stdlib.h>
-#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
 /* static */
