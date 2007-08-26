@@ -46,7 +46,7 @@ tile(void) {
 
 	nx = wax;
 	ny = way;
-	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next)) {
+	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++) {
 		c->ismax = False;
 		if(i == 0) { /* master */
 			nw = mw - 2 * c->border;
@@ -66,7 +66,6 @@ tile(void) {
 		resize(c, nx, ny, nw, nh, False);
 		if(n > 1 && th != wah)
 			ny += nh + 2 * c->border;
-		i++;
 	}
 }
 

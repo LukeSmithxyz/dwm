@@ -229,6 +229,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
 	ban(c);
 	XMapWindow(dpy, c->win);
+	setclientstate(c, NormalState);
 	arrange();
 }
 

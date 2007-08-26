@@ -1,5 +1,5 @@
 # dwm version
-VERSION = 4.4
+VERSION = 4.4.1
 
 # Customize below to fit your system
 

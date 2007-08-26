@@ -284,7 +284,7 @@ togglebar(const char *arg) {
 
 void
 togglefloating(const char *arg) {
-	if(!sel || isfloating())
+	if(!sel)
 		return;
 	sel->isfloating = !sel->isfloating;
 	if(sel->isfloating)
