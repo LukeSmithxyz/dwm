@@ -31,6 +31,7 @@ static Layout layouts[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
 };
+#define RESIZEHINTS		False	/* True - respect size hints in tiled resizals */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define SNAP			32	/* snap pixel */
 

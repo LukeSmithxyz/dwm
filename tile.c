@@ -63,7 +63,7 @@ tile(void) {
 			else
 				nh = th - 2 * c->border;
 		}
-		resize(c, nx, ny, nw, nh, False);
+		resize(c, nx, ny, nw, nh, RESIZEHINTS);
 		if(n > 1 && th != wah)
 			ny += nh + 2 * c->border;
 	}
