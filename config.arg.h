@@ -4,12 +4,15 @@
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-*-*-12-*-*-*-*-*-iso10646-*"
-#define NORMBORDERCOLOR		"#cccc99"
-#define NORMFGCOLOR		"#000000"
-#define NORMBGCOLOR		"#99cc99"
-#define SELBORDERCOLOR		"#669966"
-#define SELFGCOLOR		"#000000"
-#define SELBGCOLOR		"#ccffcc"
+#define NORMBORDERCOLOR		"#244"
+#define NORMFGCOLOR		"#ddd"
+#define NORMBGCOLOR		"#133"
+#define SELBORDERCOLOR		"#699"
+#define SELFGCOLOR		"#eee"
+#define SELBGCOLOR		"#366"
+#define TERMBGCOLOR		"#122"
+#define TERMFGCOLOR		"#ddd"
+#define TERMCRCOLOR		"#ddd"
 
 /* tagging */
 #define TAGS \
@@ -44,7 +47,7 @@ Key keys[] = { \
 		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
 		" -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
-		"exec xterm -bg '#ffffea' -fg '#222222' -cr '#222222' +sb -fn '"FONT"'" }, \
+		"exec xterm -bg '"TERMBGCOLOR"' -fg '"TERMFGCOLOR"' -cr '"TERMCRCOLOR"' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_j,		focusnext,	NULL }, \
