@@ -273,16 +273,6 @@ tag(const char *arg) {
 }
 
 void
-togglebar(const char *arg) {
-	if(bpos == BarOff)
-		bpos = (BARPOS == BarOff) ? BarTop : BARPOS;
-	else
-		bpos = BarOff;
-	updatebarpos();
-	arrange();
-}
-
-void
 togglefloating(const char *arg) {
 	if(!sel)
 		return;
@@ -335,32 +325,6 @@ toggleview(const char *arg) {
 	if(j == ntags)
 		seltags[i] = True; /* cannot toggle last view */
 	arrange();
-}
-
-void
-updatebarpos(void) {
-	XEvent ev;
-
-	wax = sx;
-	way = sy;
-	wah = sh;
-	waw = sw;
-	switch(bpos) {
-	default:
-		wah -= bh;
-		way += bh;
-		XMoveWindow(dpy, barwin, sx, sy);
-		break;
-	case BarBot:
-		wah -= bh;
-		XMoveWindow(dpy, barwin, sx, sy + wah);
-		break;
-	case BarOff:
-		XMoveWindow(dpy, barwin, sx, sy - bh);
-		break;
-	}
-	XSync(dpy, False);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void

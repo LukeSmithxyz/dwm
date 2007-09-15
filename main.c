@@ -17,8 +17,7 @@
 
 char stext[256];
 int screen, sx, sy, sw, sh, wax, way, waw, wah;
-unsigned int bh, ntags;
-unsigned int bpos = BARPOS;
+unsigned int ntags;
 unsigned int numlockmask = 0;
 Atom wmatom[WMLast], netatom[NetLast];
 Bool *seltags;
@@ -28,8 +27,7 @@ Client *sel = NULL;
 Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
-DC dc = {0};
-Window root, barwin;
+Window root;
 
 /* static */
 
@@ -58,57 +56,6 @@ cleanup(void) {
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
 	free(seltags);
-}
-
-static unsigned long
-initcolor(const char *colstr) {
-	Colormap cmap = DefaultColormap(dpy, screen);
-	XColor color;
-
-	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
-		eprint("error, cannot allocate color '%s'\n", colstr);
-	return color.pixel;
-}
-
-static void
-initfont(const char *fontstr) {
-	char *def, **missing;
-	int i, n;
-
-	missing = NULL;
-	if(dc.font.set)
-		XFreeFontSet(dpy, dc.font.set);
-	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
-	if(missing) {
-		while(n--)
-			fprintf(stderr, "dwm: missing fontset: %s\n", missing[n]);
-		XFreeStringList(missing);
-	}
-	if(dc.font.set) {
-		XFontSetExtents *font_extents;
-		XFontStruct **xfonts;
-		char **font_names;
-		dc.font.ascent = dc.font.descent = 0;
-		font_extents = XExtentsOfFontSet(dc.font.set);
-		n = XFontsOfFontSet(dc.font.set, &xfonts, &font_names);
-		for(i = 0, dc.font.ascent = 0, dc.font.descent = 0; i < n; i++) {
-			if(dc.font.ascent < (*xfonts)->ascent)
-				dc.font.ascent = (*xfonts)->ascent;
-			if(dc.font.descent < (*xfonts)->descent)
-				dc.font.descent = (*xfonts)->descent;
-			xfonts++;
-		}
-	}
-	else {
-		if(dc.font.xfont)
-			XFreeFont(dpy, dc.font.xfont);
-		dc.font.xfont = NULL;
-		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr)))
-			eprint("error, cannot load font: '%s'\n", fontstr);
-		dc.font.ascent = dc.font.xfont->ascent;
-		dc.font.descent = dc.font.xfont->descent;
-	}
-	dc.font.height = dc.font.ascent + dc.font.descent;
 }
 
 static long
@@ -197,37 +144,12 @@ setup(void) {
 	for(ntags = 0; tags[ntags]; ntags++);
 	seltags = emallocz(sizeof(Bool) * ntags);
 	seltags[0] = True;
-	/* style */
-	dc.norm[ColBorder] = initcolor(NORMBORDERCOLOR);
-	dc.norm[ColBG] = initcolor(NORMBGCOLOR);
-	dc.norm[ColFG] = initcolor(NORMFGCOLOR);
-	dc.sel[ColBorder] = initcolor(SELBORDERCOLOR);
-	dc.sel[ColBG] = initcolor(SELBGCOLOR);
-	dc.sel[ColFG] = initcolor(SELFGCOLOR);
-	initfont(FONT);
 	/* geometry */
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	initlayouts();
-	/* bar */
-	dc.h = bh = dc.font.height + 2;
-	wa.override_redirect = 1;
-	wa.background_pixmap = ParentRelative;
-	wa.event_mask = ButtonPressMask | ExposureMask;
-	barwin = XCreateWindow(dpy, root, sx, sy, sw, bh, 0,
-			DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
-			CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
-	XDefineCursor(dpy, barwin, cursor[CurNormal]);
-	updatebarpos();
-	XMapRaised(dpy, barwin);
-	strcpy(stext, "dwm-"VERSION);
-	/* pixmap for everything */
-	dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
-	dc.gc = XCreateGC(dpy, root, 0, 0);
-	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
-	if(!dc.font.set)
-		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
+	initbar();
 	/* multihead support */
 	selscreen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
 }

@@ -88,6 +88,13 @@ extern DC dc;					/* global draw context */
 extern Display *dpy;
 extern Window root, barwin;
 
+/* bar.c */
+void drawbar(void);			/* draw the bar */
+void initbar(void);			/* initializes the bar */
+unsigned int textw(const char *text);	/* return the width of text in px*/
+void togglebar(const char *arg);	/* shows/hides the bar */
+void updatebarpos(void);		/* updates the bar position */
+
 /* client.c */
 void attach(Client *c);			/* attaches c to global client list */
 void ban(Client *c);			/* bans c */
@@ -102,11 +109,6 @@ void unban(Client *c);			/* unbans c */
 void unmanage(Client *c);		/* unmanage c */
 void updatesizehints(Client *c);	/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
-
-/* draw.c */
-void drawbar(void);			/* draw the bar */
-void drawtext(const char *text, unsigned long col[ColLast]);	/* draw text */
-unsigned int textw(const char *text);	/* return the width of text in px*/
 
 /* event.c */
 void grabkeys(void);			/* grab all keys defined in config.h */
@@ -132,12 +134,10 @@ Client *nexttiled(Client *c);		/* returns tiled successor of c */
 void restack(void);			/* restores z layers of all clients */
 void setlayout(const char *arg);	/* sets layout, NULL means next layout */
 void tag(const char *arg);		/* tags sel with arg's index */
-void togglebar(const char *arg);	/* shows/hides the bar */
 void togglefloating(const char *arg);	/* toggles sel between floating/tiled state */
 void togglemax(const char *arg);	/* toggles maximization of floating client */
 void toggletag(const char *arg);	/* toggles sel tags with arg's index */
 void toggleview(const char *arg);	/* toggles the tag with arg's index (in)visible */
-void updatebarpos(void);		/* updates the bar position */
 void view(const char *arg);		/* views the tag with arg's index */
 
 /* util.c */
