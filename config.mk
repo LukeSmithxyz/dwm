@@ -3,9 +3,6 @@ VERSION = 4.5
 
 # Customize below to fit your system
 
-# additional layouts beside floating
-SRC = tile.c
-
 # paths
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man

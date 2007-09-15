@@ -12,24 +12,20 @@
 #define SELFGCOLOR		"#fff"
 
 /* tagging */
-#define TAGS \
-const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
-#define RULES \
-static Rule rules[] = { \
-	/* class:instance:title regex	tags regex	isfloating */ \
-	{ "Firefox",			"3",		False }, \
-	{ "Gimp",			NULL,		True }, \
-	{ "MPlayer",			NULL,		True }, \
-	{ "Acroread",			NULL,		True }, \
+static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
+static Rule rules[] = {
+	/* class:instance:title regex	tags regex	isfloating */
+	{ "Firefox",			"3",		False },
+	{ "Gimp",			NULL,		True },
+	{ "MPlayer",			NULL,		True },
+	{ "Acroread",			NULL,		True },
 };
 
 /* layout(s) */
-#include "tile.h"
-#define LAYOUTS \
-static Layout layouts[] = { \
-	/* symbol		function */ \
-	{ "[]=",		tile }, /* first entry is default */ \
-	{ "><>",		floating }, \
+static Layout layouts[] = {
+	/* symbol		function */
+	{ "[]=",		tile }, /* first entry is default */
+	{ "><>",		floating },
 };
 #define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */

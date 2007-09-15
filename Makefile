@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC += bar.c client.c event.c main.c screen.c util.c
+SRC = dwm.c
 OBJ = ${SRC:.c=.o}
 
 all: options dwm
@@ -18,7 +18,7 @@ options:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${OBJ}: dwm.h config.h config.mk
+${OBJ}: config.h config.mk
 
 dwm: ${OBJ}
 	@echo CC -o $@
@@ -32,7 +32,7 @@ dist: clean
 	@echo creating dist tarball
 	@mkdir -p dwm-${VERSION}
 	@cp -R LICENSE Makefile README config.h config.mk \
-		dwm.1 dwm.h tile.h ${SRC} dwm-${VERSION}
+		dwm.1 ${SRC} dwm-${VERSION}
 	@tar -cf dwm-${VERSION}.tar dwm-${VERSION}
 	@gzip dwm-${VERSION}.tar
 	@rm -rf dwm-${VERSION}
