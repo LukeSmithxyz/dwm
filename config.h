@@ -4,19 +4,11 @@
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-*-*-12-*-*-*-*-*-iso10646-*"
-#define DARK /* LIGHT */
-#ifdef DARK
-#define NORMBORDERCOLOR		"#222"
+#define NORMBORDERCOLOR		"#333"
 #define NORMBGCOLOR		"#000"
-#define NORMFGCOLOR		"#ddd"
-#define SELBORDERCOLOR		"#09f"
-#else
-#define NORMBORDERCOLOR		"#666"
-#define NORMBGCOLOR		"#eee"
-#define NORMFGCOLOR		"#222"
+#define NORMFGCOLOR		"#ccc"
 #define SELBORDERCOLOR		"#f00"
-#endif
-#define SELBGCOLOR		"#369"
+#define SELBGCOLOR		"#00f"
 #define SELFGCOLOR		"#fff"
 
 /* tagging */

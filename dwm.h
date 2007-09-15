@@ -91,6 +91,7 @@ extern Window root, barwin;
 /* bar.c */
 void drawbar(void);			/* draw the bar */
 void initbar(void);			/* initializes the bar */
+void initstyle(void);			/* initializes colors and font */
 unsigned int textw(const char *text);	/* return the width of text in px*/
 void togglebar(const char *arg);	/* shows/hides the bar */
 void updatebarpos(void);		/* updates the bar position */

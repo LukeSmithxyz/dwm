@@ -148,6 +148,7 @@ setup(void) {
 	sx = sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
+	initstyle();
 	initlayouts();
 	initbar();
 	/* multihead support */

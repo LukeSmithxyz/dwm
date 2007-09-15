@@ -69,7 +69,8 @@ initfont(const char *fontstr) {
 		if(dc.font.xfont)
 			XFreeFont(dpy, dc.font.xfont);
 		dc.font.xfont = NULL;
-		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr)))
+		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr))
+		|| !(dc.font.xfont = XLoadQueryFont(dpy, "fixed")))
 			eprint("error, cannot load font: '%s'\n", fontstr);
 		dc.font.ascent = dc.font.xfont->ascent;
 		dc.font.descent = dc.font.xfont->descent;
@@ -186,9 +187,7 @@ drawbar(void) {
 }
 
 void
-initbar(void) {
-	XSetWindowAttributes wa;
-
+initstyle(void) {
 	dc.norm[ColBorder] = initcolor(NORMBORDERCOLOR);
 	dc.norm[ColBG] = initcolor(NORMBGCOLOR);
 	dc.norm[ColFG] = initcolor(NORMFGCOLOR);
@@ -197,6 +196,12 @@ initbar(void) {
 	dc.sel[ColFG] = initcolor(SELFGCOLOR);
 	initfont(FONT);
 	dc.h = bh = dc.font.height + 2;
+}
+
+void
+initbar(void) {
+	XSetWindowAttributes wa;
+
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask | ExposureMask;
