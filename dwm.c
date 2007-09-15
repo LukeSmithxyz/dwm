@@ -129,7 +129,6 @@ static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void propertynotify(XEvent *e);
 static void unmapnotify(XEvent *e);
-static void grabkeys(void);
 static unsigned int idxoftag(const char *tag);
 static void floating(void); /* default floating layout */
 static void applyrules(Client *c);
@@ -1070,9 +1069,26 @@ keypress(XEvent *e) {
 	KEYS
 	unsigned int len = sizeof keys / sizeof keys[0];
 	unsigned int i;
+	KeyCode code;
 	KeySym keysym;
-	XKeyEvent *ev = &e->xkey;
+	XKeyEvent *ev;
 
+	if(!e) { /* grabkeys */
+		XUngrabKey(dpy, AnyKey, AnyModifier, root);
+		for(i = 0; i < len; i++) {
+			code = XKeysymToKeycode(dpy, keys[i].keysym);
+			XGrabKey(dpy, code, keys[i].mod, root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
+					GrabModeAsync, GrabModeAsync);
+		}
+		return;
+	}
+	ev = &e->xkey;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++)
 		if(keysym == keys[i].keysym
@@ -1099,7 +1115,7 @@ mappingnotify(XEvent *e) {
 
 	XRefreshKeyboardMapping(ev);
 	if(ev->request == MappingKeyboard)
-		grabkeys();
+		keypress(NULL);
 }
 
 static void
@@ -1150,27 +1166,6 @@ unmapnotify(XEvent *e) {
 
 	if((c = getclient(ev->window)))
 		unmanage(c);
-}
-
-static void
-grabkeys(void) {
-	KEYS
-	unsigned int len = sizeof keys / sizeof keys[0];
-	unsigned int i;
-	KeyCode code;
-
-	XUngrabKey(dpy, AnyKey, AnyModifier, root);
-	for(i = 0; i < len; i++) {
-		code = XKeysymToKeycode(dpy, keys[i].keysym);
-		XGrabKey(dpy, code, keys[i].mod, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
-				GrabModeAsync, GrabModeAsync);
-	}
 }
 
 static unsigned int
@@ -1546,7 +1541,7 @@ setup(void) {
 	wa.cursor = cursor[CurNormal];
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
-	grabkeys();
+	keypress(NULL); /* grabkeys */
 	compileregs();
 	for(ntags = 0; tags[ntags]; ntags++);
 	seltags = emallocz(sizeof(Bool) * ntags);
