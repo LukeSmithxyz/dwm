@@ -3,22 +3,29 @@
 /* appearance */
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
-#define FONT			"-*-fixed-medium-r-normal-*-13-*-*-*-*-*-*-*"
-#define NORMBORDERCOLOR		"#dddddd"
-#define NORMBGCOLOR		"#eeeeee"
-#define NORMFGCOLOR		"#222222"
-#define SELBORDERCOLOR		"#ff0000"
-#define SELBGCOLOR		"#006699"
-#define SELFGCOLOR		"#ffffff"
+#define FONT			"-*-terminus-medium-r-*-*-12-*-*-*-*-*-iso10646-*"
+#define DARK /* LIGHT */
+#ifdef DARK
+#define NORMBORDERCOLOR		"#222"
+#define NORMBGCOLOR		"#000"
+#define NORMFGCOLOR		"#eee"
+#define SELBORDERCOLOR		"#09f"
+#else
+#define NORMBORDERCOLOR		"#666"
+#define NORMBGCOLOR		"#eee"
+#define NORMFGCOLOR		"#222"
+#define SELBORDERCOLOR		"#f00"
+#endif
+#define SELBGCOLOR		"#369"
+#define SELFGCOLOR		"#fff"
 
 /* tagging */
 #define TAGS \
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
-/* Query class:instance:title for regex matching info with following command:
- * xprop | awk -F '"' '/^WM_CLASS/ { printf("%s:%s:",$4,$2) }; /^WM_NAME/ { printf("%s\n",$2) }' */
 #define RULES \
 static Rule rules[] = { \
 	/* class:instance:title regex	tags regex	isfloating */ \
+	{ "Firefox",			"3",		False }, \
 	{ "Gimp",			NULL,		True }, \
 	{ "MPlayer",			NULL,		True }, \
 	{ "Acroread",			NULL,		True }, \
@@ -32,7 +39,7 @@ static Layout layouts[] = { \
 	{ "[]=",		tile }, /* first entry is default */ \
 	{ "><>",		floating }, \
 };
-#define RESIZEHINTS		False	/* True - respect size hints in tiled resizals */
+#define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define SNAP			32	/* snap pixel */
 
@@ -41,8 +48,11 @@ static Layout layouts[] = { \
 #define KEYS \
 Key keys[] = { \
 	/* modifier			key		function	argument */ \
-	{ MODKEY|ShiftMask,		XK_Return,	spawn,		"exec xterm" }, \
-	{ MODKEY,			XK_p,		spawn, 		"exe=`dmenu_path | dmenu` && exec $exe" }, \
+	{ MODKEY,			XK_p,		spawn, \
+		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
+		" -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
+	{ MODKEY|ShiftMask,		XK_Return,	spawn, \
+		"exec xterm -bg '"NORMBGCOLOR"' -fg '"NORMFGCOLOR"' -cr '"NORMFGCOLOR"' +sb -fn '"FONT"'" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_j,		focusnext,	NULL }, \
