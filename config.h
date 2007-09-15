@@ -8,7 +8,7 @@
 #ifdef DARK
 #define NORMBORDERCOLOR		"#222"
 #define NORMBGCOLOR		"#000"
-#define NORMFGCOLOR		"#eee"
+#define NORMFGCOLOR		"#ddd"
 #define SELBORDERCOLOR		"#09f"
 #else
 #define NORMBORDERCOLOR		"#666"

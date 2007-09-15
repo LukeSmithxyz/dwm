@@ -20,10 +20,6 @@ options:
 
 ${OBJ}: dwm.h config.h config.mk
 
-config.h:
-	@echo creating $@ from config.default.h
-	@cp config.default.h $@
-
 dwm: ${OBJ}
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
@@ -35,7 +31,7 @@ clean:
 dist: clean
 	@echo creating dist tarball
 	@mkdir -p dwm-${VERSION}
-	@cp -R LICENSE Makefile README config.default.h config.mk \
+	@cp -R LICENSE Makefile README config.h config.mk \
 		dwm.1 dwm.h tile.h ${SRC} dwm-${VERSION}
 	@tar -cf dwm-${VERSION}.tar dwm-${VERSION}
 	@gzip dwm-${VERSION}.tar
