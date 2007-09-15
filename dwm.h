@@ -104,7 +104,7 @@ void updatesizehints(Client *c);	/* update the size hint variables of c */
 void updatetitle(Client *c);		/* update the name of c */
 
 /* draw.c */
-void drawstatus(void);			/* draw the bar */
+void drawbar(void);			/* draw the bar */
 void drawtext(const char *text, unsigned long col[ColLast]);	/* draw text */
 unsigned int textw(const char *text);	/* return the width of text in px*/
 

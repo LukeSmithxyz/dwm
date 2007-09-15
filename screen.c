@@ -213,7 +213,7 @@ restack(void) {
 	XEvent ev;
 	XWindowChanges wc;
 
-	drawstatus();
+	drawbar();
 	if(!sel)
 		return;
 	if(sel->isfloating || isfloating())
@@ -255,7 +255,7 @@ setlayout(const char *arg) {
 	if(sel)
 		arrange();
 	else
-		drawstatus();
+		drawbar();
 }
 
 void
@@ -307,7 +307,7 @@ togglemax(const char *arg) {
 	}
 	else
 		resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
-	drawstatus();
+	drawbar();
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 

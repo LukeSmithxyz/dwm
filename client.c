@@ -145,7 +145,7 @@ focus(Client *c) {
 		grabbuttons(c, True);
 	}
 	sel = c;
-	drawstatus();
+	drawbar();
 	if(!selscreen)
 		return;
 	if(c) {

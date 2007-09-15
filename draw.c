@@ -49,7 +49,7 @@ textnw(const char *text, unsigned int len) {
 /* extern */
 
 void
-drawstatus(void) {
+drawbar(void) {
 	int i, x;
 
 	dc.x = dc.y = 0;

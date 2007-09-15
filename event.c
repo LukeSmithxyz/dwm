@@ -245,7 +245,7 @@ expose(XEvent *e) {
 
 	if(ev->count == 0) {
 		if(barwin == ev->window)
-			drawstatus();
+			drawbar();
 	}
 }
 
@@ -322,7 +322,7 @@ propertynotify(XEvent *e) {
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
 			if(c == sel)
-				drawstatus();
+				drawbar();
 		}
 	}
 }

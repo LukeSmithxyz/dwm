@@ -326,7 +326,7 @@ main(int argc, char *argv[]) {
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
 	setup();
-	drawstatus();
+	drawbar();
 	scan();
 
 	/* main event loop, also reads status text from stdin */
@@ -359,7 +359,7 @@ main(int argc, char *argv[]) {
 				if(p > stext)
 					strncpy(stext, p + 1, sizeof stext);
 			}
-			drawstatus();
+			drawbar();
 		}
 		while(XPending(dpy)) {
 			XNextEvent(dpy, &ev);
