@@ -342,8 +342,12 @@ buttonpress(XEvent *e) {
 				restack();
 			movemouse(c);
 		}
-		else if(ev->button == Button2)
-			zoom(NULL);
+		else if(ev->button == Button2) {
+			if(isarrange(tile) && !c->isfixed && c->isfloating)
+				togglefloating(NULL);
+			else
+				zoom(NULL);
+		}
 		else if(ev->button == Button3 && !c->isfixed) {
 			if(!isarrange(floating) && !c->isfloating)
 				togglefloating(NULL);
