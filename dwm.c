@@ -335,16 +335,20 @@ buttonpress(XEvent *e) {
 		focus(c);
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
-		if(ev->button == Button1 && (isarrange(floating) || c->isfloating)) {
-			restack();
+		if(ev->button == Button1) {
+			if(!isarrange(floating) && !c->isfloating)
+				togglefloating(NULL);
+			else
+				restack();
 			movemouse(c);
 		}
 		else if(ev->button == Button2)
 			zoom(NULL);
-		else if(ev->button == Button3
-		&& (isarrange(floating) || c->isfloating) && !c->isfixed)
-		{
-			restack();
+		else if(ev->button == Button3 && !c->isfixed) {
+			if(!isarrange(floating) && !c->isfloating)
+				togglefloating(NULL);
+			else
+				restack();
 			resizemouse(c);
 		}
 	}
