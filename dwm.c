@@ -1806,7 +1806,7 @@ main(int argc, char *argv[]) {
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 
-	/* macros from config.h can be used beginning within main() */
+	/* macros from config.h can be used at function level only */
 	mwfact = MWFACT;
 	bpos = BARPOS;
 
