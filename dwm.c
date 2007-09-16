@@ -194,20 +194,16 @@ static int xerrordummy(Display *dsply, XErrorEvent *ee);
 static int xerrorstart(Display *dsply, XErrorEvent *ee);
 static void zoom(const char *arg);
 
-#include "config.h"
-
 /* variables */
 static char stext[256];
-static double mwfact = MWFACT;
+static double mwfact;
 static int screen, sx, sy, sw, sh, wax, way, waw, wah;
 static int (*xerrorxlib)(Display *, XErrorEvent *);
-static unsigned int bh;
+static unsigned int bh, bpos, ntags;
 static unsigned int blw = 0;
-static unsigned int bpos = BARPOS;
 static unsigned int ltidx = 0; /* default */
 static unsigned int nlayouts = 0;
 static unsigned int nrules = 0;
-static unsigned int ntags;
 static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -236,6 +232,9 @@ static Display *dpy;
 static DC dc = {0};
 static Window barwin, root;
 static Regs *regs = NULL;
+
+/* configuration, allows nested code to work on above variables */
+#include "config.h"
 
 static void
 eprint(const char *errstr, ...) {
@@ -1806,6 +1805,11 @@ main(int argc, char *argv[]) {
 		eprint("dwm-"VERSION", © 2006-2007 A. R. Garbe, S. van Dijk, J. Salmi, P. Hruby, S. Nagy\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
+
+	/* macros from config.h can be used beginning within main() */
+	mwfact = MWFACT;
+	bpos = BARPOS;
+
 	setlocale(LC_CTYPE, "");
 	if(!(dpy = XOpenDisplay(0)))
 		eprint("dwm: cannot open display\n");
