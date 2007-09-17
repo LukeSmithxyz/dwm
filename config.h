@@ -12,8 +12,8 @@
 #define SELFGCOLOR		"#fff"
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
-static Rule rules[] = {
+const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
+Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
 	{ "Firefox",			"3",		False },
 	{ "Gimp",			NULL,		True },
@@ -22,7 +22,7 @@ static Rule rules[] = {
 };
 
 /* layout(s) */
-static Layout layouts[] = {
+Layout layouts[] = {
 	/* symbol		function */
 	{ "[]=",		tile }, /* first entry is default */
 	{ "><>",		floating },
