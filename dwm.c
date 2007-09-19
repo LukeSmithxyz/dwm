@@ -334,10 +334,10 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			if(!isarrange(floating) && !c->isfloating)
-				togglefloating(NULL);
-			else
+			if(isarrange(floating) || c->isfloating)
 				restack();
+			else
+				togglefloating(NULL);
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
@@ -347,10 +347,10 @@ buttonpress(XEvent *e) {
 				zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
-			if(!isarrange(floating) && !c->isfloating)
-				togglefloating(NULL);
-			else
+			if(isarrange(floating) || c->isfloating)
 				restack();
+			else
+				togglefloating(NULL);
 			resizemouse(c);
 		}
 	}
@@ -444,7 +444,7 @@ void
 configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 
-	if (ev->window == root && (ev->width != sw || ev->height != sh)) {
+	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
 		sw = ev->width;
 		sh = ev->height;
 		XFreePixmap(dpy, dc.drawable);
@@ -883,7 +883,7 @@ initfont(const char *fontstr) {
 			XFreeFont(dpy, dc.font.xfont);
 		dc.font.xfont = NULL;
 		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr))
-		|| !(dc.font.xfont = XLoadQueryFont(dpy, "fixed")))
+		&& !(dc.font.xfont = XLoadQueryFont(dpy, "fixed")))
 			eprint("error, cannot load font: '%s'\n", fontstr);
 		dc.font.ascent = dc.font.xfont->ascent;
 		dc.font.descent = dc.font.xfont->descent;
@@ -1404,10 +1404,10 @@ setmwfact(const char *arg) {
 	if(arg == NULL)
 		mwfact = MWFACT;
 	else if(1 == sscanf(arg, "%lf", &delta)) {
-		if(arg[0] != '+' && arg[0] != '-')
-			mwfact = delta;
-		else
+		if(arg[0] == '+' || arg[0] == '-')
 			mwfact += delta;
+		else
+			mwfact = delta;
 		if(mwfact < 0.1)
 			mwfact = 0.1;
 		else if(mwfact > 0.9)
@@ -1644,7 +1644,7 @@ togglemax(const char *arg) {
 	}
 	else {
 		resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
-		if (!sel->wasfloating)
+		if(!sel->wasfloating)
 			togglefloating(NULL);
 	}
 	drawbar();
