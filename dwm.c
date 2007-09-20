@@ -1673,7 +1673,7 @@ toggleview(const char *arg) {
 	seltags[i] = !seltags[i];
 	for(j = 0; j < ntags && !seltags[j]; j++);
 	if(j == ntags)
-		seltags[i] = True; /* cannot toggle last view */
+		seltags[i] = True; /* at least one tag must be viewed */
 	arrange();
 }
 
