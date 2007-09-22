@@ -1398,7 +1398,7 @@ void
 setmwfact(const char *arg) {
 	double delta;
 
-	if(!isarrange(tile))
+	if(isarrange(floating))
 		return;
 	/* arg handling, manipulate mwfact */
 	if(arg == NULL)
@@ -1850,7 +1850,7 @@ void
 zoom(const char *arg) {
 	Client *c;
 
-	if(!sel || !isarrange(tile) || sel->isfloating)
+	if(!sel || isarrange(floating) || sel->isfloating)
 		return;
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
