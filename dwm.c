@@ -341,7 +341,7 @@ buttonpress(XEvent *e) {
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if(isarrange(tile) && !c->isfixed && c->isfloating)
+			if(ISTILE && !c->isfixed && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
@@ -1398,7 +1398,7 @@ void
 setmwfact(const char *arg) {
 	double delta;
 
-	if(isarrange(floating))
+	if(!ISTILE)
 		return;
 	/* arg handling, manipulate mwfact */
 	if(arg == NULL)
@@ -1850,7 +1850,7 @@ void
 zoom(const char *arg) {
 	Client *c;
 
-	if(!sel || isarrange(floating) || sel->isfloating)
+	if(!sel || !ISTILE || sel->isfloating)
 		return;
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))
