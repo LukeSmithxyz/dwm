@@ -1418,6 +1418,7 @@ setmwfact(const char *arg) {
 
 void
 setup(void) {
+	int d;
 	unsigned int i, j, mask;
 	Window w;
 	XModifierKeymap *modmap;
@@ -1507,7 +1508,7 @@ setup(void) {
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 
 	/* multihead support */
-	selscreen = XQueryPointer(dpy, root, &w, &w, &i, &i, &i, &i, &mask);
+	selscreen = XQueryPointer(dpy, root, &w, &w, &d, &d, &d, &d, &mask);
 }
 
 void
