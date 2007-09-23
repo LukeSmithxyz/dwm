@@ -4,25 +4,25 @@
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-*-*-12-*-*-*-*-*-iso10646-*"
-#define NORMBORDERCOLOR		"#333"
-#define NORMBGCOLOR		"#000"
-#define NORMFGCOLOR		"#ccc"
-#define SELBORDERCOLOR		"#f00"
-#define SELBGCOLOR		"#00f"
-#define SELFGCOLOR		"#fff"
+#define NORMBORDERCOLOR		"#cccccc"
+#define NORMBGCOLOR		"#ffffff"
+#define NORMFGCOLOR		"#000000"
+#define SELBORDERCOLOR		"#ff0000"
+#define SELBGCOLOR		"#0000ff"
+#define SELFGCOLOR		"#ffffff"
 
 /* tagging */
-const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
+const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www", NULL };
 Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
-	{ "Firefox",			"3",		False },
+	{ "Firefox",			"www",		False },
 	{ "Gimp",			NULL,		True },
 	{ "MPlayer",			NULL,		True },
 	{ "Acroread",			NULL,		True },
 };
 
 /* layout(s) */
-#define ISTILE			isarrange(tile)
+#define ISTILE			isarrange(tile) /* || isarrange(<custom>) */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define SNAP			32	/* snap pixel */
