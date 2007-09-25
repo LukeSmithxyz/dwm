@@ -4,12 +4,12 @@
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-*-*-12-*-*-*-*-*-iso10646-*"
-#define NORMBORDERCOLOR		"#cccccc"
-#define NORMBGCOLOR		"#ffffff"
-#define NORMFGCOLOR		"#000000"
-#define SELBORDERCOLOR		"#ff0000"
-#define SELBGCOLOR		"#0000ff"
-#define SELFGCOLOR		"#ffffff"
+#define NORMBORDERCOLOR         "#cccccc"
+#define NORMBGCOLOR             "#eeeeee"
+#define NORMFGCOLOR             "#444444"
+#define SELBORDERCOLOR          "#0066ff"
+#define SELBGCOLOR              "#0066ff"
+#define SELFGCOLOR              "#ffffff"
 
 /* tagging */
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www", NULL };
