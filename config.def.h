@@ -5,10 +5,10 @@
 #define BORDERPX		1
 #define FONT			"-*-proggyclean-*-*-*-*-*-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR         "#cccccc"
-#define NORMBGCOLOR             "#ffffff"
+#define NORMBGCOLOR             "#dddddd"
 #define NORMFGCOLOR             "#333333"
-#define SELBORDERCOLOR          "#3366ff"
-#define SELBGCOLOR              "#3366ff"
+#define SELBORDERCOLOR          "#0066cc"
+#define SELBGCOLOR              "#0066cc"
 #define SELFGCOLOR              "#ffffff"
 
 /* tagging */
