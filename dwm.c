@@ -1569,7 +1569,7 @@ textw(const char *text) {
 void
 tile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, th;
-	Client *c;
+	Client *c, *mc;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
@@ -1582,7 +1582,8 @@ tile(void) {
 
 	nx = wax;
 	ny = way;
-	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++) {
+	nw = 0; /* gcc stupidity requires this */
+	for(i = 0, c = mc = nexttiled(clients); c; c = nexttiled(c->next), i++) {
 		c->ismax = False;
 		if(i == 0) { /* master */
 			nw = mw - 2 * c->border;
@@ -1591,9 +1592,9 @@ tile(void) {
 		else {  /* tile window */
 			if(i == 1) {
 				ny = way;
-				nx += mw;
+				nx += mc->w + 2 * mc->border;
+				nw = waw - nx - 2 * c->border;
 			}
-			nw = waw - mw - 2 * c->border;
 			if(i + 1 == n) /* remainder */
 				nh = (way + wah) - ny - 2 * c->border;
 			else
@@ -1601,7 +1602,7 @@ tile(void) {
 		}
 		resize(c, nx, ny, nw, nh, RESIZEHINTS);
 		if(n > 1 && th != wah)
-			ny += nh + 2 * c->border;
+			ny = c->y + c->h + 2 * c->border;
 	}
 }
 
