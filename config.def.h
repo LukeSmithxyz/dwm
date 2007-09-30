@@ -3,13 +3,13 @@
 /* appearance */
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
-#define FONT			"-*-proggyclean-*-*-*-*-*-*-*-*-*-*-*-*"
-#define NORMBORDERCOLOR         "#cccccc"
-#define NORMBGCOLOR             "#dddddd"
-#define NORMFGCOLOR             "#333333"
-#define SELBORDERCOLOR          "#0066cc"
-#define SELBGCOLOR              "#0066cc"
-#define SELFGCOLOR              "#ffffff"
+#define FONT			"-*-terminus-*-*-*-*-*-*-*-*-*-*-*-*"
+#define NORMBORDERCOLOR		"#cccccc"
+#define NORMBGCOLOR		"#cccccc"
+#define NORMFGCOLOR		"#000000"
+#define SELBORDERCOLOR		"#0066ff"
+#define SELBGCOLOR		"#0066ff"
+#define SELFGCOLOR		"#ffffff"
 
 /* tagging */
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www", NULL };

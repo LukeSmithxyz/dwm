@@ -646,8 +646,10 @@ enternotify(XEvent *e) {
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
 		return;
-	if((c = getclient(ev->window)))
+	if((c = getclient(ev->window))) {
 		focus(c);
+		restack();
+	}
 	else if(ev->window == root) {
 		selscreen = True;
 		focus(NULL);
@@ -1592,7 +1594,7 @@ tile(void) {
 		else {  /* tile window */
 			if(i == 1) {
 				ny = way;
-				nx += mc->w + 2 * mc->border;
+				nx += mc->w + mc->border;
 				nw = waw - nx - 2 * c->border;
 			}
 			if(i + 1 == n) /* remainder */
@@ -1602,7 +1604,7 @@ tile(void) {
 		}
 		resize(c, nx, ny, nw, nh, RESIZEHINTS);
 		if(n > 1 && th != wah)
-			ny = c->y + c->h + 2 * c->border;
+			ny = c->y + c->h + c->border;
 	}
 }
 
