@@ -648,7 +648,8 @@ enternotify(XEvent *e) {
 		return;
 	if((c = getclient(ev->window))) {
 		focus(c);
-		restack();
+		if(ISTILE && !c->isfloating)
+			restack();
 	}
 	else if(ev->window == root) {
 		selscreen = True;
