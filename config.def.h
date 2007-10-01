@@ -40,7 +40,7 @@ Key keys[] = { \
 	{ MODKEY,			XK_p,		spawn, \
 		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'" \
 		" -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" }, \
-	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec xterm" }, \
+	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" }, \
 	{ MODKEY,			XK_space,	setlayout,	NULL }, \
 	{ MODKEY,			XK_b,		togglebar,	NULL }, \
 	{ MODKEY,			XK_j,		focusnext,	NULL }, \
