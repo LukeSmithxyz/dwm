@@ -63,7 +63,7 @@ struct Client {
 	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
-	long flags; 
+	long flags;
 	unsigned int border, oldborder;
 	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
 	Bool *tags;
@@ -1162,7 +1162,7 @@ quit(const char *arg) {
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	double dx, dy, max, min, ratio;
-	XWindowChanges wc; 
+	XWindowChanges wc;
 
 	if(sizehints) {
 		if(c->minay > 0 && c->maxay > 0 && (h - c->baseh) > 0 && (w - c->basew) > 0) {
