@@ -1467,7 +1467,7 @@ setup(void) {
 
 	/* init tags */
 	compileregs();
-	for(ntags = 0; tags[ntags]; ntags++);
+	ntags = sizeof tags / sizeof tags[0];
 	seltags = emallocz(sizeof(Bool) * ntags);
 	seltags[0] = True;
 

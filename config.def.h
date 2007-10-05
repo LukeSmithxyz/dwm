@@ -12,7 +12,7 @@
 #define SELFGCOLOR		"#ffffff"
 
 /* tagging */
-const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www", NULL };
+const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
 Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
 	{ "Firefox",			"www",		False },
