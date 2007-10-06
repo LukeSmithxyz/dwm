@@ -57,21 +57,6 @@ enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
 /* typedefs */
 typedef struct Client Client;
-struct Client {
-	char name[256];
-	int x, y, w, h;
-	int rx, ry, rw, rh; /* revert geometry */
-	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int minax, maxax, minay, maxay;
-	long flags;
-	unsigned int border, oldborder;
-	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
-	Bool *tags;
-	Client *next;
-	Client *prev;
-	Client *snext;
-	Window win;
-};
 
 typedef struct {
 	int x, y, w, h;
@@ -195,7 +180,7 @@ char stext[256];
 double mwfact;
 int screen, sx, sy, sw, sh, wax, way, waw, wah;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-unsigned int bh, bpos, ntags;
+unsigned int bh, bpos;
 unsigned int blw = 0;
 unsigned int ltidx = 0; /* default */
 unsigned int nlayouts = 0;
@@ -218,7 +203,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 Atom wmatom[WMLast], netatom[NetLast];
 Bool otherwm, readin;
 Bool running = True;
-Bool *seltags;
 Bool selscreen = True;
 Client *clients = NULL;
 Client *sel = NULL;
@@ -231,6 +215,26 @@ Regs *regs = NULL;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+/* Statically define the number of tags. */
+unsigned int ntags = sizeof tags / sizeof tags[0];
+Bool seltags[sizeof tags / sizeof tags[0]] = {[0] = True};
+
+struct Client {
+	char name[256];
+	int x, y, w, h;
+	int rx, ry, rw, rh; /* revert geometry */
+	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+	int minax, maxax, minay, maxay;
+	long flags;
+	unsigned int border, oldborder;
+	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
+	Bool tags[sizeof tags / sizeof tags[0]];
+	Client *next;
+	Client *prev;
+	Client *snext;
+	Window win;
+};
 
 /* functions*/
 void
@@ -393,7 +397,6 @@ cleanup(void) {
 	XFreeCursor(dpy, cursor[CurMove]);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
-	free(seltags);
 }
 
 void
@@ -1006,7 +1009,6 @@ manage(Window w, XWindowAttributes *wa) {
 	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
-	c->tags = emallocz(ntags * sizeof(Bool));
 	c->win = w;
 	c->x = wa->x;
 	c->y = wa->y;
@@ -1467,9 +1469,6 @@ setup(void) {
 
 	/* init tags */
 	compileregs();
-	ntags = sizeof tags / sizeof tags[0];
-	seltags = emallocz(sizeof(Bool) * ntags);
-	seltags[0] = True;
 
 	/* init appearance */
 	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
@@ -1703,7 +1702,6 @@ unmanage(Client *c) {
 		focus(NULL);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
-	free(c->tags);
 	free(c);
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
