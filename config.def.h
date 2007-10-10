@@ -49,6 +49,7 @@ Key keys[] = { \
 	{ MODKEY,			XK_l,		setmwfact,	"+0.05" }, \
 	{ MODKEY,			XK_m,		togglemax,	NULL }, \
 	{ MODKEY,			XK_Return,	zoom,		NULL }, \
+	{ MODKEY,			XK_Tab,		viewprevtag,	NULL }, \
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL }, \
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL }, \
 	{ MODKEY,			XK_0,		view,		NULL }, \

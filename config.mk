@@ -17,7 +17,7 @@ LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
 # flags
 CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
 LDFLAGS = -s ${LIBS}
-#CFLAGS = -g -Wall -O2 ${INCS} -DVERSION=\"${VERSION}\"
+#CFLAGS = -g -std=c99 -pedantic -Wall -O2 ${INCS} -DVERSION=\"${VERSION}\"
 #LDFLAGS = -g ${LIBS}
 
 # Solaris

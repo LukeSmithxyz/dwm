@@ -58,6 +58,22 @@ enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 /* typedefs */
 typedef struct Client Client;
 
+struct Client {
+	char name[256];
+	int x, y, w, h;
+	int rx, ry, rw, rh; /* revert geometry */
+	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+	int minax, maxax, minay, maxay;
+	long flags;
+	unsigned int border, oldborder;
+	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
+	Bool *tags;
+	Client *next;
+	Client *prev;
+	Client *snext;
+	Window win;
+};
+
 typedef struct {
 	int x, y, w, h;
 	unsigned long norm[ColLast];
@@ -170,6 +186,7 @@ void updatebarpos(void);
 void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void view(const char *arg);
+void viewprevtag(const char *arg);	/* views previous selected tags */
 int xerror(Display *dpy, XErrorEvent *ee);
 int xerrordummy(Display *dsply, XErrorEvent *ee);
 int xerrorstart(Display *dsply, XErrorEvent *ee);
@@ -219,22 +236,7 @@ Regs *regs = NULL;
 /* Statically define the number of tags. */
 unsigned int ntags = sizeof tags / sizeof tags[0];
 Bool seltags[sizeof tags / sizeof tags[0]] = {[0] = True};
-
-struct Client {
-	char name[256];
-	int x, y, w, h;
-	int rx, ry, rw, rh; /* revert geometry */
-	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int minax, maxax, minay, maxay;
-	long flags;
-	unsigned int border, oldborder;
-	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
-	Bool tags[sizeof tags / sizeof tags[0]];
-	Client *next;
-	Client *prev;
-	Client *snext;
-	Window win;
-};
+Bool prevtags[sizeof tags / sizeof tags[0]] = {[0] = True};
 
 /* functions*/
 void
@@ -265,8 +267,7 @@ applyrules(Client *c) {
 	if(ch.res_name)
 		XFree(ch.res_name);
 	if(!matched)
-		for(i = 0; i < ntags; i++)
-			c->tags[i] = seltags[i];
+		memcpy(c->tags, seltags, sizeof seltags);
 }
 
 void
@@ -1002,13 +1003,13 @@ leavenotify(XEvent *e) {
 
 void
 manage(Window w, XWindowAttributes *wa) {
-	unsigned int i;
 	Client *c, *t = NULL;
 	Window trans;
 	Status rettrans;
 	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
+	c->tags = emallocz(sizeof seltags);
 	c->win = w;
 	c->x = wa->x;
 	c->y = wa->y;
@@ -1043,8 +1044,7 @@ manage(Window w, XWindowAttributes *wa) {
 	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
 		for(t = clients; t && t->win != trans; t = t->next);
 	if(t)
-		for(i = 0; i < ntags; i++)
-			c->tags[i] = t->tags[i];
+		memcpy(c->tags, t->tags, sizeof seltags);
 	applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
@@ -1702,6 +1702,7 @@ unmanage(Client *c) {
 		focus(NULL);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
+	free(c->tags);
 	free(c);
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
@@ -1838,11 +1839,22 @@ void
 view(const char *arg) {
 	unsigned int i;
 
+	memcpy(prevtags, seltags, sizeof seltags);
 	for(i = 0; i < ntags; i++)
 		seltags[i] = arg == NULL;
 	i = idxoftag(arg);
 	if(i >= 0 && i < ntags)
 		seltags[i] = True;
+	arrange();
+}
+
+void
+viewprevtag(const char *arg) {
+	static Bool tmptags[sizeof tags / sizeof tags[0]];
+
+	memcpy(tmptags, seltags, sizeof seltags);
+	memcpy(seltags, prevtags, sizeof seltags);
+	memcpy(prevtags, tmptags, sizeof seltags);
 	arrange();
 }
 
