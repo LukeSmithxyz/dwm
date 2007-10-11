@@ -25,6 +25,8 @@
  *
  * To understand everything else, start reading main().
  */
+#include "dwm.h"
+
 #include <errno.h>
 #include <locale.h>
 #include <stdarg.h>
@@ -39,7 +41,6 @@
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
-#include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
 
@@ -54,25 +55,6 @@ enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
-
-/* typedefs */
-typedef struct Client Client;
-
-struct Client {
-	char name[256];
-	int x, y, w, h;
-	int rx, ry, rw, rh; /* revert geometry */
-	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int minax, maxax, minay, maxay;
-	long flags;
-	unsigned int border, oldborder;
-	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
-	Bool *tags;
-	Client *next;
-	Client *prev;
-	Client *snext;
-	Window win;
-};
 
 typedef struct {
 	int x, y, w, h;
