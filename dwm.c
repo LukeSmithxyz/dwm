@@ -56,6 +56,7 @@ enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
+/* typedefs */
 typedef struct {
 	int x, y, w, h;
 	unsigned long norm[ColLast];
