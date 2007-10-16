@@ -1036,39 +1036,42 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	XWindowChanges wc;
 
 	if(sizehints) {
-		if(c->minay > 0 && c->maxay > 0 && (h - c->baseh) > 0 && (w - c->basew) > 0) {
-			dx = (double)(w - c->basew);
-			dy = (double)(h - c->baseh);
-			min = (double)(c->minax) / (double)(c->minay);
-			max = (double)(c->maxax) / (double)(c->maxay);
-			ratio = dx / dy;
-			if(max > 0 && min > 0 && ratio > 0) {
-				if(ratio < min) {
-					dy = (dx * min + dy) / (min * min + 1);
-					dx = dy * min;
-					w = (int)dx + c->basew;
-					h = (int)dy + c->baseh;
-				}
-				else if(ratio > max) {
-					dy = (dx * min + dy) / (max * max + 1);
-					dx = dy * min;
-					w = (int)dx + c->basew;
-					h = (int)dy + c->baseh;
-				}
-			}
+		/* set minimum possible */
+		if (w < 1)
+			w = 1;
+		if (h < 1)
+			h = 1;
+
+		/* temporarily remove base dimensions */
+		w -= c->basew;
+		h -= c->baseh;
+
+		/* adjust for aspect limits */
+		if (c->minay > 0 && c->maxay > 0 && c->minax > 0 && c->maxax > 0) {
+			if (w * c->maxay > h * c->maxax)
+				w = h * c->maxax / c->maxay;
+			else if (w * c->minay < h * c->minax)
+				h = w * c->minay / c->minax;
 		}
-		if(c->minw && w < c->minw)
-			w = c->minw;
-		if(c->minh && h < c->minh)
-			h = c->minh;
-		if(c->maxw && w > c->maxw)
-			w = c->maxw;
-		if(c->maxh && h > c->maxh)
-			h = c->maxh;
+
+		/* adjust for increment value */
 		if(c->incw)
-			w -= (w - c->basew) % c->incw;
+			w -= w % c->incw;
 		if(c->inch)
-			h -= (h - c->baseh) % c->inch;
+			h -= h % c->inch;
+
+		/* restore base dimensions */
+		w += c->basew;
+		h += c->baseh;
+
+		if(c->minw > 0 && w < c->minw)
+			w = c->minw;
+		if(c->minh > 0 && h < c->minh)
+			h = c->minh;
+		if(c->maxw > 0 && w > c->maxw)
+			w = c->maxw;
+		if(c->maxh > 0 && h > c->maxh)
+			h = c->maxh;
 	}
 	if(w <= 0 || h <= 0)
 		return;
