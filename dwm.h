@@ -184,8 +184,7 @@ Regs *regs = NULL;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-/* Statically define the number of tags. */
+/* statically define the number of tags. */
 unsigned int ntags = sizeof tags / sizeof tags[0];
 Bool seltags[sizeof tags / sizeof tags[0]] = {[0] = True};
 Bool prevtags[sizeof tags / sizeof tags[0]] = {[0] = True};
-
