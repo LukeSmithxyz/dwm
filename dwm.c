@@ -25,8 +25,6 @@
  *
  * To understand everything else, start reading main().
  */
-#include "dwm.h"
-
 #include <errno.h>
 #include <locale.h>
 #include <stdarg.h>
@@ -41,73 +39,17 @@
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
+
+#include "dwm.h"
 
 /* macros */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)		(mask & ~(numlockmask | LockMask))
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 
-/* local typedefs */
-typedef struct {
-	const char *prop;
-	const char *tags;
-	Bool isfloating;
-} Rule;
-
-typedef struct {
-	regex_t *propregex;
-	regex_t *tagregex;
-} Regs;
-
-/* variables */
-char stext[256];
-double mwfact;
-int screen, sx, sy, sw, sh, wax, way, waw, wah;
-int (*xerrorxlib)(Display *, XErrorEvent *);
-unsigned int bh, bpos;
-unsigned int blw = 0;
-unsigned int ltidx = 0; /* default */
-unsigned int nlayouts = 0;
-unsigned int nrules = 0;
-unsigned int numlockmask = 0;
-void (*handler[LASTEvent]) (XEvent *) = {
-	[ButtonPress] = buttonpress,
-	[ConfigureRequest] = configurerequest,
-	[ConfigureNotify] = configurenotify,
-	[DestroyNotify] = destroynotify,
-	[EnterNotify] = enternotify,
-	[LeaveNotify] = leavenotify,
-	[Expose] = expose,
-	[KeyPress] = keypress,
-	[MappingNotify] = mappingnotify,
-	[MapRequest] = maprequest,
-	[PropertyNotify] = propertynotify,
-	[UnmapNotify] = unmapnotify
-};
-Atom wmatom[WMLast], netatom[NetLast];
-Bool otherwm, readin;
-Bool running = True;
-Bool selscreen = True;
-Client *clients = NULL;
-Client *sel = NULL;
-Client *stack = NULL;
-Cursor cursor[CurLast];
-Display *dpy;
-DC dc = {0};
-Window barwin, root;
-Regs *regs = NULL;
-
-/* configuration, allows nested code to access above variables */
-#include "config.h"
-
-/* Statically define the number of tags. */
-unsigned int ntags = sizeof tags / sizeof tags[0];
-Bool seltags[sizeof tags / sizeof tags[0]] = {[0] = True};
-Bool prevtags[sizeof tags / sizeof tags[0]] = {[0] = True};
-
-/* functions*/
 void
 applyrules(Client *c) {
 	static char buf[512];
@@ -1032,7 +974,6 @@ quit(const char *arg) {
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
-	double dx, dy, max, min, ratio;
 	XWindowChanges wc;
 
 	if(sizehints) {
