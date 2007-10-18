@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC += dwm.c
+SRC = dwm.c
 OBJ = ${SRC:.c=.o}
 
 all: options dwm
@@ -35,7 +35,7 @@ clean:
 dist: clean
 	@echo creating dist tarball
 	@mkdir -p dwm-${VERSION}
-	@cp -R LICENSE Makefile README config.def.h config.mk dwm.h \
+	@cp -R LICENSE Makefile README config.def.h config.mk \
 		dwm.1 ${SRC} dwm-${VERSION}
 	@tar -cf dwm-${VERSION}.tar dwm-${VERSION}
 	@gzip dwm-${VERSION}.tar
