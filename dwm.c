@@ -111,7 +111,7 @@ typedef struct {
 	regex_t *tagregex;
 } Regs;
 
-/* functions */
+/* function declarations */
 void applyrules(Client *c);
 void arrange(void);
 void attach(Client *c);
@@ -236,6 +236,8 @@ Regs *regs = NULL;
 unsigned int ntags = sizeof tags / sizeof tags[0];
 Bool seltags[sizeof tags / sizeof tags[0]] = {[0] = True};
 Bool prevtags[sizeof tags / sizeof tags[0]] = {[0] = True};
+
+/* function implementations */
 void
 applyrules(Client *c) {
 	static char buf[512];
