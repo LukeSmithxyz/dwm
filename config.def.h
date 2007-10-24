@@ -24,7 +24,6 @@ Rule rules[] = {
 /* layout(s) */
 #define ISTILE			isarrange(tile) /* || isarrange(<custom>) */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
-#define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define SNAP			32	/* snap pixel */
 Layout layouts[] = {
 	/* symbol		function */
