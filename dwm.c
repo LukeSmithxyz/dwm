@@ -232,10 +232,9 @@ Regs *regs = NULL;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-/* statically define the number of tags. */
-unsigned int ntags = sizeof tags / sizeof tags[0];
-Bool seltags[sizeof tags / sizeof tags[0]] = {[0] = True};
-Bool prevtags[sizeof tags / sizeof tags[0]] = {[0] = True};
+#define NTAGS (sizeof tags / sizeof tags[0])
+Bool seltags[NTAGS] = {[0] = True};
+Bool prevtags[NTAGS] = {[0] = True};
 
 /* function implementations */
 void
@@ -254,7 +253,7 @@ applyrules(Client *c) {
 	for(i = 0; i < nrules; i++)
 		if(regs[i].propregex && !regexec(regs[i].propregex, buf, 1, &tmp, 0)) {
 			c->isfloating = rules[i].isfloating;
-			for(j = 0; regs[i].tagregex && j < ntags; j++) {
+			for(j = 0; regs[i].tagregex && j < NTAGS; j++) {
 				if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 					matched = True;
 					c->tags[j] = True;
@@ -313,7 +312,7 @@ buttonpress(XEvent *e) {
 
 	if(barwin == ev->window) {
 		x = 0;
-		for(i = 0; i < ntags; i++) {
+		for(i = 0; i < NTAGS; i++) {
 			x += textw(tags[i]);
 			if(ev->x < x) {
 				if(ev->button == Button1) {
@@ -537,7 +536,7 @@ drawbar(void) {
 	int i, x;
 
 	dc.x = dc.y = 0;
-	for(i = 0; i < ntags; i++) {
+	for(i = 0; i < NTAGS; i++) {
 		dc.w = textw(tags[i]);
 		if(seltags[i]) {
 			drawtext(tags[i], dc.sel);
@@ -847,10 +846,8 @@ unsigned int
 idxoftag(const char *tag) {
 	unsigned int i;
 
-	for(i = 0; i < ntags; i++)
-		if(tags[i] == tag)
-			return i;
-	return 0;
+	for(i = 0; (i < NTAGS) && (tags[i] != tag); i++);
+	return (i < NTAGS) ? i : 0;
 }
 
 void
@@ -930,7 +927,7 @@ Bool
 isvisible(Client *c) {
 	unsigned int i;
 
-	for(i = 0; i < ntags; i++)
+	for(i = 0; i < NTAGS; i++)
 		if(c->tags[i] && seltags[i])
 			return True;
 	return False;
@@ -1140,7 +1137,7 @@ propertynotify(XEvent *e) {
 			default: break;
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
-				if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
+				if(!c->isfloating && (c->isfloating = (NULL != getclient(trans))))
 					arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
@@ -1542,11 +1539,9 @@ tag(const char *arg) {
 
 	if(!sel)
 		return;
-	for(i = 0; i < ntags; i++)
-		sel->tags[i] = arg == NULL;
-	i = idxoftag(arg);
-	if(i >= 0 && i < ntags)
-		sel->tags[i] = True;
+	for(i = 0; i < NTAGS; i++)
+		sel->tags[i] = (NULL == arg);
+	sel->tags[idxoftag(arg)] = True;
 	arrange();
 }
 
@@ -1662,9 +1657,9 @@ toggletag(const char *arg) {
 		return;
 	i = idxoftag(arg);
 	sel->tags[i] = !sel->tags[i];
-	for(j = 0; j < ntags && !sel->tags[j]; j++);
-	if(j == ntags)
-		sel->tags[i] = True;
+	for(j = 0; j < NTAGS && !sel->tags[j]; j++);
+	if(j == NTAGS)
+		sel->tags[i] = True; /* at least one tag must be enabled */
 	arrange();
 }
 
@@ -1674,8 +1669,8 @@ toggleview(const char *arg) {
 
 	i = idxoftag(arg);
 	seltags[i] = !seltags[i];
-	for(j = 0; j < ntags && !seltags[j]; j++);
-	if(j == ntags)
+	for(j = 0; j < NTAGS && !seltags[j]; j++);
+	if(j == NTAGS)
 		seltags[i] = True; /* at least one tag must be viewed */
 	arrange();
 }
@@ -1841,11 +1836,9 @@ view(const char *arg) {
 	unsigned int i;
 
 	memcpy(prevtags, seltags, sizeof seltags);
-	for(i = 0; i < ntags; i++)
+	for(i = 0; i < NTAGS; i++)
 		seltags[i] = arg == NULL;
-	i = idxoftag(arg);
-	if(i >= 0 && i < ntags)
-		seltags[i] = True;
+	seltags[idxoftag(arg)] = True;
 	arrange();
 }
 
