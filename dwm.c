@@ -1597,7 +1597,7 @@ tile(void) {
 		}
 		resize(c, nx, ny, nw, nh, True);
 		if((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw))
-			/* client doesn't accept geometry, so enforce it */
+			/* client doesn't accept size constraints */
 			resize(c, nx, ny, nw, nh, False);
 		if(n > 1 && th != wah)
 			ny = c->y + c->h + 2 * c->border;
