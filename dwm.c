@@ -666,7 +666,7 @@ void
 expose(XEvent *e) {
 	XExposeEvent *ev = &e->xexpose;
 
-	if(ev->count == 0) {
+	if(0 == ev->count) {
 		if(barwin == ev->window)
 			drawbar();
 	}
@@ -780,7 +780,7 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 	int n;
 	XTextProperty name;
 
-	if(!text || size == 0)
+	if(!text || 0 == size)
 		return False;
 	text[0] = '\0';
 	XGetTextProperty(dpy, w, &name, atom);
@@ -1398,7 +1398,7 @@ setmwfact(const char *arg) {
 	if(!(ISTILE))
 		return;
 	/* arg handling, manipulate mwfact */
-	if(arg == NULL)
+	if(NULL == arg)
 		mwfact = MWFACT;
 	else if(1 == sscanf(arg, "%lf", &delta)) {
 		if(arg[0] == '+' || arg[0] == '-')
@@ -1515,8 +1515,8 @@ spawn(const char *arg) {
 		return;
 	/* The double-fork construct avoids zombie processes and keeps the code
 	 * clean from stupid signal handlers. */
-	if(fork() == 0) {
-		if(fork() == 0) {
+	if(0 == fork()) {
+		if(0 == fork()) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
@@ -1576,7 +1576,7 @@ tile(void) {
 	nw = 0; /* gcc stupidity requires this */
 	for(i = 0, c = mc = nexttiled(clients); c; c = nexttiled(c->next), i++) {
 		c->ismax = False;
-		if(i == 0) { /* master */
+		if(0 == i) { /* master */
 			nw = mw - 2 * c->border;
 			nh = wah - 2 * c->border;
 		}
@@ -1836,7 +1836,7 @@ view(const char *arg) {
 
 	memcpy(prevtags, seltags, sizeof seltags);
 	for(i = 0; i < NTAGS; i++)
-		seltags[i] = arg == NULL;
+		seltags[i] = (NULL == arg);
 	seltags[idxoftag(arg)] = True;
 	arrange();
 }
