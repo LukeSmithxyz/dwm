@@ -13,6 +13,9 @@
 
 /* tagging */
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
+#define NTAGS (sizeof tags / sizeof tags[0])
+Bool seltags[NTAGS] = {[0] = True};
+Bool prevtags[NTAGS] = {[0] = True};
 Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
 	{ "Firefox",			"www",		False },

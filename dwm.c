@@ -232,10 +232,6 @@ Regs *regs = NULL;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-#define NTAGS (sizeof tags / sizeof tags[0])
-Bool seltags[NTAGS] = {[0] = True};
-Bool prevtags[NTAGS] = {[0] = True};
-
 /* function implementations */
 void
 applyrules(Client *c) {
