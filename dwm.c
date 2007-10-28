@@ -145,7 +145,6 @@ Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
 unsigned int idxoftag(const char *tag);
 void initfont(const char *fontstr);
-Bool isarrange(void (*func)());
 Bool isoccupied(unsigned int t);
 Bool isprotodel(Client *c);
 Bool isvisible(Client *c);
@@ -198,9 +197,6 @@ int screen, sx, sy, sw, sh, wax, way, waw, wah;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int bh, bpos;
 unsigned int blw = 0;
-unsigned int ltidx = 0; /* default */
-unsigned int nlayouts = 0;
-unsigned int nrules = 0;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -217,6 +213,8 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 Atom wmatom[WMLast], netatom[NetLast];
+Bool domwfact = True;
+Bool dozoom = True;
 Bool otherwm, readin;
 Bool running = True;
 Bool selscreen = True;
@@ -226,6 +224,7 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
+Layout *layout = NULL;
 Window barwin, root;
 Regs *regs = NULL;
 
@@ -246,7 +245,7 @@ applyrules(Client *c) {
 	snprintf(buf, sizeof buf, "%s:%s:%s",
 			ch.res_class ? ch.res_class : "",
 			ch.res_name ? ch.res_name : "", c->name);
-	for(i = 0; i < nrules; i++)
+	for(i = 0; i < NRULES; i++)
 		if(regs[i].propregex && !regexec(regs[i].propregex, buf, 1, &tmp, 0)) {
 			c->isfloating = rules[i].isfloating;
 			for(j = 0; regs[i].tagregex && j < NTAGS; j++) {
@@ -273,7 +272,7 @@ arrange(void) {
 			unban(c);
 		else
 			ban(c);
-	layouts[ltidx].arrange();
+	layout->arrange();
 	focus(NULL);
 	restack();
 }
@@ -334,20 +333,20 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			if(isarrange(floating) || c->isfloating)
+			if((floating == layout->arrange) || c->isfloating)
 				restack();
 			else
 				togglefloating(NULL);
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if((ISTILE) && !c->isfixed && c->isfloating)
+			if((floating != layout->arrange) && !c->isfixed && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
-			if(isarrange(floating) || c->isfloating)
+			if((floating == layout->arrange) || c->isfloating)
 				restack();
 			else
 				togglefloating(NULL);
@@ -401,9 +400,8 @@ compileregs(void) {
 
 	if(regs)
 		return;
-	nrules = sizeof rules / sizeof rules[0];
-	regs = emallocz(nrules * sizeof(Regs));
-	for(i = 0; i < nrules; i++) {
+	regs = emallocz(NRULES * sizeof(Regs));
+	for(i = 0; i < NRULES; i++) {
 		if(rules[i].prop) {
 			reg = emallocz(sizeof(regex_t));
 			if(regcomp(reg, rules[i].prop, REG_EXTENDED))
@@ -464,7 +462,7 @@ configurerequest(XEvent *e) {
 		c->ismax = False;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-		if(c->isfixed || c->isfloating || isarrange(floating)) {
+		if(c->isfixed || c->isfloating || (floating == layout->arrange)) {
 			if(ev->value_mask & CWX)
 				c->x = ev->x;
 			if(ev->value_mask & CWY)
@@ -545,7 +543,7 @@ drawbar(void) {
 		dc.x += dc.w;
 	}
 	dc.w = blw;
-	drawtext(layouts[ltidx].symbol, dc.norm);
+	drawtext(layout->symbol, dc.norm);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
 	dc.x = sw - dc.w;
@@ -676,6 +674,7 @@ void
 floating(void) { /* default floating layout */
 	Client *c;
 
+	domwfact = dozoom = False;
 	for(c = clients; c; c = c->next)
 		if(isvisible(c))
 			resize(c, c->x, c->y, c->w, c->h, True);
@@ -889,12 +888,6 @@ initfont(const char *fontstr) {
 }
 
 Bool
-isarrange(void (*func)())
-{
-	return func == layouts[ltidx].arrange;
-}
-
-Bool
 isoccupied(unsigned int t) {
 	Client *c;
 
@@ -932,7 +925,6 @@ isvisible(Client *c) {
 void
 keypress(XEvent *e) {
 	KEYS
-	unsigned int len = sizeof keys / sizeof keys[0];
 	unsigned int i;
 	KeyCode code;
 	KeySym keysym;
@@ -940,7 +932,7 @@ keypress(XEvent *e) {
 
 	if(!e) { /* grabkeys */
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for(i = 0; i < len; i++) {
+		for(i = 0; i < NKEYS; i++) {
 			code = XKeysymToKeycode(dpy, keys[i].keysym);
 			XGrabKey(dpy, code, keys[i].mod, root, True,
 					GrabModeAsync, GrabModeAsync);
@@ -955,7 +947,7 @@ keypress(XEvent *e) {
 	}
 	ev = &e->xkey;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	for(i = 0; i < len; i++)
+	for(i = 0; i < NKEYS; i++)
 		if(keysym == keys[i].keysym
 		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state))
 		{
@@ -1266,9 +1258,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(sel->isfloating || isarrange(floating))
+	if(sel->isfloating || (floating == layout->arrange))
 		XRaiseWindow(dpy, sel->win);
-	if(!isarrange(floating)) {
+	if(floating != layout->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		if(!sel->isfloating) {
@@ -1374,16 +1366,16 @@ setlayout(const char *arg) {
 	unsigned int i;
 
 	if(!arg) {
-		if(++ltidx == nlayouts)
-			ltidx = 0;;
+		if(++layout == &layouts[NLAYOUTS])
+			layout = &layouts[0];
 	}
 	else {
-		for(i = 0; i < nlayouts; i++)
+		for(i = 0; i < NLAYOUTS; i++)
 			if(!strcmp(arg, layouts[i].symbol))
 				break;
-		if(i == nlayouts)
+		if(i == NLAYOUTS)
 			return;
-		ltidx = i;
+		layout = &layouts[i];
 	}
 	if(sel)
 		arrange();
@@ -1395,7 +1387,7 @@ void
 setmwfact(const char *arg) {
 	double delta;
 
-	if(!(ISTILE))
+	if(!domwfact)
 		return;
 	/* arg handling, manipulate mwfact */
 	if(NULL == arg)
@@ -1476,8 +1468,8 @@ setup(void) {
 
 	/* init layouts */
 	mwfact = MWFACT;
-	nlayouts = sizeof layouts / sizeof layouts[0];
-	for(blw = i = 0; i < nlayouts; i++) {
+	layout = &layouts[0];
+	for(blw = i = 0; i < NLAYOUTS; i++) {
 		j = textw(layouts[i].symbol);
 		if(j > blw)
 			blw = j;
@@ -1562,6 +1554,7 @@ tile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, th;
 	Client *c, *mc;
 
+	domwfact = dozoom = True;
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
@@ -1627,7 +1620,7 @@ togglemax(const char *arg) {
 	if(!sel || sel->isfixed)
 		return;
 	if((sel->ismax = !sel->ismax)) {
-		if(isarrange(floating) || sel->isfloating)
+		if((floating == layout->arrange) || sel->isfloating)
 			sel->wasfloating = True;
 		else {
 			togglefloating(NULL);
@@ -1855,7 +1848,7 @@ void
 zoom(const char *arg) {
 	Client *c;
 
-	if(!sel || !(ISTILE) || sel->isfloating)
+	if(!sel || !dozoom || sel->isfloating)
 		return;
 	if((c = sel) == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))

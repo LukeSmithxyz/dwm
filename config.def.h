@@ -23,9 +23,9 @@ Rule rules[] = {
 	{ "MPlayer",			NULL,		True },
 	{ "Acroread",			NULL,		True },
 };
+#define NRULES (sizeof rules / sizeof rules[0])
 
 /* layout(s) */
-#define ISTILE			isarrange(tile) /* || isarrange(<custom>) */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define SNAP			32	/* snap pixel */
 Layout layouts[] = {
@@ -33,6 +33,7 @@ Layout layouts[] = {
 	{ "[]=",		tile }, /* first entry is default */
 	{ "><>",		floating },
 };
+#define NLAYOUTS (sizeof layouts / sizeof layouts[0])
 
 /* key definitions */
 #define MODKEY			Mod1Mask
@@ -94,3 +95,4 @@ Key keys[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	tags[8] }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		NULL }, \
 };
+#define NKEYS (sizeof keys / sizeof keys[0])
