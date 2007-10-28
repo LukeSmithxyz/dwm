@@ -245,10 +245,10 @@ applyrules(Client *c) {
 	snprintf(buf, sizeof buf, "%s:%s:%s",
 			ch.res_class ? ch.res_class : "",
 			ch.res_name ? ch.res_name : "", c->name);
-	for(i = 0; i < NRULES; i++)
+	for(i = 0; i < LENGTH(rules); i++)
 		if(regs[i].propregex && !regexec(regs[i].propregex, buf, 1, &tmp, 0)) {
 			c->isfloating = rules[i].isfloating;
-			for(j = 0; regs[i].tagregex && j < NTAGS; j++) {
+			for(j = 0; regs[i].tagregex && j < LENGTH(tags); j++) {
 				if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
 					matched = True;
 					c->tags[j] = True;
@@ -307,7 +307,7 @@ buttonpress(XEvent *e) {
 
 	if(barwin == ev->window) {
 		x = 0;
-		for(i = 0; i < NTAGS; i++) {
+		for(i = 0; i < LENGTH(tags); i++) {
 			x += textw(tags[i]);
 			if(ev->x < x) {
 				if(ev->button == Button1) {
@@ -400,8 +400,8 @@ compileregs(void) {
 
 	if(regs)
 		return;
-	regs = emallocz(NRULES * sizeof(Regs));
-	for(i = 0; i < NRULES; i++) {
+	regs = emallocz(LENGTH(rules) * sizeof(Regs));
+	for(i = 0; i < LENGTH(rules); i++) {
 		if(rules[i].prop) {
 			reg = emallocz(sizeof(regex_t));
 			if(regcomp(reg, rules[i].prop, REG_EXTENDED))
@@ -530,7 +530,7 @@ drawbar(void) {
 	int i, x;
 
 	dc.x = dc.y = 0;
-	for(i = 0; i < NTAGS; i++) {
+	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
 		if(seltags[i]) {
 			drawtext(tags[i], dc.sel);
@@ -841,8 +841,8 @@ unsigned int
 idxoftag(const char *tag) {
 	unsigned int i;
 
-	for(i = 0; (i < NTAGS) && (tags[i] != tag); i++);
-	return (i < NTAGS) ? i : 0;
+	for(i = 0; (i < LENGTH(tags)) && (tags[i] != tag); i++);
+	return (i < LENGTH(tags)) ? i : 0;
 }
 
 void
@@ -916,7 +916,7 @@ Bool
 isvisible(Client *c) {
 	unsigned int i;
 
-	for(i = 0; i < NTAGS; i++)
+	for(i = 0; i < LENGTH(tags); i++)
 		if(c->tags[i] && seltags[i])
 			return True;
 	return False;
@@ -932,7 +932,7 @@ keypress(XEvent *e) {
 
 	if(!e) { /* grabkeys */
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for(i = 0; i < NKEYS; i++) {
+		for(i = 0; i < LENGTH(keys); i++) {
 			code = XKeysymToKeycode(dpy, keys[i].keysym);
 			XGrabKey(dpy, code, keys[i].mod, root, True,
 					GrabModeAsync, GrabModeAsync);
@@ -947,7 +947,7 @@ keypress(XEvent *e) {
 	}
 	ev = &e->xkey;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-	for(i = 0; i < NKEYS; i++)
+	for(i = 0; i < LENGTH(keys); i++)
 		if(keysym == keys[i].keysym
 		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state))
 		{
@@ -1366,14 +1366,14 @@ setlayout(const char *arg) {
 	unsigned int i;
 
 	if(!arg) {
-		if(++layout == &layouts[NLAYOUTS])
+		if(++layout == &layouts[LENGTH(layouts)])
 			layout = &layouts[0];
 	}
 	else {
-		for(i = 0; i < NLAYOUTS; i++)
+		for(i = 0; i < LENGTH(layouts); i++)
 			if(!strcmp(arg, layouts[i].symbol))
 				break;
-		if(i == NLAYOUTS)
+		if(i == LENGTH(layouts))
 			return;
 		layout = &layouts[i];
 	}
@@ -1469,7 +1469,7 @@ setup(void) {
 	/* init layouts */
 	mwfact = MWFACT;
 	layout = &layouts[0];
-	for(blw = i = 0; i < NLAYOUTS; i++) {
+	for(blw = i = 0; i < LENGTH(layouts); i++) {
 		j = textw(layouts[i].symbol);
 		if(j > blw)
 			blw = j;
@@ -1527,7 +1527,7 @@ tag(const char *arg) {
 
 	if(!sel)
 		return;
-	for(i = 0; i < NTAGS; i++)
+	for(i = 0; i < LENGTH(tags); i++)
 		sel->tags[i] = (NULL == arg);
 	sel->tags[idxoftag(arg)] = True;
 	arrange();
@@ -1649,8 +1649,8 @@ toggletag(const char *arg) {
 		return;
 	i = idxoftag(arg);
 	sel->tags[i] = !sel->tags[i];
-	for(j = 0; j < NTAGS && !sel->tags[j]; j++);
-	if(j == NTAGS)
+	for(j = 0; j < LENGTH(tags) && !sel->tags[j]; j++);
+	if(j == LENGTH(tags))
 		sel->tags[i] = True; /* at least one tag must be enabled */
 	arrange();
 }
@@ -1661,8 +1661,8 @@ toggleview(const char *arg) {
 
 	i = idxoftag(arg);
 	seltags[i] = !seltags[i];
-	for(j = 0; j < NTAGS && !seltags[j]; j++);
-	if(j == NTAGS)
+	for(j = 0; j < LENGTH(tags) && !seltags[j]; j++);
+	if(j == LENGTH(tags))
 		seltags[i] = True; /* at least one tag must be viewed */
 	arrange();
 }
@@ -1828,7 +1828,7 @@ view(const char *arg) {
 	unsigned int i;
 
 	memcpy(prevtags, seltags, sizeof seltags);
-	for(i = 0; i < NTAGS; i++)
+	for(i = 0; i < LENGTH(tags); i++)
 		seltags[i] = (NULL == arg);
 	seltags[idxoftag(arg)] = True;
 	arrange();

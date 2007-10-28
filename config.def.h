@@ -11,11 +11,13 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
+/* convenience */
+#define LENGTH(x) (sizeof x / sizeof x[0])
+
 /* tagging */
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
-#define NTAGS (sizeof tags / sizeof tags[0])
-Bool seltags[NTAGS] = {[0] = True};
-Bool prevtags[NTAGS] = {[0] = True};
+Bool seltags[LENGTH(tags)] = {[0] = True};
+Bool prevtags[LENGTH(tags)] = {[0] = True};
 Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
 	{ "Firefox",			"www",		False },
@@ -23,7 +25,6 @@ Rule rules[] = {
 	{ "MPlayer",			NULL,		True },
 	{ "Acroread",			NULL,		True },
 };
-#define NRULES (sizeof rules / sizeof rules[0])
 
 /* layout(s) */
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
@@ -33,7 +34,6 @@ Layout layouts[] = {
 	{ "[]=",		tile }, /* first entry is default */
 	{ "><>",		floating },
 };
-#define NLAYOUTS (sizeof layouts / sizeof layouts[0])
 
 /* key definitions */
 #define MODKEY			Mod1Mask
@@ -95,4 +95,3 @@ Key keys[] = { \
 	{ MODKEY|ControlMask|ShiftMask,	XK_9,		toggletag,	tags[8] }, \
 	{ MODKEY|ShiftMask,		XK_q,		quit,		NULL }, \
 };
-#define NKEYS (sizeof keys / sizeof keys[0])
