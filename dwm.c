@@ -340,7 +340,7 @@ buttonpress(XEvent *e) {
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if((floating != layout->arrange) && !c->isfixed && c->isfloating)
+			if((floating != layout->arrange) && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
