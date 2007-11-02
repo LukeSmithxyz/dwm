@@ -1280,15 +1280,15 @@ restack(void) {
 
 void
 run(void) {
-	char *p;
-	int r, xfd;
 	fd_set rd;
+	int xfd;
 	XEvent ev;
 
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
 	xfd = ConnectionNumber(dpy);
 	readin = True;
+	stext[sizeof stext - 1] = '\0'; /* 0-terminator is never touched */
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
@@ -1300,22 +1300,10 @@ run(void) {
 			eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			switch(r = read(STDIN_FILENO, stext, sizeof stext - 1)) {
-			case -1:
+			if(stext == fgets(stext, sizeof stext - 1, stdin))
+				stext[strlen(stext) - 1] = '\0'; /* remove tailing '\n' */
+			else
 				strncpy(stext, strerror(errno), sizeof stext - 1);
-				stext[sizeof stext - 1] = '\0';
-				readin = False;
-				break;
-			case 0:
-				strncpy(stext, "EOF", 4);
-				readin = False;
-				break;
-			default:
-				for(stext[r] = '\0', p = stext + strlen(stext) - 1; p >= stext && *p == '\n'; *p-- = '\0');
-				for(; p >= stext && *p != '\n'; --p);
-				if(p > stext)
-					strncpy(stext, p + 1, sizeof stext);
-			}
 			drawbar();
 		}
 		while(XPending(dpy)) {
