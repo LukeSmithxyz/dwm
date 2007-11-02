@@ -1584,8 +1584,8 @@ tile(void) {
 			else
 				nh = th - 2 * c->border;
 		}
-		resize(c, nx, ny, nw, nh, True);
-		if((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw))
+		resize(c, nx, ny, nw, nh, RESIZEHINTS);
+		if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
 			/* client doesn't accept size constraints */
 			resize(c, nx, ny, nw, nh, False);
 		if(n > 1 && th != wah)
