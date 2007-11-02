@@ -1300,15 +1300,12 @@ run(void) {
 			eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			if(stext == fgets(stext, sizeof stext - 1, stdin))
+			if((readin = (stext == fgets(stext, sizeof stext - 1, stdin))))
 				stext[strlen(stext) - 1] = '\0'; /* remove tailing '\n' */
-			else {
-				readin = False;
-				if(feof(stdin))
-					strncpy(stext, "EOF", 4);
-				else /* error occured */
-					strncpy(stext, strerror(errno), sizeof stext - 1);
-			}
+			else if(feof(stdin))
+				strncpy(stext, "EOF", 4);
+			else /* error occured */
+				strncpy(stext, strerror(errno), sizeof stext - 1);
 			drawbar();
 		}
 		while(XPending(dpy)) {
