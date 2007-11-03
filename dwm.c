@@ -1145,6 +1145,7 @@ quit(const char *arg) {
 	readin = running = False;
 }
 
+
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	XWindowChanges wc;
@@ -1280,15 +1281,19 @@ restack(void) {
 
 void
 run(void) {
+	char *p;
 	fd_set rd;
-	int xfd;
+	int r, xfd;
+	unsigned int len, offset;
 	XEvent ev;
 
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
 	xfd = ConnectionNumber(dpy);
 	readin = True;
-	stext[sizeof stext - 1] = '\0'; /* 0-terminator is never touched */
+	offset = 0;
+	len = sizeof stext - 1;
+	stext[len] = '\0'; /* 0-terminator is never touched */
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
@@ -1300,12 +1305,27 @@ run(void) {
 			eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			if((readin = (stext == fgets(stext, sizeof stext - 1, stdin))))
-				stext[strlen(stext) - 1] = '\0'; /* remove tailing '\n' */
-			else if(feof(stdin))
+			switch((r = read(STDIN_FILENO, stext + offset, len - offset))) {
+			case -1:
+				strncpy(stext, strerror(errno), len);
+				readin = False;
+				break;
+			case 0:
 				strncpy(stext, "EOF", 4);
-			else /* error occured */
-				strncpy(stext, strerror(errno), sizeof stext - 1);
+				readin = False;
+				break;
+			default:
+				stext[offset + r] = '\0';
+				for(p = stext; *p && *p != '\n'; p++);
+				if(*p == '\n') {
+					*p = '\0';
+					offset = 0;
+				}
+				else if(offset + r < len - 1)
+					offset += r;
+				else
+					offset = 0;
+			}
 			drawbar();
 		}
 		while(XPending(dpy)) {
