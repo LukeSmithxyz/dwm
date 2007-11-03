@@ -1321,10 +1321,8 @@ run(void) {
 					*p = '\0';
 					offset = 0;
 				}
-				else if(offset + r < len - 1)
-					offset += r;
 				else
-					offset = 0;
+					offset = (offset + r < len - 1) ? offset + r : 0;
 			}
 			drawbar();
 		}
