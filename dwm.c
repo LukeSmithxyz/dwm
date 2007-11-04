@@ -303,7 +303,7 @@ buttonpress(XEvent *e) {
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	if(barwin == ev->window) {
+	if(ev->window == barwin) {
 		x = 0;
 		for(i = 0; i < LENGTH(tags); i++) {
 			x += textw(tags[i]);
@@ -331,7 +331,7 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			if((floating == layout->arrange) || c->isfloating)
+			if((layout->arrange == floating) || c->isfloating)
 				restack();
 			else
 				togglefloating(NULL);
@@ -662,8 +662,8 @@ void
 expose(XEvent *e) {
 	XExposeEvent *ev = &e->xexpose;
 
-	if(0 == ev->count) {
-		if(barwin == ev->window)
+	if(ev->count == 0) {
+		if(ev->window == barwin)
 			drawbar();
 	}
 }
@@ -777,7 +777,7 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 	int n;
 	XTextProperty name;
 
-	if(!text || 0 == size)
+	if(!text || size == 0)
 		return False;
 	text[0] = '\0';
 	XGetTextProperty(dpy, w, &name, atom);
@@ -787,8 +787,7 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 		strncpy(text, (char *)name.value, size - 1);
 	else {
 		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
-		&& n > 0 && *list)
-		{
+		&& n > 0 && *list) {
 			strncpy(text, *list, size - 1);
 			XFreeStringList(list);
 		}
@@ -1123,7 +1122,7 @@ propertynotify(XEvent *e) {
 			default: break;
 			case XA_WM_TRANSIENT_FOR:
 				XGetTransientForHint(dpy, c->win, &trans);
-				if(!c->isfloating && (c->isfloating = (NULL != getclient(trans))))
+				if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
 					arrange();
 				break;
 			case XA_WM_NORMAL_HINTS:
@@ -1257,9 +1256,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(sel->isfloating || (floating == layout->arrange))
+	if(sel->isfloating || (layout->arrange == floating))
 		XRaiseWindow(dpy, sel->win);
-	if(floating != layout->arrange) {
+	if(layout->arrange != floating) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		if(!sel->isfloating) {
@@ -1396,9 +1395,9 @@ setmwfact(const char *arg) {
 	if(!domwfact)
 		return;
 	/* arg handling, manipulate mwfact */
-	if(NULL == arg)
+	if(arg == NULL)
 		mwfact = MWFACT;
-	else if(1 == sscanf(arg, "%lf", &delta)) {
+	else if(sscanf(arg, "%lf", &delta) == 1) {
 		if(arg[0] == '+' || arg[0] == '-')
 			mwfact += delta;
 		else
@@ -1513,8 +1512,8 @@ spawn(const char *arg) {
 		return;
 	/* The double-fork construct avoids zombie processes and keeps the code
 	 * clean from stupid signal handlers. */
-	if(0 == fork()) {
-		if(0 == fork()) {
+	if(fork() == 0) {
+		if(fork() == 0) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
@@ -1575,7 +1574,7 @@ tile(void) {
 	nw = 0; /* gcc stupidity requires this */
 	for(i = 0, c = mc = nexttiled(clients); c; c = nexttiled(c->next), i++) {
 		c->ismax = False;
-		if(0 == i) { /* master */
+		if(i == 0) { /* master */
 			nw = mw - 2 * c->border;
 			nh = wah - 2 * c->border;
 		}
@@ -1626,7 +1625,7 @@ togglemax(const char *arg) {
 	if(!sel || sel->isfixed)
 		return;
 	if((sel->ismax = !sel->ismax)) {
-		if((floating == layout->arrange) || sel->isfloating)
+		if((layout->arrange == floating) || sel->isfloating)
 			sel->wasfloating = True;
 		else {
 			togglefloating(NULL);
