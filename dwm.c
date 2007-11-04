@@ -1870,7 +1870,8 @@ zoom(const char *arg) {
 int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		eprint("dwm-"VERSION", © 2006-2007 A. R. Garbe, S. van Dijk, J. Salmi, P. Hruby, S. Nagy\n");
+		eprint("dwm-"VERSION", © 2006-2007 Anselm R. Garbe, Sander van Dijk, "
+		       "Jukka Salmi, Premysl Hruby, Szabolcs Nagy\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 
