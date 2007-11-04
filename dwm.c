@@ -17,9 +17,7 @@
  * set the override_redirect flag.  Clients are organized in a global
  * doubly-linked client list, the focus history is remembered through a global
  * stack list. Each client contains an array of Bools of the same size as the
- * global tags array to indicate the tags of a client.  For each client dwm
- * creates a small title window, which is resized whenever the (_NET_)WM_NAME
- * properties are updated or the client is moved/resized.
+ * global tags array to indicate the tags of a client.  
  *
  * Keys and tagging rules are organized as arrays and defined in config.h.
  *
