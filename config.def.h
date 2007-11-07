@@ -11,13 +11,9 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
-/* convenience */
-#define LENGTH(x) (sizeof x / sizeof x[0])
-
 /* tagging */
 const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
 Bool seltags[LENGTH(tags)] = {[0] = True};
-Bool prevtags[LENGTH(tags)] = {[0] = True};
 Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
 	{ "Firefox",			"www",		False },

@@ -45,6 +45,8 @@
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)		(mask & ~(numlockmask | LockMask))
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
+#define LENGTH(x)		(sizeof x / sizeof x[0])
+
 
 /* enums */
 enum { BarTop, BarBot, BarOff };			/* bar position */
@@ -228,6 +230,8 @@ Regs *regs = NULL;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+Bool prevtags[LENGTH(tags)] = {[0] = True};
 
 /* function implementations */
 void
