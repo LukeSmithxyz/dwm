@@ -44,8 +44,9 @@
 /* macros */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)		(mask & ~(numlockmask | LockMask))
-#define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 #define LENGTH(x)		(sizeof x / sizeof x[0])
+#define MAXTAGLEN		16
+#define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 
 
 /* enums */
@@ -143,6 +144,7 @@ unsigned long getcolor(const char *colstr);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
+void grabkeys(void);
 unsigned int idxoftag(const char *tag);
 void initfont(const char *fontstr);
 Bool isoccupied(unsigned int t);
@@ -838,6 +840,25 @@ grabbuttons(Client *c, Bool focused) {
 				GrabModeAsync, GrabModeSync, None, None);
 }
 
+void
+grabkeys(void)  {
+	unsigned int i;
+	KeyCode code;
+
+	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	for(i = 0; i < LENGTH(keys); i++) {
+		code = XKeysymToKeycode(dpy, keys[i].keysym);
+		XGrabKey(dpy, code, keys[i].mod, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
+				GrabModeAsync, GrabModeAsync);
+	}
+}
+
 unsigned int
 idxoftag(const char *tag) {
 	unsigned int i;
@@ -925,27 +946,10 @@ isvisible(Client *c) {
 
 void
 keypress(XEvent *e) {
-	KEYS
 	unsigned int i;
-	KeyCode code;
 	KeySym keysym;
 	XKeyEvent *ev;
 
-	if(!e) { /* grabkeys */
-		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for(i = 0; i < LENGTH(keys); i++) {
-			code = XKeysymToKeycode(dpy, keys[i].keysym);
-			XGrabKey(dpy, code, keys[i].mod, root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
-					GrabModeAsync, GrabModeAsync);
-		}
-		return;
-	}
 	ev = &e->xkey;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < LENGTH(keys); i++)
@@ -1048,7 +1052,7 @@ mappingnotify(XEvent *e) {
 
 	XRefreshKeyboardMapping(ev);
 	if(ev->request == MappingKeyboard)
-		keypress(NULL);
+		grabkeys();
 }
 
 void
@@ -1460,7 +1464,7 @@ setup(void) {
 	XSelectInput(dpy, root, wa.event_mask);
 
 	/* grab keys */
-	keypress(NULL);
+	grabkeys();
 
 	/* init tags */
 	compileregs();
