@@ -1287,6 +1287,7 @@ restack(void) {
 void
 run(void) {
 	char *p;
+	char buf[sizeof stext];
 	fd_set rd;
 	int r, xfd;
 	unsigned int len, offset;
@@ -1298,7 +1299,7 @@ run(void) {
 	readin = True;
 	offset = 0;
 	len = sizeof stext - 1;
-	stext[len] = '\0'; /* 0-terminator is never touched */
+	buf[len] = stext[len] = '\0'; /* 0-terminator is never touched */
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
@@ -1310,7 +1311,7 @@ run(void) {
 			eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			switch((r = read(STDIN_FILENO, stext + offset, len - offset))) {
+			switch((r = read(STDIN_FILENO, buf + offset, len - offset))) {
 			case -1:
 				strncpy(stext, strerror(errno), len);
 				readin = False;
@@ -1320,14 +1321,18 @@ run(void) {
 				readin = False;
 				break;
 			default:
-				stext[offset + r] = '\0';
-				for(p = stext; *p && *p != '\n'; p++);
-				if(*p == '\n') {
-					*p = '\0';
-					offset = 0;
-				}
-				else
-					offset = (offset + r < len - 1) ? offset + r : 0;
+				for(p = buf + offset; r > 0; p++, r--, offset++)
+					if(*p == '\n' || *p == '\0') {
+						*p = '\0';
+						strncpy(stext, buf, len);
+						p += r - 1; /* p is buf + offset + r - 1 */
+						for(r = 0; *(p - r) && *(p - r) != '\n'; r++);
+						offset = r;
+						if(r)
+							memmove(buf, p - r + 1, r);
+						break;
+					}
+				break;
 			}
 			drawbar();
 		}
