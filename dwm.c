@@ -233,7 +233,7 @@ Regs *regs = NULL;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-Bool prevtags[LENGTH(tags)] = {[0] = True};
+Bool prevtags[LENGTH(tags)];
 
 /* function implementations */
 void
@@ -1467,6 +1467,7 @@ setup(void) {
 	grabkeys();
 
 	/* init tags */
+	memcpy(prevtags, seltags, sizeof seltags);
 	compileregs();
 
 	/* init appearance */
@@ -1849,11 +1850,11 @@ view(const char *arg) {
 
 void
 viewprevtag(const char *arg) {
-	static Bool tmptags[sizeof tags / sizeof tags[0]];
+	static Bool tmp[LENGTH(tags)];
 
-	memcpy(tmptags, seltags, sizeof seltags);
+	memcpy(tmp, seltags, sizeof seltags);
 	memcpy(seltags, prevtags, sizeof seltags);
-	memcpy(prevtags, tmptags, sizeof seltags);
+	memcpy(prevtags, tmp, sizeof seltags);
 	arrange();
 }
 
