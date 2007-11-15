@@ -1521,7 +1521,7 @@ setup(void) {
 			PropModeReplace, (unsigned char *) &barwin, 1);
 	/* HACK: dwm identifies itself as compiz to workaround the XToolkit bug of Sun JDK */
 	XChangeProperty(dpy, barwin, netatom[NetWMName], utf8string, 8,
-			PropModeReplace, (unsigned char *) "compiz", 7);
+			PropModeReplace, (unsigned char *) "compiz", 6);
 	XChangeProperty(dpy, root, netatom[NetWMCheck], XA_WINDOW, 32,
 			PropModeReplace, (unsigned char *) &barwin, 1);
 	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
