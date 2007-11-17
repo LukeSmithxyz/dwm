@@ -137,6 +137,7 @@ void eprint(const char *errstr, ...);
 void expose(XEvent *e);
 void floating(void); /* default floating layout */
 void focus(Client *c);
+void focusin(XEvent *e);
 void focusnext(const char *arg);
 void focusprev(const char *arg);
 Client *getclient(Window w);
@@ -206,9 +207,10 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[ConfigureNotify] = configurenotify,
 	[DestroyNotify] = destroynotify,
 	[EnterNotify] = enternotify,
-	[LeaveNotify] = leavenotify,
 	[Expose] = expose,
+	[FocusIn] = focusin,
 	[KeyPress] = keypress,
+	[LeaveNotify] = leavenotify,
 	[MappingNotify] = mappingnotify,
 	[MapRequest] = maprequest,
 	[PropertyNotify] = propertynotify,
@@ -710,6 +712,14 @@ focus(Client *c) {
 }
 
 void
+focusin(XEvent *e) { /* there are some broken focus acquiring clients */
+	XFocusChangeEvent *ev = &e->xfocus;
+
+	if(sel && ev->window != sel->win)
+		XSetInputFocus(dpy, sel->win, RevertToPointerRoot, CurrentTime);
+}
+
+void
 focusnext(const char *arg) {
 	Client *c;
 
@@ -1026,8 +1036,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatesizehints(c);
-	XSelectInput(dpy, w,
-		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
+	XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
 	grabbuttons(c, False);
 	updatetitle(c);
 	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
