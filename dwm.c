@@ -53,7 +53,7 @@
 enum { BarTop, BarBot, BarOff };			/* bar position */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
-enum { NetSupported, NetWMCheck, NetWMName, NetLast };	/* EWMH atoms */
+enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
 /* typedefs */
@@ -1427,20 +1427,19 @@ void
 setup(void) {
 	int d;
 	unsigned int i, j, mask;
-	Atom utf8string;
 	Window w;
 	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
 
 	/* init atoms */
-	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	wmatom[WMName] = XInternAtom(dpy, "WM_NAME", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
-	netatom[NetWMCheck] = XInternAtom(dpy, "_NET_SUPPORTING_WM_CHECK", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
+			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
@@ -1516,16 +1515,6 @@ setup(void) {
 	/* multihead support */
 	selscreen = XQueryPointer(dpy, root, &w, &w, &d, &d, &d, &d, &mask);
 
-	/* EWMH properties */
-	XChangeProperty(dpy, barwin, netatom[NetWMCheck], XA_WINDOW, 32,
-			PropModeReplace, (unsigned char *) &barwin, 1);
-	/* HACK: dwm identifies itself as LookingGlass to workaround the XToolkit bug of Sun JDK */
-	XChangeProperty(dpy, barwin, netatom[NetWMName], utf8string, 8,
-			PropModeReplace, (unsigned char *) "LG3D", 4);
-	XChangeProperty(dpy, root, netatom[NetWMCheck], XA_WINDOW, 32,
-			PropModeReplace, (unsigned char *) &barwin, 1);
-	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
-			PropModeReplace, (unsigned char *) netatom, NetLast);
 }
 
 void
