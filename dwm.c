@@ -61,12 +61,11 @@ typedef struct Client Client;
 struct Client {
 	char name[256];
 	int x, y, w, h;
-	int rx, ry, rw, rh; /* revert geometry */
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
 	unsigned int border, oldborder;
-	Bool isbanned, isfixed, ismax, isfloating, wasfloating;
+	Bool isbanned, isfixed, isfloating;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -157,6 +156,7 @@ void leavenotify(XEvent *e);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
+void maximize(const char *arg);
 void movemouse(Client *c);
 Client *nexttiled(Client *c);
 void propertynotify(XEvent *e);
@@ -178,7 +178,6 @@ unsigned int textw(const char *text);
 void tile(void);
 void togglebar(const char *arg);
 void togglefloating(const char *arg);
-void togglemax(const char *arg);
 void toggletag(const char *arg);
 void toggleview(const char *arg);
 void unban(Client *c);
@@ -466,7 +465,6 @@ configurerequest(XEvent *e) {
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
-		c->ismax = False;
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
 		if(c->isfixed || c->isfloating || (floating == layout->arrange)) {
@@ -563,7 +561,7 @@ drawbar(void) {
 		dc.x = x;
 		if(sel) {
 			drawtext(sel->name, dc.sel);
-			drawsquare(sel->ismax, sel->isfloating, dc.sel);
+			drawsquare(False, sel->isfloating, dc.sel);
 		}
 		else
 			drawtext(NULL, dc.norm);
@@ -1079,6 +1077,13 @@ maprequest(XEvent *e) {
 }
 
 void
+maximize(const char *arg) {
+	if(!sel || (!sel->isfloating && layout->arrange != floating))
+		return;
+	resize(sel, wax, way, waw - 2 * sel->border, wah - 2 * sel->border, True);
+}
+
+void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di, nx, ny;
 	unsigned int dui;
@@ -1090,7 +1095,6 @@ movemouse(Client *c) {
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	c->ismax = False;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask, &ev);
@@ -1248,7 +1252,6 @@ resizemouse(Client *c) {
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
-	c->ismax = False;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask , &ev);
@@ -1609,7 +1612,6 @@ tile(void) {
 	ny = way;
 	nw = 0; /* gcc stupidity requires this */
 	for(i = 0, c = mc = nexttiled(clients); c; c = nexttiled(c->next), i++) {
-		c->ismax = False;
 		if(i == 0) { /* master */
 			nw = mw - 2 * c->border;
 			nh = wah - 2 * c->border;
@@ -1652,34 +1654,6 @@ togglefloating(const char *arg) {
 	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
 	arrange();
-}
-
-void
-togglemax(const char *arg) {
-	XEvent ev;
-
-	if(!sel || sel->isfixed)
-		return;
-	if((sel->ismax = !sel->ismax)) {
-		if((layout->arrange == floating) || sel->isfloating)
-			sel->wasfloating = True;
-		else {
-			togglefloating(NULL);
-			sel->wasfloating = False;
-		}
-		sel->rx = sel->x;
-		sel->ry = sel->y;
-		sel->rw = sel->w;
-		sel->rh = sel->h;
-		resize(sel, wax, way, waw - 2 * sel->border, wah - 2 * sel->border, True);
-	}
-	else {
-		resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
-		if(!sel->wasfloating)
-			togglefloating(NULL);
-	}
-	drawbar();
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
