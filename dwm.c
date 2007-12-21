@@ -119,6 +119,8 @@ typedef struct {
 typedef struct {
 	int id;
 	Window barwin;
+//TODO: Window root;
+//TODO: int screen;
 	int sx, sy, sw, sh, wax, way, wah, waw;
 	DC dc;
 	Bool *seltags;
