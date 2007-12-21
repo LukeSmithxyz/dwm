@@ -12,7 +12,7 @@ X11LIB = /usr/X11R6/lib
 
 # includes and libs
 INCS = -I. -I/usr/include -I${X11INC}
-LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
+LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 -lXinerama
 
 # flags
 CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
