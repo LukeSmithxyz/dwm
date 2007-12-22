@@ -297,7 +297,7 @@ applyrules(Client *c) {
 	if(ch.res_name)
 		XFree(ch.res_name);
 	if(!matched_tag)
-		memcpy(c->tags, monitors[monitorat(-1, -1)].seltags, sizeof seltags);
+		memcpy(c->tags, monitors[monitorat(-1, -1)].seltags, sizeof initags);
 	if (!matched_monitor)
 		c->monitor = monitorat(-1, -1);
 }
@@ -1056,7 +1056,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
-	c->tags = emallocz(sizeof seltags);
+	c->tags = emallocz(sizeof initags);
 	c->win = w;
 
 	applyrules(c);
@@ -1100,7 +1100,7 @@ manage(Window w, XWindowAttributes *wa) {
 	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
 		for(t = clients; t && t->win != trans; t = t->next);
 	if(t)
-		memcpy(c->tags, t->tags, sizeof seltags);
+		memcpy(c->tags, t->tags, sizeof initags);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
@@ -1181,7 +1181,7 @@ movemouse(Client *c) {
 			else if(abs((m->way + m->wah) - (ny + c->h + 2 * c->border)) < SNAP)
 				ny = m->way + m->wah - c->h - 2 * c->border;
 			resize(c, nx, ny, c->w, c->h, False);
-			memcpy(c->tags, monitors[monitorat(nx, ny)].seltags, sizeof seltags);
+			memcpy(c->tags, monitors[monitorat(nx, ny)].seltags, sizeof initags);
 			break;
 		}
 	}
@@ -1591,11 +1591,11 @@ setup(void) {
 		}
 
 		monitors[i].id = i;
-		monitors[i].seltags = emallocz(LENGTH(tags)*sizeof(char*));
-		monitors[i].prevtags = emallocz(LENGTH(tags)*sizeof(char*));
+		monitors[i].seltags = emallocz(sizeof initags);
+		monitors[i].prevtags = emallocz(sizeof initags);
 
-		memcpy(monitors[i].seltags, seltags, sizeof seltags);
-		memcpy(monitors[i].prevtags, seltags, sizeof seltags);
+		memcpy(monitors[i].seltags, initags, sizeof initags);
+		memcpy(monitors[i].prevtags, initags, sizeof initags);
 
 		/* init appearance */
 		monitors[i].dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
@@ -1950,7 +1950,7 @@ view(const char *arg) {
 
 	Monitor *m = &monitors[monitorat(-1, -1)];
 
-	memcpy(m->prevtags, seltags, sizeof seltags);
+	memcpy(m->prevtags, m->seltags, sizeof initags);
 	for(i = 0; i < LENGTH(tags); i++)
 		m->seltags[i] = (NULL == arg);
 	m->seltags[idxoftag(arg)] = True;
@@ -1963,9 +1963,9 @@ viewprevtag(const char *arg) {
 
 	Monitor *m = &monitors[monitorat(-1, -1)];
 
-	memcpy(tmp, m->seltags, sizeof seltags);
-	memcpy(m->seltags, m->prevtags, sizeof seltags);
-	memcpy(m->prevtags, tmp, sizeof seltags);
+	memcpy(tmp, m->seltags, sizeof initags);
+	memcpy(m->seltags, m->prevtags, sizeof initags);
+	memcpy(m->prevtags, tmp, sizeof initags);
 	arrange();
 }
 
@@ -2011,7 +2011,7 @@ movetomonitor(const char *arg) {
 	if (sel) {
 		sel->monitor = arg ? atoi(arg) : (sel->monitor+1) % mcount;
 
-		memcpy(sel->tags, monitors[sel->monitor].seltags, sizeof seltags);
+		memcpy(sel->tags, monitors[sel->monitor].seltags, sizeof initags);
 		resize(sel, monitors[sel->monitor].wax, monitors[sel->monitor].way, sel->w, sel->h, True);
 		arrange();
 	}

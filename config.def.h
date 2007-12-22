@@ -13,7 +13,7 @@
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
-Bool seltags[LENGTH(tags)] = {[0] = True};
+Bool initags[LENGTH(tags)] = {[0] = True};
 Rule rules[] = {
 	/* class:instance:title regex	tags regex	isfloating */
 	{ "Firefox",			"www",		False },
