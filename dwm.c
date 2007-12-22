@@ -198,7 +198,7 @@ void toggleview(const char *arg);
 void unban(Client *c);
 void unmanage(Client *c);
 void unmapnotify(XEvent *e);
-void updatebarpos(Monitor *s);
+void updatebarpos(Monitor *m);
 void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void view(const char *arg);
@@ -336,12 +336,12 @@ buttonpress(XEvent *e) {
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	Monitor s = monitors[monitorat(-1, -1)];
+	Monitor *m = &monitors[monitorat(-1, -1)];
 
-	if(ev->window == s.barwin) {
+	if(ev->window == m->barwin) {
 		x = 0;
 		for(i = 0; i < LENGTH(tags); i++) {
-			x += textw(&s, tags[i]);
+			x += textw(m, tags[i]);
 			if(ev->x < x) {
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
@@ -366,20 +366,20 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			if((s.layout->arrange == floating) || c->isfloating)
+			if((m->layout->arrange == floating) || c->isfloating)
 				restack();
 			else
 				togglefloating(NULL);
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if((floating != s.layout->arrange) && c->isfloating)
+			if((floating != m->layout->arrange) && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
-			if((floating == s.layout->arrange) || c->isfloating)
+			if((floating == m->layout->arrange) || c->isfloating)
 				restack();
 			else
 				togglefloating(NULL);
@@ -565,20 +565,20 @@ detachstack(Client *c) {
 
 void
 drawbar(void) {
-	int i, x, s;
+	int i, j, x;
 
-	for(s = 0; s < mcount; ++s) {
-		Monitor *m = &monitors[s];
+	for(i = 0; i < mcount; i++) {
+		Monitor *m = &monitors[i];
 		m->dc.x = 0;
-		for(i = 0; i < LENGTH(tags); i++) {
-			m->dc.w = textw(m, tags[i]);
-			if(m->seltags[i]) {
-				drawtext(m, tags[i], m->dc.sel);
-				drawsquare(m, sel && sel->tags[i] && sel->monitor == selmonitor, isoccupied(m, i), m->dc.sel);
+		for(j = 0; j < LENGTH(tags); j++) {
+			m->dc.w = textw(m, tags[j]);
+			if(m->seltags[j]) {
+				drawtext(m, tags[j], m->dc.sel);
+				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor, isoccupied(m, j), m->dc.sel);
 			}
 			else {
-				drawtext(m, tags[i], m->dc.norm);
-				drawsquare(m, sel && sel->tags[i] && sel->monitor == selmonitor, isoccupied(m, i), m->dc.norm);
+				drawtext(m, tags[j], m->dc.norm);
+				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor, isoccupied(m, j), m->dc.norm);
 			}
 			m->dc.x += m->dc.w;
 		}
@@ -1336,10 +1336,10 @@ resizemouse(Client *c) {
 
 void
 restack(void) {
+	unsigned int i;
 	Client *c;
 	XEvent ev;
 	XWindowChanges wc;
-	int s;
 
 	drawbar();
 	if(!sel)
@@ -1353,8 +1353,8 @@ restack(void) {
 			XConfigureWindow(dpy, sel->win, CWSibling | CWStackMode, &wc);
 			wc.sibling = sel->win;
 		}
-		for(s = 0; s < mcount; s++) {
-			for(c = nexttiled(clients, &monitors[s]); c; c = nexttiled(c->next, &monitors[s])) {
+		for(i = 0; i < mcount; i++) {
+			for(c = nexttiled(clients, &monitors[i]); c; c = nexttiled(c->next, &monitors[i])) {
 				if(c == sel)
 					continue;
 				XConfigureWindow(dpy, c->win, CWSibling | CWStackMode, &wc);
@@ -1676,39 +1676,38 @@ textw(Monitor *m, const char *text) {
 
 void
 tile(void) {
-	unsigned int i, n, nx, ny, nw, nh, mw, th;
-	int s;
+	unsigned int i, j, n, nx, ny, nw, nh, mw, th;
 	Client *c, *mc;
 
 	domwfact = dozoom = True;
 
 	nw = 0; /* gcc stupidity requires this */
 
-	for (s = 0; s < mcount; s++) {
-		Monitor *m = &monitors[s];
+	for (i = 0; i < mcount; i++) {
+		Monitor *m = &monitors[i];
 
 		for(n = 0, c = nexttiled(clients, m); c; c = nexttiled(c->next, m))
 			n++;
 
-		for(i = 0, c = mc = nexttiled(clients, m); c; c = nexttiled(c->next, m)) {
+		for(j = 0, c = mc = nexttiled(clients, m); c; c = nexttiled(c->next, m)) {
 			/* window geoms */
 			mw = (n == 1) ? m->waw : m->mwfact * m->waw;
 			th = (n > 1) ? m->wah / (n - 1) : 0;
 			if(n > 1 && th < bh)
 				th = m->wah;
-			if(i == 0) { /* master */
+			if(j == 0) { /* master */
 				nx = m->wax;
 				ny = m->way;
 				nw = mw - 2 * c->border;
 				nh = m->wah - 2 * c->border;
 			}
 			else {  /* tile window */
-				if(i == 1) {
+				if(j == 1) {
 					ny = m->way;
 					nx += mc->w + 2 * mc->border;
 					nw = m->waw - mw - 2 * c->border;
 				}
-				if(i + 1 == n) /* remainder */
+				if(j + 1 == n) /* remainder */
 					nh = (m->way + m->wah) - ny - 2 * c->border;
 				else
 					nh = th - 2 * c->border;
@@ -1720,7 +1719,7 @@ tile(void) {
 			if(n > 1 && th != m->wah)
 				ny = c->y + c->h + 2 * c->border;
 
-			i++;
+			j++;
 		}
 	}
 }
@@ -1813,25 +1812,25 @@ unmapnotify(XEvent *e) {
 }
 
 void
-updatebarpos(Monitor *s) {
+updatebarpos(Monitor *m) {
 	XEvent ev;
 
-	s->wax = s->sx;
-	s->way = s->sy;
-	s->wah = s->sh;
-	s->waw = s->sw;
+	m->wax = m->sx;
+	m->way = m->sy;
+	m->wah = m->sh;
+	m->waw = m->sw;
 	switch(bpos) {
 	default:
-		s->wah -= bh;
-		s->way += bh;
-		XMoveWindow(dpy, s->barwin, s->sx, s->sy);
+		m->wah -= bh;
+		m->way += bh;
+		XMoveWindow(dpy, m->barwin, m->sx, m->sy);
 		break;
 	case BarBot:
-		s->wah -= bh;
-		XMoveWindow(dpy, s->barwin, s->sx, s->sy + s->wah);
+		m->wah -= bh;
+		XMoveWindow(dpy, m->barwin, m->sx, m->sy + m->wah);
 		break;
 	case BarOff:
-		XMoveWindow(dpy, s->barwin, s->sx, s->sy - bh);
+		XMoveWindow(dpy, m->barwin, m->sx, m->sy - bh);
 		break;
 	}
 	XSync(dpy, False);
