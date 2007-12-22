@@ -117,10 +117,9 @@ typedef struct {
 } Regs;
 
 typedef struct {
-	int id;
+	int screen;
+	Window root;
 	Window barwin;
-//TODO: Window root;
-//TODO: int screen;
 	int sx, sy, sw, sh, wax, way, wah, waw;
 	DC dc;
 	Bool *seltags;
@@ -158,7 +157,7 @@ void focusin(XEvent *e);
 void focusnext(const char *arg);
 void focusprev(const char *arg);
 Client *getclient(Window w);
-unsigned long getcolor(const char *colstr);
+unsigned long getcolor(const char *colstr, int screen);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
@@ -170,7 +169,6 @@ Bool isprotodel(Client *c);
 Bool isvisible(Client *c, Monitor *m);
 void keypress(XEvent *e);
 void killclient(const char *arg);
-void leavenotify(XEvent *e);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
@@ -215,9 +213,8 @@ void selectmonitor(const char *arg);
 
 /* variables */
 char stext[256];
-int mcount, screen;
+int mcount = 1;
 //double mwfact;
-//int screen, sx, sy, sw, sh, wax, way, waw, wah;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int bh, bpos;
 unsigned int blw = 0;
@@ -231,7 +228,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[Expose] = expose,
 	[FocusIn] = focusin,
 	[KeyPress] = keypress,
-	[LeaveNotify] = leavenotify,
 	[MappingNotify] = mappingnotify,
 	[MapRequest] = maprequest,
 	[PropertyNotify] = propertynotify,
@@ -242,16 +238,12 @@ Bool domwfact = True;
 Bool dozoom = True;
 Bool otherwm, readin;
 Bool running = True;
-//Bool selscreen = True;
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
-Window root;
-//Layout *layout = NULL;
-//Window barwin, root;
 Regs *regs = NULL;
 Monitor *monitors;
 int selmonitor = 0;
@@ -402,7 +394,7 @@ checkotherwm(void) {
 	XSetErrorHandler(xerrorstart);
 
 	/* this causes an error if some other window manager is running */
-	XSelectInput(dpy, root, SubstructureRedirectMask);
+	XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
 	XSync(dpy, False);
 	if(otherwm)
 		eprint("dwm: another window manager is already running\n");
@@ -426,7 +418,7 @@ cleanup(void) {
 			XFreeFontSet(dpy, m->dc.font.set);
 		else
 			XFreeFont(dpy, m->dc.font.xfont);
-		XUngrabKey(dpy, AnyKey, AnyModifier, root);
+		XUngrabKey(dpy, AnyKey, AnyModifier, m->root);
 		XFreePixmap(dpy, m->dc.drawable);
 		XFreeGC(dpy, m->dc.gc);
 		XDestroyWindow(dpy, m->barwin);
@@ -487,11 +479,11 @@ configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 	Monitor *m = &monitors[selmonitor];
 
-	if(ev->window == root && (ev->width != m->sw || ev->height != m->sh)) {
+	if(ev->window == m->root && (ev->width != m->sw || ev->height != m->sh)) {
 		m->sw = ev->width;
 		m->sh = ev->height;
 		XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, root, m->sw, bh, DefaultDepth(dpy, screen));
+		dc.drawable = XCreatePixmap(dpy, m->root, m->sw, bh, DefaultDepth(dpy, m->screen));
 		XResizeWindow(dpy, m->barwin, m->sw, bh);
 		updatebarpos(m);
 		arrange();
@@ -582,11 +574,11 @@ drawbar(void) {
 			m->dc.w = textw(m, tags[i]);
 			if(m->seltags[i]) {
 				drawtext(m, tags[i], m->dc.sel);
-				drawsquare(m, sel && sel->tags[i] && sel->monitor == m->id, isoccupied(m, i), m->dc.sel);
+				drawsquare(m, sel && sel->tags[i] && sel->monitor == selmonitor, isoccupied(m, i), m->dc.sel);
 			}
 			else {
 				drawtext(m, tags[i], m->dc.norm);
-				drawsquare(m, sel && sel->tags[i] && sel->monitor == m->id, isoccupied(m, i), m->dc.norm);
+				drawsquare(m, sel && sel->tags[i] && sel->monitor == selmonitor, isoccupied(m, i), m->dc.norm);
 			}
 			m->dc.x += m->dc.w;
 		}
@@ -602,7 +594,7 @@ drawbar(void) {
 		drawtext(m, stext, m->dc.norm);
 		if((m->dc.w = m->dc.x - x) > bh) {
 			m->dc.x = x;
-			if(sel && sel->monitor == m->id) {
+			if(sel && sel->monitor == selmonitor) {
 				drawtext(m, sel->name, m->dc.sel);
 				drawsquare(m, False, sel->isfloating, m->dc.sel);
 			}
@@ -686,6 +678,7 @@ emallocz(unsigned int size) {
 
 void
 enternotify(XEvent *e) {
+	unsigned int i;
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
@@ -693,9 +686,13 @@ enternotify(XEvent *e) {
 		return;
 	if((c = getclient(ev->window)))
 		focus(c);
-	else if(ev->window == root) {
-		selmonitor = True;
-		focus(NULL);
+	else {
+		for(i = 0; i < mcount; i++)
+			if(ev->window == monitors[i].root) {
+				selmonitor = i;
+				focus(NULL);
+				break;
+			}
 	}
 }
 
@@ -731,7 +728,7 @@ floating(void) { /* default floating layout */
 
 void
 focus(Client *c) {
-	Monitor *m = &monitors[monitorat(-1, -1)];
+	Monitor *m = &monitors[c ? c->monitor : selmonitor];
 	if(!c || (c && !isvisible(c, m)))
 		for(c = stack; c && !isvisible(c, m); c = c->snext);
 	if(sel && sel != c) {
@@ -746,13 +743,12 @@ focus(Client *c) {
 	sel = c;
 	drawbar();
 	if(c) {
-		XSetWindowBorder(dpy, c->win, monitors[c->monitor].dc.sel[ColBorder]);
+		XSetWindowBorder(dpy, c->win, m->dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-		selmonitor = monitorat(c->x, c->y);
+		selmonitor = c->monitor;
 	}
 	else {
-		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-		selmonitor = monitorat(-1, -1);
+		XSetInputFocus(dpy, m->root, RevertToPointerRoot, CurrentTime);
 	}
 }
 
@@ -807,7 +803,7 @@ getclient(Window w) {
 }
 
 unsigned long
-getcolor(const char *colstr) {
+getcolor(const char *colstr, int screen) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
@@ -899,20 +895,33 @@ grabbuttons(Client *c, Bool focused) {
 
 void
 grabkeys(void)  {
-	unsigned int i;
+	unsigned int i, j;
 	KeyCode code;
+	XModifierKeymap *modmap;
 
-	XUngrabKey(dpy, AnyKey, AnyModifier, root);
-	for(i = 0; i < LENGTH(keys); i++) {
-		code = XKeysymToKeycode(dpy, keys[i].keysym);
-		XGrabKey(dpy, code, keys[i].mod, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
-				GrabModeAsync, GrabModeAsync);
+	/* init modifier map */
+	modmap = XGetModifierMapping(dpy);
+	for(i = 0; i < 8; i++)
+		for(j = 0; j < modmap->max_keypermod; j++) {
+			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+				numlockmask = (1 << i);
+		}
+	XFreeModifiermap(modmap);
+
+	for(i = 0; i < mcount; i++) {
+		Monitor *m = &monitors[i];
+		XUngrabKey(dpy, AnyKey, AnyModifier, m->root);
+		for(j = 0; j < LENGTH(keys); j++) {
+			code = XKeysymToKeycode(dpy, keys[j].keysym);
+			XGrabKey(dpy, code, keys[j].mod, m->root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, keys[j].mod | LockMask, m->root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, keys[j].mod | numlockmask, m->root, True,
+					GrabModeAsync, GrabModeAsync);
+			XGrabKey(dpy, code, keys[j].mod | numlockmask | LockMask, m->root, True,
+					GrabModeAsync, GrabModeAsync);
+		}
 	}
 }
 
@@ -971,7 +980,7 @@ isoccupied(Monitor *m, unsigned int t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(c->tags[t] && c->monitor == m->id)
+		if(c->tags[t] && c->monitor == selmonitor)
 			return True;
 	return False;
 }
@@ -996,7 +1005,7 @@ isvisible(Client *c, Monitor *m) {
 	unsigned int i;
 
 	for(i = 0; i < LENGTH(tags); i++)
-		if(c->tags[i] && monitors[c->monitor].seltags[i] && m->id == c->monitor)
+		if(c->tags[i] && monitors[c->monitor].seltags[i] && c->monitor == selmonitor)
 			return True;
 	return False;
 }
@@ -1038,20 +1047,11 @@ killclient(const char *arg) {
 }
 
 void
-leavenotify(XEvent *e) {
-	XCrossingEvent *ev = &e->xcrossing;
-
-	if((ev->window == root) && !ev->same_screen) {
-		selmonitor = False;
-		focus(NULL);
-	}
-}
-
-void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t = NULL;
-	Window trans;
+	Monitor *m = &monitors[selmonitor];
 	Status rettrans;
+	Window trans;
 	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
@@ -1059,10 +1059,9 @@ manage(Window w, XWindowAttributes *wa) {
 	c->win = w;
 
 	applyrules(c);
-	Monitor *m = &monitors[c->monitor];
 
-	c->x = wa->x+m->sx;
-	c->y = wa->y+m->sy;
+	c->x = wa->x + m->sx;
+	c->y = wa->y + m->sy;
 	c->w = wa->width;
 	c->h = wa->height;
 	c->oldborder = wa->border_width;
@@ -1142,10 +1141,10 @@ movemouse(Client *c) {
 
 	ocx = nx = c->x;
 	ocy = ny = c->y;
-	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+	if(XGrabPointer(dpy, monitors[selmonitor].root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
+	XQueryPointer(dpy, monitors[selmonitor].root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -1232,7 +1231,7 @@ void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	XWindowChanges wc;
 	Monitor scr = monitors[monitorat(x, y)];
-	c->monitor = scr.id;
+	c->monitor = monitorat(x, y);
 
 	if(sizehints) {
 		/* set minimum possible */
@@ -1305,7 +1304,7 @@ resizemouse(Client *c) {
 
 	ocx = c->x;
 	ocy = c->y;
-	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+	if(XGrabPointer(dpy, monitors[selmonitor].root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
@@ -1429,29 +1428,32 @@ run(void) {
 
 void
 scan(void) {
-	unsigned int i, num;
+	unsigned int i, j, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
-	wins = NULL;
-	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
-		for(i = 0; i < num; i++) {
-			if(!XGetWindowAttributes(dpy, wins[i], &wa)
-			|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
-				continue;
-			if(wa.map_state == IsViewable || getstate(wins[i]) == IconicState)
-				manage(wins[i], &wa);
+	for(i = 0; i < mcount; i++) {
+		Monitor *m = &monitors[i];
+		wins = NULL;
+		if(XQueryTree(dpy, m->root, &d1, &d2, &wins, &num)) {
+			for(j = 0; j < num; j++) {
+				if(!XGetWindowAttributes(dpy, wins[j], &wa)
+				|| wa.override_redirect || XGetTransientForHint(dpy, wins[j], &d1))
+					continue;
+				if(wa.map_state == IsViewable || getstate(wins[j]) == IconicState)
+					manage(wins[j], &wa);
+			}
+			for(j = 0; j < num; j++) { /* now the transients */
+				if(!XGetWindowAttributes(dpy, wins[j], &wa))
+					continue;
+				if(XGetTransientForHint(dpy, wins[j], &d1)
+				&& (wa.map_state == IsViewable || getstate(wins[j]) == IconicState))
+					manage(wins[j], &wa);
+			}
 		}
-		for(i = 0; i < num; i++) { /* now the transients */
-			if(!XGetWindowAttributes(dpy, wins[i], &wa))
-				continue;
-			if(XGetTransientForHint(dpy, wins[i], &d1)
-			&& (wa.map_state == IsViewable || getstate(wins[i]) == IconicState))
-				manage(wins[i], &wa);
-		}
+		if(wins)
+			XFree(wins);
 	}
-	if(wins)
-		XFree(wins);
 }
 
 void
@@ -1513,10 +1515,8 @@ setmwfact(const char *arg) {
 void
 setup(void) {
 	unsigned int i, j, k;
-	XModifierKeymap *modmap;
+	Monitor *m;
 	XSetWindowAttributes wa;
-	int s = 1;
-	GC g;
 	XineramaScreenInfo *info = NULL;
 
 	/* init atoms */
@@ -1526,106 +1526,100 @@ setup(void) {
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
-			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* init cursors */
-	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
+	wa.cursor = cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
-
-	/* init modifier map */
-	modmap = XGetModifierMapping(dpy);
-	for(i = 0; i < 8; i++)
-		for(j = 0; j < modmap->max_keypermod; j++) {
-			if(modmap->modifiermap[i * modmap->max_keypermod + j]
-			== XKeysymToKeycode(dpy, XK_Num_Lock))
-				numlockmask = (1 << i);
-		}
-	XFreeModifiermap(modmap);
-
-	/* select for events */
-	wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
-		| EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
-	wa.cursor = cursor[CurNormal];
-	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
-	XSelectInput(dpy, root, wa.event_mask);
-
-	/* grab keys */
-	grabkeys();
-
-	/* init tags */
-	compileregs();
-
+	// init screens/monitors first
 	if (XineramaIsActive(dpy)) {
-		info = XineramaQueryScreens(dpy, &s);
+		info = XineramaQueryScreens(dpy, &mcount);
 	}
+	mcount = 1;
+	monitors = emallocz(mcount * sizeof(Monitor));
 
-	monitors = emallocz(s*sizeof(Monitor));
-	mcount = s;
-
-	for(i = 0; i < s; i++) {
+	for(i = 0; i < mcount; i++) {
 		/* init geometry */
-		if (mcount != 1) {
-			monitors[i].sx = info[i].x_org;
-			monitors[i].sy = info[i].y_org;
-			monitors[i].sw = info[i].width;
-			monitors[i].sh = info[i].height;
+		m = &monitors[i];
+
+		m->screen = i;
+		m->root = RootWindow(dpy, i);
+
+		if (mcount != 1) { // TODO: Xinerama
+			m->sx = info[i].x_org;
+			m->sy = info[i].y_org;
+			m->sw = info[i].width;
+			m->sh = info[i].height;
 		}
 		else {
-			monitors[i].sx = 0;
-			monitors[i].sy = 0;
-			monitors[i].sw = DisplayWidth(dpy, screen);
-			monitors[i].sh = DisplayHeight(dpy, screen);
+			m->sx = 0;
+			m->sy = 0;
+			m->sw = DisplayWidth(dpy, m->screen);
+			m->sh = DisplayHeight(dpy, m->screen);
 		}
 
-		monitors[i].id = i;
-		monitors[i].seltags = emallocz(sizeof initags);
-		monitors[i].prevtags = emallocz(sizeof initags);
+		m->seltags = emallocz(sizeof initags);
+		m->prevtags = emallocz(sizeof initags);
 
-		memcpy(monitors[i].seltags, initags, sizeof initags);
-		memcpy(monitors[i].prevtags, initags, sizeof initags);
+		memcpy(m->seltags, initags, sizeof initags);
+		memcpy(m->prevtags, initags, sizeof initags);
 
 		/* init appearance */
-		monitors[i].dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
-		monitors[i].dc.norm[ColBG] = getcolor(NORMBGCOLOR);
-		monitors[i].dc.norm[ColFG] = getcolor(NORMFGCOLOR);
-		monitors[i].dc.sel[ColBorder] = getcolor(SELBORDERCOLOR);
-		monitors[i].dc.sel[ColBG] = getcolor(SELBGCOLOR);
-		monitors[i].dc.sel[ColFG] = getcolor(SELFGCOLOR);
-		initfont(&(monitors[i]), FONT);
-		monitors[i].dc.h = bh = monitors[i].dc.font.height + 2;
+		m->dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR, i);
+		m->dc.norm[ColBG] = getcolor(NORMBGCOLOR, i);
+		m->dc.norm[ColFG] = getcolor(NORMFGCOLOR, i);
+		m->dc.sel[ColBorder] = getcolor(SELBORDERCOLOR, i);
+		m->dc.sel[ColBG] = getcolor(SELBGCOLOR, i);
+		m->dc.sel[ColFG] = getcolor(SELFGCOLOR, i);
+		initfont(m, FONT);
+		m->dc.h = bh = m->dc.font.height + 2;
 
 		/* init layouts */
-		monitors[i].mwfact = MWFACT;
-		monitors[i].layout = &layouts[0];
+		m->mwfact = MWFACT;
+		m->layout = &layouts[0];
 		for(blw = k = 0; k < LENGTH(layouts); k++) {
-			j = textw(&monitors[i], layouts[k].symbol);
+			j = textw(m, layouts[k].symbol);
 			if(j > blw)
 				blw = j;
 		}
 
+		// TODO: bpos per screen?
 		bpos = BARPOS;
 		wa.override_redirect = 1;
 		wa.background_pixmap = ParentRelative;
 		wa.event_mask = ButtonPressMask | ExposureMask;
 
 		/* init bars */
-		monitors[i].barwin = XCreateWindow(dpy, root, monitors[i].sx, monitors[i].sy, monitors[i].sw, bh, 0,
-				DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
+		m->barwin = XCreateWindow(dpy, m->root, m->sx, m->sy, m->sw, bh, 0,
+				DefaultDepth(dpy, m->screen), CopyFromParent, DefaultVisual(dpy, m->screen),
 				CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
-		XDefineCursor(dpy, monitors[i].barwin, cursor[CurNormal]);
-		updatebarpos(&monitors[i]);
-		XMapRaised(dpy, monitors[i].barwin);
+		XDefineCursor(dpy, m->barwin, cursor[CurNormal]);
+		updatebarpos(m);
+		XMapRaised(dpy, m->barwin);
 		strcpy(stext, "dwm-"VERSION);
-		monitors[i].dc.drawable = XCreatePixmap(dpy, root, monitors[i].sw, bh, DefaultDepth(dpy, screen));
-		g = XCreateGC(dpy, root, 0, 0);
-		monitors[i].dc.gc = XCreateGC(dpy, root, 0, 0);
-		XSetLineAttributes(dpy, monitors[i].dc.gc, 1, LineSolid, CapButt, JoinMiter);
-		if(!monitors[i].dc.font.set)
-			XSetFont(dpy, monitors[i].dc.gc, monitors[i].dc.font.xfont->fid);
+		m->dc.drawable = XCreatePixmap(dpy, m->root, m->sw, bh, DefaultDepth(dpy, m->screen));
+		m->dc.gc = XCreateGC(dpy, m->root, 0, 0);
+		XSetLineAttributes(dpy, m->dc.gc, 1, LineSolid, CapButt, JoinMiter);
+		if(!m->dc.font.set)
+			XSetFont(dpy, m->dc.gc, m->dc.font.xfont->fid);
+
+		/* EWMH support per monitor */
+		XChangeProperty(dpy, m->root, netatom[NetSupported], XA_ATOM, 32,
+				PropModeReplace, (unsigned char *) netatom, NetLast);
+
+		/* select for events */
+		wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
+				| EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
+		XChangeWindowAttributes(dpy, m->root, CWEventMask | CWCursor, &wa);
+		XSelectInput(dpy, m->root, wa.event_mask);
 	}
+
+	/* grab keys */
+	grabkeys();
+
+	/* init tags */
+	compileregs();
 }
 
 void
@@ -1978,21 +1972,24 @@ int
 monitorat(int x, int y) {
 	int i;
 
+	return 0;
 	if(!XineramaIsActive(dpy))
 		return 0;
 
 	if (x < 0 || y < 0) {
 		Window win;
 		unsigned int mask;
-		XQueryPointer(dpy, root, &win, &win, &x, &y, &i, &i, &mask);
+		XQueryPointer(dpy, DefaultRootWindow(dpy), &win, &win, &x, &y, &i, &i, &mask);
 	}
 
-	for(i = 0; i < mcount; i++)
-		if((x < 0 || (x >= monitors[i].sx && x < monitors[i].sx + monitors[i].sw))
-				&& (y < 0 || (y >= monitors[i].sy && y < monitors[i].sy + monitors[i].sh)))
+	for(i = 0; i < mcount; i++) {
+		Monitor *m = &monitors[i];
+		if((x < 0 || (x >= m->sx && x < m->sx + m->sw))
+				&& (y < 0 || (y >= m->sy && y < m->sy + m->sh)))
 		{
 			return i;
 		}
+	}
 	return 0;
 }
 
@@ -2011,7 +2008,7 @@ void
 selectmonitor(const char *arg) {
 	Monitor *m = &monitors[arg ? atoi(arg) : (monitorat(-1, -1)+1) % mcount];
 
-	XWarpPointer(dpy, None, root, 0, 0, 0, 0, m->wax+m->waw/2, m->way+m->wah/2);
+	XWarpPointer(dpy, None, m->root, 0, 0, 0, 0, m->wax+m->waw/2, m->way+m->wah/2);
 	focus(NULL);
 }
 
@@ -2020,15 +2017,13 @@ int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
 		eprint("dwm-"VERSION", © 2006-2007 Anselm R. Garbe, Sander van Dijk, "
-		       "Jukka Salmi, Premysl Hruby, Szabolcs Nagy\n");
+		       "Jukka Salmi, Premysl Hruby, Szabolcs Nagy, Christof Musik\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 
 	setlocale(LC_CTYPE, "");
 	if(!(dpy = XOpenDisplay(0)))
 		eprint("dwm: cannot open display\n");
-	screen = DefaultScreen(dpy);
-	root = RootWindow(dpy, screen);
 
 	checkotherwm();
 	setup();

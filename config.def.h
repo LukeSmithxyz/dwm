@@ -15,11 +15,11 @@
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
 Bool initags[LENGTH(tags)] = {[0] = True};
 Rule rules[] = {
-	/* class:instance:title regex	tags regex	isfloating */
-	{ "Firefox",			"www",		False },
-	{ "Gimp",			NULL,		True },
-	{ "MPlayer",			NULL,		True },
-	{ "Acroread",			NULL,		True },
+	/* class:instance:title regex	tags regex	isfloating */	/* monitor */
+	{ "Firefox",			"www",		False,		-1 },
+	{ "Gimp",			NULL,		True,		-1 },
+	{ "MPlayer",			NULL,		True,		-1 },
+	{ "Acroread",			NULL,		True,		-1 },
 };
 
 /* layout(s) */
