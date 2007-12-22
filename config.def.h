@@ -45,7 +45,6 @@ Key keys[] = {
 	{ MODKEY,			XK_k,		focusprev,	NULL },
 	{ MODKEY,			XK_h,		setmwfact,	"-0.05" },
 	{ MODKEY,			XK_l,		setmwfact,	"+0.05" },
-	{ MODKEY,			XK_m,		maximize,	NULL },
 	{ MODKEY,			XK_r,		reapply,	NULL },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },

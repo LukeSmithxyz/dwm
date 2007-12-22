@@ -174,7 +174,6 @@ void leavenotify(XEvent *e);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
-void maximize(const char *arg);
 void movemouse(Client *c);
 Client *nexttiled(Client *c, Monitor *m);
 void propertynotify(XEvent *e);
@@ -1132,15 +1131,6 @@ maprequest(XEvent *e) {
 		return;
 	if(!getclient(ev->window))
 		manage(ev->window, &wa);
-}
-
-void
-maximize(const char *arg) {
-/*
-	if(!sel || (!sel->isfloating && layout->arrange != floating))
-		return;
-	resize(sel, wax, way, waw - 2 * sel->border, wah - 2 * sel->border, True);
-*/
 }
 
 void
