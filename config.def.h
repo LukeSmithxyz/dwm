@@ -37,8 +37,7 @@ Layout layouts[] = {
 Key keys[] = {
 	/* modifier			key		function	argument */
 	{ MODKEY,			XK_p,		spawn,
-		"exe=`dmenu_path | dmenu -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"'"
-		" -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'` && exec $exe" },
+		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
 	{ MODKEY,			XK_space,	setlayout,	NULL },
 	{ MODKEY,			XK_b,		togglebar,	NULL },
