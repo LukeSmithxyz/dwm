@@ -374,7 +374,8 @@ buttonpress(XEvent *e) {
 		else if(ev->button == Button2) {
 			if((floating != m->layout->arrange) && c->isfloating)
 				togglefloating(NULL);
-			zoom(NULL);
+			else
+				zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
 			restack();
