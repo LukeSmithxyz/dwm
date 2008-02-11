@@ -1976,14 +1976,17 @@ xerrorstart(Display *dsply, XErrorEvent *ee) {
 void
 view(const char *arg) {
 	unsigned int i;
-
+	Bool tmp[LENGTH(tags)];
 	Monitor *m = &monitors[monitorat()];
 
-	memcpy(m->prevtags, m->seltags, sizeof initags);
 	for(i = 0; i < LENGTH(tags); i++)
-		m->seltags[i] = (NULL == arg);
-	m->seltags[idxoftag(arg)] = True;
-	arrange();
+		tmp[i] = (NULL == arg);
+	tmp[idxoftag(arg)] = True;
+	if(memcmp(m->seltags, tmp, sizeof initags) != 0) {
+		memcpy(m->prevtags, m->seltags, sizeof initags);
+		memcpy(m->seltags, tmp, sizeof initags);
+		arrange();
+	}
 }
 
 void
