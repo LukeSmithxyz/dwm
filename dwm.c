@@ -368,23 +368,16 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			if((m->layout->arrange == floating) || c->isfloating)
-				restack();
-			else
-				togglefloating(NULL);
+			restack();
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
 			if((floating != m->layout->arrange) && c->isfloating)
 				togglefloating(NULL);
-			else
-				zoom(NULL);
+			zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
-			if((floating == m->layout->arrange) || c->isfloating)
-				restack();
-			else
-				togglefloating(NULL);
+			restack();
 			resizemouse(c);
 		}
 	}
@@ -1195,7 +1188,10 @@ movemouse(Client *c) {
 				ny = m->way;
 			else if(abs((m->way + m->wah) - (ny + c->h + 2 * c->border)) < SNAP)
 				ny = m->way + m->wah - c->h - 2 * c->border;
-			resize(c, nx, ny, c->w, c->h, False);
+			if((monitors[selmonitor].layout->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
+				togglefloating(NULL);
+			if((monitors[selmonitor].layout->arrange == floating) || c->isfloating)
+				resize(c, nx, ny, c->w, c->h, False);
 			memcpy(c->tags, monitors[monitorat()].seltags, sizeof initags);
 			break;
 		}
@@ -1358,7 +1354,10 @@ resizemouse(Client *c) {
 				nw = 1;
 			if((nh = ev.xmotion.y - ocy - 2 * c->border + 1) <= 0)
 				nh = 1;
-			resize(c, c->x, c->y, nw, nh, True);
+			if((monitors[selmonitor].layout->arrange != floating) && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
+				togglefloating(NULL);
+			if((monitors[selmonitor].layout->arrange == floating) || c->isfloating)
+				resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
 	}
