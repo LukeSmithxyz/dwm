@@ -68,7 +68,7 @@ struct Client {
 	int minax, maxax, minay, maxay;
 	long flags;
 	unsigned int border, oldborder;
-	Bool isbanned, isfixed, isfloating;
+	Bool isbanned, isfixed, isfloating, isurgent;
 	Bool *tags;
 	Client *next;
 	Client *prev;
@@ -146,7 +146,7 @@ void detach(Client *c);
 void detachstack(Client *c);
 void drawbar(void);
 void drawsquare(Monitor *, Bool filled, Bool empty, unsigned long col[ColLast]);
-void drawtext(Monitor *, const char *text, unsigned long col[ColLast]);
+void drawtext(Monitor *, const char *text, unsigned long col[ColLast], Bool invert);
 void *emallocz(unsigned int size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
@@ -166,6 +166,7 @@ unsigned int idxoftag(const char *tag);
 void initfont(Monitor*, const char *fontstr);
 Bool isoccupied(Monitor *m, unsigned int t);
 Bool isprotodel(Client *c);
+Bool isurgent(int monitor, unsigned int t);
 Bool isvisible(Client *c, int monitor);
 void keypress(XEvent *e);
 void killclient(const char *arg);
@@ -201,6 +202,7 @@ void unmapnotify(XEvent *e);
 void updatebarpos(Monitor *m);
 void updatesizehints(Client *c);
 void updatetitle(Client *c);
+void updatewmhints(Client *c);
 void view(const char *arg);
 void viewprevtag(const char *arg);	/* views previous selected tags */
 int xerror(Display *dpy, XErrorEvent *ee);
@@ -573,17 +575,17 @@ drawbar(void) {
 		for(j = 0; j < LENGTH(tags); j++) {
 			m->dc.w = textw(m, tags[j]);
 			if(m->seltags[j]) {
-				drawtext(m, tags[j], m->dc.sel);
+				drawtext(m, tags[j], m->dc.sel, isurgent(i, j));
 				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor, isoccupied(m, j), m->dc.sel);
 			}
 			else {
-				drawtext(m, tags[j], m->dc.norm);
+				drawtext(m, tags[j], m->dc.norm, isurgent(i, j));
 				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor, isoccupied(m, j), m->dc.norm);
 			}
 			m->dc.x += m->dc.w;
 		}
 		m->dc.w = blw;
-		drawtext(m, m->layout->symbol, m->dc.norm);
+		drawtext(m, m->layout->symbol, m->dc.norm, False);
 		x = m->dc.x + m->dc.w;
 		m->dc.w = textw(m, stext);
 		m->dc.x = m->sw - m->dc.w;
@@ -591,15 +593,15 @@ drawbar(void) {
 			m->dc.x = x;
 			m->dc.w = m->sw - x;
 		}
-		drawtext(m, stext, m->dc.norm);
+		drawtext(m, stext, m->dc.norm, False);
 		if((m->dc.w = m->dc.x - x) > bh) {
 			m->dc.x = x;
 			if(sel && sel->monitor == selmonitor) {
-				drawtext(m, sel->name, m->dc.sel);
+				drawtext(m, sel->name, m->dc.sel, False);
 				drawsquare(m, False, sel->isfloating, m->dc.sel);
 			}
 			else
-				drawtext(m, NULL, m->dc.norm);
+				drawtext(m, NULL, m->dc.norm, False);
 		}
 		XCopyArea(dpy, m->dc.drawable, m->barwin, m->dc.gc, 0, 0, m->sw, bh, 0, 0);
 		XSync(dpy, False);
@@ -628,13 +630,13 @@ drawsquare(Monitor *m, Bool filled, Bool empty, unsigned long col[ColLast]) {
 }
 
 void
-drawtext(Monitor *m, const char *text, unsigned long col[ColLast]) {
+drawtext(Monitor *m, const char *text, unsigned long col[ColLast], Bool invert) {
 	int x, y, w, h;
 	static char buf[256];
 	unsigned int len, olen;
 	XRectangle r = { m->dc.x, m->dc.y, m->dc.w, m->dc.h };
 
-	XSetForeground(dpy, m->dc.gc, col[ColBG]);
+	XSetForeground(dpy, m->dc.gc, col[invert ? ColFG : ColBG]);
 	XFillRectangles(dpy, m->dc.drawable, m->dc.gc, &r, 1);
 	if(!text)
 		return;
@@ -660,7 +662,7 @@ drawtext(Monitor *m, const char *text, unsigned long col[ColLast]) {
 	}
 	if(w > m->dc.w)
 		return; /* too long */
-	XSetForeground(dpy, m->dc.gc, col[ColFG]);
+	XSetForeground(dpy, m->dc.gc, col[invert ? ColBG : ColFG]);
 	if(m->dc.font.set)
 		XmbDrawString(dpy, m->dc.drawable, m->dc.font.set, m->dc.gc, x, y, buf, len);
 	else
@@ -999,6 +1001,16 @@ isprotodel(Client *c) {
 }
 
 Bool
+isurgent(int monitor, unsigned int t) {
+	Client *c;
+
+	for(c = clients; c; c = c->next)
+		if(c->monitor == monitor && c->isurgent && c->tags[t])
+			return True;
+	return False;
+}
+
+Bool
 isvisible(Client *c, int monitor) {
 	unsigned int i;
 
@@ -1214,6 +1226,10 @@ propertynotify(XEvent *e) {
 				break;
 			case XA_WM_NORMAL_HINTS:
 				updatesizehints(c);
+				break;
+			case XA_WM_HINTS:
+				updatewmhints(c);
+				drawbar();
 				break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
@@ -1914,6 +1930,16 @@ void
 updatetitle(Client *c) {
 	if(!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
 		gettextprop(c->win, wmatom[WMName], c->name, sizeof c->name);
+}
+
+void
+updatewmhints(Client *c) {
+	XWMHints *wmh;
+
+	if((wmh = XGetWMHints(dpy, c->win))) {
+		c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
+		XFree(wmh);
+	}
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are
