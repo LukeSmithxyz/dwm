@@ -1724,12 +1724,13 @@ tile(void) {
 		for(n = 0, c = nexttiled(clients, i); c; c = nexttiled(c->next, i))
 			n++;
 
+		/* window geoms */
+		mw = (n == 1) ? m->waw : m->mwfact * m->waw;
+		th = (n > 1) ? m->wah / (n - 1) : 0;
+		if(n > 1 && th < bh)
+			th = m->wah;
+
 		for(j = 0, c = mc = nexttiled(clients, i); c; c = nexttiled(c->next, i)) {
-			/* window geoms */
-			mw = (n == 1) ? m->waw : m->mwfact * m->waw;
-			th = (n > 1) ? m->wah / (n - 1) : 0;
-			if(n > 1 && th < bh)
-				th = m->wah;
 			if(j == 0) { /* master */
 				nx = m->wax;
 				ny = m->way;
