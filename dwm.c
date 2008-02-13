@@ -145,7 +145,7 @@ void destroynotify(XEvent *e);
 void detach(Client *c);
 void detachstack(Client *c);
 void drawbar(void);
-void drawsquare(Monitor *, Bool filled, Bool empty, unsigned long col[ColLast]);
+void drawsquare(Monitor *, Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
 void drawtext(Monitor *, const char *text, unsigned long col[ColLast], Bool invert);
 void *emallocz(unsigned int size);
 void enternotify(XEvent *e);
@@ -570,11 +570,13 @@ drawbar(void) {
 			m->dc.w = textw(m, tags[j]);
 			if(m->seltags[j]) {
 				drawtext(m, tags[j], m->dc.sel, isurgent(i, j));
-				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor, isoccupied(m, j), m->dc.sel);
+				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor,
+						isoccupied(m, j), isurgent(i, j), m->dc.sel);
 			}
 			else {
 				drawtext(m, tags[j], m->dc.norm, isurgent(i, j));
-				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor, isoccupied(m, j), m->dc.norm);
+				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor,
+						isoccupied(m, j), isurgent(i, j), m->dc.norm);
 			}
 			m->dc.x += m->dc.w;
 		}
@@ -592,7 +594,7 @@ drawbar(void) {
 			m->dc.x = x;
 			if(sel && sel->monitor == selmonitor) {
 				drawtext(m, sel->name, m->dc.sel, False);
-				drawsquare(m, False, sel->isfloating, m->dc.sel);
+				drawsquare(m, False, sel->isfloating, False, m->dc.sel);
 			}
 			else
 				drawtext(m, NULL, m->dc.norm, False);
@@ -603,12 +605,12 @@ drawbar(void) {
 }
 
 void
-drawsquare(Monitor *m, Bool filled, Bool empty, unsigned long col[ColLast]) {
+drawsquare(Monitor *m, Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
 	int x;
 	XGCValues gcv;
 	XRectangle r = { m->dc.x, m->dc.y, m->dc.w, m->dc.h };
 
-	gcv.foreground = col[ColFG];
+	gcv.foreground = col[invert ? ColBG : ColFG];
 	XChangeGC(dpy, m->dc.gc, GCForeground, &gcv);
 	x = (m->dc.font.ascent + m->dc.font.descent + 2) / 4;
 	r.x = m->dc.x + 1;
@@ -1141,14 +1143,11 @@ monitorat() {
 
 	XQueryPointer(dpy, monitors[selmonitor].root, &win, &win, &x, &y, &i, &i, &mask);
 	for(i = 0; i < mcount; i++) {
-		fprintf(stderr, "checking monitor[%d]: %d %d %d %d\n", i, monitors[i].sx, monitors[i].sy, monitors[i].sw, monitors[i].sh);
 		if((x >= monitors[i].sx && x < monitors[i].sx + monitors[i].sw)
 		&& (y >= monitors[i].sy && y < monitors[i].sy + monitors[i].sh)) {
-			fprintf(stderr, "%d,%d -> %d\n", x, y, i);
 			return i;
 		}
 	}
-	fprintf(stderr, "?,? -> 0\n");
 	return 0;
 }
 
