@@ -164,9 +164,9 @@ void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 unsigned int idxoftag(const char *tag);
 void initfont(Monitor*, const char *fontstr);
-Bool isoccupied(Monitor *m, unsigned int t);
+Bool isoccupied(unsigned int monitor, unsigned int t);
 Bool isprotodel(Client *c);
-Bool isurgent(int monitor, unsigned int t);
+Bool isurgent(unsigned int monitor, unsigned int t);
 Bool isvisible(Client *c, int monitor);
 void keypress(XEvent *e);
 void killclient(const char *arg);
@@ -562,39 +562,46 @@ detachstack(Client *c) {
 void
 drawbar(void) {
 	int i, j, x;
+	Client *c;
 
 	for(i = 0; i < mcount; i++) {
 		Monitor *m = &monitors[i];
 		m->dc.x = 0;
+		for(c = stack; c && !isvisible(c, i); c = c->snext);
+		fprintf(stderr, "m%d %s\n", i, c ? c->name : "NIL");
 		for(j = 0; j < LENGTH(tags); j++) {
 			m->dc.w = textw(m, tags[j]);
 			if(m->seltags[j]) {
 				drawtext(m, tags[j], m->dc.sel, isurgent(i, j));
-				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor,
-						isoccupied(m, j), isurgent(i, j), m->dc.sel);
+				drawsquare(m, c && c->tags[j] && c->monitor == i,
+						isoccupied(i, j), isurgent(i, j), m->dc.sel);
 			}
 			else {
 				drawtext(m, tags[j], m->dc.norm, isurgent(i, j));
-				drawsquare(m, sel && sel->tags[j] && sel->monitor == selmonitor,
-						isoccupied(m, j), isurgent(i, j), m->dc.norm);
+				drawsquare(m, c && c->tags[j] && c->monitor == i,
+						isoccupied(i, j), isurgent(i, j), m->dc.norm);
 			}
 			m->dc.x += m->dc.w;
 		}
 		m->dc.w = blw;
 		drawtext(m, m->layout->symbol, m->dc.norm, False);
 		x = m->dc.x + m->dc.w;
-		m->dc.w = textw(m, stext);
-		m->dc.x = m->sw - m->dc.w;
-		if(m->dc.x < x) {
-			m->dc.x = x;
-			m->dc.w = m->sw - x;
+		if(i == selmonitor) {
+			m->dc.w = textw(m, stext);
+			m->dc.x = m->sw - m->dc.w;
+			if(m->dc.x < x) {
+				m->dc.x = x;
+				m->dc.w = m->sw - x;
+			}
+			drawtext(m, stext, m->dc.norm, False);
 		}
-		drawtext(m, stext, m->dc.norm, False);
+		else
+			m->dc.x = m->sw;
 		if((m->dc.w = m->dc.x - x) > bh) {
 			m->dc.x = x;
-			if(sel && sel->monitor == selmonitor) {
-				drawtext(m, sel->name, m->dc.sel, False);
-				drawsquare(m, False, sel->isfloating, False, m->dc.sel);
+			if(c) {
+				drawtext(m, c->name, m->dc.sel, False);
+				drawsquare(m, False, c->isfloating, False, m->dc.sel);
 			}
 			else
 				drawtext(m, NULL, m->dc.norm, False);
@@ -679,8 +686,10 @@ enternotify(XEvent *e) {
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior);
-		//return;
+	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior) {
+		if(!isxinerama || ev->window != monitors[selmonitor].root)
+			return;
+	}
 	if((c = getclient(ev->window)))
 		focus(c);
 	else {
@@ -747,6 +756,7 @@ focus(Client *c) {
 	}
 	else {
 		XSetInputFocus(dpy, m->root, RevertToPointerRoot, CurrentTime);
+		drawbar();
 	}
 }
 
@@ -972,11 +982,11 @@ initfont(Monitor *m, const char *fontstr) {
 }
 
 Bool
-isoccupied(Monitor *m, unsigned int t) {
+isoccupied(unsigned int monitor, unsigned int t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(c->tags[t] && c->monitor == selmonitor)
+		if(c->tags[t] && c->monitor == monitor)
 			return True;
 	return False;
 }
@@ -997,7 +1007,7 @@ isprotodel(Client *c) {
 }
 
 Bool
-isurgent(int monitor, unsigned int t) {
+isurgent(unsigned int monitor, unsigned int t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -1010,8 +1020,10 @@ Bool
 isvisible(Client *c, int monitor) {
 	unsigned int i;
 
+	if(c->monitor != monitor)
+		return False;
 	for(i = 0; i < LENGTH(tags); i++)
-		if(c->tags[i] && monitors[c->monitor].seltags[i] && c->monitor == monitor)
+		if(c->tags[i] && monitors[c->monitor].seltags[i])
 			return True;
 	return False;
 }
