@@ -118,7 +118,6 @@ typedef struct {
 
 typedef struct {
 	int screen;
-	Window root;
 	Window barwin;
 	int sx, sy, sw, sh, wax, way, wah, waw;
 	DC dc;
@@ -216,6 +215,7 @@ void selectmonitor(const char *arg);
 /* variables */
 char stext[256];
 int mcount = 1;
+int selmonitor = 0;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int bh, bpos;
 unsigned int blw = 0;
@@ -248,7 +248,7 @@ Display *dpy;
 DC dc = {0};
 Regs *regs = NULL;
 Monitor *monitors;
-int selmonitor = 0;
+Window root;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -414,7 +414,7 @@ cleanup(void) {
 			XFreeFontSet(dpy, m->dc.font.set);
 		else
 			XFreeFont(dpy, m->dc.font.xfont);
-		XUngrabKey(dpy, AnyKey, AnyModifier, m->root);
+		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		XFreePixmap(dpy, m->dc.drawable);
 		XFreeGC(dpy, m->dc.gc);
 		XDestroyWindow(dpy, m->barwin);
@@ -475,11 +475,11 @@ configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 	Monitor *m = &monitors[selmonitor];
 
-	if(ev->window == m->root && (ev->width != m->sw || ev->height != m->sh)) {
+	if(ev->window == root && (ev->width != m->sw || ev->height != m->sh)) {
 		m->sw = ev->width;
 		m->sh = ev->height;
 		XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, m->root, m->sw, bh, DefaultDepth(dpy, m->screen));
+		dc.drawable = XCreatePixmap(dpy, root, m->sw, bh, DefaultDepth(dpy, m->screen));
 		XResizeWindow(dpy, m->barwin, m->sw, bh);
 		updatebarpos(m);
 		arrange();
@@ -687,7 +687,7 @@ enternotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior) {
-		if(!isxinerama || ev->window != monitors[selmonitor].root)
+		if(!isxinerama || ev->window != root)
 			return;
 	}
 	if((c = getclient(ev->window)))
@@ -755,7 +755,7 @@ focus(Client *c) {
 		selmonitor = c->monitor;
 	}
 	else {
-		XSetInputFocus(dpy, m->root, RevertToPointerRoot, CurrentTime);
+		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 		drawbar();
 	}
 }
@@ -914,20 +914,17 @@ grabkeys(void)  {
 		}
 	XFreeModifiermap(modmap);
 
-	for(i = 0; i < mcount; i++) {
-		Monitor *m = &monitors[i];
-		XUngrabKey(dpy, AnyKey, AnyModifier, m->root);
-		for(j = 0; j < LENGTH(keys); j++) {
-			code = XKeysymToKeycode(dpy, keys[j].keysym);
-			XGrabKey(dpy, code, keys[j].mod, m->root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, keys[j].mod | LockMask, m->root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, keys[j].mod | numlockmask, m->root, True,
-					GrabModeAsync, GrabModeAsync);
-			XGrabKey(dpy, code, keys[j].mod | numlockmask | LockMask, m->root, True,
-					GrabModeAsync, GrabModeAsync);
-		}
+	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	for(i = 0; i < LENGTH(keys); i++) {
+		code = XKeysymToKeycode(dpy, keys[i].keysym);
+		XGrabKey(dpy, code, keys[i].mod, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, keys[i].mod | LockMask, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, keys[i].mod | numlockmask, root, True,
+				GrabModeAsync, GrabModeAsync);
+		XGrabKey(dpy, code, keys[i].mod | numlockmask | LockMask, root, True,
+				GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -1153,7 +1150,7 @@ monitorat() {
 	Window win;
 	unsigned int mask;
 
-	XQueryPointer(dpy, monitors[selmonitor].root, &win, &win, &x, &y, &i, &i, &mask);
+	XQueryPointer(dpy, root, &win, &win, &x, &y, &i, &i, &mask);
 	for(i = 0; i < mcount; i++) {
 		if((x >= monitors[i].sx && x < monitors[i].sx + monitors[i].sw)
 		&& (y >= monitors[i].sy && y < monitors[i].sy + monitors[i].sh)) {
@@ -1172,10 +1169,10 @@ movemouse(Client *c) {
 
 	ocx = nx = c->x;
 	ocy = ny = c->y;
-	if(XGrabPointer(dpy, monitors[selmonitor].root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	XQueryPointer(dpy, monitors[selmonitor].root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
+	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | ExposureMask | SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -1342,7 +1339,7 @@ resizemouse(Client *c) {
 
 	ocx = c->x;
 	ocy = c->y;
-	if(XGrabPointer(dpy, monitors[selmonitor].root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
@@ -1469,32 +1466,29 @@ run(void) {
 
 void
 scan(void) {
-	unsigned int i, j, num;
+	unsigned int i, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
-	for(i = 0; i < mcount; i++) {
-		Monitor *m = &monitors[i];
-		wins = NULL;
-		if(XQueryTree(dpy, m->root, &d1, &d2, &wins, &num)) {
-			for(j = 0; j < num; j++) {
-				if(!XGetWindowAttributes(dpy, wins[j], &wa)
-				|| wa.override_redirect || XGetTransientForHint(dpy, wins[j], &d1))
-					continue;
-				if(wa.map_state == IsViewable || getstate(wins[j]) == IconicState)
-					manage(wins[j], &wa);
-			}
-			for(j = 0; j < num; j++) { /* now the transients */
-				if(!XGetWindowAttributes(dpy, wins[j], &wa))
-					continue;
-				if(XGetTransientForHint(dpy, wins[j], &d1)
-				&& (wa.map_state == IsViewable || getstate(wins[j]) == IconicState))
-					manage(wins[j], &wa);
-			}
+	wins = NULL;
+	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
+		for(i = 0; i < num; i++) {
+			if(!XGetWindowAttributes(dpy, wins[i], &wa)
+					|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
+				continue;
+			if(wa.map_state == IsViewable || getstate(wins[i]) == IconicState)
+				manage(wins[i], &wa);
 		}
-		if(wins)
-			XFree(wins);
+		for(i = 0; i < num; i++) { /* now the transients */
+			if(!XGetWindowAttributes(dpy, wins[i], &wa))
+				continue;
+			if(XGetTransientForHint(dpy, wins[i], &d1)
+					&& (wa.map_state == IsViewable || getstate(wins[i]) == IconicState))
+				manage(wins[i], &wa);
+		}
 	}
+	if(wins)
+		XFree(wins);
 }
 
 void
@@ -1579,12 +1573,13 @@ setup(void) {
 		info = XineramaQueryScreens(dpy, &mcount);
 	monitors = emallocz(mcount * sizeof(Monitor));
 
+	root = DefaultRootWindow(dpy);
+
 	for(i = 0; i < mcount; i++) {
 		/* init geometry */
 		m = &monitors[i];
 
 		m->screen = isxinerama ? 0 : i;
-		m->root = RootWindow(dpy, m->screen);
 
 		if (mcount != 1 && isxinerama) {
 			m->sx = info[i].x_org;
@@ -1632,28 +1627,28 @@ setup(void) {
 		wa.event_mask = ButtonPressMask | ExposureMask;
 
 		/* init bars */
-		m->barwin = XCreateWindow(dpy, m->root, m->sx, m->sy, m->sw, bh, 0,
+		m->barwin = XCreateWindow(dpy, root, m->sx, m->sy, m->sw, bh, 0,
 				DefaultDepth(dpy, m->screen), CopyFromParent, DefaultVisual(dpy, m->screen),
 				CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
 		XDefineCursor(dpy, m->barwin, cursor[CurNormal]);
 		updatebarpos(m);
 		XMapRaised(dpy, m->barwin);
 		strcpy(stext, "dwm-"VERSION);
-		m->dc.drawable = XCreatePixmap(dpy, m->root, m->sw, bh, DefaultDepth(dpy, m->screen));
-		m->dc.gc = XCreateGC(dpy, m->root, 0, 0);
+		m->dc.drawable = XCreatePixmap(dpy, root, m->sw, bh, DefaultDepth(dpy, m->screen));
+		m->dc.gc = XCreateGC(dpy, root, 0, 0);
 		XSetLineAttributes(dpy, m->dc.gc, 1, LineSolid, CapButt, JoinMiter);
 		if(!m->dc.font.set)
 			XSetFont(dpy, m->dc.gc, m->dc.font.xfont->fid);
 
 		/* EWMH support per monitor */
-		XChangeProperty(dpy, m->root, netatom[NetSupported], XA_ATOM, 32,
+		XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
 				PropModeReplace, (unsigned char *) netatom, NetLast);
 
 		/* select for events */
 		wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask
 				| EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
-		XChangeWindowAttributes(dpy, m->root, CWEventMask | CWCursor, &wa);
-		XSelectInput(dpy, m->root, wa.event_mask);
+		XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+		XSelectInput(dpy, root, wa.event_mask);
 	}
 	if(info)
 		XFree(info);
@@ -2044,7 +2039,7 @@ void
 selectmonitor(const char *arg) {
 	Monitor *m = &monitors[arg ? atoi(arg) : (monitorat()+1) % mcount];
 
-	XWarpPointer(dpy, None, m->root, 0, 0, 0, 0, m->wax+m->waw/2, m->way+m->wah/2);
+	XWarpPointer(dpy, None, root, 0, 0, 0, 0, m->wax+m->waw/2, m->way+m->wah/2);
 	focus(NULL);
 }
 
