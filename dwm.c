@@ -117,7 +117,6 @@ typedef struct {
 } Regs;
 
 typedef struct {
-	int monitor;
 	Window barwin;
 	int sx, sy, sw, sh, wax, way, wah, waw;
 	Bool *seltags;
@@ -1164,11 +1163,13 @@ void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di, nx, ny;
 	unsigned int dui;
+	Monitor *m;
 	Window dummy;
 	XEvent ev;
 
 	ocx = nx = c->x;
 	ocy = ny = c->y;
+	m = &monitors[c->monitor];
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
@@ -1188,7 +1189,6 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x1);
 			ny = ocy + (ev.xmotion.y - y1);
-			Monitor *m = &monitors[monitorat()];
 			if(abs(m->wax - nx) < SNAP)
 				nx = m->wax;
 			else if(abs((m->wax + m->waw) - (nx + c->w + 2 * c->border)) < SNAP)
@@ -1197,11 +1197,10 @@ movemouse(Client *c) {
 				ny = m->way;
 			else if(abs((m->way + m->wah) - (ny + c->h + 2 * c->border)) < SNAP)
 				ny = m->way + m->wah - c->h - 2 * c->border;
-			if((monitors[selmonitor].layout->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
+			if((m->layout->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
-			if((monitors[selmonitor].layout->arrange == floating) || c->isfloating)
+			if((m->layout->arrange == floating) || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
-			memcpy(c->tags, monitors[monitorat()].seltags, sizeof initags);
 			break;
 		}
 	}
@@ -1335,10 +1334,12 @@ void
 resizemouse(Client *c) {
 	int ocx, ocy;
 	int nw, nh;
+	Monitor *m;
 	XEvent ev;
 
 	ocx = c->x;
 	ocy = c->y;
+	m = &monitors[c->monitor];
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
@@ -1363,9 +1364,9 @@ resizemouse(Client *c) {
 				nw = 1;
 			if((nh = ev.xmotion.y - ocy - 2 * c->border + 1) <= 0)
 				nh = 1;
-			if((monitors[selmonitor].layout->arrange != floating) && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
+			if((m->layout->arrange != floating) && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
 				togglefloating(NULL);
-			if((monitors[selmonitor].layout->arrange == floating) || c->isfloating)
+			if((m->layout->arrange == floating) || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
@@ -1599,8 +1600,6 @@ setup(void) {
 	for(i = 0; i < mcount; i++) {
 		/* init geometry */
 		m = &monitors[i];
-
-		m->monitor = i;
 
 		if (mcount != 1 && isxinerama) {
 			m->sx = info[i].x_org;
