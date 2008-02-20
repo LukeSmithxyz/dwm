@@ -2009,11 +2009,11 @@ viewprevtag(const char *arg) {
 
 void
 zoom(const char *arg) {
-	Client *c;
+	Client *c = sel;
 
 	if(!sel || !dozoom || sel->isfloating)
 		return;
-	if((c = sel) == nexttiled(clients, c->monitor))
+	if(c == nexttiled(clients, c->monitor))
 		if(!(c = nexttiled(c->next, c->monitor)))
 			return;
 	detach(c);
