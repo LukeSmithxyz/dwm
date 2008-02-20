@@ -1263,9 +1263,10 @@ reapply(const char *arg) {
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
+	Monitor *m;
 	XWindowChanges wc;
-	//Monitor scr = monitors[monitorat()];
-//	c->monitor = monitorat();
+
+	m = &monitors[c->monitor];
 
 	if(sizehints) {
 		/* set minimum possible */
@@ -1307,17 +1308,14 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	}
 	if(w <= 0 || h <= 0)
 		return;
-	/* TODO: offscreen appearance fixes */
-	/*
-	if(x > scr.sw)
-		x = scr.sw - w - 2 * c->border;
-	if(y > scr.sh)
-		y = scr.sh - h - 2 * c->border;
-	if(x + w + 2 * c->border < scr.sx)
-		x = scr.sx;
-	if(y + h + 2 * c->border < scr.sy)
-		y = scr.sy;
-	*/
+	if(x > m->sw)
+		x = m->sw - w - 2 * c->border;
+	if(y > m->sh)
+		y = m->sh - h - 2 * c->border;
+	if(x + w + 2 * c->border < m->sx)
+		x = m->sx;
+	if(y + h + 2 * c->border < m->sy)
+		y = m->sy;
 	if(c->x != x || c->y != y || c->w != w || c->h != h) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
