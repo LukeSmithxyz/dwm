@@ -1568,7 +1568,6 @@ setup(void) {
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
 	// init screens/monitors first
-	mcount = 1;
 	if((isxinerama = XineramaIsActive(dpy)))
 		info = XineramaQueryScreens(dpy, &mcount);
 	selmonitor = monitors = emallocz(mcount * sizeof(Monitor));
