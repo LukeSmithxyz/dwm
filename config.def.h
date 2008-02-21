@@ -3,7 +3,7 @@
 /* appearance */
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
-#define FONT			"-*-terminus-medium-*-*-*-*-*-*-*-*-*-*-*"
+#define FONT			"-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#cccccc"
 #define NORMBGCOLOR		"#cccccc"
 #define NORMFGCOLOR		"#000000"

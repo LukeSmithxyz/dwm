@@ -99,9 +99,10 @@ typedef struct {
 	const char *arg;
 } Key;
 
+typedef struct Monitor Monitor;
 typedef struct {
 	const char *symbol;
-	void (*arrange)(void);
+	void (*arrange)(Monitor *);
 } Layout;
 
 typedef struct {
@@ -116,14 +117,16 @@ typedef struct {
 	regex_t *tagregex;
 } Regs;
 
-typedef struct {
-	Window barwin;
+struct Monitor {
+	unsigned int id;
 	int sx, sy, sw, sh, wax, way, wah, waw;
+	double mwfact;
 	Bool *seltags;
 	Bool *prevtags;
 	Layout *layout;
-	double mwfact;
-} Monitor;
+	Window barwin;
+};
+
 
 /* function declarations */
 void applyrules(Client *c);
@@ -148,7 +151,7 @@ void *emallocz(unsigned int size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
 void expose(XEvent *e);
-void floating(void); /* default floating layout */
+void floating(Monitor *m); /* default floating layout */
 void focus(Client *c);
 void focusin(XEvent *e);
 void focusnext(const char *arg);
@@ -188,7 +191,7 @@ void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
-void tile(void);
+void tile(Monitor *m);
 void togglebar(const char *arg);
 void togglefloating(const char *arg);
 void toggletag(const char *arg);
@@ -304,7 +307,7 @@ arrange(void) {
 		else
 			ban(c);
 
-	monitors[selmonitor].layout->arrange();
+	monitors[selmonitor].layout->arrange(&monitors[selmonitor]);
 	focus(NULL);
 	restack();
 }
@@ -719,12 +722,12 @@ expose(XEvent *e) {
 }
 
 void
-floating(void) { /* default floating layout */
+floating(Monitor *m) { /* default floating layout */
 	Client *c;
 
 	domwfact = dozoom = False;
 	for(c = clients; c; c = c->next)
-		if(isvisible(c, selmonitor))
+		if(isvisible(c, m->id))
 			resize(c, c->x, c->y, c->w, c->h, True);
 }
 
@@ -1598,6 +1601,7 @@ setup(void) {
 	for(i = 0; i < mcount; i++) {
 		/* init geometry */
 		m = &monitors[i];
+		m->id = i;
 
 		if (mcount != 1 && isxinerama) {
 			m->sx = info[i].x_org;
@@ -1714,56 +1718,50 @@ textw(const char *text) {
 }
 
 void
-tile(void) {
-	unsigned int i, j, n, nx, ny, nw, nh, mw, th;
+tile(Monitor *m) {
+	unsigned int i, n, nx, ny, nw, nh, mw, th;
 	Client *c, *mc;
 
 	domwfact = dozoom = True;
 
 	nx = ny = nw = 0; /* gcc stupidity requires this */
 
-	for (i = 0; i < mcount; i++) {
-		Monitor *m = &monitors[i];
+	for(n = 0, c = nexttiled(clients, m->id); c; c = nexttiled(c->next, m->id))
+		n++;
 
-		for(n = 0, c = nexttiled(clients, i); c; c = nexttiled(c->next, i))
-			n++;
+	/* window geoms */
+	mw = (n == 1) ? m->waw : m->mwfact * m->waw;
+	th = (n > 1) ? m->wah / (n - 1) : 0;
+	if(n > 1 && th < bh)
+		th = m->wah;
 
-		/* window geoms */
-		mw = (n == 1) ? m->waw : m->mwfact * m->waw;
-		th = (n > 1) ? m->wah / (n - 1) : 0;
-		if(n > 1 && th < bh)
-			th = m->wah;
-
-		for(j = 0, c = mc = nexttiled(clients, i); c; c = nexttiled(c->next, i)) {
-			if(j == 0) { /* master */
-				nx = m->wax;
-				ny = m->way;
-				nw = mw - 2 * c->border;
-				nh = m->wah - 2 * c->border;
-			}
-			else {  /* tile window */
-				if(j == 1) {
-					ny = m->way;
-					nx += mc->w + 2 * mc->border;
-					nw = m->waw - mw - 2 * c->border;
-				}
-				if(j + 1 == n) /* remainder */
-					nh = (m->way + m->wah) - ny - 2 * c->border;
-				else
-					nh = th - 2 * c->border;
-			}
-			fprintf(stderr, "tile(%d, %d, %d, %d)\n", nx, ny, nw, nh);
-			resize(c, nx, ny, nw, nh, RESIZEHINTS);
-			if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
-				/* client doesn't accept size constraints */
-				resize(c, nx, ny, nw, nh, False);
-			if(n > 1 && th != m->wah)
-				ny = c->y + c->h + 2 * c->border;
-
-			j++;
+	for(i = 0, c = mc = nexttiled(clients, m->id); c; c = nexttiled(c->next, m->id)) {
+		if(i == 0) { /* master */
+			nx = m->wax;
+			ny = m->way;
+			nw = mw - 2 * c->border;
+			nh = m->wah - 2 * c->border;
 		}
+		else {  /* tile window */
+			if(i == 1) {
+				ny = m->way;
+				nx += mc->w + 2 * mc->border;
+				nw = m->waw - mw - 2 * c->border;
+			}
+			if(i + 1 == n) /* remainder */
+				nh = (m->way + m->wah) - ny - 2 * c->border;
+			else
+				nh = th - 2 * c->border;
+		}
+		resize(c, nx, ny, nw, nh, RESIZEHINTS);
+		if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
+			/* client doesn't accept size constraints */
+			resize(c, nx, ny, nw, nh, False);
+		if(n > 1 && th != m->wah)
+			ny = c->y + c->h + 2 * c->border;
+
+		i++;
 	}
-	fprintf(stderr, "done\n");
 }
 void
 togglebar(const char *arg) {
@@ -2045,7 +2043,7 @@ selectmonitor(const char *arg) {
 int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		eprint("dwm-"VERSION", © 2006-2007 Anselm R. Garbe, Sander van Dijk, "
+		eprint("dwm-"VERSION", © 2006-2008 Anselm R. Garbe, Sander van Dijk, "
 		       "Jukka Salmi, Premysl Hruby, Szabolcs Nagy, Christof Musik\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
