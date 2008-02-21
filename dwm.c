@@ -144,9 +144,9 @@ void configurerequest(XEvent *e);
 void destroynotify(XEvent *e);
 void detach(Client *c);
 void detachstack(Client *c);
-void drawbar(void);
-void drawsquare(Monitor *, Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
-void drawtext(Monitor *, const char *text, unsigned long col[ColLast], Bool invert);
+void drawbar(Monitor *m);
+void drawsquare(Monitor *m, Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
+void drawtext(Monitor *m, const char *text, unsigned long col[ColLast], Bool invert);
 void *emallocz(unsigned int size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
@@ -158,6 +158,7 @@ void focusnext(const char *arg);
 void focusprev(const char *arg);
 Client *getclient(Window w);
 unsigned long getcolor(const char *colstr);
+Monitor *getmonitor(Window barwin);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
@@ -180,7 +181,7 @@ void quit(const char *arg);
 void reapply(const char *arg);
 void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
 void resizemouse(Client *c);
-void restack(void);
+void restack(Monitor *m);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
@@ -309,7 +310,7 @@ arrange(void) {
 
 	monitors[selmonitor].layout->arrange(&monitors[selmonitor]);
 	focus(NULL);
-	restack();
+	restack(&monitors[selmonitor]);
 }
 
 void
@@ -370,7 +371,7 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			restack();
+			restack(&monitors[c->monitor]);
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
@@ -380,7 +381,7 @@ buttonpress(XEvent *e) {
 				zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
-			restack();
+			restack(&monitors[c->monitor]);
 			resizemouse(c);
 		}
 	}
@@ -562,55 +563,51 @@ detachstack(Client *c) {
 }
 
 void
-drawbar(void) {
-	int i, j, x;
+drawbar(Monitor *m) {
+	int j, x;
 	Client *c;
 
-	for(i = 0; i < mcount; i++) {
-		Monitor *m = &monitors[i];
-		dc.x = 0;
-		for(c = stack; c && !isvisible(c, i); c = c->snext);
-		fprintf(stderr, "m%d %s\n", i, c ? c->name : "NIL");
-		for(j = 0; j < LENGTH(tags); j++) {
-			dc.w = textw(tags[j]);
-			if(m->seltags[j]) {
-				drawtext(m, tags[j], dc.sel, isurgent(i, j));
-				drawsquare(m, c && c->tags[j] && c->monitor == i,
-						isoccupied(i, j), isurgent(i, j), dc.sel);
-			}
-			else {
-				drawtext(m, tags[j], dc.norm, isurgent(i, j));
-				drawsquare(m, c && c->tags[j] && c->monitor == i,
-						isoccupied(i, j), isurgent(i, j), dc.norm);
-			}
-			dc.x += dc.w;
+	dc.x = 0;
+	for(c = stack; c && !isvisible(c, m->id); c = c->snext);
+	for(j = 0; j < LENGTH(tags); j++) {
+		dc.w = textw(tags[j]);
+		if(m->seltags[j]) {
+			drawtext(m, tags[j], dc.sel, isurgent(m->id, j));
+			drawsquare(m, c && c->tags[j] && c->monitor == m->id,
+					isoccupied(m->id, j), isurgent(m->id, j), dc.sel);
 		}
-		dc.w = blw;
-		drawtext(m, m->layout->symbol, dc.norm, False);
-		x = dc.x + dc.w;
-		if(i == selmonitor) {
-			dc.w = textw(stext);
-			dc.x = m->sw - dc.w;
-			if(dc.x < x) {
-				dc.x = x;
-				dc.w = m->sw - x;
-			}
-			drawtext(m, stext, dc.norm, False);
+		else {
+			drawtext(m, tags[j], dc.norm, isurgent(m->id, j));
+			drawsquare(m, c && c->tags[j] && c->monitor == m->id,
+					isoccupied(m->id, j), isurgent(m->id, j), dc.norm);
+		}
+		dc.x += dc.w;
+	}
+	dc.w = blw;
+	drawtext(m, m->layout->symbol, dc.norm, False);
+	x = dc.x + dc.w;
+	if(m->id == selmonitor) {
+		dc.w = textw(stext);
+		dc.x = m->sw - dc.w;
+		if(dc.x < x) {
+			dc.x = x;
+			dc.w = m->sw - x;
+		}
+		drawtext(m, stext, dc.norm, False);
+	}
+	else
+		dc.x = m->sw;
+	if((dc.w = dc.x - x) > bh) {
+		dc.x = x;
+		if(c) {
+			drawtext(m, c->name, dc.sel, False);
+			drawsquare(m, False, c->isfloating, False, dc.sel);
 		}
 		else
-			dc.x = m->sw;
-		if((dc.w = dc.x - x) > bh) {
-			dc.x = x;
-			if(c) {
-				drawtext(m, c->name, dc.sel, False);
-				drawsquare(m, False, c->isfloating, False, dc.sel);
-			}
-			else
-				drawtext(m, NULL, dc.norm, False);
-		}
-		XCopyArea(dpy, dc.drawable, m->barwin, dc.gc, 0, 0, m->sw, bh, 0, 0);
-		XSync(dpy, False);
+			drawtext(m, NULL, dc.norm, False);
 	}
+	XCopyArea(dpy, dc.drawable, m->barwin, dc.gc, 0, 0, m->sw, bh, 0, 0);
+	XSync(dpy, False);
 }
 
 void
@@ -713,12 +710,11 @@ eprint(const char *errstr, ...) {
 
 void
 expose(XEvent *e) {
+	Monitor *m;
 	XExposeEvent *ev = &e->xexpose;
 
-	if(ev->count == 0) {
-		if(ev->window == monitors[selmonitor].barwin)
-			drawbar();
-	}
+	if(ev->count == 0 && (m = getmonitor(ev->window)))
+		drawbar(m);
 }
 
 void
@@ -750,16 +746,14 @@ focus(Client *c) {
 		grabbuttons(c, True);
 	}
 	sel = c;
-	drawbar();
 	if(c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 		selmonitor = c->monitor;
 	}
-	else {
+	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
-		drawbar();
-	}
+	drawbar(&monitors[selmonitor]);
 }
 
 void
@@ -781,7 +775,7 @@ focusnext(const char *arg) {
 		for(c = clients; c && !isvisible(c, selmonitor); c = c->next);
 	if(c) {
 		focus(c);
-		restack();
+		restack(&monitors[c->monitor]);
 	}
 }
 
@@ -798,7 +792,7 @@ focusprev(const char *arg) {
 	}
 	if(c) {
 		focus(c);
-		restack();
+		restack(&monitors[c->monitor]);
 	}
 }
 
@@ -818,6 +812,16 @@ getcolor(const char *colstr) {
 	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
 		eprint("error, cannot allocate color '%s'\n", colstr);
 	return color.pixel;
+}
+
+Monitor *
+getmonitor(Window barwin) {
+	unsigned int i;
+
+	for(i = 0; i < mcount; i++)
+		if(monitors[i].barwin == barwin)
+			return &monitors[i];
+	return NULL;
 }
 
 long
@@ -1225,24 +1229,24 @@ propertynotify(XEvent *e) {
 		return; /* ignore */
 	if((c = getclient(ev->window))) {
 		switch (ev->atom) {
-			default: break;
-			case XA_WM_TRANSIENT_FOR:
-				XGetTransientForHint(dpy, c->win, &trans);
-				if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
-					arrange();
-				break;
-			case XA_WM_NORMAL_HINTS:
-				updatesizehints(c);
-				break;
-			case XA_WM_HINTS:
-				updatewmhints(c);
-				drawbar();
-				break;
+		default: break;
+		case XA_WM_TRANSIENT_FOR:
+			XGetTransientForHint(dpy, c->win, &trans);
+			if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
+				arrange();
+			break;
+		case XA_WM_NORMAL_HINTS:
+			updatesizehints(c);
+			break;
+		case XA_WM_HINTS:
+			updatewmhints(c);
+			drawbar(&monitors[c->monitor]);
+			break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
 			if(c == sel)
-				drawbar();
+				drawbar(&monitors[c->monitor]);
 		}
 	}
 }
@@ -1375,31 +1379,28 @@ resizemouse(Client *c) {
 }
 
 void
-restack(void) {
-	unsigned int i;
+restack(Monitor *m) {
 	Client *c;
 	XEvent ev;
 	XWindowChanges wc;
 
-	drawbar();
+	drawbar(m);
 	if(!sel)
 		return;
-	if(sel->isfloating || (monitors[selmonitor].layout->arrange == floating))
+	if(sel->isfloating || (m->layout->arrange == floating))
 		XRaiseWindow(dpy, sel->win);
-	if(monitors[selmonitor].layout->arrange != floating) {
+	if(m->layout->arrange != floating) {
 		wc.stack_mode = Below;
-		wc.sibling = monitors[selmonitor].barwin;
+		wc.sibling = m->barwin;
 		if(!sel->isfloating) {
 			XConfigureWindow(dpy, sel->win, CWSibling | CWStackMode, &wc);
 			wc.sibling = sel->win;
 		}
-		for(i = 0; i < mcount; i++) {
-			for(c = nexttiled(clients, i); c; c = nexttiled(c->next, i)) {
-				if(c == sel)
-					continue;
-				XConfigureWindow(dpy, c->win, CWSibling | CWStackMode, &wc);
-				wc.sibling = c->win;
-			}
+		for(c = nexttiled(clients, m->id); c; c = nexttiled(c->next, m->id)) {
+			if(c == sel)
+				continue;
+			XConfigureWindow(dpy, c->win, CWSibling | CWStackMode, &wc);
+			wc.sibling = c->win;
 		}
 	}
 	XSync(dpy, False);
@@ -1456,7 +1457,7 @@ run(void) {
 					}
 				break;
 			}
-			drawbar();
+			drawbar(&monitors[selmonitor]);
 		}
 		while(XPending(dpy)) {
 			XNextEvent(dpy, &ev);
@@ -1522,7 +1523,7 @@ setlayout(const char *arg) {
 	if(sel)
 		arrange();
 	else
-		drawbar();
+		drawbar(m);
 }
 
 void
@@ -1651,6 +1652,8 @@ setup(void) {
 				| EnterWindowMask | LeaveWindowMask | StructureNotifyMask;
 		XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 		XSelectInput(dpy, root, wa.event_mask);
+
+		drawbar(m);
 	}
 	if(info)
 		XFree(info);
@@ -2054,7 +2057,6 @@ main(int argc, char *argv[]) {
 
 	checkotherwm();
 	setup();
-	drawbar();
 	scan();
 	run();
 	cleanup();
