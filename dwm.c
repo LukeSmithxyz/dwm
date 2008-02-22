@@ -1276,7 +1276,6 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	XWindowChanges wc;
 
 	m = c->monitor;
-
 	if(sizehints) {
 		/* set minimum possible */
 		if (w < 1)
@@ -1325,6 +1324,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		x = m->sx;
 	if(y + h + 2 * c->border < m->sy)
 		y = m->sy;
+	fprintf(stderr, "resize %d %d %d %d (%d %d %d %d)\n", x, y , w, h, m->sx, m->sy, m->sw, m->sh);
 	if(c->x != x || c->y != y || c->w != w || c->h != h) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
@@ -1605,7 +1605,7 @@ setup(void) {
 		m = &monitors[i];
 		m->id = i;
 
-		if (mcount != 1 && isxinerama) {
+		if(mcount != 1 && isxinerama) {
 			m->sx = info[i].x_org;
 			m->sy = info[i].y_org;
 			m->sw = info[i].width;
@@ -1727,9 +1727,9 @@ tile(Monitor *m) {
 	Client *c, *mc;
 
 	domwfact = dozoom = True;
-
-	nx = ny = nw = 0; /* gcc stupidity requires this */
-
+	nx = m->wax;
+	ny = m->way;
+	nw = 0;
 	for(n = 0, c = nexttiled(clients, m); c; c = nexttiled(c->next, m))
 		n++;
 
@@ -1757,16 +1757,17 @@ tile(Monitor *m) {
 			else
 				nh = th - 2 * c->border;
 		}
+		fprintf(stderr, "tile %d %d %d %d\n", nx, ny, nw, nh);
 		resize(c, nx, ny, nw, nh, RESIZEHINTS);
 		if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
 			/* client doesn't accept size constraints */
 			resize(c, nx, ny, nw, nh, False);
 		if(n > 1 && th != m->wah)
 			ny = c->y + c->h + 2 * c->border;
-
 		i++;
 	}
 }
+
 void
 togglebar(const char *arg) {
 	if(bpos == BarOff)
@@ -1824,6 +1825,7 @@ unban(Client *c) {
 
 void
 unmanage(Client *c) {
+	Monitor *m = c->monitor;
 	XWindowChanges wc;
 
 	wc.border_width = c->oldborder;
@@ -1842,7 +1844,7 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	arrange(NULL);
+	arrange(m);
 }
 
 void
