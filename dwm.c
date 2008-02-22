@@ -313,7 +313,7 @@ arrange(Monitor *m) {
 		m->layout->arrange(m);
 	else
 		for(i = 0; i < mcount; i++)
-			m->layout->arrange(&monitors[i]);
+			monitors[i].layout->arrange(&monitors[i]);
 	focus(NULL);
 	restack(m);
 }
