@@ -2061,6 +2061,7 @@ selectmonitor(const char *arg) {
 
 int
 main(int argc, char *argv[]) {
+	fprintf(stderr, "%u\n", sizeof("jsjsjsjsjssjsj"));
 	if(argc == 2 && !strcmp("-v", argv[1]))
 		eprint("dwm-"VERSION", © 2006-2008 dwm engineers, see LICENSE for details\n");
 	else if(argc != 1)
