@@ -130,7 +130,7 @@ struct Monitor {
 
 /* function declarations */
 void applyrules(Client *c);
-void arrange(void);
+void arrange(Monitor *m);
 void attach(Client *c);
 void attachstack(Client *c);
 void ban(Client *c);
@@ -299,7 +299,8 @@ applyrules(Client *c) {
 }
 
 void
-arrange(void) {
+arrange(Monitor *m) {
+	unsigned int i;
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -308,9 +309,13 @@ arrange(void) {
 		else
 			ban(c);
 
-	selmonitor->layout->arrange(selmonitor);
+	if(m)
+		m->layout->arrange(m);
+	else
+		for(i = 0; i < mcount; i++)
+			m->layout->arrange(&monitors[i]);
 	focus(NULL);
-	restack(selmonitor);
+	restack(m);
 }
 
 void
@@ -485,7 +490,7 @@ configurenotify(XEvent *e) {
 		dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(root, screen), bh, DefaultDepth(dpy, screen));
 		XResizeWindow(dpy, m->barwin, m->sw, bh);
 		updatebarpos(m);
-		arrange();
+		arrange(m);
 	}
 }
 
@@ -1078,7 +1083,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 	applyrules(c);
 
-	m = selmonitor;
+	m = c->monitor;
 
 	c->x = wa->x + m->sx;
 	c->y = wa->y + m->sy;
@@ -1122,7 +1127,7 @@ manage(Window w, XWindowAttributes *wa) {
 	ban(c);
 	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
-	arrange();
+	arrange(m);
 }
 
 void
@@ -1201,7 +1206,7 @@ movemouse(Client *c) {
 				ny = m->way;
 			else if(abs((m->way + m->wah) - (ny + c->h + 2 * c->border)) < SNAP)
 				ny = m->way + m->wah - c->h - 2 * c->border;
-			if((m->layout->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
+			if(!c->isfloating && (m->layout->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
 			if((m->layout->arrange == floating) || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
@@ -1230,7 +1235,7 @@ propertynotify(XEvent *e) {
 		case XA_WM_TRANSIENT_FOR:
 			XGetTransientForHint(dpy, c->win, &trans);
 			if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
-				arrange();
+				arrange(c->monitor);
 			break;
 		case XA_WM_NORMAL_HINTS:
 			updatesizehints(c);
@@ -1262,7 +1267,7 @@ reapply(const char *arg) {
 		memcpy(c->tags, zerotags, sizeof zerotags);
 		applyrules(c);
 	}
-	arrange();
+	arrange(NULL);
 }
 
 void
@@ -1366,7 +1371,7 @@ resizemouse(Client *c) {
 				nw = 1;
 			if((nh = ev.xmotion.y - ocy - 2 * c->border + 1) <= 0)
 				nh = 1;
-			if((m->layout->arrange != floating) && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
+			if(!c->isfloating && (m->layout->arrange != floating) && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
 				togglefloating(NULL);
 			if((m->layout->arrange == floating) || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
@@ -1518,7 +1523,7 @@ setlayout(const char *arg) {
 		m->layout = &layouts[i];
 	}
 	if(sel)
-		arrange();
+		arrange(m);
 	else
 		drawbar(m);
 }
@@ -1544,7 +1549,7 @@ setmwfact(const char *arg) {
 		else if(m->mwfact > 0.9)
 			m->mwfact = 0.9;
 	}
-	arrange();
+	arrange(m);
 }
 
 void
@@ -1697,7 +1702,7 @@ tag(const char *arg) {
 	for(i = 0; i < LENGTH(tags); i++)
 		sel->tags[i] = (NULL == arg);
 	sel->tags[idxoftag(arg)] = True;
-	arrange();
+	arrange(sel->monitor);
 }
 
 unsigned int
@@ -1769,7 +1774,7 @@ togglebar(const char *arg) {
 	else
 		bpos = BarOff;
 	updatebarpos(monitorat());
-	arrange();
+	arrange(monitorat());
 }
 
 void
@@ -1779,7 +1784,7 @@ togglefloating(const char *arg) {
 	sel->isfloating = !sel->isfloating;
 	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-	arrange();
+	arrange(sel->monitor);
 }
 
 void
@@ -1793,13 +1798,12 @@ toggletag(const char *arg) {
 	for(j = 0; j < LENGTH(tags) && !sel->tags[j]; j++);
 	if(j == LENGTH(tags))
 		sel->tags[i] = True; /* at least one tag must be enabled */
-	arrange();
+	arrange(sel->monitor);
 }
 
 void
 toggleview(const char *arg) {
 	unsigned int i, j;
-
 	Monitor *m = monitorat();
 
 	i = idxoftag(arg);
@@ -1807,7 +1811,7 @@ toggleview(const char *arg) {
 	for(j = 0; j < LENGTH(tags) && !m->seltags[j]; j++);
 	if(j == LENGTH(tags))
 		m->seltags[i] = True; /* at least one tag must be viewed */
-	arrange();
+	arrange(m);
 }
 
 void
@@ -1838,7 +1842,7 @@ unmanage(Client *c) {
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
-	arrange();
+	arrange(NULL);
 }
 
 void
@@ -1988,7 +1992,7 @@ view(const char *arg) {
 	if(memcmp(m->seltags, tmp, sizeof initags) != 0) {
 		memcpy(m->prevtags, m->seltags, sizeof initags);
 		memcpy(m->seltags, tmp, sizeof initags);
-		arrange();
+		arrange(m);
 	}
 }
 
@@ -2001,7 +2005,7 @@ viewprevtag(const char *arg) {
 	memcpy(tmp, m->seltags, sizeof initags);
 	memcpy(m->seltags, m->prevtags, sizeof initags);
 	memcpy(m->prevtags, tmp, sizeof initags);
-	arrange();
+	arrange(m);
 }
 
 void
@@ -2016,7 +2020,7 @@ zoom(const char *arg) {
 	detach(c);
 	attach(c);
 	focus(c);
-	arrange();
+	arrange(c->monitor);
 }
 
 void
@@ -2035,7 +2039,7 @@ movetomonitor(const char *arg) {
 
 	memcpy(sel->tags, sel->monitor->seltags, sizeof initags);
 	resize(sel, sel->monitor->wax, sel->monitor->way, sel->w, sel->h, True);
-	arrange();
+	arrange(sel->monitor);
 }
 
 void
