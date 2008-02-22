@@ -118,7 +118,6 @@ typedef struct {
 } Regs;
 
 struct Monitor {
-	unsigned int id;
 	int sx, sy, sw, sh, wax, way, wah, waw;
 	double mwfact;
 	Bool *seltags;
@@ -1603,7 +1602,6 @@ setup(void) {
 	for(i = 0; i < mcount; i++) {
 		/* init geometry */
 		m = &monitors[i];
-		m->id = i;
 
 		if(mcount != 1 && isxinerama) {
 			m->sx = info[i].x_org;
@@ -2064,8 +2062,7 @@ selectmonitor(const char *arg) {
 int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		eprint("dwm-"VERSION", © 2006-2008 Anselm R. Garbe, Sander van Dijk, "
-		       "Jukka Salmi, Premysl Hruby, Szabolcs Nagy, Christof Musik\n");
+		eprint("dwm-"VERSION", © 2006-2008 dwm engineers, see LICENSE for details\n");
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 
