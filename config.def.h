@@ -3,7 +3,7 @@
 /* appearance */
 #define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
-#define FONT			"-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*"
+#define FONT			"-*-terminus-medium-r-normal-*-12-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#cccccc"
 #define NORMBGCOLOR		"#cccccc"
 #define NORMFGCOLOR		"#000000"
@@ -13,13 +13,13 @@
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
-Bool initags[LENGTH(tags)] = {[0] = True};
+int initags[LENGTH(tags)]    = { [0] = 1 };
 Rule rules[] = {
-	/* class:instance:title regex	tags regex	isfloating */	/* monitor */
-	{ "Firefox",			"www",		False,		-1 },
-	{ "Gimp",			NULL,		True,		-1 },
-	{ "MPlayer",			NULL,		True,		-1 },
-	{ "Acroread",			NULL,		True,		-1 },
+	/* class:instance:title regex	tags regex	isfloating */
+	{ "Firefox",			"www",		False },
+	{ "Gimp",			NULL,		True },
+	{ "MPlayer",			NULL,		True },
+	{ "Acroread",			NULL,		True },
 };
 
 /* layout(s) */
