@@ -560,10 +560,10 @@ drawbar(View *v) {
 	Client *c;
 
 	dc.x = 0;
-	for(c = stack; c && !isvisible(c); c = c->snext);
+	for(c = stack; c && (!isvisible(c) || getview(c) != v); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
-		if(seltags[i]) {
+		if(seltags[i] && seltags[i] == v->id) {
 			drawtext(v, tags[i], dc.sel, isurgent(i));
 			drawsquare(v, c && c->tags[i], isoccupied(i), isurgent(i), dc.sel);
 		}
@@ -724,7 +724,7 @@ focus(Client *c) {
 	if(selview != v)
 		drawbar(v);
 	if(!c || (c && !isvisible(c)))
-		for(c = stack; c && !isvisible(c); c = c->snext);
+		for(c = stack; c && (!isvisible(c) || getview(c) != selview); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -1156,9 +1156,8 @@ viewat() {
 	XQueryPointer(dpy, root, &win, &win, &x, &y, &i, &i, &mask);
 	for(i = 0; i < nviews; i++) {
 		if((x >= views[i].x && x < views[i].x + views[i].w)
-		&& (y >= views[i].y && y < views[i].y + views[i].h)) {
+		&& (y >= views[i].y && y < views[i].y + views[i].h))
 			return &views[i];
-		}
 	}
 	return NULL;
 }
@@ -1761,7 +1760,6 @@ tile(View *v) {
 			else
 				nh = th - 2 * c->border;
 		}
-		fprintf(stderr, "tile %d %d %d %d\n", nx, ny, nw, nh);
 		resize(c, nx, ny, nw, nh, RESIZEHINTS);
 		if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
 			/* client doesn't accept size constraints */
