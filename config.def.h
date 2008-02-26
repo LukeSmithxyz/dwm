@@ -15,8 +15,8 @@
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
 int initags[LENGTH(tags)]    = { [0] = 1 };
 Rule rules[] = {
-	/* class:instance:title regex	tags regex	isfloating */
-	{ "Firefox",			"www",		False },
+	/* class:instance:title substr	tags ref	isfloating */
+	{ "Firefox",			tags[8],	False },
 	{ "Gimp",			NULL,		True },
 	{ "MPlayer",			NULL,		True },
 	{ "Acroread",			NULL,		True },

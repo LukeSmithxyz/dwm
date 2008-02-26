@@ -106,14 +106,9 @@ typedef struct {
 
 typedef struct {
 	const char *prop;
-	const char *tags;
+	const char *tag;
 	Bool isfloating;
 } Rule;
-
-typedef struct {
-	regex_t *propregex;
-	regex_t *tagregex;
-} Regs;
 
 struct View {
 	int id;
@@ -132,7 +127,6 @@ void ban(Client *c);
 void buttonpress(XEvent *e);
 void checkotherwm(void);
 void cleanup(void);
-void compileregs(void);
 void configure(Client *c);
 void configurenotify(XEvent *e);
 void configurerequest(XEvent *e);
@@ -210,7 +204,7 @@ void zoom(const char *arg);
 void selectview(const char *arg);
 
 /* variables */
-char stext[256];
+char stext[256], buf[256];
 int nviews = 1;
 View *selview;
 int screen;
@@ -246,7 +240,6 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
-Regs *regs = NULL;
 View *views;
 Window root;
 
@@ -256,10 +249,9 @@ Window root;
 /* function implementations */
 void
 applyrules(Client *c) {
-	static char buf[512];
-	unsigned int i, j;
-	regmatch_t tmp;
+	unsigned int i;
 	Bool matched_tag = False;
+	Rule *r;
 	XClassHint ch = { 0 };
 
 	/* rule matching */
@@ -267,16 +259,19 @@ applyrules(Client *c) {
 	snprintf(buf, sizeof buf, "%s:%s:%s",
 			ch.res_class ? ch.res_class : "",
 			ch.res_name ? ch.res_name : "", c->name);
-	for(i = 0; i < LENGTH(rules); i++)
-		if(regs[i].propregex && !regexec(regs[i].propregex, buf, 1, &tmp, 0)) {
-			c->isfloating = rules[i].isfloating;
-			for(j = 0; regs[i].tagregex && j < LENGTH(tags); j++) {
-				if(!regexec(regs[i].tagregex, tags[j], 1, &tmp, 0)) {
-					matched_tag = True;
-					c->tags[j] = selview->id;
-				}
+	for(i = 0; i < LENGTH(rules); i++) {
+		r = &rules[i];
+		if(strstr(c->name, r->prop)
+		|| (ch.res_class && strstr(ch.res_class, r->prop))
+		|| (ch.res_name && strstr(ch.res_name, r->prop)))
+		{
+			c->isfloating = r->isfloating;
+			if(r->tag) {
+				matched_tag = True;
+				c->tags[idxoftag(r->tag)] = selview->id;
 			}
 		}
+	}
 	if(ch.res_class)
 		XFree(ch.res_class);
 	if(ch.res_name)
@@ -418,32 +413,6 @@ cleanup(void) {
 		XDestroyWindow(dpy, views[i].barwin);
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-}
-
-void
-compileregs(void) {
-	unsigned int i;
-	regex_t *reg;
-
-	if(regs)
-		return;
-	regs = emallocz(LENGTH(rules) * sizeof(Regs));
-	for(i = 0; i < LENGTH(rules); i++) {
-		if(rules[i].prop) {
-			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rules[i].prop, REG_EXTENDED))
-				free(reg);
-			else
-				regs[i].propregex = reg;
-		}
-		if(rules[i].tags) {
-			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, rules[i].tags, REG_EXTENDED))
-				free(reg);
-			else
-				regs[i].tagregex = reg;
-		}
-	}
 }
 
 void
@@ -624,7 +593,6 @@ drawsquare(View *v, Bool filled, Bool empty, Bool invert, unsigned long col[ColL
 void
 drawtext(View *v, const char *text, unsigned long col[ColLast], Bool invert) {
 	int x, y, w, h;
-	static char buf[256];
 	unsigned int len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
@@ -1147,21 +1115,6 @@ maprequest(XEvent *e) {
 		manage(ev->window, &wa);
 }
 
-View *
-viewat() {
-	int i, x, y;
-	Window win;
-	unsigned int mask;
-
-	XQueryPointer(dpy, root, &win, &win, &x, &y, &i, &i, &mask);
-	for(i = 0; i < nviews; i++) {
-		if((x >= views[i].x && x < views[i].x + views[i].w)
-		&& (y >= views[i].y && y < views[i].y + views[i].h))
-			return &views[i];
-	}
-	return NULL;
-}
-
 void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di, nx, ny;
@@ -1406,7 +1359,7 @@ restack(View *v) {
 void
 run(void) {
 	char *p;
-	char buf[sizeof stext];
+	char sbuf[sizeof stext];
 	fd_set rd;
 	int r, xfd;
 	unsigned int len, offset;
@@ -1418,7 +1371,7 @@ run(void) {
 	readin = True;
 	offset = 0;
 	len = sizeof stext - 1;
-	buf[len] = stext[len] = '\0'; /* 0-terminator is never touched */
+	sbuf[len] = stext[len] = '\0'; /* 0-terminator is never touched */
 	while(running) {
 		FD_ZERO(&rd);
 		if(readin)
@@ -1430,7 +1383,7 @@ run(void) {
 			eprint("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
-			switch((r = read(STDIN_FILENO, buf + offset, len - offset))) {
+			switch((r = read(STDIN_FILENO, sbuf + offset, len - offset))) {
 			case -1:
 				strncpy(stext, strerror(errno), len);
 				readin = False;
@@ -1440,15 +1393,15 @@ run(void) {
 				readin = False;
 				break;
 			default:
-				for(p = buf + offset; r > 0; p++, r--, offset++)
+				for(p = sbuf + offset; r > 0; p++, r--, offset++)
 					if(*p == '\n' || *p == '\0') {
 						*p = '\0';
-						strncpy(stext, buf, len);
-						p += r - 1; /* p is buf + offset + r - 1 */
+						strncpy(stext, sbuf, len);
+						p += r - 1; /* p is sbuf + offset + r - 1 */
 						for(r = 0; *(p - r) && *(p - r) != '\n'; r++);
 						offset = r;
 						if(r)
-							memmove(buf, p - r + 1, r);
+							memmove(sbuf, p - r + 1, r);
 						break;
 					}
 				break;
@@ -1665,9 +1618,6 @@ v->h = DisplayHeight(dpy, screen);
 
 	/* grab keys */
 	grabkeys();
-
-	/* init tags */
-	compileregs();
 
 	selview = &views[0];
 }
@@ -1950,6 +1900,46 @@ updatewmhints(Client *c) {
 	}
 }
 
+void
+view(const char *arg) {
+	unsigned int i;
+	int tmp[LENGTH(tags)];
+
+	for(i = 0; i < LENGTH(tags); i++)
+		tmp[i] = (NULL == arg) ? selview->id : 0;
+	tmp[idxoftag(arg)] = selview->id;
+	if(memcmp(seltags, tmp, sizeof initags) != 0) {
+		memcpy(prevtags, seltags, sizeof initags);
+		memcpy(seltags, tmp, sizeof initags);
+		arrange();
+	}
+}
+
+View *
+viewat() {
+	int i, x, y;
+	Window win;
+	unsigned int mask;
+
+	XQueryPointer(dpy, root, &win, &win, &x, &y, &i, &i, &mask);
+	for(i = 0; i < nviews; i++) {
+		if((x >= views[i].x && x < views[i].x + views[i].w)
+		&& (y >= views[i].y && y < views[i].y + views[i].h))
+			return &views[i];
+	}
+	return NULL;
+}
+
+void
+viewprevtag(const char *arg) {
+	static Bool tmp[LENGTH(tags)];
+
+	memcpy(tmp, seltags, sizeof initags);
+	memcpy(seltags, prevtags, sizeof initags);
+	memcpy(prevtags, tmp, sizeof initags);
+	arrange();
+}
+
 /* There's no way to check accesses to destroyed windows, thus those cases are
  * ignored (especially on UnmapNotify's).  Other types of errors call Xlibs
  * default error handler, which may call exit.  */
@@ -1983,31 +1973,6 @@ xerrorstart(Display *dpy, XErrorEvent *ee) {
 }
 
 void
-view(const char *arg) {
-	unsigned int i;
-	int tmp[LENGTH(tags)];
-
-	for(i = 0; i < LENGTH(tags); i++)
-		tmp[i] = (NULL == arg) ? selview->id : 0;
-	tmp[idxoftag(arg)] = selview->id;
-	if(memcmp(seltags, tmp, sizeof initags) != 0) {
-		memcpy(prevtags, seltags, sizeof initags);
-		memcpy(seltags, tmp, sizeof initags);
-		arrange();
-	}
-}
-
-void
-viewprevtag(const char *arg) {
-	static Bool tmp[LENGTH(tags)];
-
-	memcpy(tmp, seltags, sizeof initags);
-	memcpy(seltags, prevtags, sizeof initags);
-	memcpy(prevtags, tmp, sizeof initags);
-	arrange();
-}
-
-void
 zoom(const char *arg) {
 	Client *c = sel;
 
@@ -2021,21 +1986,6 @@ zoom(const char *arg) {
 	focus(c);
 	arrange();
 }
-
-void
-selectview(const char *arg) {
-	int i;
-	View *v;
-
-	if(!arg)
-		return;
-	if(arg)
-		i = atoi(arg);
-	v = &views[i % nviews];
-	XWarpPointer(dpy, None, root, 0, 0, 0, 0, v->wax+v->waw/2, v->way+v->wah/2);
-	focus(NULL);
-}
-
 
 int
 main(int argc, char *argv[]) {
