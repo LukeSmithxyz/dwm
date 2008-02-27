@@ -67,10 +67,10 @@ struct Client {
 	int x, y, w, h;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
-	int *tags;
 	long flags;
 	unsigned int border, oldborder;
 	Bool isbanned, isfixed, isfloating, isurgent;
+	Bool *tags;
 	Client *next;
 	Client *prev;
 	Client *snext;
@@ -110,8 +110,12 @@ typedef struct {
 	Bool isfloating;
 } Rule;
 
+typedef struct {
+	const char name[MAXTAGLEN];
+	unsigned int view;
+} Tag;
+
 struct View {
-	int id;
 	int x, y, w, h, wax, way, wah, waw;
 	double mwfact;
 	Layout *layout;
@@ -119,6 +123,7 @@ struct View {
 };
 
 /* function declarations */
+void addtag(Client *c, const char *t);
 void applyrules(Client *c);
 void arrange(void);
 void attach(Client *c);
@@ -153,7 +158,7 @@ long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
-unsigned int idxoftag(const char *tag);
+unsigned int idxoftag(const char *t);
 void initfont(const char *fontstr);
 Bool isoccupied(unsigned int t);
 Bool isprotodel(Client *c);
@@ -208,8 +213,6 @@ char stext[256], buf[256];
 int nviews = 1;
 View *selview;
 int screen;
-int *seltags;
-int *prevtags;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int bh, bpos;
 unsigned int blw = 0;
@@ -234,6 +237,8 @@ Bool domwfact = True;
 Bool dozoom = True;
 Bool otherwm, readin;
 Bool running = True;
+Bool *prevtags;
+Bool *seltags;
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
@@ -248,17 +253,24 @@ Window root;
 
 /* function implementations */
 void
+addtag(Client *c, const char *t) {
+	unsigned int i, tidx = idxoftag(t);
+
+	for(i = 0; i < LENGTH(tags); i++)
+		if(c->tags[i] && vtags[i] != vtags[tidx])
+			return; /* conflict */
+	c->tags[tidx] = True;
+}
+
+void
 applyrules(Client *c) {
 	unsigned int i;
-	Bool matched_tag = False;
+	Bool matched = False;
 	Rule *r;
 	XClassHint ch = { 0 };
 
 	/* rule matching */
 	XGetClassHint(dpy, c->win, &ch);
-	snprintf(buf, sizeof buf, "%s:%s:%s",
-			ch.res_class ? ch.res_class : "",
-			ch.res_name ? ch.res_name : "", c->name);
 	for(i = 0; i < LENGTH(rules); i++) {
 		r = &rules[i];
 		if(strstr(c->name, r->prop)
@@ -267,8 +279,8 @@ applyrules(Client *c) {
 		{
 			c->isfloating = r->isfloating;
 			if(r->tag) {
-				matched_tag = True;
-				c->tags[idxoftag(r->tag)] = selview->id;
+				addtag(c, r->tag);
+				matched = True;
 			}
 		}
 	}
@@ -276,7 +288,7 @@ applyrules(Client *c) {
 		XFree(ch.res_class);
 	if(ch.res_name)
 		XFree(ch.res_name);
-	if(!matched_tag)
+	if(!matched)
 		memcpy(c->tags, seltags, sizeof initags);
 }
 
@@ -532,7 +544,7 @@ drawbar(View *v) {
 	for(c = stack; c && (!isvisible(c) || getview(c) != v); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
-		if(seltags[i] && seltags[i] == v->id) {
+		if(seltags[i]) {
 			drawtext(v, tags[i], dc.sel, isurgent(i));
 			drawsquare(v, c && c->tags[i], isoccupied(i), isurgent(i), dc.sel);
 		}
@@ -902,10 +914,10 @@ grabkeys(void)  {
 }
 
 unsigned int
-idxoftag(const char *tag) {
+idxoftag(const char *t) {
 	unsigned int i;
 
-	for(i = 0; (i < LENGTH(tags)) && (tags[i] != tag); i++);
+	for(i = 0; (i < LENGTH(tags)) && (tags[i] != t); i++);
 	return (i < LENGTH(tags)) ? i : 0;
 }
 
@@ -1559,7 +1571,6 @@ nviews = 2; /* aim Xinerama */
 	for(i = 0; i < nviews; i++) {
 		/* init geometry */
 		v = &views[i];
-		v->id = i + 1;
 
 		if(nviews != 1 && isxinerama) {
 
@@ -1653,8 +1664,8 @@ tag(const char *arg) {
 	if(!sel)
 		return;
 	for(i = 0; i < LENGTH(tags); i++)
-		sel->tags[i] = (NULL == arg) ? selview->id : 0;
-	sel->tags[idxoftag(arg)] = selview->id;
+		sel->tags[i] = (NULL == arg);
+	sel->tags[idxoftag(arg)] = True;
 	arrange();
 }
 
@@ -1750,7 +1761,7 @@ toggletag(const char *arg) {
 	sel->tags[i] = !sel->tags[i];
 	for(j = 0; j < LENGTH(tags) && !sel->tags[j]; j++);
 	if(j == LENGTH(tags))
-		sel->tags[i] = selview->id; /* at least one tag must be enabled */
+		sel->tags[i] = True; /* at least one tag must be enabled */
 	arrange();
 }
 
@@ -1762,7 +1773,7 @@ toggleview(const char *arg) {
 	seltags[i] = !seltags[i];
 	for(j = 0; j < LENGTH(tags) && !seltags[j]; j++);
 	if(j == LENGTH(tags))
-		seltags[i] = selview->id; /* at least one tag must be viewed */
+		seltags[i] = True; /* at least one tag must be viewed */
 	arrange();
 }
 
@@ -1903,11 +1914,12 @@ updatewmhints(Client *c) {
 void
 view(const char *arg) {
 	unsigned int i;
-	int tmp[LENGTH(tags)];
+	Bool tmp[LENGTH(tags)];
 
 	for(i = 0; i < LENGTH(tags); i++)
-		tmp[i] = (NULL == arg) ? selview->id : 0;
-	tmp[idxoftag(arg)] = selview->id;
+		tmp[i] = (NULL == arg);
+	tmp[idxoftag(arg)] = True;
+
 	if(memcmp(seltags, tmp, sizeof initags) != 0) {
 		memcpy(prevtags, seltags, sizeof initags);
 		memcpy(seltags, tmp, sizeof initags);

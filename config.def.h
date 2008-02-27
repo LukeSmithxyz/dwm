@@ -12,8 +12,10 @@
 #define SELFGCOLOR		"#ffffff"
 
 /* tagging */
-const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "www" };
-int initags[LENGTH(tags)]    = { [0] = 1 };
+const char tags[][MAXTAGLEN]     = { "1", "2", "3", "4", "nil", "6", "7", "8", "www" };
+unsigned int vtags[LENGTH(tags)] = {  0 ,  0 ,  0 ,  0 ,   0  ,  1 ,  1 ,  1 ,   1   };
+Bool initags[LENGTH(tags)]       = { [0] = True, [5] = True };
+
 Rule rules[] = {
 	/* class:instance:title substr	tags ref	isfloating */
 	{ "Firefox",			tags[8],	False },
