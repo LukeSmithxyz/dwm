@@ -291,8 +291,6 @@ applyrules(Client *c) {
 	}
 }
 
-
-
 void
 arrange(void) {
 	unsigned int i;
@@ -342,6 +340,8 @@ buttonpress(XEvent *e) {
 	if(ev->window == selview->barwin) {
 		x = 0;
 		for(i = 0; i < LENGTH(tags); i++) {
+			if(&views[vtags[i]] != selview)
+				continue;
 			x += textw(tags[i]);
 			if(ev->x < x) {
 				if(ev->button == Button1) {
