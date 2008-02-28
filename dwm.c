@@ -294,11 +294,11 @@ arrange(void) {
 		else
 			ban(c);
 
+	focus(NULL);
 	for(i = 0; i < nviews; i++) {
 		views[i].layout->arrange(&views[i]);
 		restack(&views[i]);
 	}
-	focus(NULL);
 }
 
 void
@@ -394,6 +394,7 @@ checkotherwm(void) {
 void
 cleanup(void) {
 	unsigned int i;
+
 	close(STDIN_FILENO);
 	while(stack) {
 		unban(stack);
@@ -706,6 +707,7 @@ floating(View *v) { /* default floating layout */
 void
 focus(Client *c) {
 	View *v = selview;
+
 	if(c)
 		selview = getview(c);
 	if(selview != v)
