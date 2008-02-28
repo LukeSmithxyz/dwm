@@ -71,7 +71,6 @@ struct Client {
 	unsigned int border, oldborder;
 	Bool isbanned, isfixed, isfloating, isurgent;
 	Bool *tags;
-	View *view;
 	Client *next;
 	Client *prev;
 	Client *snext;
@@ -120,7 +119,6 @@ struct View {
 };
 
 /* function declarations */
-void addtag(Client *c, const char *t);
 void applyrules(Client *c);
 void arrange(void);
 void attach(Client *c);
@@ -132,6 +130,7 @@ void cleanup(void);
 void configure(Client *c);
 void configurenotify(XEvent *e);
 void configurerequest(XEvent *e);
+Bool conflicts(Client *c, unsigned int tidx);
 void destroynotify(XEvent *e);
 void detach(Client *c);
 void detachstack(Client *c);
@@ -142,6 +141,7 @@ void *emallocz(unsigned int size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
 void expose(XEvent *e);
+unsigned int firstag(View *v);
 void floating(View *v); /* default floating layout */
 void focus(Client *c);
 void focusin(XEvent *e);
@@ -149,6 +149,7 @@ void focusnext(const char *arg);
 void focusprev(const char *arg);
 Client *getclient(Window w);
 unsigned long getcolor(const char *colstr);
+View *getview(Client *c);
 View *getviewbar(Window barwin);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
@@ -248,20 +249,10 @@ Window root;
 #define TAGSZ (LENGTH(tags) * sizeof(Bool))
 
 /* function implementations */
-void
-addtag(Client *c, const char *t) {
-	unsigned int i, tidx = idxoftag(t);
-
-	for(i = 0; i < LENGTH(tags); i++)
-		if(c->tags[i] && vtags[i] != vtags[tidx])
-			return; /* conflict */
-	c->tags[tidx] = True;
-	c->view = &views[vtags[tidx]];
-}
 
 void
 applyrules(Client *c) {
-	unsigned int i;
+	unsigned int i, idx;
 	Bool matched = False;
 	Rule *r;
 	XClassHint ch = { 0 };
@@ -275,8 +266,8 @@ applyrules(Client *c) {
 		|| (ch.res_name && strstr(ch.res_name, r->prop)))
 		{
 			c->isfloating = r->isfloating;
-			if(r->tag) {
-				addtag(c, r->tag);
+			if(r->tag && !conflicts(c, (idx = idxoftag(r->tag)))) {
+				c->tags[idx] = True;
 				matched = True;
 			}
 		}
@@ -286,8 +277,9 @@ applyrules(Client *c) {
 	if(ch.res_name)
 		XFree(ch.res_name);
 	if(!matched) {
-		memcpy(c->tags, seltags, TAGSZ);
-		c->view = selview;
+		for(i = 0; i < LENGTH(tags); i++)
+			if(seltags[i] && vtags[i] == selview->id)
+				c->tags[i] = True;
 	}
 }
 
@@ -327,7 +319,7 @@ void
 ban(Client *c) {
 	if(c->isbanned)
 		return;
-	XMoveWindow(dpy, c->win, c->x + 3 * c->view->w, c->y);
+	XMoveWindow(dpy, c->win, c->x + 3 * getview(c)->w, c->y);
 	c->isbanned = True;
 }
 
@@ -367,17 +359,17 @@ buttonpress(XEvent *e) {
 		if(CLEANMASK(ev->state) != MODKEY)
 			return;
 		if(ev->button == Button1) {
-			restack(c->view);
+			restack(getview(c));
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if((floating != c->view->layout->arrange) && c->isfloating)
+			if((floating != getview(c)->layout->arrange) && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
 		}
 		else if(ev->button == Button3 && !c->isfixed) {
-			restack(c->view);
+			restack(getview(c));
 			resizemouse(c);
 		}
 	}
@@ -466,7 +458,7 @@ configurerequest(XEvent *e) {
 	XWindowChanges wc;
 
 	if((c = getclient(ev->window))) {
-		View *v = c->view;
+		View *v = getview(c);
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
 		if(c->isfixed || c->isfloating || (floating == v->layout->arrange)) {
@@ -504,6 +496,16 @@ configurerequest(XEvent *e) {
 	XSync(dpy, False);
 }
 
+Bool
+conflicts(Client *c, unsigned int tidx) {
+	unsigned int i;
+
+	for(i = 0; i < LENGTH(tags); i++)
+		if(c->tags[i] && vtags[i] != vtags[tidx])
+			return True; /* conflict */
+	return False;
+}
+
 void
 destroynotify(XEvent *e) {
 	Client *c;
@@ -538,7 +540,7 @@ drawbar(View *v) {
 	Client *c;
 
 	dc.x = 0;
-	for(c = stack; c && (!isvisible(c) || c->view != v); c = c->snext);
+	for(c = stack; c && (!isvisible(c) || getview(c) != v); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		if(&views[vtags[i]] != v)
 			continue;
@@ -681,6 +683,16 @@ expose(XEvent *e) {
 		drawbar(v);
 }
 
+unsigned int
+firstag(View *v) {
+	unsigned int i;
+
+	for(i = 0; i < LENGTH(tags); i++)
+		if(vtags[i] == v->id)
+			return i;
+	return 0; /* safe fallback */
+}
+
 void
 floating(View *v) { /* default floating layout */
 	Client *c;
@@ -695,13 +707,12 @@ void
 focus(Client *c) {
 	View *v = selview;
 	if(c)
-		selview = c->view;
-	else
-		selview = viewat();
+		selview = getview(c);
 	if(selview != v)
 		drawbar(v);
 	if(!c || (c && !isvisible(c)))
-		for(c = stack; c && (!isvisible(c) || c->view != selview); c = c->snext);
+		/* TODO: isvisible might take getview(c) as constraint? */
+		for(c = stack; c && (!isvisible(c) || getview(c) != selview); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -715,7 +726,7 @@ focus(Client *c) {
 	if(c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-		selview = c->view;
+		selview = getview(c);
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
@@ -741,7 +752,7 @@ focusnext(const char *arg) {
 		for(c = clients; c && !isvisible(c); c = c->next);
 	if(c) {
 		focus(c);
-		restack(c->view);
+		restack(getview(c));
 	}
 }
 
@@ -758,7 +769,7 @@ focusprev(const char *arg) {
 	}
 	if(c) {
 		focus(c);
-		restack(c->view);
+		restack(getview(c));
 	}
 }
 
@@ -778,6 +789,16 @@ getcolor(const char *colstr) {
 	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
 		eprint("error, cannot allocate color '%s'\n", colstr);
 	return color.pixel;
+}
+
+View *
+getview(Client *c) {
+	unsigned int i;
+
+	for(i = 0; i < LENGTH(tags); i++)
+		if(c->tags[i])
+			return &views[vtags[i]];
+	return NULL;
 }
 
 View *
@@ -905,7 +926,7 @@ idxoftag(const char *t) {
 	unsigned int i;
 
 	for(i = 0; (i < LENGTH(tags)) && (tags[i] != t); i++);
-	return (i < LENGTH(tags)) ? i : 0;
+	return (i < LENGTH(tags)) ? i : firstag(selview);
 }
 
 void
@@ -1045,7 +1066,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 	applyrules(c);
 
-	v = c->view;
+	v = getview(c);
 
 	c->x = wa->x + v->x;
 	c->y = wa->y + v->y;
@@ -1124,7 +1145,7 @@ movemouse(Client *c) {
 
 	ocx = nx = c->x;
 	ocy = ny = c->y;
-	v = c->view;
+	v = getview(c);
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
@@ -1163,7 +1184,7 @@ movemouse(Client *c) {
 
 Client *
 nexttiled(Client *c, View *v) {
-	for(; c && (c->isfloating || c->view != v || !isvisible(c)); c = c->next);
+	for(; c && (c->isfloating || getview(c) != v || !isvisible(c)); c = c->next);
 	return c;
 }
 
@@ -1188,7 +1209,7 @@ propertynotify(XEvent *e) {
 			break;
 		case XA_WM_HINTS:
 			updatewmhints(c);
-			drawbar(c->view);
+			drawbar(getview(c));
 			break;
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
@@ -1221,7 +1242,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	View *v;
 	XWindowChanges wc;
 
-	v = c->view;
+	v = getview(c);
 	if(sizehints) {
 		/* set minimum possible */
 		if (w < 1)
@@ -1292,7 +1313,7 @@ resizemouse(Client *c) {
 
 	ocx = c->x;
 	ocy = c->y;
-	v = c->view;
+	v = getview(c);
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
@@ -1560,14 +1581,11 @@ nviews = 2; /* aim Xinerama */
 	for(i = 0; i < nviews; i++) {
 		/* init geometry */
 		v = &views[i];
+		v->id = i;
 
-		/* select first tag in each view */
-		for(j = 0; j < LENGTH(tags); j++)
-			if(vtags[j] == i) {
-				seltags[j] = prevtags[j] = True; 
-				break;
-			}
-
+		/* select first tag of view */
+		j = firstag(v);
+		seltags[j] = prevtags[j] = True; 
 
 		if(info) {
 
@@ -1661,8 +1679,10 @@ tag(const char *arg) {
 	if(!sel)
 		return;
 	for(i = 0; i < LENGTH(tags); i++)
-		sel->tags[i] = (NULL == arg);
-	sel->tags[idxoftag(arg)] = True;
+		sel->tags[i] = (NULL == arg) && (vtags[i] == getview(sel)->id);
+	i = idxoftag(arg);
+	if(!conflicts(sel, i))
+		sel->tags[idxoftag(arg)] = True;
 	arrange();
 }
 
@@ -1753,6 +1773,8 @@ toggletag(const char *arg) {
 	if(!sel)
 		return;
 	i = idxoftag(arg);
+	if(conflicts(sel, i))
+		return;
 	sel->tags[i] = !sel->tags[i];
 	for(j = 0; j < LENGTH(tags) && !sel->tags[j]; j++);
 	if(j == LENGTH(tags))
@@ -1908,13 +1930,30 @@ updatewmhints(Client *c) {
 
 void
 view(const char *arg) {
-	unsigned int i;
+	unsigned int i, j;
 	Bool tmp[LENGTH(tags)];
 
-	for(i = 0; i < LENGTH(tags); i++)
-		tmp[i] = (NULL == arg);
-	tmp[idxoftag(arg)] = True;
-
+	memcpy(tmp, seltags, TAGSZ);
+	if(arg == NULL) {
+		for(i = 0; i < LENGTH(tags); i++)
+			tmp[i] = (vtags[i] == selview->id);
+	}
+	else {
+		i = idxoftag(arg);
+		for(j = 0; j < LENGTH(tags); j++)
+			if(selview->id == vtags[i]) {
+				/* view tag of selview */
+				if(selview->id == vtags[j])
+					tmp[j] = False;
+			}
+			else {
+				/* only touch the view the focus should go */
+				if(vtags[j] == vtags[i])
+					tmp[j] = False;
+			}
+		selview = &views[vtags[i]];
+		tmp[i] = True;
+	}
 	if(memcmp(seltags, tmp, TAGSZ) != 0) {
 		memcpy(prevtags, seltags, TAGSZ);
 		memcpy(seltags, tmp, TAGSZ);
@@ -1985,8 +2024,8 @@ zoom(const char *arg) {
 
 	if(!sel || !dozoom || sel->isfloating)
 		return;
-	if(c == nexttiled(clients, c->view))
-		if(!(c = nexttiled(c->next, c->view)))
+	if(c == nexttiled(clients, getview(c)))
+		if(!(c = nexttiled(c->next, getview(c))))
 			return;
 	detach(c);
 	attach(c);
