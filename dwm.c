@@ -227,7 +227,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 Atom wmatom[WMLast], netatom[NetLast];
-Bool isxinerama = False;
 Bool domwfact = True;
 Bool dozoom = True;
 Bool otherwm, readin;
@@ -246,6 +245,7 @@ Window root;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+#define TAGSZ (LENGTH(tags) * sizeof(Bool))
 
 /* function implementations */
 void
@@ -286,7 +286,7 @@ applyrules(Client *c) {
 	if(ch.res_name)
 		XFree(ch.res_name);
 	if(!matched) {
-		memcpy(c->tags, seltags, sizeof initags);
+		memcpy(c->tags, seltags, TAGSZ);
 		c->view = selview;
 	}
 }
@@ -654,10 +654,8 @@ enternotify(XEvent *e) {
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
 
-	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior) {
-		if(!isxinerama || ev->window != root)
-			return;
-	}
+	if((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
+		return;
 	if((c = getclient(ev->window)))
 		focus(c);
 	else
@@ -1042,7 +1040,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XWindowChanges wc;
 
 	c = emallocz(sizeof(Client));
-	c->tags = emallocz(sizeof initags);
+	c->tags = emallocz(TAGSZ);
 	c->win = w;
 
 	applyrules(c);
@@ -1082,7 +1080,7 @@ manage(Window w, XWindowAttributes *wa) {
 	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
 		for(t = clients; t && t->win != trans; t = t->next);
 	if(t)
-		memcpy(c->tags, t->tags, sizeof initags);
+		memcpy(c->tags, t->tags, TAGSZ);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
@@ -1501,7 +1499,7 @@ setmwfact(const char *arg) {
 
 void
 setup(void) {
-	unsigned int i;
+	unsigned int i, j;
 	View *v;
 	XSetWindowAttributes wa;
 	XineramaScreenInfo *info = NULL;
@@ -1519,10 +1517,10 @@ setup(void) {
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
-	if((isxinerama = XineramaIsActive(dpy)))
+	if(XineramaIsActive(dpy))
 		info = XineramaQueryScreens(dpy, &nviews);
+
 #if defined(AIM_XINERAMA)
-isxinerama = True;
 nviews = 2; /* aim Xinerama */
 #endif
 	views = emallocz(nviews * sizeof(View));
@@ -1551,16 +1549,27 @@ nviews = 2; /* aim Xinerama */
 			blw = i;
 	}
 
-	seltags = emallocz(sizeof initags);
-	prevtags = emallocz(sizeof initags);
-	memcpy(seltags, initags, sizeof initags);
-	memcpy(prevtags, initags, sizeof initags);
+	seltags = emallocz(TAGSZ);
+	prevtags = emallocz(TAGSZ);
+
+	/* check, if vtags need assistance, because there is only 1 view */
+	if(nviews == 1)
+		for(i = 0; i < LENGTH(tags); i++)
+			vtags[i] = 0;
 
 	for(i = 0; i < nviews; i++) {
 		/* init geometry */
 		v = &views[i];
 
-		if(nviews != 1 && isxinerama) {
+		/* select first tag in each view */
+		for(j = 0; j < LENGTH(tags); j++)
+			if(vtags[j] == i) {
+				seltags[j] = prevtags[j] = True; 
+				break;
+			}
+
+
+		if(info) {
 
 #if defined(AIM_XINERAMA)
 v->w = DisplayWidth(dpy, screen) / 2;
@@ -1693,8 +1702,6 @@ tile(View *v) {
 
 	for(i = 0, c = mc = nexttiled(clients, v); c; c = nexttiled(c->next, v)) {
 		if(i == 0) { /* master */
-			nx = v->wax;
-			ny = v->way;
 			nw = mw - 2 * c->border;
 			nh = v->wah - 2 * c->border;
 		}
@@ -1908,9 +1915,9 @@ view(const char *arg) {
 		tmp[i] = (NULL == arg);
 	tmp[idxoftag(arg)] = True;
 
-	if(memcmp(seltags, tmp, sizeof initags) != 0) {
-		memcpy(prevtags, seltags, sizeof initags);
-		memcpy(seltags, tmp, sizeof initags);
+	if(memcmp(seltags, tmp, TAGSZ) != 0) {
+		memcpy(prevtags, seltags, TAGSZ);
+		memcpy(seltags, tmp, TAGSZ);
 		arrange();
 	}
 }
@@ -1934,9 +1941,9 @@ void
 viewprevtag(const char *arg) {
 	static Bool tmp[LENGTH(tags)];
 
-	memcpy(tmp, seltags, sizeof initags);
-	memcpy(seltags, prevtags, sizeof initags);
-	memcpy(prevtags, tmp, sizeof initags);
+	memcpy(tmp, seltags, TAGSZ);
+	memcpy(seltags, prevtags, TAGSZ);
+	memcpy(prevtags, tmp, TAGSZ);
 	arrange();
 }
 
