@@ -13,7 +13,6 @@
 
 /* old */
 const char tags[][MAXTAGLEN]     = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-unsigned int vtags[LENGTH(tags)] = {  0 ,  0 ,  0 ,  0 ,   0  ,  1 ,  1 ,  1 ,   1   };
 
 Rule rules[] = {
 	/* class:instance:title substr	tags ref	isfloating */
