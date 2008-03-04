@@ -5,22 +5,23 @@ dwm \- dynamic window manager
 .B dwm
 .RB [ \-v ]
 .SH DESCRIPTION
-dwm is a dynamic window manager for X. It manages windows in tiled and
-floating layouts. Either layout can be applied dynamically, optimizing the
+dwm is a dynamic window manager for X. It manages windows in tiled, maximised
+and floating layouts. Either layout can be applied dynamically, optimising the
 environment for the application in use and the task performed.
 .P
 In tiled layout windows are managed in a master and stacking area. The master
 area contains the window which currently needs most attention, whereas the
-stacking area contains all other windows. In floating layout windows can be
-resized and moved freely. Dialog windows are always managed floating,
-regardless of the layout applied.
+stacking area contains all other windows. In maximised layout all windows are
+maximised to the screen size. In floating layout windows can be resized and
+moved freely. Dialog windows are always managed floating, regardless of the
+layout applied.
 .P
 Windows are grouped by tags. Each window can be tagged with one or multiple
 tags. Selecting certain tags displays all windows with these tags.
 .P
 dwm contains a small status bar which displays all available tags, the layout,
 the title of the focused window, and the text read from standard input. A
-floating window is indicated with an empty square and a maximized
+floating window is indicated with an empty square and a maximised
 floating window is indicated with a filled square before the windows
 title.  The selected tags are indicated with a different color. The tags of
 the focused window are indicated with a filled square in the top left
@@ -62,6 +63,18 @@ Zooms/cycles current window to/from master area (tiled layout only).
 .B Mod1\-Tab
 Toggles to the previously selected tags.
 .TP
+.B Mod1\-t
+Applies tiled layout.
+.TP
+.B Mod1\-f
+Applies loating layout.
+.TP
+.B Mod1\-m
+Applies maximised layout.
+.TP
+.B Mod1\-space
+Toggles between layouts.
+.TP
 .B Mod1\-b
 Shows/hides the status bar.
 .TP
@@ -76,9 +89,6 @@ Focus previous window.
 .TP
 .B Mod1\-l
 Increases the master area width about 5% (tiled layout only).
-.TP
-.B Mod1\-m
-Maximizes current window (floating layout/window only).
 .TP
 .B Mod1\-r
 Re-applies tagging rules to all windows.
@@ -98,9 +108,6 @@ tag to/from current window.
 .TP
 .B Mod1\-Shift\-c
 Close focused window.
-.TP
-.B Mod1\-space
-Toggle between tiled and floating layout (affects all windows).
 .TP
 .B Mod1\-Shift\-space
 Toggle focused window between tiled and floating state.

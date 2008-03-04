@@ -48,7 +48,7 @@
 #define BUTTONMASK		(ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)		(mask & ~(numlockmask|LockMask))
 #define LENGTH(x)		(sizeof x / sizeof x[0])
-#define MAXTAGLEN		16
+#define MAXLEN			16
 #define MOUSEMASK		(BUTTONMASK|PointerMotionMask)
 
 
@@ -153,7 +153,7 @@ void killclient(const char *arg);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
-void monocle(void);
+void maximise(void);
 void movemouse(Client *c);
 Client *nexttiled(Client *c);
 void propertynotify(XEvent *e);
@@ -1073,13 +1073,12 @@ maprequest(XEvent *e) {
 }
 
 void
-monocle(void) {
+maximise(void) {
 	Client *c;
 
 	domwfact = dozoom = False;
-	for(c = clients; c; c = c->next)
-		if(isvisible(c))
-			resize(c, wax, way, waw - 2 * c->border, wah - 2 * c->border, RESIZEHINTS);
+	for(c = nexttiled(clients); c; c = nexttiled(c->next))
+		resize(c, wax, way, waw - 2 * c->border, wah - 2 * c->border, RESIZEHINTS);
 }
 
 void

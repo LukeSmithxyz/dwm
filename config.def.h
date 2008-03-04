@@ -11,8 +11,8 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
-/* old */
-const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+/* tagging */
+const char tags[][MAXLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 Rule rules[] = {
 	/* class:instance:title substr	tags ref	isfloating */
@@ -26,11 +26,12 @@ Rule rules[] = {
 #define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define SNAP			32	/* snap pixel */
+
 Layout layouts[] = {
 	/* symbol		function */
 	{ "[]=",		tile }, /* first entry is default */
 	{ "><>",		floating },
-	{ "[M]",		monocle },
+	{ "[M]",		maximise },
 };
 
 /* key definitions */
@@ -40,14 +41,15 @@ Key keys[] = {
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
-	{ MODKEY,			XK_space,	setlayout,	NULL },
 	{ MODKEY,			XK_b,		togglebar,	NULL },
+	{ MODKEY,			XK_t,		setlayout,	"[]=" },
+	{ MODKEY,			XK_f,		setlayout,	"><>" },
+	{ MODKEY,			XK_m	,	setlayout,	"[M]" },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
 	{ MODKEY,			XK_h,		setmwfact,	"-0.05" },
 	{ MODKEY,			XK_l,		setmwfact,	"+0.05" },
 	{ MODKEY,			XK_r,		reapply,	NULL },
-	{ MODKEY,			XK_m,		setlayout,	"[M]" },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
