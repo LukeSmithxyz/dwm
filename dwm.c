@@ -153,6 +153,7 @@ void killclient(const char *arg);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
+void monocle(void);
 void movemouse(Client *c);
 Client *nexttiled(Client *c);
 void propertynotify(XEvent *e);
@@ -1072,6 +1073,16 @@ maprequest(XEvent *e) {
 }
 
 void
+monocle(void) {
+	Client *c;
+
+	domwfact = dozoom = False;
+	for(c = clients; c; c = c->next)
+		if(isvisible(c))
+			resize(c, wax, way, waw - 2 * c->border, wah - 2 * c->border, RESIZEHINTS);
+}
+
+void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di, nx, ny;
 	unsigned int dui;
@@ -1412,7 +1423,7 @@ setlayout(const char *arg) {
 	}
 	else {
 		for(i = 0; i < LENGTH(layouts); i++)
-			if(arg == layouts[i].symbol)
+			if(!strcmp(arg, layouts[i].symbol))
 				break;
 		if(i == LENGTH(layouts))
 			return;

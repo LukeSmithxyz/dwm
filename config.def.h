@@ -12,7 +12,7 @@
 #define SELFGCOLOR		"#ffffff"
 
 /* old */
-const char tags[][MAXTAGLEN]     = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 Rule rules[] = {
 	/* class:instance:title substr	tags ref	isfloating */
@@ -30,6 +30,7 @@ Layout layouts[] = {
 	/* symbol		function */
 	{ "[]=",		tile }, /* first entry is default */
 	{ "><>",		floating },
+	{ "[M]",		monocle },
 };
 
 /* key definitions */
@@ -46,6 +47,7 @@ Key keys[] = {
 	{ MODKEY,			XK_h,		setmwfact,	"-0.05" },
 	{ MODKEY,			XK_l,		setmwfact,	"+0.05" },
 	{ MODKEY,			XK_r,		reapply,	NULL },
+	{ MODKEY,			XK_m,		setlayout,	"[M]" },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
