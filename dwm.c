@@ -1002,8 +1002,6 @@ manage(Window w, XWindowAttributes *wa) {
 	c->tags = emallocz(TAGSZ);
 	c->win = w;
 
-	applyrules(c);
-
 	c->x = wa->x + sx;
 	c->y = wa->y + sy;
 	c->w = wa->width;
@@ -1038,6 +1036,8 @@ manage(Window w, XWindowAttributes *wa) {
 		for(t = clients; t && t->win != trans; t = t->next);
 	if(t)
 		memcpy(c->tags, t->tags, TAGSZ);
+	else
+		applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
 	attach(c);
