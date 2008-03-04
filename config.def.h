@@ -12,7 +12,7 @@
 #define SELFGCOLOR		"#ffffff"
 
 /* tagging */
-const char tags[][MAXLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 Rule rules[] = {
 	/* class:instance:title substr	tags ref	isfloating */

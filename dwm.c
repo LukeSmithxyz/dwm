@@ -48,7 +48,7 @@
 #define BUTTONMASK		(ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)		(mask & ~(numlockmask|LockMask))
 #define LENGTH(x)		(sizeof x / sizeof x[0])
-#define MAXLEN			16
+#define MAXTAGLEN		16
 #define MOUSEMASK		(BUTTONMASK|PointerMotionMask)
 
 
