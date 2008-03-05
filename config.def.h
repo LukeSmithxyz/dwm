@@ -10,7 +10,7 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
-#if WORK
+#if ANSELM_OFFICE
 
 /* bar position */
 #define BX 0
@@ -88,8 +88,13 @@ Layout layouts[] = {
 #define MODKEY			Mod1Mask
 Key keys[] = {
 	/* modifier			key		function	argument */
+#if ANSELM_OFFICE
+	{ MODKEY,			XK_p,		spawn,
+		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"' -x 0 -y 0 -w 1280" },
+#else
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
+#endif
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
