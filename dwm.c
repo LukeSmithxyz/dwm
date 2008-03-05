@@ -44,7 +44,7 @@
  * TODO: Idea:
  * I intend to not provide real Xinerama support, but instead having a Column
  * tilecols[] array which is used by tile(), and a Column maxcols[] arrays which is used by
- * maximise(). Those arrays should be initialized in config.h. For simplicity
+ * monocle(). Those arrays should be initialized in config.h. For simplicity
  * reasons mwfact should be replaced with a more advanced method which
  * implements the same, but using the boundary between tilecols[0] and
  * tilecols[1] instead. Besides this, get rid of BARPOS and use instead the
@@ -172,7 +172,7 @@ void killclient(const char *arg);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
-void maximise(void);
+void monocle(void);
 void movemouse(Client *c);
 Client *nexttiled(Client *c);
 void propertynotify(XEvent *e);
@@ -1086,7 +1086,7 @@ maprequest(XEvent *e) {
 }
 
 void
-maximise(void) {
+monocle(void) {
 	Client *c;
 
 	domwfact = dozoom = False;

@@ -31,7 +31,7 @@ Layout layouts[] = {
 	/* symbol		function */
 	{ "[]=",		tile }, /* first entry is default */
 	{ "><>",		floating },
-	{ "[M]",		maximise },
+	{ "[M]",		monocle },
 };
 
 /* key definitions */
@@ -42,9 +42,6 @@ Key keys[] = {
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
 	{ MODKEY,			XK_b,		togglebar,	NULL },
-	{ MODKEY,			XK_t,		setlayout,	"[]=" },
-	{ MODKEY,			XK_f,		setlayout,	"><>" },
-	{ MODKEY,			XK_m	,	setlayout,	"[M]" },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
 	{ MODKEY,			XK_h,		setmwfact,	"-0.05" },
@@ -52,6 +49,7 @@ Key keys[] = {
 	{ MODKEY,			XK_r,		reapply,	NULL },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },
+	{ MODKEY,			XK_space,	setlayout,	NULL },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL },
 	{ MODKEY,			XK_0,		view,		NULL },
