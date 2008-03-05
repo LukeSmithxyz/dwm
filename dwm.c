@@ -40,6 +40,21 @@
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
+/*
+ * TODO: Idea:
+ * I intend to not provide real Xinerama support, but instead having a Column
+ * tilecols[] array which is used by tile(), and a Column maxcols[] arrays which is used by
+ * maximise(). Those arrays should be initialized in config.h. For simplicity
+ * reasons mwfact should be replaced with a more advanced method which
+ * implements the same, but using the boundary between tilecols[0] and
+ * tilecols[1] instead. Besides this, get rid of BARPOS and use instead the
+ * following mechanism:
+ *
+ * #define BX 0
+ * #define BY 0
+ * #define BW sw
+ * bh is calculated automatically and should be used for the 
+ */
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -75,6 +90,10 @@ struct Client {
 	Client *snext;
 	Window win;
 };
+
+typedef struct {
+	int x, y, w, h;
+} Column;
 
 typedef struct {
 	int x, y, w, h;
@@ -195,7 +214,7 @@ void selectview(const char *arg);
 /* variables */
 char stext[256], buf[256];
 double mwfact;
-int screen, sx, sy, sw, sh, wax, way, waw, wah, xscreens;
+int screen, sx, sy, sw, sh, wax, way, waw, wah, ncols;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int bh, bpos;
 unsigned int blw = 0;
@@ -224,14 +243,12 @@ Bool *seltags;
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
+Column *cols = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
 Layout *lt;
 Window root, barwin;
-#ifdef XINERAMA
-XineramaScreenInfo *info = NULL;
-#endif
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -393,10 +410,6 @@ cleanup(void) {
 	XFreeCursor(dpy, cursor[CurResize]);
 	XFreeCursor(dpy, cursor[CurMove]);
 	XDestroyWindow(dpy, barwin);
-#if XINERAMA
-	if(info)
-		XFree(info);
-#endif
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 }
@@ -1458,8 +1471,12 @@ setmwfact(const char *arg) {
 
 void
 setup(void) {
+	int screens = 1;
 	unsigned int i;
 	XSetWindowAttributes wa;
+#ifdef XINERAMA
+	XineramaScreenInfo *info;
+#endif
 
 	/* init screen */
 	screen = DefaultScreen(dpy);
@@ -1482,11 +1499,38 @@ setup(void) {
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
+	ncols = 2;
 #ifdef XINERAMA
-	if(XineramaIsActive(dpy))
-		info = XineramaQueryScreens(dpy, &xscreens);
+	if(XineramaIsActive(dpy)) {
+		if((info = XineramaQueryScreens(dpy, &screens))) {
+			if(screens == 1) {
+				sx = info[0].x_org;
+				sy = info[0].y_org;
+				sw = info[0].width;
+				sh = info[0].height;
+			}
+			else {
+				ncols = screens;
+				cols = emallocz(ncols * sizeof(Column));
+				for(i = 0; i < ncols; i++) {
+					cols[i].x = info[i].x_org;
+					cols[i].y = info[i].y_org;
+					cols[i].w = info[i].width;
+					cols[i].h = info[i].height;
+				}
+			}
+			XFree(info);
+		}
+	}
+	else
 #endif
+	{
+		cols = emallocz(ncols * sizeof(Column));
+		cols[0].x = sx;
+		cols[0].y = sy;
 
+
+	}
 	/* init appearance */
 	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
 	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
