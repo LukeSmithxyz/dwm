@@ -1,7 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-#define BARPOS			BarTop /* BarBot, BarOff */
 #define BORDERPX		1
 #define FONT			"-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR		"#cccccc"
@@ -10,6 +9,58 @@
 #define SELBORDERCOLOR		"#0066ff"
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
+
+#if WORK
+
+/* bar position */
+#define BX 0
+#define BY 0
+#define BW 1280
+
+/* master area */
+#define MX 0
+#define MY bh
+#define MW 1280
+#define MH 800 - bh
+
+/* tile area, might be on a different screen */
+#define TX 1280
+#define TY 0
+#define TW 1680
+#define TH 1050
+
+/* monocle area, might be restricted to a specific screen */
+#define MOX MX
+#define MOY MY
+#define MOW MW
+#define MOH MH
+
+#else
+
+/* bar position */
+#define BX sx
+#define BY sy
+#define BW sw
+
+/* master area */
+#define MX sx
+#define MY sy + bh
+#define MW ((int)(((float)sw) * 0.6))
+#define MH sh - bh
+
+/* tile area, might be on a different screen */
+#define TX sx + MW
+#define TY MY
+#define TW sw - MW
+#define TH MH
+
+/* monocle area, might be restricted to a specific screen */
+#define MOX sx
+#define MOY MY
+#define MOW sw
+#define MOH MH
+
+#endif
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -23,7 +74,6 @@ Rule rules[] = {
 };
 
 /* layout(s) */
-#define MWFACT			0.6	/* master width factor [0.1 .. 0.9] */
 #define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define SNAP			32	/* snap pixel */
 
@@ -41,15 +91,14 @@ Key keys[] = {
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
-	{ MODKEY,			XK_b,		togglebar,	NULL },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
-	{ MODKEY,			XK_h,		setmwfact,	"-0.05" },
-	{ MODKEY,			XK_l,		setmwfact,	"+0.05" },
 	{ MODKEY,			XK_r,		reapply,	NULL },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },
-	{ MODKEY,			XK_space,	setlayout,	NULL },
+	{ MODKEY,			XK_m,		setlayout,	"[M]" },
+	{ MODKEY,			XK_f,		setlayout,	"><>" },
+	{ MODKEY,			XK_t,		setlayout,	"[]=" },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL },
 	{ MODKEY,			XK_0,		view,		NULL },

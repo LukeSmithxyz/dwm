@@ -40,24 +40,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
-/*
- * TODO: Idea:
- * I intend to not provide real Xinerama support, but instead having a Column
- * tilecols[] array which is used by tile(), and a Column maxcols[] arrays which is used by
- * monocle(). Those arrays should be initialized in config.h. For simplicity
- * reasons mwfact should be replaced with a more advanced method which
- * implements the same, but using the boundary between tilecols[0] and
- * tilecols[1] instead. Besides this, get rid of BARPOS and use instead the
- * following mechanism:
- *
- * #define BX 0
- * #define BY 0
- * #define BW sw
- * bh is calculated automatically and should be used for the 
- */
-//#ifdef XINERAMA
-#include <X11/extensions/Xinerama.h>
-//#endif
 
 /* macros */
 #define BUTTONMASK		(ButtonPressMask|ButtonReleaseMask)
@@ -66,9 +48,7 @@
 #define MAXTAGLEN		16
 #define MOUSEMASK		(BUTTONMASK|PointerMotionMask)
 
-
 /* enums */
-enum { BarTop, BarBot, BarOff };			/* bar position */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
@@ -79,6 +59,7 @@ typedef struct Client Client;
 struct Client {
 	char name[256];
 	int x, y, w, h;
+	int rx, ry, rw, rh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
@@ -90,10 +71,6 @@ struct Client {
 	Client *snext;
 	Window win;
 };
-
-typedef struct {
-	int x, y, w, h;
-} Column;
 
 typedef struct {
 	int x, y, w, h;
@@ -185,21 +162,18 @@ void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
 void setlayout(const char *arg);
-void setmwfact(const char *arg);
 void setup(void);
 void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
 void tile(void);
-void togglebar(const char *arg);
 void togglefloating(const char *arg);
 void toggletag(const char *arg);
 void toggleview(const char *arg);
 void unban(Client *c);
 void unmanage(Client *c);
 void unmapnotify(XEvent *e);
-void updatebarpos(void);
 void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
@@ -214,7 +188,7 @@ void selectview(const char *arg);
 /* variables */
 char stext[256], buf[256];
 double mwfact;
-int screen, sx, sy, sw, sh, wax, way, waw, wah, ncols;
+int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int bh, bpos;
 unsigned int blw = 0;
@@ -234,7 +208,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 Atom wmatom[WMLast], netatom[NetLast];
-Bool domwfact = True;
 Bool dozoom = True;
 Bool otherwm, readin;
 Bool running = True;
@@ -243,7 +216,6 @@ Bool *seltags;
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
-Column *cols = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
@@ -350,8 +322,6 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
-		if((ev->x < x + blw) && ev->button == Button1)
-			setlayout(NULL);
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
@@ -437,13 +407,11 @@ configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
-		/* TODO -- use Xinerama dimensions here ? */
 		sw = ev->width;
 		sh = ev->height;
 		XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(root, screen), bh, DefaultDepth(dpy, screen));
-		XResizeWindow(dpy, barwin, sw, bh);
-		updatebarpos();
+		dc.drawable = XCreatePixmap(dpy, root, BW, bh, DefaultDepth(dpy, screen));
+		XMoveResizeWindow(dpy, barwin, BX, BY, BW, bh);
 		arrange();
 	}
 }
@@ -454,7 +422,6 @@ configurerequest(XEvent *e) {
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
 
-	/* TODO -- consider Xinerama if necessary when centering */
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
@@ -491,16 +458,6 @@ configurerequest(XEvent *e) {
 		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
 	}
 	XSync(dpy, False);
-}
-
-Bool
-conflicts(Client *c, unsigned int tidx) {
-	unsigned int i;
-
-	for(i = 0; i < LENGTH(tags); i++)
-		if(c->tags[i])
-			return True; /* conflict */
-	return False;
 }
 
 void
@@ -554,10 +511,10 @@ drawbar(void) {
 	drawtext(lt->symbol, dc.norm, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
-	dc.x = sw - dc.w;
+	dc.x = BW - dc.w;
 	if(dc.x < x) {
 		dc.x = x;
-		dc.w = sw - x;
+		dc.w = BW - x;
 	}
 	drawtext(stext, dc.norm, False);
 	if((dc.w = dc.x - x) > bh) {
@@ -569,7 +526,7 @@ drawbar(void) {
 		else
 			drawtext(NULL, dc.norm, False);
 	}
-	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, sw, bh, 0, 0);
+	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, BW, bh, 0, 0);
 	XSync(dpy, False);
 }
 
@@ -677,7 +634,7 @@ void
 floating(void) { /* default floating layout */
 	Client *c;
 
-	domwfact = dozoom = False;
+	dozoom = False;
 	for(c = clients; c; c = c->next)
 		if(isvisible(c))
 			resize(c, c->x, c->y, c->w, c->h, True);
@@ -690,11 +647,22 @@ focus(Client *c) {
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
+		if(lt->arrange == monocle)
+			resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
 	}
 	if(c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
+		if(lt->arrange == monocle) {
+			if(sel != c) {
+				c->rx = c->x;
+				c->ry = c->y;
+				c->rw = c->w;
+				c->rh = c->h;
+			}
+			resize(c, MOX, MOY, MOW, MOH, RESIZEHINTS);
+		}
 	}
 	sel = c;
 	if(c) {
@@ -1016,10 +984,10 @@ manage(Window w, XWindowAttributes *wa) {
 	c->tags = emallocz(TAGSZ);
 	c->win = w;
 
-	c->x = wa->x + sx;
-	c->y = wa->y + sy;
-	c->w = wa->width;
-	c->h = wa->height;
+	c->x = c->rx = wa->x + sx;
+	c->y = c->ry = wa->y + sy;
+	c->w = c->rw = wa->width;
+	c->h = c->rh = wa->height;
 	c->oldborder = wa->border_width;
 
 	if(c->w == sw && c->h == sh) {
@@ -1028,14 +996,14 @@ manage(Window w, XWindowAttributes *wa) {
 		c->border = wa->border_width;
 	}
 	else {
-		if(c->x + c->w + 2 * c->border > wax + waw)
-			c->x = wax + waw - c->w - 2 * c->border;
-		if(c->y + c->h + 2 * c->border > way + wah)
-			c->y = way + wah - c->h - 2 * c->border;
-		if(c->x < wax)
-			c->x = wax;
-		if(c->y < way)
-			c->y = way;
+		if(c->x + c->w + 2 * c->border > sx + sw)
+			c->x = sx + sw - c->w - 2 * c->border;
+		if(c->y + c->h + 2 * c->border > sy + sh)
+			c->y = sy + sh - c->h - 2 * c->border;
+		if(c->x < sx)
+			c->x = sx;
+		if(c->y < sy)
+			c->y = sy;
 		c->border = BORDERPX;
 	}
 	wc.border_width = c->border;
@@ -1087,11 +1055,7 @@ maprequest(XEvent *e) {
 
 void
 monocle(void) {
-	Client *c;
-
-	domwfact = dozoom = False;
-	for(c = nexttiled(clients); c; c = nexttiled(c->next))
-		resize(c, wax, way, waw - 2 * c->border, wah - 2 * c->border, RESIZEHINTS);
+	dozoom = False;
 }
 
 void
@@ -1122,14 +1086,14 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x1);
 			ny = ocy + (ev.xmotion.y - y1);
-			if(abs(wax - nx) < SNAP)
-				nx = wax;
-			else if(abs((wax + waw) - (nx + c->w + 2 * c->border)) < SNAP)
-				nx = wax + waw - c->w - 2 * c->border;
-			if(abs(way - ny) < SNAP)
-				ny = way;
-			else if(abs((way + wah) - (ny + c->h + 2 * c->border)) < SNAP)
-				ny = way + wah - c->h - 2 * c->border;
+			if(abs(sx - nx) < SNAP)
+				nx = sx;
+			else if(abs((sx + sw) - (nx + c->w + 2 * c->border)) < SNAP)
+				nx = sx + sw - c->w - 2 * c->border;
+			if(abs(sy - ny) < SNAP)
+				ny = sy;
+			else if(abs((sy + sh) - (ny + c->h + 2 * c->border)) < SNAP)
+				ny = sy + sh - c->h - 2 * c->border;
 			if(!c->isfloating && (lt->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
 			if((lt->arrange == floating) || c->isfloating)
@@ -1428,19 +1392,14 @@ void
 setlayout(const char *arg) {
 	unsigned int i;
 
-	if(!arg) {
-		lt++;
-		if(lt == &layouts[LENGTH(layouts)])
-			lt = &layouts[0];
-	}
-	else {
-		for(i = 0; i < LENGTH(layouts); i++)
-			if(!strcmp(arg, layouts[i].symbol))
-				break;
-		if(i == LENGTH(layouts))
-			return;
-		lt = &layouts[i];
-	}
+	if(!arg)
+		return;
+	for(i = 0; i < LENGTH(layouts); i++)
+		if(!strcmp(arg, layouts[i].symbol))
+			break;
+	if(i == LENGTH(layouts))
+		return;
+	lt = &layouts[i];
 	if(sel)
 		arrange();
 	else
@@ -1448,35 +1407,9 @@ setlayout(const char *arg) {
 }
 
 void
-setmwfact(const char *arg) {
-	double delta;
-
-	if(!domwfact)
-		return;
-	/* arg handling, manipulate mwfact */
-	if(arg == NULL)
-		mwfact = MWFACT;
-	else if(sscanf(arg, "%lf", &delta) == 1) {
-		if(arg[0] == '+' || arg[0] == '-')
-			mwfact += delta;
-		else
-			mwfact = delta;
-		if(mwfact < 0.1)
-			mwfact = 0.1;
-		else if(mwfact > 0.9)
-			mwfact = 0.9;
-	}
-	arrange();
-}
-
-void
 setup(void) {
-	int screens = 1;
 	unsigned int i;
 	XSetWindowAttributes wa;
-//#ifdef XINERAMA
-	XineramaScreenInfo *info;
-//#endif
 
 	/* init screen */
 	screen = DefaultScreen(dpy);
@@ -1485,14 +1418,6 @@ setup(void) {
 	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	if(XineramaIsActive(dpy)) {
-		if((info = XineramaQueryScreens(dpy, &screens))) {
-			sx = info[0].x_org;
-			sy = info[0].y_org;
-			sw = info[0].width;
-			sh = info[0].height;
-		}
-	}
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -1507,36 +1432,6 @@ setup(void) {
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
-	ncols = 2;
-#if 0
-	if(XineramaIsActive(dpy)) {
-		if((info = XineramaQueryScreens(dpy, &screens))) {
-			if(screens >= 1) {
-				sx = info[0].x_org;
-				sy = info[0].y_org;
-				sw = info[0].width;
-				sh = info[0].height;
-			}
-			else {
-				ncols = screens;
-				cols = emallocz(ncols * sizeof(Column));
-				for(i = 0; i < ncols; i++) {
-					cols[i].x = info[i].x_org;
-					cols[i].y = info[i].y_org;
-					cols[i].w = info[i].width;
-					cols[i].h = info[i].height;
-				}
-			}
-			XFree(info);
-		}
-	}
-	else
-	{
-		cols = emallocz(ncols * sizeof(Column));
-		cols[0].x = sx;
-		cols[0].y = sy;
-	}
-#endif
 	/* init appearance */
 	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
 	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
@@ -1558,10 +1453,8 @@ setup(void) {
 	seltags[0] = prevtags[0] = True;
 
 	/* init layouts */
-	mwfact = MWFACT;
 	lt = &layouts[0];
 
-	/* TODO: Xinerama hints ? */
 	/* init bar */
 	for(blw = i = 0; i < LENGTH(layouts); i++) {
 		i = textw(layouts[i].symbol);
@@ -1569,16 +1462,14 @@ setup(void) {
 			blw = i;
 	}
 
-	bpos = BARPOS;
 	wa.override_redirect = 1;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask|ExposureMask;
 
-	barwin = XCreateWindow(dpy, root, sx, sy, sw, bh, 0, DefaultDepth(dpy, screen),
+	barwin = XCreateWindow(dpy, root, BX, BY, BW, bh, 0, DefaultDepth(dpy, screen),
 				CopyFromParent, DefaultVisual(dpy, screen),
 				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
-	updatebarpos();
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
 	drawbar();
@@ -1655,32 +1546,32 @@ tile(void) {
 	unsigned int i, n, nx, ny, nw, nh, mw, th;
 	Client *c, *mc;
 
-	domwfact = dozoom = True;
-	nx = wax;
-	ny = way;
+	dozoom = True;
+	nx = MX;
+	ny = MY;
 	nw = 0;
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
 	/* window geoms */
-	mw = (n == 1) ? waw : mwfact * waw;
-	th = (n > 1) ? wah / (n - 1) : 0;
+	mw = (n == 1) ? MOW : MW;
+	th = (n > 1) ? TH / (n - 1) : 0;
 	if(n > 1 && th < bh)
-		th = wah;
+		th = TH;
 
 	for(i = 0, c = mc = nexttiled(clients); c; c = nexttiled(c->next)) {
 		if(i == 0) { /* master */
 			nw = mw - 2 * c->border;
-			nh = wah - 2 * c->border;
+			nh = MH - 2 * c->border;
 		}
 		else {  /* tile window */
 			if(i == 1) {
-				ny = way;
-				nx += mc->w + 2 * mc->border;
-				nw = waw - mw - 2 * c->border;
+				ny = TY;
+				nx = TX;
+				nw = TW - 2 * c->border;
 			}
 			if(i + 1 == n) /* remainder */
-				nh = (way + wah) - ny - 2 * c->border;
+				nh = (TY + TH) - ny - 2 * c->border;
 			else
 				nh = th - 2 * c->border;
 		}
@@ -1688,20 +1579,10 @@ tile(void) {
 		if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
 			/* client doesn't accept size constraints */
 			resize(c, nx, ny, nw, nh, False);
-		if(n > 1 && th != wah)
+		if(n > 1 && th != TH)
 			ny = c->y + c->h + 2 * c->border;
 		i++;
 	}
-}
-
-void
-togglebar(const char *arg) {
-	if(bpos == BarOff)
-		bpos = (BARPOS == BarOff) ? BarTop : BARPOS;
-	else
-		bpos = BarOff;
-	updatebarpos();
-	arrange();
 }
 
 void
@@ -1721,8 +1602,6 @@ toggletag(const char *arg) {
 	if(!sel)
 		return;
 	i = idxoftag(arg);
-	if(conflicts(sel, i))
-		return;
 	sel->tags[i] = !sel->tags[i];
 	for(j = 0; j < LENGTH(tags) && !sel->tags[j]; j++);
 	if(j == LENGTH(tags))
@@ -1780,32 +1659,6 @@ unmapnotify(XEvent *e) {
 
 	if((c = getclient(ev->window)))
 		unmanage(c);
-}
-
-void
-updatebarpos(void) {
-	XEvent ev;
-
-	wax = sx;
-	way = sy;
-	wah = sh;
-	waw = sw;
-	switch(bpos) {
-	default:
-		wah -= bh;
-		way += bh;
-		XMoveWindow(dpy, barwin, sx, sy);
-		break;
-	case BarBot:
-		wah -= bh;
-		XMoveWindow(dpy, barwin, sx, sy + wah);
-		break;
-	case BarOff:
-		XMoveWindow(dpy, barwin, sx, sy - bh);
-		break;
-	}
-	XSync(dpy, False);
-	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
