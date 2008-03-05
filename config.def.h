@@ -10,37 +10,16 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
-#if ANSELM_OFFICE
-
-/* bar position */
-#define BX 0
-#define BY 0
-#define BW 1280
-
-/* master area */
-#define MX 0
-#define MY bh
-#define MW 1280
-#define MH 800 - bh
-
-/* tile area, might be on a different screen */
-#define TX 1280
-#define TY 0
-#define TW 1680
-#define TH 1050
-
-/* monocle area, might be restricted to a specific screen */
-#define MOX MX
-#define MOY MY
-#define MOW MW
-#define MOH MH
-
-#else
-
 /* bar position */
 #define BX sx
 #define BY sy
-#define BW sw
+#define BW MW
+
+/* window area */
+#define WX 0
+#define WY bh
+#define WW sw
+#define WH sh
 
 /* master area */
 #define MX sx
@@ -50,17 +29,15 @@
 
 /* tile area, might be on a different screen */
 #define TX sx + MW
-#define TY MY
+#define TY sy
 #define TW sw - MW
-#define TH MH
+#define TH sh
 
 /* monocle area, might be restricted to a specific screen */
 #define MOX sx
 #define MOY MY
 #define MOW sw
 #define MOH MH
-
-#endif
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
