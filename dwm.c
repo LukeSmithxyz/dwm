@@ -1870,10 +1870,11 @@ void
 updatewmhints(Client *c) {
 	XWMHints *wmh;
 
-	if(c == sel)
-		return;
 	if((wmh = XGetWMHints(dpy, c->win))) {
-		c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
+		if(c == sel)
+			sel->isurgent = False;
+		else
+			c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
 		XFree(wmh);
 	}
 }
