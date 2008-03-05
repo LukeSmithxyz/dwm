@@ -55,9 +55,9 @@
  * #define BW sw
  * bh is calculated automatically and should be used for the 
  */
-#ifdef XINERAMA
+//#ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
-#endif
+//#endif
 
 /* macros */
 #define BUTTONMASK		(ButtonPressMask|ButtonReleaseMask)
@@ -1474,9 +1474,9 @@ setup(void) {
 	int screens = 1;
 	unsigned int i;
 	XSetWindowAttributes wa;
-#ifdef XINERAMA
+//#ifdef XINERAMA
 	XineramaScreenInfo *info;
-#endif
+//#endif
 
 	/* init screen */
 	screen = DefaultScreen(dpy);
@@ -1485,6 +1485,14 @@ setup(void) {
 	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
+	if(XineramaIsActive(dpy)) {
+		if((info = XineramaQueryScreens(dpy, &screens))) {
+			sx = info[0].x_org;
+			sy = info[0].y_org;
+			sw = info[0].width;
+			sh = info[0].height;
+		}
+	}
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -1500,10 +1508,10 @@ setup(void) {
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
 	ncols = 2;
-#ifdef XINERAMA
+#if 0
 	if(XineramaIsActive(dpy)) {
 		if((info = XineramaQueryScreens(dpy, &screens))) {
-			if(screens == 1) {
+			if(screens >= 1) {
 				sx = info[0].x_org;
 				sy = info[0].y_org;
 				sw = info[0].width;
@@ -1523,14 +1531,12 @@ setup(void) {
 		}
 	}
 	else
-#endif
 	{
 		cols = emallocz(ncols * sizeof(Column));
 		cols[0].x = sx;
 		cols[0].y = sy;
-
-
 	}
+#endif
 	/* init appearance */
 	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
 	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
@@ -1864,6 +1870,8 @@ void
 updatewmhints(Client *c) {
 	XWMHints *wmh;
 
+	if(c == sel)
+		return;
 	if((wmh = XGetWMHints(dpy, c->win))) {
 		c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
 		XFree(wmh);
