@@ -183,15 +183,12 @@ int xerror(Display *dpy, XErrorEvent *ee);
 int xerrordummy(Display *dpy, XErrorEvent *ee);
 int xerrorstart(Display *dpy, XErrorEvent *ee);
 void zoom(const char *arg);
-void selectview(const char *arg);
 
 /* variables */
 char stext[256], buf[256];
-double mwfact;
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-unsigned int bh, bpos;
-unsigned int blw = 0;
+unsigned int bh, blw = 0;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -219,7 +216,7 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
-Layout *lt;
+Layout *lt = NULL;
 Window root, barwin;
 
 /* configuration, allows nested code to access above variables */
@@ -362,7 +359,6 @@ checkotherwm(void) {
 
 void
 cleanup(void) {
-
 	close(STDIN_FILENO);
 	while(stack) {
 		unban(stack);
@@ -372,7 +368,6 @@ cleanup(void) {
 		XFreeFontSet(dpy, dc.font.set);
 	else
 		XFreeFont(dpy, dc.font.xfont);
-
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	XFreePixmap(dpy, dc.drawable);
 	XFreeGC(dpy, dc.gc);
