@@ -1,3 +1,10 @@
+/**
+ * TODO
+ * - treat monocle as floating layout, actually otherwise certain monocled windows don't get raised
+ * - use WX, WY, WW, WH for window snapping/resizing/mouse
+ * - MOX, MOY, MOW, MOH should only be used in the case of monocle layout and of n==1 in tiled
+ * - simplify tile()
+ */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
