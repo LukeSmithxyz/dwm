@@ -56,8 +56,8 @@ Rule rules[] = {
 
 Layout layouts[] = {
 	/* symbol		function	isfloating */
-	{ "[]|",		tileh,		False }, /* first entry is default */
-	{ "[]=",		tilev,		False },
+	{ "[]=",		tilev,		False }, /* first entry is default */
+	{ "[]|",		tileh,		False },
 	{ "><>",		floating,	True },
 	{ "[M]",		monocle,	True },
 };
