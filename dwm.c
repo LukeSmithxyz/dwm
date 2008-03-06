@@ -4,6 +4,7 @@
  * - use WX, WY, WW, WH for window snapping/resizing/mouse
  * - MOX, MOY, MOW, MOH should only be used in the case of monocle layout and of n==1 in tiled
  * - simplify tile()
+ * - allow for vstack
  */
 /* See LICENSE file for copyright and license details.
  *
