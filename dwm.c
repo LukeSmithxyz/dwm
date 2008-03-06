@@ -1,9 +1,4 @@
 /**
- * TODO
- * - treat monocle as floating layout, actually otherwise certain monocled windows don't get raised
- * - use WX, WY, WW, WH for window snapping/resizing/mouse
- * - MOX, MOY, MOW, MOH should only be used in the case of monocle layout and of n==1 in tiled
- * - simplify tile()
  * - allow for vstack
  */
 /* See LICENSE file for copyright and license details.
@@ -67,7 +62,6 @@ typedef struct Client Client;
 struct Client {
 	char name[256];
 	int x, y, w, h;
-	int rx, ry, rw, rh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
@@ -105,6 +99,7 @@ typedef struct {
 typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
+	Bool isfloating;
 } Layout;
 
 typedef struct {
@@ -176,6 +171,8 @@ void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
 void tile(void);
+unsigned int tilemaster(void);
+void tilevstack(unsigned int n);
 void togglefloating(const char *arg);
 void toggletag(const char *arg);
 void toggleview(const char *arg);
@@ -213,7 +210,6 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 Atom wmatom[WMLast], netatom[NetLast];
-Bool dozoom = True;
 Bool otherwm, readin;
 Bool running = True;
 Bool *prevtags;
@@ -297,7 +293,7 @@ void
 ban(Client *c) {
 	if(c->isbanned)
 		return;
-	XMoveWindow(dpy, c->win, c->x + 3 * sw, c->y);
+	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	c->isbanned = True;
 }
 
@@ -428,7 +424,7 @@ configurerequest(XEvent *e) {
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->border = ev->border_width;
-		if(c->isfixed || c->isfloating || (floating == lt->arrange)) {
+		if(c->isfixed || c->isfloating || lt->isfloating) {
 			if(ev->value_mask & CWX)
 				c->x = sx + ev->x;
 			if(ev->value_mask & CWY)
@@ -637,7 +633,6 @@ void
 floating(void) { /* default floating layout */
 	Client *c;
 
-	dozoom = False;
 	for(c = clients; c; c = c->next)
 		if(isvisible(c))
 			resize(c, c->x, c->y, c->w, c->h, True);
@@ -650,22 +645,11 @@ focus(Client *c) {
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
-		if(lt->arrange == monocle)
-			resize(sel, sel->rx, sel->ry, sel->rw, sel->rh, True);
 	}
 	if(c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
-		if(lt->arrange == monocle) {
-			if(sel != c) {
-				c->rx = c->x;
-				c->ry = c->y;
-				c->rw = c->w;
-				c->rh = c->h;
-			}
-			resize(c, MOX, MOY, MOW, MOH, RESIZEHINTS);
-		}
 	}
 	sel = c;
 	if(c) {
@@ -987,28 +971,29 @@ manage(Window w, XWindowAttributes *wa) {
 	c->tags = emallocz(TAGSZ);
 	c->win = w;
 
-	c->x = c->rx = wa->x + sx;
-	c->y = c->ry = wa->y + sy;
-	c->w = c->rw = wa->width;
-	c->h = c->rh = wa->height;
+	/* geometry */
+	c->x = wa->x;
+	c->y = wa->y;
+	c->w = wa->width;
+	c->h = wa->height;
 	c->oldborder = wa->border_width;
-
 	if(c->w == sw && c->h == sh) {
 		c->x = sx;
 		c->y = sy;
 		c->border = wa->border_width;
 	}
 	else {
-		if(c->x + c->w + 2 * c->border > sx + sw)
-			c->x = sx + sw - c->w - 2 * c->border;
-		if(c->y + c->h + 2 * c->border > sy + sh)
-			c->y = sy + sh - c->h - 2 * c->border;
-		if(c->x < sx)
-			c->x = sx;
-		if(c->y < sy)
-			c->y = sy;
+		if(c->x + c->w + 2 * c->border > WX + WW)
+			c->x = WX + WW - c->w - 2 * c->border;
+		if(c->y + c->h + 2 * c->border > WY + WH)
+			c->y = WY + WH - c->h - 2 * c->border;
+		if(c->x < WX)
+			c->x = WX;
+		if(c->y < WY)
+			c->y = WY;
 		c->border = BORDERPX;
 	}
+
 	wc.border_width = c->border;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
@@ -1057,8 +1042,12 @@ maprequest(XEvent *e) {
 }
 
 void
-monocle(void) {
-	dozoom = False;
+monocle(void) { 
+	Client *c;
+
+	for(c = clients; c; c = c->next)
+		if(isvisible(c))
+			resize(c, MOX, MOY, MOW, MOH, RESIZEHINTS);
 }
 
 void
@@ -1089,17 +1078,17 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x1);
 			ny = ocy + (ev.xmotion.y - y1);
-			if(abs(sx - nx) < SNAP)
-				nx = sx;
-			else if(abs((sx + sw) - (nx + c->w + 2 * c->border)) < SNAP)
-				nx = sx + sw - c->w - 2 * c->border;
-			if(abs(sy - ny) < SNAP)
-				ny = sy;
-			else if(abs((sy + sh) - (ny + c->h + 2 * c->border)) < SNAP)
-				ny = sy + sh - c->h - 2 * c->border;
-			if(!c->isfloating && (lt->arrange != floating) && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
+			if(abs(WX - nx) < SNAP)
+				nx = WX;
+			else if(abs((WX + WW) - (nx + c->w + 2 * c->border)) < SNAP)
+				nx = WX + WW - c->w - 2 * c->border;
+			if(abs(WY - ny) < SNAP)
+				ny = WY;
+			else if(abs((WY + WH) - (ny + c->h + 2 * c->border)) < SNAP)
+				ny = WY + WH - c->h - 2 * c->border;
+			if(!c->isfloating && !lt->isfloating && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
-			if((lt->arrange == floating) || c->isfloating)
+			if((lt->isfloating) || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
 			break;
 		}
@@ -1258,9 +1247,9 @@ resizemouse(Client *c) {
 				nw = 1;
 			if((nh = ev.xmotion.y - ocy - 2 * c->border + 1) <= 0)
 				nh = 1;
-			if(!c->isfloating && (lt->arrange != floating) && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
+			if(!c->isfloating && !lt->isfloating && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
 				togglefloating(NULL);
-			if((lt->arrange == floating) || c->isfloating)
+			if((lt->isfloating) || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
@@ -1276,9 +1265,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(sel->isfloating || (lt->arrange == floating))
+	if(sel->isfloating || lt->isfloating)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange != floating) {
+	if(!lt->isfloating) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		if(!sel->isfloating) {
@@ -1393,6 +1382,7 @@ setclientstate(Client *c, long state) {
 
 void
 setlayout(const char *arg) {
+	static Layout *revert = 0;
 	unsigned int i;
 
 	if(!arg)
@@ -1402,7 +1392,12 @@ setlayout(const char *arg) {
 			break;
 	if(i == LENGTH(layouts))
 		return;
-	lt = &layouts[i];
+	if(revert && &layouts[i] == lt)
+		lt = revert;
+	else {
+		revert = lt;
+		lt = &layouts[i];
+	}
 	if(sel)
 		arrange();
 	else
@@ -1545,47 +1540,58 @@ textw(const char *text) {
 }
 
 void
-tile(void) {
-	unsigned int i, n, nx, ny, nw, nh, mw, th;
+tileresize(Client *c, int x, int y, int w, int h) {
+	resize(c, x, y, w, h, RESIZEHINTS);
+	if((RESIZEHINTS) && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
+		/* client doesn't accept size constraints */
+		resize(c, x, y, w, h, False);
+}
+
+unsigned int
+tilemaster(void) {
+	unsigned int n;
 	Client *c, *mc;
 
-	dozoom = True;
-	nx = MX;
-	ny = MY;
-	nw = 0;
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
+	for(n = 0, mc = c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
+	if(n == 0)
+		return 0;
+	if(n == 1)
+		tileresize(mc, MOX, MOY, (MOW) - 2 * mc->border, (MOH) - 2 * mc->border);
+	else
+		tileresize(mc, MX, MY, (MW) - 2 * mc->border, (MH) - 2 * mc->border);
+	return n - 1;
+}
 
-	/* window geoms */
-	mw = (n == 1) ? MOW : MW;
-	th = (n > 1) ? TH / (n - 1) : 0;
-	if(n > 1 && th < bh)
-		th = TH;
+void
+tilevstack(unsigned int n) {
+	int i, y, h;
+	Client *c;
 
-	for(i = 0, c = mc = nexttiled(clients); c; c = nexttiled(c->next)) {
-		if(i == 0) { /* master */
-			nw = mw - 2 * c->border;
-			nh = MH - 2 * c->border;
-		}
-		else {  /* tile window */
-			if(i == 1) {
-				ny = TY;
-				nx = TX;
-				nw = TW - 2 * c->border;
-			}
-			if(i + 1 == n) /* remainder */
-				nh = (TY + TH) - ny - 2 * c->border;
+	if(n == 0)
+		return;
+
+	y = TY;
+	h = (TH) / n;
+	if(h < bh)
+		h = TH;
+
+	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
+		if(i > 0) {
+			if(i > 1 && i == n) /* remainder */
+				tileresize(c, TX, y, (TW) - 2 * c->border,
+				              ((TY) + (TH)) - y - 2 * c->border);
 			else
-				nh = th - 2 * c->border;
+				tileresize(c, TX, y, (TW) - 2 * c->border,
+				              h - 2 * c->border);
+			if(h != TH)
+				y = c->y + c->h + 2 * c->border;
 		}
-		resize(c, nx, ny, nw, nh, RESIZEHINTS);
-		if((RESIZEHINTS) && ((c->h < bh) || (c->h > nh) || (c->w < bh) || (c->w > nw)))
-			/* client doesn't accept size constraints */
-			resize(c, nx, ny, nw, nh, False);
-		if(n > 1 && th != TH)
-			ny = c->y + c->h + 2 * c->border;
-		i++;
-	}
+}
+
+void
+tile(void) {
+	tilevstack(tilemaster());
 }
 
 void
@@ -1796,7 +1802,7 @@ void
 zoom(const char *arg) {
 	Client *c = sel;
 
-	if(!sel || !dozoom || sel->isfloating)
+	if(!sel || lt->isfloating || sel->isfloating)
 		return;
 	if(c == nexttiled(clients))
 		if(!(c = nexttiled(c->next)))

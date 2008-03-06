@@ -13,31 +13,31 @@
 /* bar position */
 #define BX sx
 #define BY sy
-#define BW MW
+#define BW sw
 
 /* window area */
 #define WX 0
 #define WY bh
 #define WW sw
-#define WH sh
+#define WH sh - bh
 
 /* master area */
-#define MX sx
-#define MY sy + bh
+#define MX WX
+#define MY WY
 #define MW ((int)(((float)sw) * 0.6))
-#define MH sh - bh
+#define MH WH
 
 /* tile area, might be on a different screen */
-#define TX sx + MW
-#define TY sy
-#define TW sw - MW
-#define TH sh
+#define TX MX + MW
+#define TY WY
+#define TW WW - MW
+#define TH WH
 
 /* monocle area, might be restricted to a specific screen */
-#define MOX sx
-#define MOY MY
-#define MOW sw
-#define MOH MH
+#define MOX WX
+#define MOY WY
+#define MOW WW
+#define MOH WH
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -55,10 +55,10 @@ Rule rules[] = {
 #define SNAP			32	/* snap pixel */
 
 Layout layouts[] = {
-	/* symbol		function */
-	{ "[]=",		tile }, /* first entry is default */
-	{ "><>",		floating },
-	{ "[M]",		monocle },
+	/* symbol		function	isfloating */
+	{ "[]=",		tile,		False }, /* first entry is default */
+	{ "><>",		floating	True },
+	{ "[M]",		monocle		True },
 };
 
 /* key definitions */
