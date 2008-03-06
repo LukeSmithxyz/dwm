@@ -1,6 +1,3 @@
-/**
- * - allow for vstack
- */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
@@ -36,7 +33,6 @@
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <regex.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -170,8 +166,10 @@ void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
-void tile(void);
+void tileh(void);
+void tilehstack(unsigned int n);
 unsigned int tilemaster(void);
+void tilev(void);
 void tilevstack(unsigned int n);
 void togglefloating(const char *arg);
 void toggletag(const char *arg);
@@ -1547,6 +1545,37 @@ tileresize(Client *c, int x, int y, int w, int h) {
 		resize(c, x, y, w, h, False);
 }
 
+void
+tileh(void) {
+	tilehstack(tilemaster());
+}
+
+void
+tilehstack(unsigned int n) {
+	int i, x, w;
+	Client *c;
+
+	if(n == 0)
+		return;
+
+	x = TX;
+	w = (TW) / n;
+	if(w < bh)
+		w = TW;
+
+	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
+		if(i > 0) {
+			if(i > 1 && i == n) /* remainder */
+				tileresize(c, x, TY, ((TX) + (TW)) - x - 2 * c->border,
+				              TH - 2 * c->border);
+			else
+				tileresize(c, x, TY, w - 2 * c->border,
+				              TH - 2 * c->border);
+			if(w != TW)
+				x = c->x + c->w + 2 * c->border;
+		}
+}
+
 unsigned int
 tilemaster(void) {
 	unsigned int n;
@@ -1561,6 +1590,11 @@ tilemaster(void) {
 	else
 		tileresize(mc, MX, MY, (MW) - 2 * mc->border, (MH) - 2 * mc->border);
 	return n - 1;
+}
+
+void
+tilev(void) {
+	tilevstack(tilemaster());
 }
 
 void
@@ -1587,11 +1621,6 @@ tilevstack(unsigned int n) {
 			if(h != TH)
 				y = c->y + c->h + 2 * c->border;
 		}
-}
-
-void
-tile(void) {
-	tilevstack(tilemaster());
 }
 
 void
