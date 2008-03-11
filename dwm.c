@@ -191,7 +191,7 @@ void zoom(const char *arg);
 char stext[256], buf[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-unsigned int bh, blw = 0;
+int bx, by, bw, bh, blw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -407,8 +407,8 @@ configurenotify(XEvent *e) {
 		sw = ev->width;
 		sh = ev->height;
 		XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, root, BW, bh, DefaultDepth(dpy, screen));
-		XMoveResizeWindow(dpy, barwin, BX, BY, BW, bh);
+		dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
+		XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
 		arrange();
 	}
 }
@@ -508,10 +508,10 @@ drawbar(void) {
 	drawtext(lt->symbol, dc.norm, False);
 	x = dc.x + dc.w;
 	dc.w = textw(stext);
-	dc.x = BW - dc.w;
+	dc.x = bw - dc.w;
 	if(dc.x < x) {
 		dc.x = x;
-		dc.w = BW - x;
+		dc.w = bw - x;
 	}
 	drawtext(stext, dc.norm, False);
 	if((dc.w = dc.x - x) > bh) {
@@ -523,7 +523,7 @@ drawbar(void) {
 		else
 			drawtext(NULL, dc.norm, False);
 	}
-	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, BW, bh, 0, 0);
+	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
 	XSync(dpy, False);
 }
 
@@ -981,14 +981,14 @@ manage(Window w, XWindowAttributes *wa) {
 		c->border = wa->border_width;
 	}
 	else {
-		if(c->x + c->w + 2 * c->border > WX + WW)
-			c->x = WX + WW - c->w - 2 * c->border;
-		if(c->y + c->h + 2 * c->border > WY + WH)
-			c->y = WY + WH - c->h - 2 * c->border;
-		if(c->x < WX)
-			c->x = WX;
-		if(c->y < WY)
-			c->y = WY;
+		if(c->x + c->w + 2 * c->border > wx + ww)
+			c->x = wx + ww - c->w - 2 * c->border;
+		if(c->y + c->h + 2 * c->border > wy + wh)
+			c->y = wy + wh - c->h - 2 * c->border;
+		if(c->x < wx)
+			c->x = wx;
+		if(c->y < wy)
+			c->y = wy;
 		c->border = BORDERPX;
 	}
 
@@ -1045,7 +1045,7 @@ monocle(void) {
 
 	for(c = clients; c; c = c->next)
 		if(isvisible(c))
-			resize(c, MOX, MOY, MOW, MOH, RESIZEHINTS);
+			resize(c, mox, moy, mow, moh, RESIZEHINTS);
 }
 
 void
@@ -1076,14 +1076,14 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x1);
 			ny = ocy + (ev.xmotion.y - y1);
-			if(abs(WX - nx) < SNAP)
-				nx = WX;
-			else if(abs((WX + WW) - (nx + c->w + 2 * c->border)) < SNAP)
-				nx = WX + WW - c->w - 2 * c->border;
-			if(abs(WY - ny) < SNAP)
-				ny = WY;
-			else if(abs((WY + WH) - (ny + c->h + 2 * c->border)) < SNAP)
-				ny = WY + WH - c->h - 2 * c->border;
+			if(abs(wx - nx) < SNAP)
+				nx = wx;
+			else if(abs((wx + ww) - (nx + c->w + 2 * c->border)) < SNAP)
+				nx = wx + ww - c->w - 2 * c->border;
+			if(abs(wy - ny) < SNAP)
+				ny = wy;
+			else if(abs((wy + wh) - (ny + c->h + 2 * c->border)) < SNAP)
+				ny = wy + wh - c->h - 2 * c->border;
 			if(!c->isfloating && !lt->isfloating && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
 			if((lt->isfloating) || c->isfloating)
@@ -1451,6 +1451,35 @@ setup(void) {
 	/* init layouts */
 	lt = &layouts[0];
 
+	/* bar position */
+	bx = BX;
+	by = BY;
+	bw = BW;
+
+	/* window area */
+	wx = WX;
+	wy = WY;
+	ww = WW;
+	wh = WH;
+
+	/* master area */
+	mx = MX;
+	my = MY;
+	mw = MW;
+	mh = MH;
+
+	/* tile area */
+	tx = TX;
+	ty = TY;
+	tw = TW;
+	th = TH;
+
+	/* monocle area */
+	mox = MOX;
+	moy = MOY;
+	mow = MOW;
+	moh = MOH;
+
 	/* init bar */
 	for(blw = i = 0; i < LENGTH(layouts); i++) {
 		i = textw(layouts[i].symbol);
@@ -1462,7 +1491,9 @@ setup(void) {
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask|ExposureMask;
 
-	barwin = XCreateWindow(dpy, root, BX, BY, BW, bh, 0, DefaultDepth(dpy, screen),
+
+
+	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
 				CopyFromParent, DefaultVisual(dpy, screen),
 				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
@@ -1558,20 +1589,20 @@ tilehstack(unsigned int n) {
 	if(n == 0)
 		return;
 
-	x = TX;
-	w = (TW) / n;
+	x = tx;
+	w = tw / n;
 	if(w < bh)
-		w = TW;
+		w = tw;
 
 	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
 		if(i > 0) {
 			if(i > 1 && i == n) /* remainder */
-				tileresize(c, x, TY, ((TX) + (TW)) - x - 2 * c->border,
-				              TH - 2 * c->border);
+				tileresize(c, x, ty, (tx + tw) - x - 2 * c->border,
+				              th - 2 * c->border);
 			else
-				tileresize(c, x, TY, w - 2 * c->border,
-				              TH - 2 * c->border);
-			if(w != TW)
+				tileresize(c, x, ty, w - 2 * c->border,
+				              th - 2 * c->border);
+			if(w != tw)
 				x = c->x + c->w + 2 * c->border;
 		}
 }
@@ -1586,9 +1617,9 @@ tilemaster(void) {
 	if(n == 0)
 		return 0;
 	if(n == 1)
-		tileresize(mc, MOX, MOY, (MOW) - 2 * mc->border, (MOH) - 2 * mc->border);
+		tileresize(mc, mox, moy, mow - 2 * mc->border, moh - 2 * mc->border);
 	else
-		tileresize(mc, MX, MY, (MW) - 2 * mc->border, (MH) - 2 * mc->border);
+		tileresize(mc, mx, my, mw - 2 * mc->border, mh - 2 * mc->border);
 	return n - 1;
 }
 
@@ -1605,20 +1636,20 @@ tilevstack(unsigned int n) {
 	if(n == 0)
 		return;
 
-	y = TY;
-	h = (TH) / n;
+	y = ty;
+	h = th / n;
 	if(h < bh)
-		h = TH;
+		h = th;
 
 	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
 		if(i > 0) {
 			if(i > 1 && i == n) /* remainder */
-				tileresize(c, TX, y, (TW) - 2 * c->border,
-				              ((TY) + (TH)) - y - 2 * c->border);
+				tileresize(c, tx, y, tw - 2 * c->border,
+				              (ty + th) - y - 2 * c->border);
 			else
-				tileresize(c, TX, y, (TW) - 2 * c->border,
+				tileresize(c, tx, y, tw - 2 * c->border,
 				              h - 2 * c->border);
-			if(h != TH)
+			if(h != th)
 				y = c->y + c->h + 2 * c->border;
 		}
 }
