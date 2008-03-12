@@ -1452,33 +1452,19 @@ setup(void) {
 	lt = &layouts[0];
 
 	/* bar position */
-	bx = BX;
-	by = BY;
-	bw = BW;
+	bx = BX; by = BY; bw = BW;
 
 	/* window area */
-	wx = WX;
-	wy = WY;
-	ww = WW;
-	wh = WH;
+	wx = WX; wy = WY; ww = WW; wh = WH;
 
 	/* master area */
-	mx = MX;
-	my = MY;
-	mw = MW;
-	mh = MH;
+	mx = MX; my = MY; mw = MW; mh = MH;
 
 	/* tile area */
-	tx = TX;
-	ty = TY;
-	tw = TW;
-	th = TH;
+	tx = TX; ty = TY; tw = TW; th = TH;
 
 	/* monocle area */
-	mox = MOX;
-	moy = MOY;
-	mow = MOW;
-	moh = MOH;
+	mox = MOX; moy = MOY; mow = MOW; moh = MOH;
 
 	/* init bar */
 	for(blw = i = 0; i < LENGTH(layouts); i++) {
