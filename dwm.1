@@ -9,7 +9,7 @@ dwm is a dynamic window manager for X. It manages windows in tiled, monocle
 and floating layouts. Either layout can be applied dynamically, optimising the
 environment for the application in use and the task performed.
 .P
-In tiled layout windows are managed in a master and stacking area. The master
+In tiled layouts windows are managed in a master and stacking area. The master
 area contains the window which currently needs most attention, whereas the
 stacking area contains all other windows. In monocle layout all windows are
 maximised to the screen size. In floating layout windows can be resized and
@@ -57,23 +57,17 @@ click on a tag label adds/removes that tag to/from the focused window.
 Start
 .BR xterm.
 .TP
-.B Mod1\-Return
-Zooms/cycles current window to/from master area (tiled layout only).
-.TP
-.B Mod1\-Tab
-Toggles to the previously selected tags.
-.TP
 .B Mod1\-f
-Apply floating layout.
+Applies floating layout.
 .TP
 .B Mod1\-m
-Apply monocle layout.
+Applies monocle layout.
 .TP
 .B Mod1\-v
-Apply vertical tiled layout.
+Applies vertical tiled layout.
 .TP
 .B Mod1\-h
-Apply horizontal tiled layout.
+Applies horizontal tiled layout.
 .TP
 .B Mod1\-j
 Focus next window.
@@ -81,27 +75,33 @@ Focus next window.
 .B Mod1\-k
 Focus previous window.
 .TP
-.B Mod1\-r
-Re-applies tagging rules to all windows.
-.TP
-.B Mod1\-Shift\-[1..n]
-Apply
-.RB nth
-tag to current window.
-.TP
-.B Mod1\-Shift\-0
-Apply all tags to current window.
-.TP
-.B Mod1\-Control\-Shift\-[1..n]
-Add/remove
-.B nth
-tag to/from current window.
+.B Mod1\-Return
+Zooms/cycles focused window to/from master area (tiled layouts only).
 .TP
 .B Mod1\-Shift\-c
 Close focused window.
 .TP
 .B Mod1\-Shift\-space
 Toggle focused window between tiled and floating state.
+.TP
+.B Mod1\-Tab
+Toggles to the previously selected tags.
+.TP
+.B Mod1\-r
+Re-applies tagging rules to all windows.
+.TP
+.B Mod1\-Shift\-[1..n]
+Apply
+.RB nth
+tag to focused window.
+.TP
+.B Mod1\-Shift\-0
+Apply all tags to focused window.
+.TP
+.B Mod1\-Control\-Shift\-[1..n]
+Add/remove
+.B nth
+tag to/from focused window.
 .TP
 .B Mod1\-[1..n]
 View all windows with
@@ -121,13 +121,13 @@ Quit dwm.
 .SS Mouse commands
 .TP
 .B Mod1\-Button1
-Move current window while dragging. Tiled windows will be toggled to the floating state.
+Move focused window while dragging. Tiled windows will be toggled to the floating state.
 .TP
 .B Mod1\-Button2
-Zooms/cycles current window to/from master area. If it is floating (but not fixed) it will be toggled to the tiled state instead.
+Zooms/cycles focused window to/from master area. If it is floating (but not fixed) it will be toggled to the tiled state instead.
 .TP
 .B Mod1\-Button3
-Resize current window while dragging. Tiled windows will be toggled to the floating state.
+Resize focused window while dragging. Tiled windows will be toggled to the floating state.
 .SH CUSTOMIZATION
 dwm is customized by creating a custom config.h and (re)compiling the source
 code. This keeps it fast, secure and simple.
@@ -148,7 +148,7 @@ can set the following environment variable (to use the older Motif
 backend instead):
 .BR AWT_TOOLKIT=MToolkit .
 .P
-Recent GTK 2.10.9+ versions contain a broken
+GTK 2.10.9+ versions contain a broken
 .BR Save\-As
 file dialog implementation,
 which requests to reconfigure its window size in an endless loop. However, its
