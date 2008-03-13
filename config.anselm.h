@@ -78,13 +78,13 @@ setanselmgeoms(void) {
 void
 anselmgeoms(const char *arg) {
 	setgeoms = setanselmgeoms;
-	arrange();
+	setlayout("[]|");
 }
 
 void
 defgeoms(const char *arg) {
 	setgeoms = setdefaultgeoms;
-	arrange();
+	setlayout("[]=");
 }
 
 /* key definitions */
