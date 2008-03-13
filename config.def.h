@@ -10,35 +10,6 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
-/* bar position */
-#define BX sx
-#define BY sy
-#define BW sw
-
-/* window area */
-#define WX 0
-#define WY bh
-#define WW sw
-#define WH sh - bh
-
-/* master area */
-#define MX WX
-#define MY WY
-#define MW ((int)(((float)sw) * 0.6))
-#define MH WH
-
-/* tile area, might be on a different screen */
-#define TX MX + MW
-#define TY WY
-#define TW WW - MW
-#define TH WH
-
-/* monocle area, might be restricted to a specific screen */
-#define MOX WX
-#define MOY WY
-#define MOW WW
-#define MOH WH
-
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -66,13 +37,8 @@ Layout layouts[] = {
 #define MODKEY			Mod1Mask
 Key keys[] = {
 	/* modifier			key		function	argument */
-#if ANSELM_OFFICE
-	{ MODKEY,			XK_p,		spawn,
-		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"' -x 0 -y 0 -w 1280" },
-#else
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
-#endif
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },

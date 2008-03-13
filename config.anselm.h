@@ -10,35 +10,6 @@
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
 
-/* bar position */
-#define BX 0
-#define BY 0
-#define BW 1280
-
-/* window area, including floating windows */
-#define WX 0
-#define WY bh
-#define WW sw
-#define WH sh - bh
-
-/* master area */
-#define MX WX
-#define MY bh
-#define MW 1280
-#define MH 800 - bh
-
-/* tile area, might be on a different screen */
-#define TX 1280
-#define TY 0
-#define TW 1680
-#define TH 1050
-
-/* monocle area, might be restricted to a specific screen */
-#define MOX MX
-#define MOY MY
-#define MOW MW
-#define MOH MH
-
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -56,24 +27,78 @@ Rule rules[] = {
 
 Layout layouts[] = {
 	/* symbol		function	isfloating */
-	{ "[]|",		tileh,		False }, /* first entry is default */
-	{ "[]=",		tilev,		False },
+	{ "[]=",		tilev,		False }, /* first entry is default */
+	{ "[]|",		tileh,		False },
 	{ "><>",		floating,	True },
 	{ "[M]",		monocle,	True },
 };
+
+void
+setanselmgeoms(void) {
+
+	/* screen dimensions */
+	sx = 0;
+	sy = 0;
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
+
+	/* bar position */
+	bx = sx;
+	by = sy;
+	bw = 1280;
+	bh = dc.font.height + 2;
+
+	/* window area */
+	wx = sx;
+	wy = sy + bh;
+	ww = sw;
+	wh = sh - bh;
+
+	/* master area */
+	mx = wx;
+	my = wy;
+	mw = 1280;
+	mh = 800;
+
+	/* tile area */
+	tx = 1280;
+	ty = 0;
+	tw = ww - 1280;
+	th = wh;
+
+	/* monocle area */
+	mox = mx;
+	moy = my;
+	mow = mw;
+	moh = mh;
+
+	if(dc.drawable != 0)
+		XFreePixmap(dpy, dc.drawable);
+	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
+	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+}
+
+void
+anselmgeoms(const char *arg) {
+	setgeoms = setanselmgeoms;
+	arrange();
+}
+
+void
+defgeoms(const char *arg) {
+	setgeoms = setdefaultgeoms;
+	arrange();
+}
 
 /* key definitions */
 #define MODKEY			Mod1Mask
 Key keys[] = {
 	/* modifier			key		function	argument */
-#if ANSELM_OFFICE
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"' -x 0 -y 0 -w 1280" },
-#else
-	{ MODKEY,			XK_p,		spawn,
-		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
-#endif
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
+	{ MODKEY,			XK_a,		anselmgeoms,	NULL },
+	{ MODKEY,			XK_d,		defgeoms,	NULL },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
 	{ MODKEY,			XK_r,		reapply,	NULL },

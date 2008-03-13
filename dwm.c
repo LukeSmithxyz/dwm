@@ -160,6 +160,7 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
+void setdefaultgeoms(void);
 void setlayout(const char *arg);
 void setup(void);
 void spawn(const char *arg);
@@ -220,6 +221,7 @@ Display *dpy;
 DC dc = {0};
 Layout *lt = NULL;
 Window root, barwin;
+void (*setgeoms)(void) = setdefaultgeoms;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -404,11 +406,7 @@ configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
-		sw = ev->width;
-		sh = ev->height;
-		XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
-		XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+		setgeoms();
 		arrange();
 	}
 }
@@ -1379,6 +1377,51 @@ setclientstate(Client *c, long state) {
 }
 
 void
+setdefaultgeoms(void) {
+
+	/* screen dimensions */
+	sx = 0;
+	sy = 0;
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
+
+	/* bar position */
+	bx = sx;
+	by = sy;
+	bw = sw;
+	bh = dc.font.height + 2;
+
+	/* window area */
+	wx = sx;
+	wy = sy + bh;
+	ww = sw;
+	wh = sh - bh;
+
+	/* master area */
+	mx = wx;
+	my = wy;
+	mw = ((float)sw) * 0.55;
+	mh = wh;
+
+	/* tile area */
+	tx = wx;
+	ty = wy;
+	tw = ww - mw;
+	th = wh;
+
+	/* monocle area */
+	mox = wx;
+	moy = wy;
+	mow = ww;
+	moh = wh;
+
+	if(dc.drawable != 0)
+		XFreePixmap(dpy, dc.drawable);
+	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
+	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+}
+
+void
 setlayout(const char *arg) {
 	static Layout *revert = 0;
 	unsigned int i;
@@ -1410,10 +1453,10 @@ setup(void) {
 	/* init screen */
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
-	sx = 0;
-	sy = 0;
-	sw = DisplayWidth(dpy, screen);
-	sh = DisplayHeight(dpy, screen);
+	initfont(FONT);
+
+	/* apply default geometries */
+	setgeoms();
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -1436,7 +1479,7 @@ setup(void) {
 	dc.sel[ColBG] = getcolor(SELBGCOLOR);
 	dc.sel[ColFG] = getcolor(SELFGCOLOR);
 	initfont(FONT);
-	dc.h = bh = dc.font.height + 2;
+	dc.h = bh;
 	dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
@@ -1450,21 +1493,6 @@ setup(void) {
 
 	/* init layouts */
 	lt = &layouts[0];
-
-	/* bar position */
-	bx = BX; by = BY; bw = BW;
-
-	/* window area */
-	wx = WX; wy = WY; ww = WW; wh = WH;
-
-	/* master area */
-	mx = MX; my = MY; mw = MW; mh = MH;
-
-	/* tile area */
-	tx = TX; ty = TY; tw = TW; th = TH;
-
-	/* monocle area */
-	mox = MOX; moy = MOY; mow = MOW; moh = MOH;
 
 	/* init bar */
 	for(blw = i = 0; i < LENGTH(layouts); i++) {
