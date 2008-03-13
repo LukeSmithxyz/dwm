@@ -178,6 +178,7 @@ void toggleview(const char *arg);
 void unban(Client *c);
 void unmanage(Client *c);
 void unmapnotify(XEvent *e);
+void updatebarpos(void);
 void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
@@ -1415,10 +1416,7 @@ setdefaultgeoms(void) {
 	mow = ww;
 	moh = wh;
 
-	if(dc.drawable != 0)
-		XFreePixmap(dpy, dc.drawable);
-	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
-	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+	updatebarpos();
 }
 
 void
@@ -1740,6 +1738,15 @@ unmapnotify(XEvent *e) {
 
 	if((c = getclient(ev->window)))
 		unmanage(c);
+}
+
+void
+updatebarpos(void) {
+
+	if(dc.drawable != 0)
+		XFreePixmap(dpy, dc.drawable);
+	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
+	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
 }
 
 void

@@ -72,10 +72,7 @@ setanselmgeoms(void) {
 	mow = mw;
 	moh = mh;
 
-	if(dc.drawable != 0)
-		XFreePixmap(dpy, dc.drawable);
-	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
-	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+	updatebarpos();
 }
 
 void
