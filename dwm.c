@@ -1407,7 +1407,7 @@ setdefaultgeoms(void) {
 	mh = wh;
 
 	/* tile area */
-	tx = wx;
+	tx = mx + mw;
 	ty = wy;
 	tw = ww - mw;
 	th = wh;
