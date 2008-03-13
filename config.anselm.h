@@ -58,13 +58,13 @@ setanselmgeoms(void) {
 	mx = wx;
 	my = wy;
 	mw = 1280;
-	mh = 800;
+	mh = 800 - bh;
 
 	/* tile area */
 	tx = 1280;
 	ty = 0;
-	tw = ww - 1280;
-	th = wh;
+	tw = sw - 1280;
+	th = sh;
 
 	/* monocle area */
 	mox = mx;
