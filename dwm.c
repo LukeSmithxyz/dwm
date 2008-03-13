@@ -96,8 +96,7 @@ typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
 	Bool isfloating;
-} Layout; /* TODO: layout should keep an auxilliary pointer to its Geometry,
-	     instead of having all those layout specific vars globally */
+} Layout; 
 
 typedef struct {
 	const char *prop;
