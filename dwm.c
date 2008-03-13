@@ -117,6 +117,7 @@ void cleanup(void);
 void configure(Client *c);
 void configurenotify(XEvent *e);
 void configurerequest(XEvent *e);
+unsigned int counttiled(void);
 void destroynotify(XEvent *e);
 void detach(Client *c);
 void detachstack(Client *c);
@@ -170,7 +171,8 @@ unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
 void tileh(void);
 void tilehstack(unsigned int n);
-unsigned int tilemaster(void);
+Client *tilemaster(unsigned int n);
+void tileresize(Client *c, int x, int y, int w, int h);
 void tilev(void);
 void tilevstack(unsigned int n);
 void togglefloating(const char *arg);
@@ -456,6 +458,15 @@ configurerequest(XEvent *e) {
 		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
 	}
 	XSync(dpy, False);
+}
+
+unsigned int
+counttiled(void) {
+	unsigned int n;
+	Client *c;
+
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
+	return n;
 }
 
 void
@@ -1579,6 +1590,44 @@ textw(const char *text) {
 }
 
 void
+tileh(void) {
+	int x, w;
+	unsigned int i, n = counttiled();
+	Client *c;
+
+	if(n == 0)
+		return;
+	c = tilemaster(n);
+	if(--n == 0)
+		return;
+
+	x = tx;
+	w = tw / n;
+	if(w < bh)
+		w = tw;
+
+	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
+		if(i + 1 == n) /* remainder */
+			tileresize(c, x, ty, (tx + tw) - x - 2 * c->border, th - 2 * c->border);
+		else
+			tileresize(c, x, ty, w - 2 * c->border, th - 2 * c->border);
+		if(w != tw)
+			x = c->x + c->w + 2 * c->border;
+	}
+}
+
+Client *
+tilemaster(unsigned int n) {
+	Client *c = nexttiled(clients);
+
+	if(n == 1)
+		tileresize(c, mox, moy, mow - 2 * c->border, moh - 2 * c->border);
+	else
+		tileresize(c, mx, my, mw - 2 * c->border, mh - 2 * c->border);
+	return c;
+}
+
+void
 tileresize(Client *c, int x, int y, int w, int h) {
 	resize(c, x, y, w, h, RESIZEHINTS);
 	if((RESIZEHINTS) && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
@@ -1587,63 +1636,15 @@ tileresize(Client *c, int x, int y, int w, int h) {
 }
 
 void
-tileh(void) {
-	tilehstack(tilemaster());
-}
-
-void
-tilehstack(unsigned int n) {
-	int i, x, w;
+tilev(void) {
+	int y, h;
+	unsigned int i, n = counttiled();
 	Client *c;
 
 	if(n == 0)
 		return;
-
-	x = tx;
-	w = tw / n;
-	if(w < bh)
-		w = tw;
-
-	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
-		if(i > 0) {
-			if(i > 1 && i == n) /* remainder */
-				tileresize(c, x, ty, (tx + tw) - x - 2 * c->border,
-				              th - 2 * c->border);
-			else
-				tileresize(c, x, ty, w - 2 * c->border,
-				              th - 2 * c->border);
-			if(w != tw)
-				x = c->x + c->w + 2 * c->border;
-		}
-}
-
-unsigned int
-tilemaster(void) {
-	unsigned int n;
-	Client *c, *mc;
-
-	for(n = 0, mc = c = nexttiled(clients); c; c = nexttiled(c->next))
-		n++;
-	if(n == 0)
-		return 0;
-	if(n == 1)
-		tileresize(mc, mox, moy, mow - 2 * mc->border, moh - 2 * mc->border);
-	else
-		tileresize(mc, mx, my, mw - 2 * mc->border, mh - 2 * mc->border);
-	return n - 1;
-}
-
-void
-tilev(void) {
-	tilevstack(tilemaster());
-}
-
-void
-tilevstack(unsigned int n) {
-	int i, y, h;
-	Client *c;
-
-	if(n == 0)
+	c = tilemaster(n);
+	if(--n == 0)
 		return;
 
 	y = ty;
@@ -1651,17 +1652,14 @@ tilevstack(unsigned int n) {
 	if(h < bh)
 		h = th;
 
-	for(i = 0, c = nexttiled(clients); c; c = nexttiled(c->next), i++)
-		if(i > 0) {
-			if(i > 1 && i == n) /* remainder */
-				tileresize(c, tx, y, tw - 2 * c->border,
-				              (ty + th) - y - 2 * c->border);
-			else
-				tileresize(c, tx, y, tw - 2 * c->border,
-				              h - 2 * c->border);
-			if(h != th)
-				y = c->y + c->h + 2 * c->border;
-		}
+	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
+		if(i + 1 == n) /* remainder */
+			tileresize(c, tx, y, tw - 2 * c->border, (ty + th) - y - 2 * c->border);
+		else
+			tileresize(c, tx, y, tw - 2 * c->border, h - 2 * c->border);
+		if(h != th)
+			y = c->y + c->h + 2 * c->border;
+	}
 }
 
 void
