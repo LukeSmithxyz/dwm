@@ -71,14 +71,13 @@ setanselmgeoms(void) {
 	moy = my;
 	mow = mw;
 	moh = mh;
-
-	updatebarpos();
 }
 
 void
 anselmgeoms(const char *arg) {
 	setgeoms = setanselmgeoms;
 	setgeoms();
+	updatebarpos();
 	setlayout("[]|");
 }
 
@@ -86,6 +85,7 @@ void
 defgeoms(const char *arg) {
 	setgeoms = setdefaultgeoms;
 	setgeoms();
+	updatebarpos();
 	setlayout("[]=");
 }
 

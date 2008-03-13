@@ -408,6 +408,7 @@ configurenotify(XEvent *e) {
 
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
 		setgeoms();
+		updatebarpos();
 		arrange();
 	}
 }
@@ -1415,8 +1416,6 @@ setdefaultgeoms(void) {
 	moy = wy;
 	mow = ww;
 	moh = wh;
-
-	updatebarpos();
 }
 
 void
