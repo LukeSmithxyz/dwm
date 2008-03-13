@@ -78,12 +78,14 @@ setanselmgeoms(void) {
 void
 anselmgeoms(const char *arg) {
 	setgeoms = setanselmgeoms;
+	setgeoms();
 	setlayout("[]|");
 }
 
 void
 defgeoms(const char *arg) {
 	setgeoms = setdefaultgeoms;
+	setgeoms();
 	setlayout("[]=");
 }
 
