@@ -14,24 +14,15 @@
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 Rule rules[] = {
-	/* class:instance:title substr	tags ref	isfloating */
-	{ "Firefox",			tags[8],	False },
-	{ "Gimp",			NULL,		True },
-	{ "MPlayer",			NULL,		True },
-	{ "Acroread",			NULL,		True },
+	/* class	instance	title		tags ref	isfloating */
+	{ NULL,		NULL,		"Firefox",	tags[8],	False },
+	{ NULL,		NULL,		"Gimp",		NULL,		True },
+	{ NULL,		NULL,		"MPlayer",	NULL,		True },
+	{ NULL,		NULL,		"Acroread",	NULL,		True },
 };
 
-/* layout(s) */
-#define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
-#define SNAP			32	/* snap pixel */
-
-Layout layouts[] = {
-	/* symbol		function	isfloating */
-	{ "[]|",		tileh,		False }, /* first entry is default */
-	{ "[]=",		tilev,		False },
-	{ "><>",		floating,	True },
-	{ "[M]",		monocle,	True },
-};
+/* geometry function */
+void (*setgeoms)(void) = setdefgeoms;
 
 void
 setanselmgeoms(void) {
@@ -83,11 +74,23 @@ anselmgeoms(const char *arg) {
 
 void
 defgeoms(const char *arg) {
-	setgeoms = setdefaultgeoms;
+	setgeoms = setdefgeoms;
 	setgeoms();
 	updatebarpos();
 	setlayout("[]=");
 }
+
+/* layout(s) */
+#define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
+#define SNAP			32	/* snap pixel */
+
+Layout layouts[] = {
+	/* symbol		function	isfloating */
+	{ "[]|",		tileh,		False }, /* first entry is default */
+	{ "[]=",		tilev,		False },
+	{ "><>",		floating,	True },
+	{ "[M]",		monocle,	True },
+};
 
 /* key definitions */
 #define MODKEY			Mod1Mask

@@ -99,7 +99,9 @@ typedef struct {
 } Layout; 
 
 typedef struct {
-	const char *prop;
+	const char *class;
+	const char *instance;
+	const char *title;
 	const char *tag;
 	Bool isfloating;
 } Rule;
@@ -161,7 +163,7 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
-void setdefaultgeoms(void);
+void setdefgeoms(void);
 void setlayout(const char *arg);
 void setup(void);
 void spawn(const char *arg);
@@ -224,7 +226,6 @@ Display *dpy;
 DC dc = {0};
 Layout *lt = NULL;
 Window root, barwin;
-void (*setgeoms)(void) = setdefaultgeoms;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -244,9 +245,9 @@ applyrules(Client *c) {
 	XGetClassHint(dpy, c->win, &ch);
 	for(i = 0; i < LENGTH(rules); i++) {
 		r = &rules[i];
-		if(strstr(c->name, r->prop)
-		|| (ch.res_class && strstr(ch.res_class, r->prop))
-		|| (ch.res_name && strstr(ch.res_name, r->prop)))
+		if(strstr(c->name, r->title)
+		|| (ch.res_class && r->class && strstr(ch.res_class, r->class))
+		|| (ch.res_name && r->instance && strstr(ch.res_name, r->instance)))
 		{
 			c->isfloating = r->isfloating;
 			if(r->tag) {
@@ -1051,7 +1052,7 @@ maprequest(XEvent *e) {
 }
 
 void
-monocle(void) { 
+monocle(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -1390,7 +1391,7 @@ setclientstate(Client *c, long state) {
 }
 
 void
-setdefaultgeoms(void) {
+setdefgeoms(void) {
 
 	/* screen dimensions */
 	sx = 0;
