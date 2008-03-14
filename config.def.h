@@ -9,6 +9,7 @@
 #define SELBORDERCOLOR		"#0066ff"
 #define SELBGCOLOR		"#0066ff"
 #define SELFGCOLOR		"#ffffff"
+#define GEOMETRY		"0 0 W B 0 B W H-B 0 B W*0.55 H-B W*0.45 B H-B 0 B W H-B"
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -20,9 +21,6 @@ Rule rules[] = {
 	{ NULL,		NULL,		"MPlayer",	NULL,		True },
 	{ NULL,		NULL,		"Acroread",	NULL,		True },
 };
-
-/* geometry function */
-void (*setgeoms)(void) = setdefgeoms;
 
 /* layout(s) */
 #define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
@@ -40,6 +38,8 @@ Layout layouts[] = {
 #define MODKEY			Mod1Mask
 Key keys[] = {
 	/* modifier			key		function	argument */
+	{ MODKEY,			XK_a,		setgeom,	"0 0 W B 0 B W H-B 0 B 1280 800-B 1280 0 W-1280 H 0 B 1280 800-B" },
+	{ MODKEY,			XK_d,		setgeom,	GEOMETRY },
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },

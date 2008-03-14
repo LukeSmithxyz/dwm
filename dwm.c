@@ -136,6 +136,7 @@ void focusnext(const char *arg);
 void focusprev(const char *arg);
 Client *getclient(Window w);
 unsigned long getcolor(const char *colstr);
+double getdouble(const char *s);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
@@ -163,7 +164,7 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
-void setdefgeoms(void);
+void setgeom(const char *arg);
 void setlayout(const char *arg);
 void setup(void);
 void spawn(const char *arg);
@@ -410,7 +411,7 @@ configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
-		setgeoms();
+		setgeom(NULL);
 		updatebarpos();
 		arrange();
 	}
@@ -1390,44 +1391,95 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
+/**
+ * Idea:
+ *
+ * having a geom syntax as follows, which is interpreted as integer.
+ *
+ * [-,+][<0..n>|<W,H,B>]
+ *
+ *
+ * B = bar height, W = DisplayWidth(), H = DisplayHeight()
+ *
+ * -/+/* /: is relative to current
+ *
+ * Then we would come down with <bx>,<by>,<bw>,<bh>,...
+ *
+ * "0 0 W B 0 0 W W N E B,W,B,
+ *
+ *
+ */
+
+double
+getdouble(const char *s) {
+	char *endp;
+	double result = 0;
+
+	fprintf(stderr, "getdouble '%s'\n", s);
+	switch(*s) {
+	default: 
+		result = strtod(s, &endp);
+		if(s == endp || *endp != 0)
+			result = strtol(s, &endp, 0);
+		break;
+	case 'B': result = dc.font.height + 2; break;
+	case 'W': result = sw; break;
+	case 'H': result = sh; break;
+	}
+	fprintf(stderr, "getdouble returns '%f'\n", result);
+	return result;
+}
+
 void
-setdefgeoms(void) {
+setgeom(const char *arg) {
+	static const char *lastArg = NULL;
+	char op, *s, *e, *p;
+	double val;
+	int i, *map[] = { &bx,  &by,  &bw,  &bh,
+	                  &wx,  &wy,  &ww,  &wh,
+	                  &mx,  &my,  &mw,  &mh,
+	                  &tx,  &ty,  &tw,  &th,
+	                  &mox, &moy, &mow, &moh };
 
-	/* screen dimensions */
-	sx = 0;
-	sy = 0;
-	sw = DisplayWidth(dpy, screen);
-	sh = DisplayHeight(dpy, screen);
-
-	/* bar position */
-	bx = sx;
-	by = sy;
-	bw = sw;
-	bh = dc.font.height + 2;
-
-	/* window area */
-	wx = sx;
-	wy = sy + bh;
-	ww = sw;
-	wh = sh - bh;
-
-	/* master area */
-	mx = wx;
-	my = wy;
-	mw = ((float)sw) * 0.55;
-	mh = wh;
-
-	/* tile area */
-	tx = mx + mw;
-	ty = wy;
-	tw = ww - mw;
-	th = wh;
-
-	/* monocle area */
-	mox = wx;
-	moy = wy;
-	mow = ww;
-	moh = wh;
+	if(!arg)
+		arg = lastArg;
+	else
+		lastArg = arg;
+	if(!lastArg)
+		return;
+	strncpy(buf, arg, sizeof buf);
+	for(i = 0, e = s = buf; e && *e; e++)
+		if(*e == ' ') {
+			*e = 0;
+			fprintf(stderr, "next geom arg='%s'\n", s);
+			op = 0;
+			/* check if there is an operator */
+			for(p = s; *p && *p != '-' && *p != '+' && *p != '*' && *p != ':'; p++);
+			if(*p) {
+				op = *p;
+				*p = 0;
+			}
+			val = getdouble(s);
+			fprintf(stderr, "val1: %d\n", val);
+			if(p > s) { /* intermediate operand, e.g. H-B */
+				*(map[i]) = val;
+				s = ++p;
+				val = getdouble(s);
+				fprintf(stderr, "val2: %d\n", val);
+			}
+			switch(op) {
+			default: *(map[i])   = val; break;
+			case '-': *(map[i]) -= val; break;
+			case '+': *(map[i]) += val; break;
+			case '*': *(map[i]) *= val; break;
+			case ':': if(val != 0) *(map[i]) /= val; break;
+			}
+			fprintf(stderr, "map[i]='%d'\n", val);
+			s = ++e;
+			i++;
+		}
+	updatebarpos();
+	arrange();
 }
 
 void
@@ -1464,8 +1516,12 @@ setup(void) {
 	root = RootWindow(dpy, screen);
 	initfont(FONT);
 
-	/* apply default geometries */
-	setgeoms();
+	/* apply default dimensions */
+	sx = 0;
+	sy = 0;
+	sw = DisplayWidth(dpy, screen);
+	sh = DisplayHeight(dpy, screen);
+	setgeom(GEOMETRY);
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
