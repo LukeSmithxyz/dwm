@@ -107,6 +107,7 @@ typedef struct {
 } Rule;
 
 /* function declarations */
+void applygeom(const char *arg);
 void applyrules(Client *c);
 void arrange(void);
 void attach(Client *c);
@@ -234,6 +235,55 @@ Window root, barwin;
 static Bool tmp[LENGTH(tags)];
 
 /* function implementations */
+
+void
+applygeometry(const char *arg) {
+	static const char *lastArg = NULL;
+	char delim, op, *s, *e, *p;
+	double val;
+	int i, *map[] = { &bx,  &by,  &bw,  &bh,
+	                  &wx,  &wy,  &ww,  &wh,
+	                  &mx,  &my,  &mw,  &mh,
+	                  &tx,  &ty,  &tw,  &th,
+	                  &mox, &moy, &mow, &moh };
+
+	if(!arg)
+		arg = lastArg;
+	else
+		lastArg = arg;
+	if(!lastArg)
+		return;
+	strncpy(buf, arg, sizeof buf);
+	for(i = 0, e = s = buf; i < LENGTH(map) && e; e++)
+		if(*e == ' ' || *e == 0) {
+			delim = *e;
+			*e = 0;
+			op = 0;
+			/* check if there is an operator */
+			for(p = s; p < e && *p != '-' && *p != '+' && *p != '*'; p++);
+			if(*p) {
+				op = *p;
+				*p = 0;
+			}
+			val = getdouble(s);
+			if(op && p > s) { /* intermediate operand, e.g. H-B */
+				*(map[i]) = (int)val;
+				s = ++p;
+				val = getdouble(s);
+			}
+			switch(op) {
+			default:  *(map[i])  = (int)val; break;
+			case '-': *(map[i]) -= (int)val; break;
+			case '+': *(map[i]) += (int)val; break;
+			case '*': *(map[i])  = (int)(((double)*(map[i])) * val); break;
+			}
+			if(delim == 0)
+				e = NULL;
+			else
+				s = ++e;
+			i++;
+		}
+}
 
 void
 applyrules(Client *c) {
@@ -410,11 +460,8 @@ void
 configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 
-	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
+	if(ev->window == root && (ev->width != sw || ev->height != sh))
 		setgeom(NULL);
-		updatebarpos();
-		arrange();
-	}
 }
 
 void
@@ -1391,31 +1438,11 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
-/**
- * Idea:
- *
- * having a geom syntax as follows, which is interpreted as integer.
- *
- * [-,+][<0..n>|<W,H,B>]
- *
- *
- * B = bar height, W = DisplayWidth(), H = DisplayHeight()
- *
- * -/+/* /: is relative to current
- *
- * Then we would come down with <bx>,<by>,<bw>,<bh>,...
- *
- * "0 0 W B 0 0 W W N E B,W,B,
- *
- *
- */
-
 double
 getdouble(const char *s) {
 	char *endp;
 	double result = 0;
 
-	fprintf(stderr, "getdouble '%s'\n", s);
 	switch(*s) {
 	default: 
 		result = strtod(s, &endp);
@@ -1426,58 +1453,12 @@ getdouble(const char *s) {
 	case 'W': result = sw; break;
 	case 'H': result = sh; break;
 	}
-	fprintf(stderr, "getdouble returns '%f'\n", result);
 	return result;
 }
 
 void
 setgeom(const char *arg) {
-	static const char *lastArg = NULL;
-	char op, *s, *e, *p;
-	double val;
-	int i, *map[] = { &bx,  &by,  &bw,  &bh,
-	                  &wx,  &wy,  &ww,  &wh,
-	                  &mx,  &my,  &mw,  &mh,
-	                  &tx,  &ty,  &tw,  &th,
-	                  &mox, &moy, &mow, &moh };
-
-	if(!arg)
-		arg = lastArg;
-	else
-		lastArg = arg;
-	if(!lastArg)
-		return;
-	strncpy(buf, arg, sizeof buf);
-	for(i = 0, e = s = buf; e && *e; e++)
-		if(*e == ' ') {
-			*e = 0;
-			fprintf(stderr, "next geom arg='%s'\n", s);
-			op = 0;
-			/* check if there is an operator */
-			for(p = s; *p && *p != '-' && *p != '+' && *p != '*' && *p != ':'; p++);
-			if(*p) {
-				op = *p;
-				*p = 0;
-			}
-			val = getdouble(s);
-			fprintf(stderr, "val1: %d\n", val);
-			if(p > s) { /* intermediate operand, e.g. H-B */
-				*(map[i]) = val;
-				s = ++p;
-				val = getdouble(s);
-				fprintf(stderr, "val2: %d\n", val);
-			}
-			switch(op) {
-			default: *(map[i])   = val; break;
-			case '-': *(map[i]) -= val; break;
-			case '+': *(map[i]) += val; break;
-			case '*': *(map[i]) *= val; break;
-			case ':': if(val != 0) *(map[i]) /= val; break;
-			}
-			fprintf(stderr, "map[i]='%d'\n", val);
-			s = ++e;
-			i++;
-		}
+	applygeometry(arg);
 	updatebarpos();
 	arrange();
 }
@@ -1521,7 +1502,7 @@ setup(void) {
 	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	setgeom(GEOMETRY);
+	applygeometry(GEOMETRY);
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
