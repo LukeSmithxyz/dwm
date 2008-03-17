@@ -28,8 +28,8 @@ DEFGEOM(dual,    0,  0,1280, 0, bh, ww, wh-bh, wx, wy, 1280,800-bh,  1280,  0, w
 
 Geom geoms[] = {
 	/* symbol	function */
-	{ "[]",		single },	/* first entry is default */
-	{ "[][]",	dual },
+	{ "<>",		single },	/* first entry is default */
+	{ ")(",		dual },
 };
 
 /* layout(s) */
@@ -48,8 +48,8 @@ Layout layouts[] = {
 #define MODKEY			Mod1Mask
 Key keys[] = {
 	/* modifier			key		function	argument */
-	{ MODKEY,			XK_a,		setgeom,	"[][]" },
-	{ MODKEY,			XK_d,		setgeom,	"[]" },
+	{ MODKEY,			XK_a,		setgeom,	")(" },
+	{ MODKEY,			XK_d,		setgeom,	"<>" },
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },

@@ -210,7 +210,7 @@ void zoom(const char *arg);
 char stext[256], buf[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-int bx, by, bw, bh, blw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
+int bx, by, bw, bh, blw, bgw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -322,10 +322,10 @@ buttonpress(XEvent *e) {
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(ev->window == barwin) {
-		x = 0;
+		x = bgw;
 		for(i = 0; i < LENGTH(tags); i++) {
 			x += textw(tags[i]);
-			if(ev->x < x) {
+			if(ev->x > bgw && ev->x < x) {
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
 						tag(tags[i]);
@@ -514,6 +514,9 @@ drawbar(void) {
 	Client *c;
 
 	dc.x = 0;
+	dc.w = bgw;
+	drawtext(geom->symbol, dc.norm, False);
+	dc.x += bgw;
 	for(c = stack; c && !isvisible(c); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
@@ -854,7 +857,7 @@ unsigned int
 idxoftag(const char *t) {
 	unsigned int i;
 
-	for(i = 0; (i < LENGTH(tags)) && (tags[i] != t); i++);
+	for(i = 0; (i < LENGTH(tags)) && strcmp(tags[i], t); i++);
 	return (i < LENGTH(tags)) ? i : 0;
 }
 
@@ -1500,6 +1503,11 @@ setup(void) {
 		i = textw(layouts[i].symbol);
 		if(i > blw)
 			blw = i;
+	}
+	for(bgw = i = 0; i < LENGTH(geoms); i++) {
+		i = textw(geoms[i].symbol);
+		if(i > bgw)
+			bgw = i;
 	}
 
 	wa.override_redirect = 1;
