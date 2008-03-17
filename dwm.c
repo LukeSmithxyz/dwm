@@ -69,7 +69,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
-	unsigned int border, oldborder;
+	unsigned int bw, oldbw;
 	Bool isbanned, isfixed, isfloating, isurgent;
 	Bool *tags;
 	Client *next;
@@ -413,7 +413,7 @@ configure(Client *c) {
 	ce.y = c->y;
 	ce.width = c->w;
 	ce.height = c->h;
-	ce.border_width = c->border;
+	ce.border_width = c->bw;
 	ce.above = None;
 	ce.override_redirect = False;
 	XSendEvent(dpy, c->win, False, StructureNotifyMask, (XEvent *)&ce);
@@ -435,7 +435,7 @@ configurerequest(XEvent *e) {
 
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
-			c->border = ev->border_width;
+			c->bw = ev->border_width;
 		if(c->isfixed || c->isfloating || lt->isfloating) {
 			if(ev->value_mask & CWX)
 				c->x = sx + ev->x;
@@ -1000,25 +1000,25 @@ manage(Window w, XWindowAttributes *wa) {
 	c->y = wa->y;
 	c->w = wa->width;
 	c->h = wa->height;
-	c->oldborder = wa->border_width;
+	c->oldbw = wa->border_width;
 	if(c->w == sw && c->h == sh) {
 		c->x = sx;
 		c->y = sy;
-		c->border = wa->border_width;
+		c->bw = wa->border_width;
 	}
 	else {
-		if(c->x + c->w + 2 * c->border > wx + ww)
-			c->x = wx + ww - c->w - 2 * c->border;
-		if(c->y + c->h + 2 * c->border > wy + wh)
-			c->y = wy + wh - c->h - 2 * c->border;
+		if(c->x + c->w + 2 * c->bw > wx + ww)
+			c->x = wx + ww - c->w - 2 * c->bw;
+		if(c->y + c->h + 2 * c->bw > wy + wh)
+			c->y = wy + wh - c->h - 2 * c->bw;
 		if(c->x < wx)
 			c->x = wx;
 		if(c->y < wy)
 			c->y = wy;
-		c->border = BORDERPX;
+		c->bw = BORDERPX;
 	}
 
-	wc.border_width = c->border;
+	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
@@ -1071,7 +1071,7 @@ monocle(void) {
 
 	for(c = clients; c; c = c->next)
 		if(isvisible(c))
-			resize(c, mox, moy, mow, moh, RESIZEHINTS);
+			resize(c, mox, moy, mow - 2 * c->bw, moh - 2 * c->bw, RESIZEHINTS);
 }
 
 void
@@ -1104,12 +1104,12 @@ movemouse(Client *c) {
 			ny = ocy + (ev.xmotion.y - y1);
 			if(abs(wx - nx) < SNAP)
 				nx = wx;
-			else if(abs((wx + ww) - (nx + c->w + 2 * c->border)) < SNAP)
-				nx = wx + ww - c->w - 2 * c->border;
+			else if(abs((wx + ww) - (nx + c->w + 2 * c->bw)) < SNAP)
+				nx = wx + ww - c->w - 2 * c->bw;
 			if(abs(wy - ny) < SNAP)
 				ny = wy;
-			else if(abs((wy + wh) - (ny + c->h + 2 * c->border)) < SNAP)
-				ny = wy + wh - c->h - 2 * c->border;
+			else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < SNAP)
+				ny = wy + wh - c->h - 2 * c->bw;
 			if(!c->isfloating && !lt->isfloating && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
 			if((lt->isfloating) || c->isfloating)
@@ -1219,19 +1219,19 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	if(w <= 0 || h <= 0)
 		return;
 	if(x > sx + sw)
-		x = sw - w - 2 * c->border;
+		x = sw - w - 2 * c->bw;
 	if(y > sy + sh)
-		y = sh - h - 2 * c->border;
-	if(x + w + 2 * c->border < sx)
+		y = sh - h - 2 * c->bw;
+	if(x + w + 2 * c->bw < sx)
 		x = sx;
-	if(y + h + 2 * c->border < sy)
+	if(y + h + 2 * c->bw < sy)
 		y = sy;
 	if(c->x != x || c->y != y || c->w != w || c->h != h) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
 		c->h = wc.height = h;
-		wc.border_width = c->border;
+		wc.border_width = c->bw;
 		XConfigureWindow(dpy, c->win,
 				CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 		configure(c);
@@ -1250,13 +1250,13 @@ resizemouse(Client *c) {
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask , &ev);
 		switch(ev.type) {
 		case ButtonRelease:
 			XWarpPointer(dpy, None, c->win, 0, 0, 0, 0,
-					c->w + c->border - 1, c->h + c->border - 1);
+					c->w + c->bw - 1, c->h + c->bw - 1);
 			XUngrabPointer(dpy, CurrentTime);
 			while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 			return;
@@ -1267,9 +1267,9 @@ resizemouse(Client *c) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			if((nw = ev.xmotion.x - ocx - 2 * c->border + 1) <= 0)
+			if((nw = ev.xmotion.x - ocx - 2 * c->bw + 1) <= 0)
 				nw = 1;
-			if((nh = ev.xmotion.y - ocy - 2 * c->border + 1) <= 0)
+			if((nh = ev.xmotion.y - ocy - 2 * c->bw + 1) <= 0)
 				nh = 1;
 			if(!c->isfloating && !lt->isfloating && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
 				togglefloating(NULL);
@@ -1608,11 +1608,11 @@ tileh(void) {
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		if(i + 1 == n) /* remainder */
-			tileresize(c, x, ty, (tx + tw) - x - 2 * c->border, th - 2 * c->border);
+			tileresize(c, x, ty, (tx + tw) - x - 2 * c->bw, th - 2 * c->bw);
 		else
-			tileresize(c, x, ty, w - 2 * c->border, th - 2 * c->border);
+			tileresize(c, x, ty, w - 2 * c->bw, th - 2 * c->bw);
 		if(w != tw)
-			x = c->x + c->w + 2 * c->border;
+			x = c->x + c->w + 2 * c->bw;
 	}
 }
 
@@ -1621,9 +1621,9 @@ tilemaster(unsigned int n) {
 	Client *c = nexttiled(clients);
 
 	if(n == 1)
-		tileresize(c, mox, moy, mow - 2 * c->border, moh - 2 * c->border);
+		tileresize(c, mox, moy, mow - 2 * c->bw, moh - 2 * c->bw);
 	else
-		tileresize(c, mx, my, mw - 2 * c->border, mh - 2 * c->border);
+		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
 	return c;
 }
 
@@ -1654,11 +1654,11 @@ tilev(void) {
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		if(i + 1 == n) /* remainder */
-			tileresize(c, tx, y, tw - 2 * c->border, (ty + th) - y - 2 * c->border);
+			tileresize(c, tx, y, tw - 2 * c->bw, (ty + th) - y - 2 * c->bw);
 		else
-			tileresize(c, tx, y, tw - 2 * c->border, h - 2 * c->border);
+			tileresize(c, tx, y, tw - 2 * c->bw, h - 2 * c->bw);
 		if(h != th)
-			y = c->y + c->h + 2 * c->border;
+			y = c->y + c->h + 2 * c->bw;
 	}
 }
 
@@ -1710,7 +1710,7 @@ void
 unmanage(Client *c) {
 	XWindowChanges wc;
 
-	wc.border_width = c->oldborder;
+	wc.border_width = c->oldbw;
 	/* The server grab construct avoids race conditions. */
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
