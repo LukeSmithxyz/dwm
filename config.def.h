@@ -25,11 +25,15 @@ Rule rules[] = {
 /*   func name  bx  by  bw  wx  wy  ww     wh  mx  my       mw  mh     tx  ty     tw  th  mox moy mow moh */
 DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, 0.55*sw, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
 DEFGEOM(dual,    0,  0,1280, 0, bh, ww, wh-bh, wx, wy, 1280,800-bh,  1280,  0, ww-mw, sh,  mx, my, mw, mh)
+/* DEFGEOM(growmaster, bx, by, bw, wx, wy, ww, wh, mx, my, mw+20, mh, mx+mw, ty, tw-20, th, mox, moy, mow, moh) */
+/* DEFGEOM(shrinkmaster, bx, by, bw, wx, wy, ww, wh, mx, my, mw-20, mh, mx+mw, ty, tw+20, th, mox, moy, mow, moh) */
 
 Geom geoms[] = {
 	/* symbol	function */
 	{ "<>",		single },	/* first entry is default */
 	{ ")(",		dual },
+/*	{ "+|",		growmaster },*/
+/*	{ "|-",		shrinkmaster },*/
 };
 
 /* layout(s) */
