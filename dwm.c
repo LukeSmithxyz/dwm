@@ -46,6 +46,14 @@
 #define LENGTH(x)		(sizeof x / sizeof x[0])
 #define MAXTAGLEN		16
 #define MOUSEMASK		(BUTTONMASK|PointerMotionMask)
+#define DEFGEOM(GEONAME,BX,BY,BW,WX,WY,WW,WH,MX,MY,MW,MH,TX,TY,TW,TH,MOX,MOY,MOW,MOH) \
+void GEONAME(void) { \
+	bx = (BX); by = (BY); bw = (BW); \
+	wx = (WX); wy = (WY); ww = (WW); wh = (WH); \
+	mx = (MX); my = (MY); mw = (MW); mh = (MH); \
+	tx = (TX); ty = (TY); tw = (TW); th = (TH); \
+	mox = (MOX); moy = (MOY); mow = (MOW); moh = (MOH); \
+}
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
@@ -86,6 +94,11 @@ typedef struct {
 } DC; /* draw context */
 
 typedef struct {
+	const char *symbol;
+	void (*apply)(void);
+} Geom;
+
+typedef struct {
 	unsigned long mod;
 	KeySym keysym;
 	void (*func)(const char *arg);
@@ -107,7 +120,6 @@ typedef struct {
 } Rule;
 
 /* function declarations */
-void applygeom(const char *arg);
 void applyrules(Client *c);
 void arrange(void);
 void attach(Client *c);
@@ -137,7 +149,6 @@ void focusnext(const char *arg);
 void focusprev(const char *arg);
 Client *getclient(Window w);
 unsigned long getcolor(const char *colstr);
-double getdouble(const char *s);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 void grabbuttons(Client *c, Bool focused);
@@ -226,6 +237,7 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
+Geom *geom = NULL;
 Layout *lt = NULL;
 Window root, barwin;
 
@@ -235,55 +247,6 @@ Window root, barwin;
 static Bool tmp[LENGTH(tags)];
 
 /* function implementations */
-
-void
-applygeometry(const char *arg) {
-	static const char *lastArg = NULL;
-	char delim, op, *s, *e, *p;
-	double val;
-	int i, *map[] = { &bx,  &by,  &bw,  &bh,
-	                  &wx,  &wy,  &ww,  &wh,
-	                  &mx,  &my,  &mw,  &mh,
-	                  &tx,  &ty,  &tw,  &th,
-	                  &mox, &moy, &mow, &moh };
-
-	if(!arg)
-		arg = lastArg;
-	else
-		lastArg = arg;
-	if(!lastArg)
-		return;
-	strncpy(buf, arg, sizeof buf);
-	for(i = 0, e = s = buf; i < LENGTH(map) && e; e++)
-		if(*e == ' ' || *e == 0) {
-			delim = *e;
-			*e = 0;
-			op = 0;
-			/* check if there is an operator */
-			for(p = s; p < e && *p != '-' && *p != '+' && *p != '*'; p++);
-			if(*p) {
-				op = *p;
-				*p = 0;
-			}
-			val = getdouble(s);
-			if(op && p > s) { /* intermediate operand, e.g. H-B */
-				*(map[i]) = (int)val;
-				s = ++p;
-				val = getdouble(s);
-			}
-			switch(op) {
-			default:  *(map[i])  = (int)val; break;
-			case '-': *(map[i]) -= (int)val; break;
-			case '+': *(map[i]) += (int)val; break;
-			case '*': *(map[i])  = (int)(((double)*(map[i])) * val); break;
-			}
-			if(delim == 0)
-				e = NULL;
-			else
-				s = ++e;
-			i++;
-		}
-}
 
 void
 applyrules(Client *c) {
@@ -1438,27 +1401,17 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
-double
-getdouble(const char *s) {
-	char *endp;
-	double result = 0;
-
-	switch(*s) {
-	default: 
-		result = strtod(s, &endp);
-		if(s == endp || *endp != 0)
-			result = strtol(s, &endp, 0);
-		break;
-	case 'B': result = dc.font.height + 2; break;
-	case 'W': result = sw; break;
-	case 'H': result = sh; break;
-	}
-	return result;
-}
-
 void
 setgeom(const char *arg) {
-	applygeometry(arg);
+	unsigned int i;
+
+	for(i = 0; arg && i < LENGTH(geoms); i++)
+		if(!strcmp(geoms[i].symbol, arg))
+			break;
+	if(i == LENGTH(geoms))
+		return;
+	geom = &geoms[i];
+	geom->apply();
 	updatebarpos();
 	arrange();
 }
@@ -1497,12 +1450,14 @@ setup(void) {
 	root = RootWindow(dpy, screen);
 	initfont(FONT);
 
-	/* apply default dimensions */
+	/* apply default geometry */
 	sx = 0;
 	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	applygeometry(GEOMETRY);
+	bh = dc.font.height + 2;
+	geom = &geoms[0];
+	geom->apply();
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
