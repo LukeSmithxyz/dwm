@@ -423,8 +423,11 @@ void
 configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 
-	if(ev->window == root && (ev->width != sw || ev->height != sh))
+	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
+		sw = ev->width;
+		sh = ev->height;
 		setgeom(NULL);
+	}
 }
 
 void
