@@ -1448,7 +1448,7 @@ setlayout(const char *arg) {
 
 void
 setup(void) {
-	unsigned int i;
+	unsigned int i, w;
 	XSetWindowAttributes wa;
 
 	/* init screen */
@@ -1503,14 +1503,14 @@ setup(void) {
 
 	/* init bar */
 	for(blw = i = 0; i < LENGTH(layouts); i++) {
-		i = textw(layouts[i].symbol);
-		if(i > blw)
-			blw = i;
+		w = textw(layouts[i].symbol);
+		if(w > blw)
+			blw = w;
 	}
 	for(bgw = i = 0; i < LENGTH(geoms); i++) {
-		i = textw(geoms[i].symbol);
-		if(i > bgw)
-			bgw = i;
+		w = textw(geoms[i].symbol);
+		if(w > bgw)
+			bgw = w;
 	}
 
 	wa.override_redirect = 1;
