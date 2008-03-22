@@ -259,7 +259,7 @@ applyrules(Client *c) {
 	XGetClassHint(dpy, c->win, &ch);
 	for(i = 0; i < LENGTH(rules); i++) {
 		r = &rules[i];
-		if(r->title && strstr(c->name, r->title)
+		if((r->title && strstr(c->name, r->title))
 		|| (ch.res_class && r->class && strstr(ch.res_class, r->class))
 		|| (ch.res_name && r->instance && strstr(ch.res_name, r->instance)))
 		{
@@ -860,7 +860,7 @@ unsigned int
 idxoftag(const char *t) {
 	unsigned int i;
 
-	for(i = 0; (i < LENGTH(tags)) && strcmp(tags[i], t); i++);
+	for(i = 0; (i < LENGTH(tags)) && t && strcmp(tags[i], t); i++);
 	return (i < LENGTH(tags)) ? i : 0;
 }
 
