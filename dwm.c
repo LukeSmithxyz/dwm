@@ -178,6 +178,7 @@ void scan(void);
 void setclientstate(Client *c, long state);
 void setgeom(const char *arg);
 void setlayout(const char *arg);
+void setmfact(const char *arg);
 void setup(void);
 void spawn(const char *arg);
 void tag(const char *arg);
@@ -1460,6 +1461,26 @@ setlayout(const char *arg) {
 		arrange();
 	else
 		drawbar();
+}
+
+void
+setmfact(const char *arg) {
+	double delta;
+
+	if(!arg)
+		return;
+	delta = strtod(arg, NULL);
+	if(arg[0] == '-' || arg[0] == '+') {
+		if(mfact + delta < 0.1 || mfact + delta > 0.9)
+			return;
+		mfact += delta;
+	}
+	else {
+		if(delta < 0.1 || delta > 0.9)
+			return;
+		mfact = delta;
+	}
+	arrange();
 }
 
 void

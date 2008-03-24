@@ -20,7 +20,8 @@ Rule rules[] = {
 
 /* geometries, s{x,y,w,h} and bh are already initualized here */
 /*   func name  bx  by  bw  wx  wy  ww     wh  mx  my       mw  mh     tx  ty     tw  th  mox moy mow moh */
-DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, 0.55*sw, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
+double mfact = 0.55;
+DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, mfact*sw, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
 DEFGEOM(dual,    0,  0,1280, 0, bh, ww, wh-bh, wx, wy, 1280,800-bh,  1280,  0, ww-mw, sh,  mx, my, mw, mh)
 
 Geom geoms[] = {
@@ -51,6 +52,8 @@ Key keys[] = {
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
 	{ MODKEY,			XK_r,		reapply,	NULL },
+	{ MODKEY,			XK_h,		setmfact,	"-0.05" },
+	{ MODKEY,			XK_l,		setmfact,	"+0.05" },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL },
