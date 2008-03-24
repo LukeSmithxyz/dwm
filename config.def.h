@@ -22,15 +22,11 @@ Rule rules[] = {
 /*   func name  bx  by  bw  wx  wy  ww     wh  mx  my       mw  mh     tx  ty     tw  th  mox moy mow moh */
 DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, 0.55*sw, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
 DEFGEOM(dual,    0,  0,1280, 0, bh, ww, wh-bh, wx, wy, 1280,800-bh,  1280,  0, ww-mw, sh,  mx, my, mw, mh)
-/* DEFGEOM(growmaster, bx, by, bw, wx, wy, ww, wh, mx, my, mw+20, mh, mx+mw, ty, tw-20, th, mox, moy, mow, moh) */
-/* DEFGEOM(shrinkmaster, bx, by, bw, wx, wy, ww, wh, mx, my, mw-20, mh, mx+mw, ty, tw+20, th, mox, moy, mow, moh) */
 
 Geom geoms[] = {
 	/* symbol	function */
-	{ "<>",		single },	/* first entry is default */
-	{ ")(",		dual },
-/*	{ "+|",		growmaster },*/
-/*	{ "|-",		shrinkmaster },*/
+	{ "[]",		single },	/* first entry is default */
+	{ "[][]",	dual },
 };
 
 /* layout(s) */
@@ -49,22 +45,18 @@ Layout layouts[] = {
 #define MODKEY			Mod1Mask
 Key keys[] = {
 	/* modifier			key		function	argument */
-	{ MODKEY,			XK_a,		setgeom,	")(" },
-	{ MODKEY,			XK_d,		setgeom,	"<>" },
 	{ MODKEY,			XK_p,		spawn,
 		"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
-	{ MODKEY|ShiftMask,		XK_Return,	spawn, "exec uxterm" },
+	{ MODKEY|ShiftMask,		XK_Return,	spawn,		"exec uxterm" },
 	{ MODKEY,			XK_j,		focusnext,	NULL },
 	{ MODKEY,			XK_k,		focusprev,	NULL },
 	{ MODKEY,			XK_r,		reapply,	NULL },
 	{ MODKEY,			XK_Return,	zoom,		NULL },
 	{ MODKEY,			XK_Tab,		viewprevtag,	NULL },
-	{ MODKEY,			XK_m,		setlayout,	"[M]" },
-	{ MODKEY,			XK_f,		setlayout,	"><>" },
-	{ MODKEY,			XK_v,		setlayout,	"[]=" },
-	{ MODKEY,			XK_h,		setlayout,	"[]|" },
-	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL },
+	{ MODKEY,			XK_space,	setlayout,	NULL },
+	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
+	{ MODKEY|ControlMask,		XK_space,	setgeom,	NULL },
 	{ MODKEY,			XK_0,		view,		NULL },
 	{ MODKEY,			XK_1,		view,		tags[0] },
 	{ MODKEY,			XK_2,		view,		tags[1] },

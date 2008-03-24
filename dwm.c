@@ -322,6 +322,10 @@ buttonpress(XEvent *e) {
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(ev->window == barwin) {
+		if((ev->x < bgw) && ev->button == Button1) {
+			setgeom(NULL);
+			return;
+		}
 		x = bgw;
 		for(i = 0; i < LENGTH(tags); i++) {
 			x += textw(tags[i]);
@@ -341,6 +345,8 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
+		if((ev->x < x + blw) && ev->button == Button1) 
+			setlayout(NULL);
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
@@ -426,7 +432,7 @@ configurenotify(XEvent *e) {
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
 		sw = ev->width;
 		sh = ev->height;
-		setgeom(NULL);
+		setgeom(geom->symbol);
 	}
 }
 
@@ -1417,12 +1423,18 @@ void
 setgeom(const char *arg) {
 	unsigned int i;
 
-	for(i = 0; arg && i < LENGTH(geoms); i++)
-		if(!strcmp(geoms[i].symbol, arg))
-			break;
-	if(i == LENGTH(geoms))
-		return;
-	geom = &geoms[i];
+	if(!arg) {
+		if(++geom == &geoms[LENGTH(geoms)])
+			geom = &geoms[0];
+	}
+	else {
+		for(i = 0; i < LENGTH(geoms); i++)
+			if(!strcmp(geoms[i].symbol, arg))
+				break;
+		if(i == LENGTH(geoms))
+			return;
+		geom = &geoms[i];
+	}
 	geom->apply();
 	updatebarpos();
 	arrange();
@@ -1430,20 +1442,18 @@ setgeom(const char *arg) {
 
 void
 setlayout(const char *arg) {
-	static Layout *revert = 0;
 	unsigned int i;
 
-	if(!arg)
-		return;
-	for(i = 0; i < LENGTH(layouts); i++)
-		if(!strcmp(arg, layouts[i].symbol))
-			break;
-	if(i == LENGTH(layouts))
-		return;
-	if(revert && &layouts[i] == lt)
-		lt = revert;
+	if(!arg) {
+		if(++lt == &layouts[LENGTH(layouts)])
+			lt = &layouts[0];
+	}
 	else {
-		revert = lt;
+		for(i = 0; i < LENGTH(layouts); i++)
+			if(!strcmp(arg, layouts[i].symbol))
+				break;
+		if(i == LENGTH(layouts))
+			return;
 		lt = &layouts[i];
 	}
 	if(sel)
