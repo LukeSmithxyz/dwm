@@ -1480,7 +1480,7 @@ setmfact(const char *arg) {
 			return;
 		mfact = delta;
 	}
-	arrange();
+	setgeom(geom->symbol);
 }
 
 void
