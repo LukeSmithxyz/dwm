@@ -15,10 +15,7 @@ const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 Rule rules[] = {
 	/* class	instance	title		tags ref	isfloating */
-	{ NULL,		NULL,		"Firefox",	tags[8],	False },
-	{ NULL,		NULL,		"Gimp",		NULL,		True },
-	{ NULL,		NULL,		"MPlayer",	NULL,		True },
-	{ NULL,		NULL,		"Acroread",	NULL,		True },
+	{ "Gimp",	NULL,		NULL,		NULL,		True },
 };
 
 /* geometries, s{x,y,w,h} and bh are already initualized here */

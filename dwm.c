@@ -517,9 +517,11 @@ drawbar(void) {
 	Client *c;
 
 	dc.x = 0;
-	dc.w = bgw;
-	drawtext(geom->symbol, dc.norm, False);
-	dc.x += bgw;
+	if(bgw > 0) {
+		dc.w = bgw;
+		drawtext(geom->symbol, dc.norm, False);
+		dc.x += bgw;
+	}
 	for(c = stack; c && !isvisible(c); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
@@ -533,9 +535,13 @@ drawbar(void) {
 		}
 		dc.x += dc.w;
 	}
-	dc.w = blw;
-	drawtext(lt->symbol, dc.norm, False);
-	x = dc.x + dc.w;
+	if(blw > 0) {
+		dc.w = blw;
+		drawtext(lt->symbol, dc.norm, False);
+		x = dc.x + dc.w;
+	}
+	else
+		x = dc.x;
 	dc.w = textw(stext);
 	dc.x = bw - dc.w;
 	if(dc.x < x) {
@@ -1502,12 +1508,12 @@ setup(void) {
 	lt = &layouts[0];
 
 	/* init bar */
-	for(blw = i = 0; i < LENGTH(layouts); i++) {
+	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
 		w = textw(layouts[i].symbol);
 		if(w > blw)
 			blw = w;
 	}
-	for(bgw = i = 0; i < LENGTH(geoms); i++) {
+	for(bgw = i = 0; LENGTH(geoms) > 1 && i < LENGTH(geoms); i++) {
 		w = textw(geoms[i].symbol);
 		if(w > bgw)
 			bgw = w;
