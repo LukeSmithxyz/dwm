@@ -1467,7 +1467,7 @@ void
 setmfact(const char *arg) {
 	double delta;
 
-	if(!arg)
+	if(!arg || lt->isfloating)
 		return;
 	delta = strtod(arg, NULL);
 	if(arg[0] == '-' || arg[0] == '+') {
