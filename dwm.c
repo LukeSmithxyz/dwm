@@ -330,7 +330,7 @@ buttonpress(XEvent *e) {
 		x = bgw;
 		for(i = 0; i < LENGTH(tags); i++) {
 			x += textw(tags[i]);
-			if(ev->x > bgw && ev->x < x) {
+			if(ev->x >= bgw && ev->x < x) {
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
 						tag(tags[i]);
