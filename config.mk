@@ -23,7 +23,6 @@ LDFLAGS = -s ${LIBS}
 # Solaris
 #CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
 #LDFLAGS = ${LIBS}
-#CFLAGS += -xtarget=ultra
 
 # compiler and linker
 CC = cc
