@@ -1196,9 +1196,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 	if(sizehints) {
 		/* set minimum possible */
-		if (w < 1)
+		if(w < 1)
 			w = 1;
-		if (h < 1)
+		if(h < 1)
 			h = 1;
 
 		/* temporarily remove base dimensions */
@@ -1206,7 +1206,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		h -= c->baseh;
 
 		/* adjust for aspect limits */
-		if (c->minay > 0 && c->maxay > 0 && c->minax > 0 && c->maxax > 0) {
+		if(c->minax != c->maxax && c->minay != c->maxay 
+		&& c->minax > 0 && c->maxax > 0 && c->minay > 0 && c->maxay > 0)
+		{
 			if (w * c->maxay > h * c->maxax)
 				w = h * c->maxax / c->maxay;
 			else if (w * c->minay < h * c->minax)
