@@ -212,6 +212,7 @@ char stext[256], buf[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 int bx, by, bw, bh, blw, bgw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
+double mfact;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -805,39 +806,20 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 
 void
 grabbuttons(Client *c, Bool focused) {
+	int i, j;
+	unsigned int buttons[]   = { Button1, Button2, Button3 };
+	unsigned int modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask,
+	                             MODKEY|numlockmask|LockMask} ;
+
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-
-	if(focused) {
-		XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button1, MODKEY|LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button1, MODKEY|numlockmask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button1, MODKEY|numlockmask|LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-
-		XGrabButton(dpy, Button2, MODKEY, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button2, MODKEY|LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button2, MODKEY|numlockmask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button2, MODKEY|numlockmask|LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-
-		XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button3, MODKEY|LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button3, MODKEY|numlockmask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button3, MODKEY|numlockmask|LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-	}
+	if(focused)
+		for(i = 0; i < LENGTH(buttons); i++)
+			for(j = 0; j < LENGTH(modifiers); j++)
+				XGrabButton(dpy, buttons[i], modifiers[j], c->win, False,
+				            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 	else
-		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
+		            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 }
 
 void
@@ -1467,20 +1449,19 @@ setlayout(const char *arg) {
 
 void
 setmfact(const char *arg) {
-	double delta;
+	double d;
 
-	if(!arg || lt->isfloating)
+	if(lt->isfloating)
 		return;
-	delta = strtod(arg, NULL);
-	if(arg[0] == '-' || arg[0] == '+') {
-		if(mfact + delta < 0.1 || mfact + delta > 0.9)
-			return;
-		mfact += delta;
-	}
+	if(!arg)
+		mfact = MFACT;
 	else {
-		if(delta < 0.1 || delta > 0.9)
+		d = strtod(arg, NULL);
+		if(arg[0] == '-' || arg[0] == '+')
+			d += mfact;
+		if(d < 0.1 || d > 0.9)
 			return;
-		mfact = delta;
+		mfact = d;
 	}
 	setgeom(geom->symbol);
 }
@@ -1501,6 +1482,7 @@ setup(void) {
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.font.height + 2;
+	mfact = MFACT;
 	geom = &geoms[0];
 	geom->apply();
 
