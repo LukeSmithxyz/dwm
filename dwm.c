@@ -1191,9 +1191,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		if(c->minax != c->maxax && c->minay != c->maxay 
 		&& c->minax > 0 && c->maxax > 0 && c->minay > 0 && c->maxay > 0)
 		{
-			if (w * c->maxay > h * c->maxax)
+			if(w * c->maxay > h * c->maxax)
 				w = h * c->maxax / c->maxay;
-			else if (w * c->minay < h * c->minax)
+			else if(w * c->minay < h * c->minax)
 				h = w * c->minay / c->minax;
 		}
 
