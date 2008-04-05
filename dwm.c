@@ -1068,7 +1068,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(isvisible(c))
+		if((lt->isfloating || !c->floating) &&  isvisible(c))
 			resize(c, mox, moy, mow - 2 * c->bw, moh - 2 * c->bw, RESIZEHINTS);
 }
 
