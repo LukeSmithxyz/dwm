@@ -261,9 +261,9 @@ applyrules(Client *c) {
 	XGetClassHint(dpy, c->win, &ch);
 	for(i = 0; i < LENGTH(rules); i++) {
 		r = &rules[i];
-		if((r->title && strstr(c->name, r->title))
-		|| (ch.res_class && r->class && strstr(ch.res_class, r->class))
-		|| (ch.res_name && r->instance && strstr(ch.res_name, r->instance)))
+		if((!r->title || strstr(c->name, r->title))
+		&& (!ch.res_class || !r->class || strstr(ch.res_class, r->class))
+		&& (!ch.res_name || !r->instance || strstr(ch.res_name, r->instance)))
 		{
 			c->isfloating = r->isfloating;
 			if(r->tag) {
