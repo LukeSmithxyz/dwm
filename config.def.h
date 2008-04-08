@@ -21,7 +21,7 @@ Rule rules[] = {
 /* geometries, s{x,y,w,h} and bh are already initualized here */
 /*   func name  bx  by  bw  wx  wy  ww     wh  mx  my       mw  mh     tx  ty     tw  th  mox moy mow moh */
 #define MFACT			0.55	/* master width factor [0.1 .. 0.9] */
-DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, mfact*sw, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
+DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, mfact*ww, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
 
 Geom geoms[] = {
 	/* symbol	function */
