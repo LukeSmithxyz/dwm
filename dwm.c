@@ -41,6 +41,8 @@
 #include <X11/Xutil.h>
 
 /* macros */
+#define MAX(a, b) ((a)>(b)?(a):(b))
+#define MIN(a, b) ((a)<(b)?(a):(b))
 #define BUTTONMASK		(ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)		(mask & ~(numlockmask|LockMask))
 #define LENGTH(x)		(sizeof x / sizeof x[0])
@@ -601,9 +603,8 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	if(!text)
 		return;
 	w = 0;
-	olen = len = strlen(text);
-	if(len >= sizeof buf)
-		len = sizeof buf - 1;
+	olen = strlen(text);
+	len = MIN(olen, sizeof buf - 1);
 	memcpy(buf, text, len);
 	buf[len] = 0;
 	h = dc.font.ascent + dc.font.descent;
@@ -880,10 +881,8 @@ initfont(const char *fontstr) {
 		font_extents = XExtentsOfFontSet(dc.font.set);
 		n = XFontsOfFontSet(dc.font.set, &xfonts, &font_names);
 		for(i = 0, dc.font.ascent = 0, dc.font.descent = 0; i < n; i++) {
-			if(dc.font.ascent < (*xfonts)->ascent)
-				dc.font.ascent = (*xfonts)->ascent;
-			if(dc.font.descent < (*xfonts)->descent)
-				dc.font.descent = (*xfonts)->descent;
+			dc.font.ascent = MAX(dc.font.ascent, (*xfonts)->ascent);
+			dc.font.descent = MAX(dc.font.descent,(*xfonts)->descent);
 			xfonts++;
 		}
 	}
@@ -1008,10 +1007,8 @@ manage(Window w, XWindowAttributes *wa) {
 			c->x = wx + ww - c->w - 2 * c->bw;
 		if(c->y + c->h + 2 * c->bw > wy + wh)
 			c->y = wy + wh - c->h - 2 * c->bw;
-		if(c->x < wx)
-			c->x = wx;
-		if(c->y < wy)
-			c->y = wy;
+		c->x = MAX(c->x, wx);
+		c->y = MAX(c->y, wy);
 		c->bw = BORDERPX;
 	}
 
@@ -1177,10 +1174,8 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 	if(sizehints) {
 		/* set minimum possible */
-		if(w < 1)
-			w = 1;
-		if(h < 1)
-			h = 1;
+		w = MAX(1, w);
+		h = MAX(1, h);
 
 		/* temporarily remove base dimensions */
 		w -= c->basew;
@@ -1206,14 +1201,14 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		w += c->basew;
 		h += c->baseh;
 
-		if(c->minw > 0 && w < c->minw)
-			w = c->minw;
-		if(c->minh > 0 && h < c->minh)
-			h = c->minh;
-		if(c->maxw > 0 && w > c->maxw)
-			w = c->maxw;
-		if(c->maxh > 0 && h > c->maxh)
-			h = c->maxh;
+		w = MAX(w, c->minw);
+		h = MAX(h, c->minh);
+		
+		if (c->maxw)
+			w = MIN(w, c->maxw);
+
+		if (c->maxh)
+			h = MIN(h, c->maxh);
 	}
 	if(w <= 0 || h <= 0)
 		return;
@@ -1266,10 +1261,8 @@ resizemouse(Client *c) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			if((nw = ev.xmotion.x - ocx - 2 * c->bw + 1) <= 0)
-				nw = 1;
-			if((nh = ev.xmotion.y - ocy - 2 * c->bw + 1) <= 0)
-				nh = 1;
+			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
+			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
 			if(!c->isfloating && !lt->isfloating && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
 				togglefloating(NULL);
 			if((lt->isfloating) || c->isfloating)
@@ -1520,13 +1513,11 @@ setup(void) {
 	/* init bar */
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
 		w = textw(layouts[i].symbol);
-		if(w > blw)
-			blw = w;
+		blw = MAX(blw, w);
 	}
 	for(bgw = i = 0; LENGTH(geoms) > 1 && i < LENGTH(geoms); i++) {
 		w = textw(geoms[i].symbol);
-		if(w > bgw)
-			bgw = w;
+		bgw = MAX(bgw, w);
 	}
 
 	wa.override_redirect = 1;
