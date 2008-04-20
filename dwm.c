@@ -214,6 +214,7 @@ char stext[256], buf[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 int bx, by, bw, bh, blw, bgw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
+int viewtags_set = 0;
 double mfact;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
@@ -233,8 +234,8 @@ void (*handler[LASTEvent]) (XEvent *) = {
 Atom wmatom[WMLast], netatom[NetLast];
 Bool otherwm, readin;
 Bool running = True;
-Bool *prevtags;
 Bool *seltags;
+Bool *viewtags[2];
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
@@ -246,7 +247,6 @@ Window root, barwin;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 #define TAGSZ (LENGTH(tags) * sizeof(Bool))
-Bool tmp[LENGTH(tags)];
 Layout *lt = layouts;
 Geom *geom = geoms;
 
@@ -1158,11 +1158,10 @@ quit(const char *arg) {
 
 void
 reapply(const char *arg) {
-	static Bool zerotags[LENGTH(tags)] = { 0 };
 	Client *c;
 
 	for(c = clients; c; c = c->next) {
-		memcpy(c->tags, zerotags, sizeof zerotags);
+		memset(c->tags, 0, TAGSZ);
 		applyrules(c);
 	}
 	arrange();
@@ -1506,9 +1505,10 @@ setup(void) {
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 
 	/* init tags */
-	seltags = emallocz(TAGSZ);
-	prevtags = emallocz(TAGSZ);
-	seltags[0] = prevtags[0] = True;
+	viewtags[0] = emallocz(TAGSZ);
+	viewtags[1] = emallocz(TAGSZ);
+	viewtags[0][0] = viewtags[1][0] = True;
+	seltags = viewtags[0];
 
 	/* init bar */
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
@@ -1828,9 +1828,9 @@ updatewmhints(Client *c) {
 	}
 }
 
-
 void
 view(const char *arg) {
+	Bool tmp[LENGTH(tags)];
 	unsigned int i;
 
 	for(i = 0; i < LENGTH(tags); i++)
@@ -1838,7 +1838,7 @@ view(const char *arg) {
 	tmp[idxoftag(arg)] = True;
 
 	if(memcmp(seltags, tmp, TAGSZ) != 0) {
-		memcpy(prevtags, seltags, TAGSZ);
+		seltags = viewtags[viewtags_set ^= 1];  /* toggle tagset */
 		memcpy(seltags, tmp, TAGSZ);
 		arrange();
 	}
@@ -1846,10 +1846,7 @@ view(const char *arg) {
 
 void
 viewprevtag(const char *arg) {
-
-	memcpy(tmp, seltags, TAGSZ);
-	memcpy(seltags, prevtags, TAGSZ);
-	memcpy(prevtags, tmp, TAGSZ);
+	seltags = viewtags[viewtags_set ^= 1];  /* toggle tagset */
 	arrange();
 }
 
