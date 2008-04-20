@@ -239,14 +239,14 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
-Geom *geom = NULL;
-Layout *lt = NULL;
 Window root, barwin;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 #define TAGSZ (LENGTH(tags) * sizeof(Bool))
-static Bool tmp[LENGTH(tags)];
+Bool tmp[LENGTH(tags)];
+Layout *lt = layouts;
+Geom *geom = geoms;
 
 /* function implementations */
 
@@ -264,7 +264,6 @@ applyrules(Client *c) {
 		if((!r->title || strstr(c->name, r->title))
 		&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
 		&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
-		{
 			c->isfloating = r->isfloating;
 			if(r->tag) {
 				c->tags[idxoftag(r->tag)] = True;
@@ -1483,7 +1482,6 @@ setup(void) {
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.font.height + 2;
 	mfact = MFACT;
-	geom = &geoms[0];
 	geom->apply();
 
 	/* init atoms */
@@ -1518,9 +1516,6 @@ setup(void) {
 	seltags = emallocz(TAGSZ);
 	prevtags = emallocz(TAGSZ);
 	seltags[0] = prevtags[0] = True;
-
-	/* init layouts */
-	lt = &layouts[0];
 
 	/* init bar */
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
@@ -1934,3 +1929,4 @@ main(int argc, char *argv[]) {
 	XCloseDisplay(dpy);
 	return 0;
 }
+
