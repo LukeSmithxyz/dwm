@@ -1828,16 +1828,9 @@ updatewmhints(Client *c) {
 
 void
 view(const char *arg) {
-	Bool tmp[LENGTH(tags)];
-	unsigned int i;
-
-	for(i = 0; i < LENGTH(tags); i++)
-		tmp[i] = (NULL == arg);
-	tmp[idxoftag(arg)] = True;
-
-	seltags ^= 1; /* toggle sel tagset */
-	if(memcmp(tagset[seltags ^ 1], tmp, TAGSZ) != 0)
-		memcpy(tagset[seltags], tmp, TAGSZ);
+	seltags ^= 1;
+	memset(tagset[seltags], (NULL == arg), TAGSZ);
+	tagset[seltags][idxoftag(arg)] = True;
 	arrange();
 }
 
