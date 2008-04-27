@@ -35,8 +35,11 @@ Geom geoms[] = {
 Layout layouts[] = {
 	/* symbol		function	isfloating */
 	{ "[]=",		tilev,		False }, /* first entry is default */
+	{ "<>=",		tilev,		True },
 	{ "[]|",		tileh,		False },
-	{ "><>",		floating,	True },
+	{ "<>|",		tileh,		True },
+	{ "><>",		NULL,	True },
+	{ "[m]",		monocle,	False },
 	{ "[M]",		monocle,	True },
 };
 

@@ -68,6 +68,7 @@ typedef struct Client Client;
 struct Client {
 	char name[256];
 	int x, y, w, h;
+	int fx, fy, fw, fh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
@@ -144,7 +145,6 @@ void *emallocz(unsigned int size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
 void expose(XEvent *e);
-void floating(void); /* default floating layout */
 void focus(Client *c);
 void focusin(XEvent *e);
 void focusnext(const char *arg);
@@ -286,13 +286,17 @@ arrange(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(isvisible(c))
+		if(isvisible(c)) {
 			unban(c);
+			if(lt->isfloating || c->isfloating)
+				resize(c, c->fx, c->fy, c->fw, c->fh, True);
+		}
 		else
 			ban(c);
 
 	focus(NULL);
-	lt->arrange();
+	if(lt->arrange)
+		lt->arrange();
 	restack();
 }
 
@@ -360,7 +364,7 @@ buttonpress(XEvent *e) {
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if((floating != lt->arrange) && c->isfloating)
+			if(!lt->isfloating && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
@@ -667,15 +671,6 @@ expose(XEvent *e) {
 
 	if(ev->count == 0 && (ev->window == barwin))
 		drawbar();
-}
-
-void
-floating(void) { /* default floating layout */
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(isvisible(c))
-			resize(c, c->x, c->y, c->w, c->h, True);
 }
 
 void
@@ -993,8 +988,8 @@ manage(Window w, XWindowAttributes *wa) {
 	/* geometry */
 	c->x = wa->x;
 	c->y = wa->y;
-	c->w = wa->width;
-	c->h = wa->height;
+	c->w = c->fw = wa->width;
+	c->h = c->fh = wa->height;
 	c->oldbw = wa->border_width;
 	if(c->w == sw && c->h == sh) {
 		c->x = sx;
@@ -1010,6 +1005,8 @@ manage(Window w, XWindowAttributes *wa) {
 		c->y = MAX(c->y, wy);
 		c->bw = BORDERPX;
 	}
+	c->fx = c->x;
+	c->fy = c->y;
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -1105,8 +1102,11 @@ movemouse(Client *c) {
 				ny = wy + wh - c->h - 2 * c->bw;
 			if(!c->isfloating && !lt->isfloating && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
-			if((lt->isfloating) || c->isfloating)
+			if(lt->isfloating || c->isfloating) {
+				c->fx = nx;
+				c->fy = ny;
 				resize(c, nx, ny, c->w, c->h, False);
+			}
 			break;
 		}
 	}
@@ -1261,10 +1261,16 @@ resizemouse(Client *c) {
 			XSync(dpy, False);
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-			if(!c->isfloating && !lt->isfloating && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP))
+			if(!c->isfloating && !lt->isfloating && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP)) {
+				c->fx = c->x;
+				c->fy = c->y;
 				togglefloating(NULL);
-			if((lt->isfloating) || c->isfloating)
+			}
+			if((lt->isfloating) || c->isfloating) {
 				resize(c, c->x, c->y, nw, nh, True);
+				c->fw = nw;
+				c->fh = nh;
+			}
 			break;
 		}
 	}
@@ -1284,16 +1290,11 @@ restack(void) {
 	if(!lt->isfloating) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
-		if(!sel->isfloating) {
-			XConfigureWindow(dpy, sel->win, CWSibling|CWStackMode, &wc);
-			wc.sibling = sel->win;
-		}
-		for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
-			if(c == sel)
-				continue;
-			XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
-			wc.sibling = c->win;
-		}
+		for(c = stack; c; c = c->snext)
+			if(!c->isfloating && isvisible(c)) {
+				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
+				wc.sibling = c->win;
+			}
 	}
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
@@ -1841,6 +1842,8 @@ view(const char *arg) {
 		memcpy(seltags, tmp, TAGSZ);
 		arrange();
 	}
+	else
+		viewprevtag(NULL);
 }
 
 void
@@ -1885,14 +1888,14 @@ void
 zoom(const char *arg) {
 	Client *c = sel;
 
-	if(!sel || lt->isfloating || sel->isfloating)
-		return;
 	if(c == nexttiled(clients))
-		if(!(c = nexttiled(c->next)))
+		if(!c || !(c = nexttiled(c->next)))
 			return;
-	detach(c);
-	attach(c);
-	focus(c);
+	if(!lt->isfloating && !sel->isfloating) {
+		detach(c);
+		attach(c);
+		focus(c);
+	}
 	arrange();
 }
 
