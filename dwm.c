@@ -210,7 +210,7 @@ int xerrorstart(Display *dpy, XErrorEvent *ee);
 void zoom(const char *arg);
 
 /* variables */
-char stext[256], buf[256];
+char stext[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 int bx, by, bw, bh, blw, bgw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
@@ -597,22 +597,23 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	int x, y, w, h;
 	unsigned int len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
+	char buf[256];
 
 	XSetForeground(dpy, dc.gc, col[invert ? ColFG : ColBG]);
 	XFillRectangles(dpy, dc.drawable, dc.gc, &r, 1);
 	if(!text)
 		return;
-	w = 0;
 	olen = strlen(text);
-	len = MIN(olen, sizeof buf - 1);
+	len = MIN(olen, sizeof buf);
 	memcpy(buf, text, len);
-	buf[len] = 0;
+	w = 0;
 	h = dc.font.ascent + dc.font.descent;
 	y = dc.y + (dc.h / 2) - (h / 2) + dc.font.ascent;
 	x = dc.x + (h / 2);
 	/* shorten text if necessary */
-	while(len && (w = textnw(buf, len)) > dc.w - h)
-		buf[--len] = 0;
+	for(; len && (w = textnw(buf, len)) > dc.w - h; len--);
+	if (!len)
+		return;
 	if(len < olen) {
 		if(len > 1)
 			buf[len - 1] = '.';
@@ -621,8 +622,6 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 		if(len > 3)
 			buf[len - 3] = '.';
 	}
-	if(w > dc.w)
-		return; /* too long */
 	XSetForeground(dpy, dc.gc, col[invert ? ColBG : ColFG]);
 	if(dc.font.set)
 		XmbDrawString(dpy, dc.drawable, dc.font.set, dc.gc, x, y, buf, len);
