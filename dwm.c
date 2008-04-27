@@ -214,7 +214,7 @@ char stext[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 int bx, by, bw, bh, blw, bgw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
-int viewtags_set = 0;
+int seltags = 0;
 double mfact;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
@@ -234,8 +234,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 Atom wmatom[WMLast], netatom[NetLast];
 Bool otherwm, readin;
 Bool running = True;
-Bool *seltags;
-Bool *viewtags[2];
+Bool *tagset[2];
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
@@ -278,7 +277,7 @@ applyrules(Client *c) {
 	if(ch.res_name)
 		XFree(ch.res_name);
 	if(!matched)
-		memcpy(c->tags, seltags, TAGSZ);
+		memcpy(c->tags, tagset[seltags], TAGSZ);
 }
 
 void
@@ -538,7 +537,7 @@ drawbar(void) {
 	for(c = stack; c && !isvisible(c); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
-		if(seltags[i]) {
+		if(tagset[seltags][i]) {
 			drawtext(tags[i], dc.sel, isurgent(i));
 			drawsquare(c && c->tags[i], isoccupied(i), isurgent(i), dc.sel);
 		}
@@ -933,7 +932,7 @@ isvisible(Client *c) {
 	unsigned int i;
 
 	for(i = 0; i < LENGTH(tags); i++)
-		if(c->tags[i] && seltags[i])
+		if(c->tags[i] && tagset[seltags][i])
 			return True;
 	return False;
 }
@@ -1505,10 +1504,9 @@ setup(void) {
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 
 	/* init tags */
-	viewtags[0] = emallocz(TAGSZ);
-	viewtags[1] = emallocz(TAGSZ);
-	viewtags[0][0] = viewtags[1][0] = True;
-	seltags = viewtags[0];
+	tagset[0] = emallocz(TAGSZ);
+	tagset[1] = emallocz(TAGSZ);
+	tagset[0][0] = tagset[1][0] = True;
 
 	/* init bar */
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
@@ -1701,10 +1699,10 @@ toggleview(const char *arg) {
 	unsigned int i, j;
 
 	i = idxoftag(arg);
-	seltags[i] = !seltags[i];
-	for(j = 0; j < LENGTH(tags) && !seltags[j]; j++);
+	tagset[seltags][i] = !tagset[seltags][i];
+	for(j = 0; j < LENGTH(tags) && !tagset[seltags][j]; j++);
 	if(j == LENGTH(tags))
-		seltags[i] = True; /* at least one tag must be viewed */
+		tagset[seltags][i] = True; /* at least one tag must be viewed */
 	arrange();
 }
 
@@ -1837,18 +1835,15 @@ view(const char *arg) {
 		tmp[i] = (NULL == arg);
 	tmp[idxoftag(arg)] = True;
 
-	if(memcmp(seltags, tmp, TAGSZ) != 0) {
-		seltags = viewtags[viewtags_set ^= 1];  /* toggle tagset */
-		memcpy(seltags, tmp, TAGSZ);
-		arrange();
-	}
-	else
-		viewprevtag(NULL);
+	seltags ^= 1; /* toggle sel tagset */
+	if(memcmp(tagset[seltags ^ 1], tmp, TAGSZ) != 0)
+		memcpy(tagset[seltags], tmp, TAGSZ);
+	arrange();
 }
 
 void
 viewprevtag(const char *arg) {
-	seltags = viewtags[viewtags_set ^= 1];  /* toggle tagset */
+	seltags ^= 1; /* toggle sel tagset */
 	arrange();
 }
 
