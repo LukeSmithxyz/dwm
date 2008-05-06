@@ -112,7 +112,7 @@ typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
 	Bool isfloating;
-} Layout; 
+} Layout;
 
 typedef struct {
 	const char *class;
@@ -241,13 +241,15 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
+Geom geoms[];
+Geom *geom = geoms;
+Layout layouts[];
+Layout *lt = layouts;
 Window root, barwin;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 #define TAGSZ (LENGTH(tags) * sizeof(Bool))
-Layout *lt = layouts;
-Geom *geom = geoms;
 
 /* function implementations */
 
