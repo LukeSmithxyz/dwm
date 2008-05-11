@@ -1722,7 +1722,7 @@ updategeom(void) {
 
 	/* window area geometry */
 	wx = sx;
-	wy = sy;
+	wy = sy + bh;
 	ww = sw;
 	wh = sh - bh;
 
