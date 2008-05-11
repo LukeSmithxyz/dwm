@@ -1724,7 +1724,7 @@ updategeom(void) {
 	wx = sx;
 	wy = sy;
 	ww = sw;
-	sh = sh - bh;
+	wh = sh - bh;
 
 	/* master area geometry */
 	mfact = MFACT;
