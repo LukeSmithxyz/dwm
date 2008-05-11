@@ -1432,8 +1432,7 @@ setup(void) {
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.font.height + 2;
-
-	/* update geometry */
+	mfact = MFACT;
 	updategeom();
 
 	/* init atoms */
@@ -1727,7 +1726,6 @@ updategeom(void) {
 	wh = sh - bh;
 
 	/* master area geometry */
-	mfact = MFACT;
 	mx = wx;
 	my = wy;
 	mw = mfact * ww;
