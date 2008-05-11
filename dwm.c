@@ -160,7 +160,7 @@ void initfont(const char *fontstr);
 Bool isoccupied(unsigned int t);
 Bool isprotodel(Client *c);
 Bool isurgent(unsigned int t);
-Bool isvisible(Client *c);
+Bool isvisible(Client *c, Bool *cmp);
 void keypress(XEvent *e);
 void killclient(const char *arg);
 void manage(Window w, XWindowAttributes *wa);
@@ -287,7 +287,7 @@ arrange(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(isvisible(c)) {
+		if(isvisible(c, NULL)) {
 			unban(c);
 			if(lt->isfloating || c->isfloating)
 				resize(c, c->fx, c->fy, c->fw, c->fh, True);
@@ -469,7 +469,7 @@ configurerequest(XEvent *e) {
 			if((ev->value_mask & (CWX|CWY))
 			&& !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
-			if(isvisible(c))
+			if(isvisible(c, NULL))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else
@@ -536,7 +536,7 @@ drawbar(void) {
 		drawtext(geom->symbol, dc.norm, False);
 		dc.x += bgw;
 	}
-	for(c = stack; c && !isvisible(c); c = c->snext);
+	for(c = stack; c && !isvisible(c, NULL); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
 		if(tagset[seltags][i]) {
@@ -676,8 +676,8 @@ expose(XEvent *e) {
 
 void
 focus(Client *c) {
-	if(!c || (c && !isvisible(c)))
-		for(c = stack; c && !isvisible(c); c = c->snext);
+	if(!c || (c && !isvisible(c, NULL)))
+		for(c = stack; c && !isvisible(c, NULL); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -711,9 +711,9 @@ focusnext(const char *arg) {
 
 	if(!sel)
 		return;
-	for(c = sel->next; c && !isvisible(c); c = c->next);
+	for(c = sel->next; c && !isvisible(c, arg ? sel->tags : NULL); c = c->next);
 	if(!c)
-		for(c = clients; c && !isvisible(c); c = c->next);
+		for(c = clients; c && !isvisible(c, arg ? sel->tags : NULL); c = c->next);
 	if(c) {
 		focus(c);
 		restack();
@@ -726,10 +726,10 @@ focusprev(const char *arg) {
 
 	if(!sel)
 		return;
-	for(c = sel->prev; c && !isvisible(c); c = c->prev);
+	for(c = sel->prev; c && !isvisible(c, arg ? sel->tags : NULL); c = c->prev);
 	if(!c) {
 		for(c = clients; c && c->next; c = c->next);
-		for(; c && !isvisible(c); c = c->prev);
+		for(; c && !isvisible(c, arg ? sel->tags : NULL); c = c->prev);
 	}
 	if(c) {
 		focus(c);
@@ -930,11 +930,13 @@ isurgent(unsigned int t) {
 }
 
 Bool
-isvisible(Client *c) {
+isvisible(Client *c, Bool *cmp) {
 	unsigned int i;
 
+	if(!cmp)
+		cmp = tagset[seltags];
 	for(i = 0; i < LENGTH(tags); i++)
-		if(c->tags[i] && tagset[seltags][i])
+		if(c->tags[i] && cmp[i])
 			return True;
 	return False;
 }
@@ -1061,7 +1063,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if((lt->isfloating || !c->isfloating) &&  isvisible(c))
+		if((lt->isfloating || !c->isfloating) &&  isvisible(c, NULL))
 			resize(c, mox, moy, mow - 2 * c->bw, moh - 2 * c->bw, RESIZEHINTS);
 }
 
@@ -1115,7 +1117,7 @@ movemouse(Client *c) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->isfloating || !isvisible(c)); c = c->next);
+	for(; c && (c->isfloating || !isvisible(c, NULL)); c = c->next);
 	return c;
 }
 
@@ -1292,7 +1294,7 @@ restack(void) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
-			if(!c->isfloating && isvisible(c)) {
+			if(!c->isfloating && isvisible(c, NULL)) {
 				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
 				wc.sibling = c->win;
 			}
