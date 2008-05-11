@@ -22,12 +22,10 @@ Rule rules[] = {
 /*   func name  bx  by  bw  wx  wy  ww     wh  mx  my       mw  mh     tx  ty     tw  th  mox moy mow moh */
 #define MFACT			0.55	/* master width factor [0.1 .. 0.9] */
 DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, mfact*ww, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
-DEFGEOM(dual,    0,  0,1280, 0, bh, ww, wh-bh, wx, wy, 1280,800-bh,  1280,  0, ww-mw, sh,  mx, my, mw, mh)
 
 Geom geoms[] = {
 	/* symbol	function */
 	{ "[]",		single },	/* first entry is default */
-	{ "[][]",	dual },
 };
 
 /* layout(s) */
@@ -37,12 +35,8 @@ Geom geoms[] = {
 Layout layouts[] = {
 	/* symbol		function	isfloating */
 	{ "[]=",		tilev,		False }, /* first entry is default */
-	{ "<>=",		tilev,		True },
-	{ "[]|",		tileh,		False },
-	{ "<>|",		tileh,		True },
-	{ "><>",		NULL,	True },
-	{ "[m]",		monocle,	False },
-	{ "[M]",		monocle,	True },
+	{ "><>",		NULL,		True },
+	{ "<M>",		monocle,	True },
 };
 
 /* key definitions */
