@@ -18,17 +18,8 @@ Rule rules[] = {
 	{ "Gimp",	NULL,		NULL,		NULL,		True },
 };
 
-/* geometries, s{x,y,w,h} and bh are already initualized here */
-/*   func name  bx  by  bw  wx  wy  ww     wh  mx  my       mw  mh     tx  ty     tw  th  mox moy mow moh */
-#define MFACT			0.55	/* master width factor [0.1 .. 0.9] */
-DEFGEOM(single,  0,  0, sw,  0, bh, sw, sh-bh, wx, wy, mfact*ww, wh, mx+mw, wy, ww-mw, wh,  wx, wy, ww, wh)
-
-Geom geoms[] = {
-	/* symbol	function */
-	{ "[]",		single },	/* first entry is default */
-};
-
 /* layout(s) */
+#define MFACT			0.55	/* master width factor [0.1 .. 0.9] */
 #define RESIZEHINTS		True	/* False - respect size hints in tiled resizals */
 #define SNAP			32	/* snap pixel */
 
@@ -58,7 +49,6 @@ Key keys[] = {
 	{ MODKEY|ShiftMask,		XK_c,		killclient,	NULL },
 	{ MODKEY,			XK_space,	setlayout,	NULL },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	NULL },
-	{ MODKEY|ControlMask,		XK_space,	setgeom,	NULL },
 	{ MODKEY,			XK_0,		view,		NULL },
 	{ MODKEY,			XK_1,		view,		tags[0] },
 	{ MODKEY,			XK_2,		view,		tags[1] },

@@ -41,21 +41,13 @@
 #include <X11/Xutil.h>
 
 /* macros */
-#define MAX(a, b) ((a)>(b)?(a):(b))
-#define MIN(a, b) ((a)<(b)?(a):(b))
-#define BUTTONMASK		(ButtonPressMask|ButtonReleaseMask)
-#define CLEANMASK(mask)		(mask & ~(numlockmask|LockMask))
-#define LENGTH(x)		(sizeof x / sizeof x[0])
-#define MAXTAGLEN		16
-#define MOUSEMASK		(BUTTONMASK|PointerMotionMask)
-#define DEFGEOM(GEONAME,BX,BY,BW,WX,WY,WW,WH,MX,MY,MW,MH,TX,TY,TW,TH,MOX,MOY,MOW,MOH) \
-void GEONAME(void) { \
-	bx = (BX); by = (BY); bw = (BW); \
-	wx = (WX); wy = (WY); ww = (WW); wh = (WH); \
-	mx = (MX); my = (MY); mw = (MW); mh = (MH); \
-	tx = (TX); ty = (TY); tw = (TW); th = (TH); \
-	mox = (MOX); moy = (MOY); mow = (MOW); moh = (MOH); \
-}
+#define MAX(a, b)	((a) > (b) ? (a) : (b))
+#define MIN(a, b)	((a) < (b) ? (a) : (b))
+#define BUTTONMASK	(ButtonPressMask|ButtonReleaseMask)
+#define CLEANMASK(mask)	(mask & ~(numlockmask|LockMask))
+#define LENGTH(x)	(sizeof x / sizeof x[0])
+#define MAXTAGLEN	16
+#define MOUSEMASK	(BUTTONMASK|PointerMotionMask)
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
@@ -95,11 +87,6 @@ typedef struct {
 		XFontStruct *xfont;
 	} font;
 } DC; /* draw context */
-
-typedef struct {
-	const char *symbol;
-	void (*apply)(void);
-} Geom;
 
 typedef struct {
 	unsigned long mod;
@@ -178,7 +165,6 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
-void setgeom(const char *arg);
 void setlayout(const char *arg);
 void setmfact(const char *arg);
 void setup(void);
@@ -198,7 +184,8 @@ void toggleview(const char *arg);
 void unban(Client *c);
 void unmanage(Client *c);
 void unmapnotify(XEvent *e);
-void updatebarpos(void);
+void updatebar(void);
+void updategeom(void);
 void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
@@ -213,7 +200,7 @@ void zoom(const char *arg);
 char stext[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-int bx, by, bw, bh, blw, bgw, mx, my, mw, mh, mox, moy, mow, moh, tx, ty, tw, th, wx, wy, ww, wh;
+int bx, by, bw, bh, blw, mx, my, mw, mh, tx, ty, tw, th, wx, wy, ww, wh;
 int seltags = 0;
 double mfact;
 unsigned int numlockmask = 0;
@@ -241,8 +228,6 @@ Client *stack = NULL;
 Cursor cursor[CurLast];
 Display *dpy;
 DC dc = {0};
-Geom geoms[];
-Geom *geom = geoms;
 Layout layouts[];
 Layout *lt = layouts;
 Window root, barwin;
@@ -330,14 +315,10 @@ buttonpress(XEvent *e) {
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	if(ev->window == barwin) {
-		if((ev->x < bgw) && ev->button == Button1) {
-			setgeom(NULL);
-			return;
-		}
-		x = bgw;
+		x = 0;
 		for(i = 0; i < LENGTH(tags); i++) {
 			x += textw(tags[i]);
-			if(ev->x >= bgw && ev->x < x) {
+			if(ev->x < x) {
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
 						tag(tags[i]);
@@ -440,7 +421,9 @@ configurenotify(XEvent *e) {
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
 		sw = ev->width;
 		sh = ev->height;
-		setgeom(geom->symbol);
+		updategeom();
+		updatebar();
+		arrange();
 	}
 }
 
@@ -531,11 +514,6 @@ drawbar(void) {
 	Client *c;
 
 	dc.x = 0;
-	if(bgw > 0) {
-		dc.w = bgw;
-		drawtext(geom->symbol, dc.norm, False);
-		dc.x += bgw;
-	}
 	for(c = stack; c && !isvisible(c, NULL); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
@@ -1064,7 +1042,7 @@ monocle(void) {
 
 	for(c = clients; c; c = c->next)
 		if((lt->isfloating || !c->isfloating) &&  isvisible(c, NULL))
-			resize(c, mox, moy, mow - 2 * c->bw, moh - 2 * c->bw, RESIZEHINTS);
+			resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, RESIZEHINTS);
 }
 
 void
@@ -1399,27 +1377,6 @@ setclientstate(Client *c, long state) {
 }
 
 void
-setgeom(const char *arg) {
-	unsigned int i;
-
-	if(!arg) {
-		if(++geom == &geoms[LENGTH(geoms)])
-			geom = &geoms[0];
-	}
-	else {
-		for(i = 0; i < LENGTH(geoms); i++)
-			if(!strcmp(geoms[i].symbol, arg))
-				break;
-		if(i == LENGTH(geoms))
-			return;
-		geom = &geoms[i];
-	}
-	geom->apply();
-	updatebarpos();
-	arrange();
-}
-
-void
 setlayout(const char *arg) {
 	unsigned int i;
 
@@ -1457,7 +1414,8 @@ setmfact(const char *arg) {
 			return;
 		mfact = d;
 	}
-	setgeom(geom->symbol);
+	updategeom();
+	arrange();
 }
 
 void
@@ -1469,15 +1427,14 @@ setup(void) {
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 	initfont(FONT);
-
-	/* apply default geometry */
 	sx = 0;
 	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.font.height + 2;
-	mfact = MFACT;
-	geom->apply();
+
+	/* update geometry */
+	updategeom();
 
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -1516,10 +1473,6 @@ setup(void) {
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
 		w = textw(layouts[i].symbol);
 		blw = MAX(blw, w);
-	}
-	for(bgw = i = 0; LENGTH(geoms) > 1 && i < LENGTH(geoms); i++) {
-		w = textw(geoms[i].symbol);
-		bgw = MAX(bgw, w);
 	}
 
 	wa.override_redirect = 1;
@@ -1633,7 +1586,7 @@ tilemaster(unsigned int n) {
 	Client *c = nexttiled(clients);
 
 	if(n == 1)
-		tileresize(c, mox, moy, mow - 2 * c->bw, moh - 2 * c->bw);
+		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
 	else
 		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
 	return c;
@@ -1751,12 +1704,40 @@ unmapnotify(XEvent *e) {
 }
 
 void
-updatebarpos(void) {
+updatebar(void) {
 
 	if(dc.drawable != 0)
 		XFreePixmap(dpy, dc.drawable);
 	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
 	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+}
+
+void
+updategeom(void) {
+
+	/* bar geometry */
+	bx = 0;
+	by = 0;
+	bw = sw;
+
+	/* window area geometry */
+	wx = sx;
+	wy = sy;
+	ww = sw;
+	sh = sh - bh;
+
+	/* master area geometry */
+	mfact = MFACT;
+	mx = wx;
+	my = wy;
+	mw = mfact * ww;
+	mh = wh;
+
+	/* tile area geometry */
+	tx = mx + mw;
+	ty = wy;
+	tw = ww - mw;
+	th = wh;
 }
 
 void
@@ -1912,4 +1893,3 @@ main(int argc, char *argv[]) {
 	XCloseDisplay(dpy);
 	return 0;
 }
-
