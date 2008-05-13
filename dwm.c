@@ -1811,7 +1811,7 @@ updatewmhints(Client *c) {
 
 void
 view(const char *arg) {
-	seltags ^= 1;
+	seltags ^= 1; /* toggle sel tagset */
 	memset(tagset[seltags], (NULL == arg), TAGSZ);
 	tagset[seltags][idxoftag(arg)] = True;
 	arrange();
