@@ -595,7 +595,7 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	x = dc.x + (h / 2);
 	/* shorten text if necessary */
 	for(; len && (w = textnw(buf, len)) > dc.w - h; len--);
-	if (!len)
+	if(!len)
 		return;
 	if(len < olen) {
 		if(len > 1)
@@ -782,21 +782,21 @@ grabbuttons(Client *c, Bool focused) {
 	int i, j;
 	unsigned int buttons[]   = { Button1, Button2, Button3 };
 	unsigned int modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask,
-	                             MODKEY|numlockmask|LockMask} ;
+				MODKEY|numlockmask|LockMask} ;
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	if(focused)
 		for(i = 0; i < LENGTH(buttons); i++)
 			for(j = 0; j < LENGTH(modifiers); j++)
 				XGrabButton(dpy, buttons[i], modifiers[j], c->win, False,
-				            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+					BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 	else
 		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
-		            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+			BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 }
 
 void
-grabkeys(void)  {
+grabkeys(void) {
 	unsigned int i, j;
 	KeyCode code;
 	XModifierKeymap *modmap;
@@ -1041,7 +1041,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if((lt->isfloating || !c->isfloating) &&  isvisible(c, NULL))
+		if((lt->isfloating || !c->isfloating) && isvisible(c, NULL))
 			resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, RESIZEHINTS);
 }
 
@@ -1055,7 +1055,7 @@ movemouse(Client *c) {
 	ocx = nx = c->x;
 	ocy = ny = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-			None, cursor[CurMove], CurrentTime) != GrabSuccess)
+	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
@@ -1221,7 +1221,7 @@ resizemouse(Client *c) {
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-			None, cursor[CurResize], CurrentTime) != GrabSuccess)
+	None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	for(;;) {
@@ -1351,7 +1351,7 @@ scan(void) {
 	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
 		for(i = 0; i < num; i++) {
 			if(!XGetWindowAttributes(dpy, wins[i], &wa)
-					|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
+			|| wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
 				continue;
 			if(wa.map_state == IsViewable || getstate(wins[i]) == IconicState)
 				manage(wins[i], &wa);
@@ -1360,7 +1360,7 @@ scan(void) {
 			if(!XGetWindowAttributes(dpy, wins[i], &wa))
 				continue;
 			if(XGetTransientForHint(dpy, wins[i], &d1)
-					&& (wa.map_state == IsViewable || getstate(wins[i]) == IconicState))
+			&& (wa.map_state == IsViewable || getstate(wins[i]) == IconicState))
 				manage(wins[i], &wa);
 		}
 	}
@@ -1479,8 +1479,8 @@ setup(void) {
 	wa.event_mask = ButtonPressMask|ExposureMask;
 
 	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
-				CopyFromParent, DefaultVisual(dpy, screen),
-				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+			CopyFromParent, DefaultVisual(dpy, screen),
+			CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
 	XMapRaised(dpy, barwin);
 	strcpy(stext, "dwm-"VERSION);
@@ -1704,7 +1704,6 @@ unmapnotify(XEvent *e) {
 
 void
 updatebar(void) {
-
 	if(dc.drawable != 0)
 		XFreePixmap(dpy, dc.drawable);
 	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
@@ -1839,7 +1838,7 @@ xerror(Display *dpy, XErrorEvent *ee) {
 	|| (ee->request_code == X_CopyArea && ee->error_code == BadDrawable))
 		return 0;
 	fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
-		ee->request_code, ee->error_code);
+			ee->request_code, ee->error_code);
 	return xerrorxlib(dpy, ee); /* may call exit */
 }
 
