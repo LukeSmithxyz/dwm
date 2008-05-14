@@ -504,7 +504,7 @@ void
 detachstack(Client *c) {
 	Client **tc;
 
-	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
+	for(tc = &stack; *tc && *tc != c; tc = &(*tc)->snext);
 	*tc = c->snext;
 }
 
@@ -1162,8 +1162,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 		/* adjust for aspect limits */
 		if(c->minax != c->maxax && c->minay != c->maxay 
-		&& c->minax > 0 && c->maxax > 0 && c->minay > 0 && c->maxay > 0)
-		{
+		&& c->minax > 0 && c->maxax > 0 && c->minay > 0 && c->maxay > 0) {
 			if(w * c->maxay > h * c->maxax)
 				w = h * c->maxax / c->maxay;
 			else if(w * c->minay < h * c->minax)
@@ -1532,7 +1531,7 @@ tag(const char *arg) {
 	if(!sel)
 		return;
 	for(i = 0; i < LENGTH(tags); i++)
-		sel->tags[i] = (NULL == arg);
+		sel->tags[i] = (arg == NULL);
 	sel->tags[idxoftag(arg)] = True;
 	arrange();
 }
