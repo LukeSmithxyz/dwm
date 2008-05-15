@@ -240,7 +240,7 @@ Window root, barwin;
 
 void
 applyrules(Client *c) {
-	unsigned int i;
+	unsigned int i, j;
 	Bool matched = False;
 	Rule *r;
 	XClassHint ch = { 0 };
@@ -254,7 +254,11 @@ applyrules(Client *c) {
 		&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
 			c->isfloating = r->isfloating;
 			if(r->tag) {
-				c->tags[idxoftag(r->tag)] = True;
+				if(r->tag[0] == '*' && r->tag[1] == 0)
+					for(j = 0; j < LENGTH(tags); i++)
+						c->tags[j] = True;
+				else
+					c->tags[idxoftag(r->tag)] = True;
 				matched = True;
 			}
 		}
