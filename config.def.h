@@ -9,6 +9,7 @@
 #define SELBORDERCOLOR  "#0066ff"
 #define SELBGCOLOR      "#0066ff"
 #define SELFGCOLOR      "#ffffff"
+#define SNAP            32    /* snap pixel */
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -19,15 +20,14 @@ Rule rules[] = {
 };
 
 /* layout(s) */
-#define MFACT       0.55  /* master factor [0.1 .. 0.9] */
 #define RESIZEHINTS True  /* False - respect size hints in tiled resizals */
-#define SNAP        32    /* snap pixel */
-
+#define MFACT       0.55  /* master factor [0.1 .. 0.9] */
+#include "tile.c"
 Layout layouts[] = {
-	/* symbol     function */
-	{ "[]=",      tile    }, /* first entry is default */
-	{ "><>",      NULL    }, /* no layout function means floating behavior */
-	{ "<M>",      monocle }, /* TODO: remove this */
+	/* symbol     arrange  geom */
+	{ "[]=",      tile,    tilegeom }, /* first entry is default */
+	{ "><>",      NULL,             }, /* no layout function means floating behavior */
+	{ "<M>",      monocle, NULL     }, /* TODO: remove this */
 };
 
 /* key definitions */

@@ -97,6 +97,7 @@ typedef struct {
 typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
+	void (*updategeom)(void);
 } Layout;
 
 typedef struct {
@@ -152,7 +153,7 @@ void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
 void monocle(void);
 void movemouse(Client *c);
-Client *nexttiled(Client *c);
+Client *nextunfloating(Client *c);
 void propertynotify(XEvent *e);
 void quit(const char *arg);
 void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
@@ -161,14 +162,11 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
-void setmfact(const char *arg);
 void setup(void);
 void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
-void tileresize(Client *c, int x, int y, int w, int h);
-void tile(void);
 void togglefloating(const char *arg);
 void togglelayout(const char *arg);
 void toggletag(const char *arg);
@@ -192,9 +190,8 @@ void zoom(const char *arg);
 char stext[256];
 int screen, sx, sy, sw, sh;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-int bx, by, bw, bh, blw, mx, my, mw, mh, tx, ty, tw, th, wx, wy, ww, wh;
+int bx, by, bw, bh, blw, wx, wy, ww, wh;
 int seltags = 0;
-double mfact;
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -1072,7 +1069,7 @@ movemouse(Client *c) {
 }
 
 Client *
-nexttiled(Client *c) {
+nextunfloating(Client *c) {
 	for(; c && (c->isfloating || !isvisible(c, NULL)); c = c->next);
 	return c;
 }
@@ -1337,27 +1334,6 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
-/* TODO: move this into tile.c */
-void
-setmfact(const char *arg) {
-	double d;
-
-	if(!lt->arrange) /* TODO: check this against the actual tile() function */
-		return;
-	if(!arg)
-		mfact = MFACT;
-	else {
-		d = strtod(arg, NULL);
-		if(arg[0] == '-' || arg[0] == '+')
-			d += mfact;
-		if(d < 0.1 || d > 0.9)
-			return;
-		mfact = d;
-	}
-	updategeom();
-	arrange();
-}
-
 void
 setup(void) {
 	unsigned int i, w;
@@ -1372,7 +1348,6 @@ setup(void) {
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.font.height + 2;
-	mfact = MFACT;
 	updategeom();
 
 	/* init atoms */
@@ -1494,51 +1469,6 @@ textw(const char *text) {
 }
 
 void
-tileresize(Client *c, int x, int y, int w, int h) {
-	resize(c, x, y, w, h, RESIZEHINTS);
-	if((RESIZEHINTS) && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
-		/* client doesn't accept size constraints */
-		resize(c, x, y, w, h, False);
-}
-
-void
-tile(void) {
-	int y, h;
-	unsigned int i, n;
-	Client *c;
-
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
-	if(n == 0)
-		return;
-
-	/* master */
-	c = nexttiled(clients);
-
-	if(n == 1)
-		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
-	else
-		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
-
-	if(--n == 0)
-		return;
-
-	/* tile stack */
-	y = ty;
-	h = th / n;
-	if(h < bh)
-		h = th;
-
-	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		if(i + 1 == n) /* remainder */
-			tileresize(c, tx, y, tw - 2 * c->bw, (ty + th) - y - 2 * c->bw);
-		else
-			tileresize(c, tx, y, tw - 2 * c->bw, h - 2 * c->bw);
-		if(h != th)
-			y = c->y + c->h + 2 * c->bw;
-	}
-}
-
-void
 togglefloating(const char *arg) {
 	if(!sel)
 		return;
@@ -1646,6 +1576,7 @@ updatebar(void) {
 
 void
 updategeom(void) {
+	unsigned int i;
 
 	/* bar geometry */
 	bx = 0;
@@ -1658,17 +1589,10 @@ updategeom(void) {
 	ww = sw;
 	wh = sh - bh;
 
-	/* master area geometry */
-	mx = wx;
-	my = wy;
-	mw = mfact * ww;
-	mh = wh;
-
-	/* tile area geometry */
-	tx = mx + mw;
-	ty = wy;
-	tw = ww - mw;
-	th = wh;
+	/* update layout geometries */
+	for(i = 0; i < LENGTH(layouts); i++)
+		if(layouts[i].updategeom)
+			layouts[i].updategeom();
 }
 
 void
@@ -1787,22 +1711,6 @@ int
 xerrorstart(Display *dpy, XErrorEvent *ee) {
 	otherwm = True;
 	return -1;
-}
-
-/* TODO: move this into tile.c */
-void
-zoom(const char *arg) {
-	Client *c = sel;
-
-	if(c == nexttiled(clients))
-		if(!c || !(c = nexttiled(c->next)))
-			return;
-	if(lt->arrange && !sel->isfloating) { /* TODO: check this against tile() */
-		detach(c);
-		attach(c);
-		focus(c);
-	}
-	arrange();
 }
 
 int
