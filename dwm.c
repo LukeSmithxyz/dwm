@@ -151,7 +151,6 @@ void killclient(const char *arg);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
-void monocle(void);
 void movemouse(Client *c);
 Client *nextunfloating(Client *c);
 void propertynotify(XEvent *e);
@@ -1010,15 +1009,6 @@ maprequest(XEvent *e) {
 		return;
 	if(!getclient(ev->window))
 		manage(ev->window, &wa);
-}
-
-void
-monocle(void) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(!c->isfloating && isvisible(c))
-			resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, RESIZEHINTS);
 }
 
 void

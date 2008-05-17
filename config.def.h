@@ -27,7 +27,6 @@ Layout layouts[] = {
 	/* symbol     arrange  geom */
 	{ "[]=",      tile,    tilegeom }, /* first entry is default */
 	{ "><>",      NULL,             }, /* no layout function means floating behavior */
-	{ "<M>",      monocle, NULL     }, /* TODO: remove this */
 };
 
 /* key definitions */
