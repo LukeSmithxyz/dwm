@@ -165,7 +165,6 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
-void setlayout(const char *arg);
 void setmfact(const char *arg);
 void setup(void);
 void spawn(const char *arg);
@@ -179,6 +178,7 @@ void tileresize(Client *c, int x, int y, int w, int h);
 void tilev(void);
 void tilevstack(unsigned int n);
 void togglefloating(const char *arg);
+void togglelayout(const char *arg);
 void toggletag(const char *arg);
 void toggleview(const char *arg);
 void unban(Client *c);
@@ -335,7 +335,7 @@ buttonpress(XEvent *e) {
 			}
 		}
 		if((ev->x < x + blw) && ev->button == Button1) 
-			setlayout(NULL);
+			togglelayout(NULL);
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
@@ -1376,28 +1376,6 @@ setclientstate(Client *c, long state) {
 }
 
 void
-setlayout(const char *arg) {
-	unsigned int i;
-
-	if(!arg) {
-		if(++lt == &layouts[LENGTH(layouts)])
-			lt = &layouts[0];
-	}
-	else {
-		for(i = 0; i < LENGTH(layouts); i++)
-			if(!strcmp(arg, layouts[i].symbol))
-				break;
-		if(i == LENGTH(layouts))
-			return;
-		lt = &layouts[i];
-	}
-	if(sel)
-		arrange();
-	else
-		drawbar();
-}
-
-void
 setmfact(const char *arg) {
 	double d;
 
@@ -1633,6 +1611,28 @@ togglefloating(const char *arg) {
 	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
 	arrange();
+}
+
+void
+togglelayout(const char *arg) {
+	unsigned int i;
+
+	if(!arg) {
+		if(++lt == &layouts[LENGTH(layouts)])
+			lt = &layouts[0];
+	}
+	else {
+		for(i = 0; i < LENGTH(layouts); i++)
+			if(!strcmp(arg, layouts[i].symbol))
+				break;
+		if(i == LENGTH(layouts))
+			return;
+		lt = &layouts[i];
+	}
+	if(sel)
+		arrange();
+	else
+		drawbar();
 }
 
 void
