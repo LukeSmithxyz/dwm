@@ -40,7 +40,6 @@ Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_j,      focusnext,      "exact" },
 	{ MODKEY,                       XK_k,      focusprev,      NULL },
 	{ MODKEY|ShiftMask,             XK_k,      focusprev,      "exact" },
-	{ MODKEY,                       XK_r,      reapply,        NULL },
 	{ MODKEY,                       XK_h,      setmfact,       "-0.05" },
 	{ MODKEY,                       XK_l,      setmfact,       "+0.05" },
 	{ MODKEY,                       XK_Return, zoom,           NULL },

@@ -158,7 +158,6 @@ void movemouse(Client *c);
 Client *nexttiled(Client *c);
 void propertynotify(XEvent *e);
 void quit(const char *arg);
-void reapply(const char *arg);
 void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
 void resizemouse(Client *c);
 void restack(void);
@@ -1134,17 +1133,6 @@ propertynotify(XEvent *e) {
 void
 quit(const char *arg) {
 	readin = running = False;
-}
-
-void
-reapply(const char *arg) {
-	Client *c;
-
-	for(c = clients; c; c = c->next) {
-		memset(c->tags, 0, TAGSZ);
-		applyrules(c);
-	}
-	arrange();
 }
 
 void
