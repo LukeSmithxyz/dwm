@@ -25,8 +25,8 @@ Rule rules[] = {
 #include "tile.c"
 Layout layouts[] = {
 	/* symbol     arrange  geom */
-	{ "[]=",      tile,    tilegeom }, /* first entry is default */
-	{ "><>",      NULL,             }, /* no layout function means floating behavior */
+	{ "[]=",      tile,    updatetilegeom }, /* first entry is default */
+	{ "><>",      NULL,                   }, /* no layout function means floating behavior */
 };
 
 /* key definitions */
@@ -40,7 +40,6 @@ Key keys[] = {
 	{ MODKEY,                       XK_h,      setmfact,       "-0.05" },
 	{ MODKEY,                       XK_l,      setmfact,       "+0.05" },
 	{ MODKEY,                       XK_Return, zoom,           NULL },
-	{ MODKEY,                       XK_m,      togglelayout,   "<M>" },
 	{ MODKEY,                       XK_Tab,    viewprevtag,    NULL },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     NULL },
 	{ MODKEY,                       XK_space,  togglelayout,   NULL },
