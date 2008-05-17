@@ -60,7 +60,6 @@ typedef struct Client Client;
 struct Client {
 	char name[256];
 	int x, y, w, h;
-	int fx, fy, fw, fh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
@@ -98,7 +97,6 @@ typedef struct {
 typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
-	Bool isfloating;
 } Layout;
 
 typedef struct {
@@ -273,8 +271,8 @@ arrange(void) {
 	for(c = clients; c; c = c->next)
 		if(isvisible(c, NULL)) {
 			unban(c);
-			if(lt->isfloating || c->isfloating)
-				resize(c, c->fx, c->fy, c->fw, c->fh, True);
+			if(!lt->arrange || c->isfloating)
+				resize(c, c->x, c->y, c->w, c->h, True);
 		}
 		else
 			ban(c);
@@ -345,7 +343,7 @@ buttonpress(XEvent *e) {
 			movemouse(c);
 		}
 		else if(ev->button == Button2) {
-			if(!lt->isfloating && c->isfloating)
+			if(lt->arrange && c->isfloating)
 				togglefloating(NULL);
 			else
 				zoom(NULL);
@@ -435,7 +433,7 @@ configurerequest(XEvent *e) {
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
-		if(c->isfixed || c->isfloating || lt->isfloating) {
+		if(c->isfixed || c->isfloating || !lt->arrange) {
 			if(ev->value_mask & CWX)
 				c->x = sx + ev->x;
 			if(ev->value_mask & CWY)
@@ -968,8 +966,8 @@ manage(Window w, XWindowAttributes *wa) {
 	/* geometry */
 	c->x = wa->x;
 	c->y = wa->y;
-	c->w = c->fw = wa->width;
-	c->h = c->fh = wa->height;
+	c->w = wa->width;
+	c->h = wa->height;
 	c->oldbw = wa->border_width;
 	if(c->w == sw && c->h == sh) {
 		c->x = sx;
@@ -985,8 +983,6 @@ manage(Window w, XWindowAttributes *wa) {
 		c->y = MAX(c->y, wy);
 		c->bw = BORDERPX;
 	}
-	c->fx = c->x;
-	c->fy = c->y;
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -1040,7 +1036,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if((lt->isfloating || !c->isfloating) && isvisible(c, NULL))
+		if(!c->isfloating && isvisible(c, NULL))
 			resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, RESIZEHINTS);
 }
 
@@ -1080,13 +1076,10 @@ movemouse(Client *c) {
 				ny = wy;
 			else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < SNAP)
 				ny = wy + wh - c->h - 2 * c->bw;
-			if(!c->isfloating && !lt->isfloating && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
+			if(!c->isfloating && lt->arrange && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
 				togglefloating(NULL);
-			if(lt->isfloating || c->isfloating) {
-				c->fx = nx;
-				c->fy = ny;
+			if(!lt->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
-			}
 			break;
 		}
 	}
@@ -1229,16 +1222,11 @@ resizemouse(Client *c) {
 			XSync(dpy, False);
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-			if(!c->isfloating && !lt->isfloating && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP)) {
-				c->fx = c->x;
-				c->fy = c->y;
+			if(!c->isfloating && lt->arrange && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP)) {
 				togglefloating(NULL);
 			}
-			if((lt->isfloating) || c->isfloating) {
+			if(!lt->arrange || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
-				c->fw = nw;
-				c->fh = nh;
-			}
 			break;
 		}
 	}
@@ -1253,9 +1241,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(sel->isfloating || lt->isfloating)
+	if(sel->isfloating || !lt->arrange)
 		XRaiseWindow(dpy, sel->win);
-	if(!lt->isfloating) {
+	if(lt->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
@@ -1363,11 +1351,12 @@ setclientstate(Client *c, long state) {
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
+/* TODO: move this into tile.c */
 void
 setmfact(const char *arg) {
 	double d;
 
-	if(lt->isfloating)
+	if(!lt->arrange) /* TODO: check this against the actual tile() function */
 		return;
 	if(!arg)
 		mfact = MFACT;
@@ -1842,6 +1831,7 @@ xerrorstart(Display *dpy, XErrorEvent *ee) {
 	return -1;
 }
 
+/* TODO: move this into tile.c */
 void
 zoom(const char *arg) {
 	Client *c = sel;
@@ -1849,7 +1839,7 @@ zoom(const char *arg) {
 	if(c == nexttiled(clients))
 		if(!c || !(c = nexttiled(c->next)))
 			return;
-	if(!lt->isfloating && !sel->isfloating) {
+	if(lt->arrange && !sel->isfloating) { /* TODO: check this against tile() */
 		detach(c);
 		attach(c);
 		focus(c);

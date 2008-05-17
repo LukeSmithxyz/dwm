@@ -24,10 +24,10 @@ Rule rules[] = {
 #define SNAP        32    /* snap pixel */
 
 Layout layouts[] = {
-	/* symbol     function    isfloating */
-	{ "[]=",      tilev,      False }, /* first entry is default */
-	{ "><>",      NULL,       True },
-	{ "<M>",      monocle,    True },
+	/* symbol     function */
+	{ "[]=",      tilev   }, /* first entry is default */
+	{ "><>",      NULL    }, /* no layout function means floating behavior */
+	{ "<M>",      monocle }, /* TODO: remove this */
 };
 
 /* key definitions */
