@@ -119,7 +119,6 @@ void cleanup(void);
 void configure(Client *c);
 void configurenotify(XEvent *e);
 void configurerequest(XEvent *e);
-unsigned int counttiled(void);
 void destroynotify(XEvent *e);
 void detach(Client *c);
 void detachstack(Client *c);
@@ -168,12 +167,8 @@ void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
-void tileh(void);
-void tilehstack(unsigned int n);
-Client *tilemaster(unsigned int n);
 void tileresize(Client *c, int x, int y, int w, int h);
-void tilev(void);
-void tilevstack(unsigned int n);
+void tile(void);
 void togglefloating(const char *arg);
 void togglelayout(const char *arg);
 void toggletag(const char *arg);
@@ -466,15 +461,6 @@ configurerequest(XEvent *e) {
 		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
 	}
 	XSync(dpy, False);
-}
-
-unsigned int
-counttiled(void) {
-	unsigned int n;
-	Client *c;
-
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
-	return n;
 }
 
 void
@@ -1508,44 +1494,6 @@ textw(const char *text) {
 }
 
 void
-tileh(void) {
-	int x, w;
-	unsigned int i, n = counttiled();
-	Client *c;
-
-	if(n == 0)
-		return;
-	c = tilemaster(n);
-	if(--n == 0)
-		return;
-
-	x = tx;
-	w = tw / n;
-	if(w < bh)
-		w = tw;
-
-	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		if(i + 1 == n) /* remainder */
-			tileresize(c, x, ty, (tx + tw) - x - 2 * c->bw, th - 2 * c->bw);
-		else
-			tileresize(c, x, ty, w - 2 * c->bw, th - 2 * c->bw);
-		if(w != tw)
-			x = c->x + c->w + 2 * c->bw;
-	}
-}
-
-Client *
-tilemaster(unsigned int n) {
-	Client *c = nexttiled(clients);
-
-	if(n == 1)
-		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
-	else
-		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
-	return c;
-}
-
-void
 tileresize(Client *c, int x, int y, int w, int h) {
 	resize(c, x, y, w, h, RESIZEHINTS);
 	if((RESIZEHINTS) && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
@@ -1554,17 +1502,27 @@ tileresize(Client *c, int x, int y, int w, int h) {
 }
 
 void
-tilev(void) {
+tile(void) {
 	int y, h;
-	unsigned int i, n = counttiled();
+	unsigned int i, n;
 	Client *c;
 
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
 	if(n == 0)
 		return;
-	c = tilemaster(n);
+
+	/* master */
+	c = nexttiled(clients);
+
+	if(n == 1)
+		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
+	else
+		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
+
 	if(--n == 0)
 		return;
 
+	/* tile stack */
 	y = ty;
 	h = th / n;
 	if(h < bh)
