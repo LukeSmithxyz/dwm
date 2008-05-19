@@ -1590,7 +1590,7 @@ updategeom(void) {
 	if(XineramaIsActive(dpy)) {
 		info = XineramaQueryScreens(dpy, &i);
 		wx = info[0].x_org;
-		wy = showbar && topbar ? info[0].y_org + info[0].height + bh : info[0].y_org;
+		wy = showbar && topbar ? info[0].y_org + bh : info[0].y_org;
 		ww = info[0].width;
 		wh = showbar ? info[0].height - bh : info[0].height;
 		XFree(info);
