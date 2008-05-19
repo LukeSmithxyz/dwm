@@ -86,9 +86,6 @@ zoom(const char *arg) {
 
 void
 updatetilegeom(void) {
-#ifdef TILEGEOM /* define your own if you are Xinerama user */
-	TILEGEOM
-#else
 	/* master area geometry */
 	mx = wx;
 	my = wy;
@@ -100,5 +97,4 @@ updatetilegeom(void) {
 	ty = wy;
 	tw = ww - mw;
 	th = wh;
-#endif
 }
