@@ -10,14 +10,19 @@ MANPREFIX = ${PREFIX}/share/man
 X11INC = /usr/X11R6/include
 X11LIB = /usr/X11R6/lib
 
+# Xinerama, uncomment if you don't want it
+XINERAMALIBS = -L${X11LIB} -lXinerama
+XINERAMAFLAGS = -DXINERAMA
+
 # includes and libs
 INCS = -I. -I/usr/include -I${X11INC}
-LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
+LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 ${XINERAMALIBS}
 
 # flags
-CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
+CPPFLAGS = -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
+CFLAGS = -Os ${INCS} ${CPPFLAGS}
 LDFLAGS = -s ${LIBS}
-#CFLAGS = -g -std=c99 -pedantic -Wall -O2 ${INCS} -DVERSION=\"${VERSION}\"
+#CFLAGS = -g -std=c99 -pedantic -Wall -O2 ${INCS} ${CPPFLAGS}
 #LDFLAGS = -g ${LIBS}
 
 # Solaris

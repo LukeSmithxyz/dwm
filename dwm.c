@@ -39,6 +39,9 @@
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
+#ifdef XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
 
 /* macros */
 #define MAX(a, b)       ((a) > (b) ? (a) : (b))
@@ -1579,22 +1582,32 @@ updatebar(void) {
 
 void
 updategeom(void) {
-	unsigned int i;
-
-#ifdef CUSTOMGEOM /* define your own if you are Xinerama user */
-	CUSTOMGEOM
-#else
-	/* bar geometry*/
-	bx = 0;
-	by = showbar ? (topbar ? 0 : sh - bh) : -bh;
-	bw = sw;
+	int i;
+#ifdef XINERAMA
+	XineramaScreenInfo *info = NULL;
 
 	/* window area geometry */
-	wx = sx;
-	wy = showbar && topbar ? sy + bh : sy;
-	ww = sw;
-	wh = showbar ? sh - bh : sh;
+	if(XineramaIsActive(dpy)) {
+		info = XineramaQueryScreens(dpy, &i);
+		wx = info[0].x_org;
+		wy = showbar && topbar ? info[0].y_org + info[0].height + bh : info[0].y_org;
+		ww = info[0].width;
+		wh = showbar ? info[0].height - bh : info[0].height;
+		XFree(info);
+	}
+	else
 #endif
+	{
+		wx = sx;
+		wy = showbar && topbar ? sy + bh : sy;
+		ww = sw;
+		wh = showbar ? sh - bh : sh;
+	}
+
+	/* bar geometry*/
+	bx = wx;
+	by = showbar ? (topbar ? 0 : wy + wh) : -bh;
+	bw = ww;
 
 	/* update layout geometries */
 	for(i = 0; i < LENGTH(layouts); i++)
