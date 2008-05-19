@@ -1039,16 +1039,19 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x1);
 			ny = ocy + (ev.xmotion.y - y1);
-			if(abs(wx - nx) < snap)
-				nx = wx;
-			else if(abs((wx + ww) - (nx + c->w + 2 * c->bw)) < snap)
-				nx = wx + ww - c->w - 2 * c->bw;
-			if(abs(wy - ny) < snap)
-				ny = wy;
-			else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < snap)
-				ny = wy + wh - c->h - 2 * c->bw;
-			if(!c->isfloating && lt->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
-				togglefloating(NULL);
+			if(snap && nx >= wx && nx <= wx + ww
+			        && ny >= wy && ny <= wy + wh) {
+				if(abs(wx - nx) < snap)
+					nx = wx;
+				else if(abs((wx + ww) - (nx + c->w + 2 * c->bw)) < snap)
+					nx = wx + ww - c->w - 2 * c->bw;
+				if(abs(wy - ny) < snap)
+					ny = wy;
+				else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < snap)
+					ny = wy + wh - c->h - 2 * c->bw;
+				if(!c->isfloating && lt->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
+					togglefloating(NULL);
+			}
 			if(!lt->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
 			break;
@@ -1193,8 +1196,12 @@ resizemouse(Client *c) {
 			XSync(dpy, False);
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-			if(!c->isfloating && lt->arrange && (abs(nw - c->w) > snap || abs(nh - c->h) > snap)) {
-				togglefloating(NULL);
+
+			if(snap && nw >= wx && nw <= wx + ww
+			        && nh >= wy && nh <= wy + wh) {
+				if(!c->isfloating && lt->arrange
+				   && (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
+					togglefloating(NULL);
 			}
 			if(!lt->arrange || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
