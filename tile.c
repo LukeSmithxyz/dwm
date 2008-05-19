@@ -26,7 +26,7 @@ setmfact(const char *arg) {
 
 void
 tile(void) {
-	int y, h;
+	int x, y, h, w;
 	unsigned int i, n;
 	Client *c;
 
@@ -46,16 +46,18 @@ tile(void) {
 		return;
 
 	/* tile stack */
+	x = (tx > c->x + c->w) ? c->x + c->w + 2 * c->bw : tw;
 	y = ty;
+	w = (tx > c->x + c->w) ? wx + ww - x : tw;
 	h = th / n;
 	if(h < bh)
 		h = th;
 
 	for(i = 0, c = nextunfloating(c->next); c; c = nextunfloating(c->next), i++) {
 		if(i + 1 == n) /* remainder */
-			tileresize(c, tx, y, tw - 2 * c->bw, (ty + th) - y - 2 * c->bw);
+			tileresize(c, x, y, w - 2 * c->bw, (ty + th) - y - 2 * c->bw);
 		else
-			tileresize(c, tx, y, tw - 2 * c->bw, h - 2 * c->bw);
+			tileresize(c, x, y, w - 2 * c->bw, h - 2 * c->bw);
 		if(h != th)
 			y = c->y + c->h + 2 * c->bw;
 	}
