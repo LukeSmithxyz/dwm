@@ -342,10 +342,8 @@ buttonpress(XEvent *e) {
 			restack();
 			movemouse(c);
 		}
-		else if(ev->button == Button2) {
-			if(lt->arrange && c->isfloating)
-				togglefloating(NULL);
-		}
+		else if(ev->button == Button2)
+			togglefloating(NULL);
 		else if(ev->button == Button3 && !c->isfixed) {
 			restack();
 			resizemouse(c);
