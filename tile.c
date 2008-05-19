@@ -20,7 +20,7 @@ setmfact(const char *arg) {
 			return;
 		mfact = d;
 	}
-	updategeom();
+	updatetilegeom();
 	arrange();
 }
 
