@@ -41,18 +41,19 @@
 #include <X11/Xutil.h>
 
 /* macros */
-#define MAX(a, b)	((a) > (b) ? (a) : (b))
-#define MIN(a, b)	((a) < (b) ? (a) : (b))
-#define BUTTONMASK	(ButtonPressMask|ButtonReleaseMask)
-#define CLEANMASK(mask)	(mask & ~(numlockmask|LockMask))
-#define LENGTH(x)	(sizeof x / sizeof x[0])
-#define MAXTAGLEN	16
-#define MOUSEMASK	(BUTTONMASK|PointerMotionMask)
+#define MAX(a, b)       ((a) > (b) ? (a) : (b))
+#define MIN(a, b)       ((a) < (b) ? (a) : (b))
+#define BUTTONMASK      (ButtonPressMask|ButtonReleaseMask)
+#define CLEANMASK(mask) (mask & ~(numlockmask|LockMask))
+#define LENGTH(x)       (sizeof x / sizeof x[0])
+#define MAXTAGLEN       16
+#define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
 
 /* enums */
-enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
-enum { ColBorder, ColFG, ColBG, ColLast };		/* color */
-enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
+enum { BarTop, BarBot, BarOff, BarLast };               /* bar appearance */
+enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
+enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
+enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
 /* typedefs */
@@ -166,6 +167,7 @@ void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
+void togglebar(const char *arg);
 void togglefloating(const char *arg);
 void togglelayout(const char *arg);
 void toggletag(const char *arg);
@@ -179,7 +181,7 @@ void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
 void view(const char *arg);
-void viewprevtag(const char *arg);	/* views previous selected tags */
+void viewprevtag(const char *arg);
 int xerror(Display *dpy, XErrorEvent *ee);
 int xerrordummy(Display *dpy, XErrorEvent *ee);
 int xerrorstart(Display *dpy, XErrorEvent *ee);
@@ -188,9 +190,9 @@ void zoom(const char *arg);
 /* variables */
 char stext[256];
 int screen, sx, sy, sw, sh;
-int (*xerrorxlib)(Display *, XErrorEvent *);
 int bx, by, bw, bh, blw, wx, wy, ww, wh;
 int seltags = 0;
+int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
@@ -959,7 +961,7 @@ manage(Window w, XWindowAttributes *wa) {
 			c->y = wy + wh - c->h - 2 * c->bw;
 		c->x = MAX(c->x, wx);
 		c->y = MAX(c->y, wy);
-		c->bw = BORDERPX;
+		c->bw = borderpx;
 	}
 
 	wc.border_width = c->bw;
@@ -1037,15 +1039,15 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x1);
 			ny = ocy + (ev.xmotion.y - y1);
-			if(abs(wx - nx) < SNAP)
+			if(abs(wx - nx) < snap)
 				nx = wx;
-			else if(abs((wx + ww) - (nx + c->w + 2 * c->bw)) < SNAP)
+			else if(abs((wx + ww) - (nx + c->w + 2 * c->bw)) < snap)
 				nx = wx + ww - c->w - 2 * c->bw;
-			if(abs(wy - ny) < SNAP)
+			if(abs(wy - ny) < snap)
 				ny = wy;
-			else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < SNAP)
+			else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < snap)
 				ny = wy + wh - c->h - 2 * c->bw;
-			if(!c->isfloating && lt->arrange && (abs(nx - c->x) > SNAP || abs(ny - c->y) > SNAP))
+			if(!c->isfloating && lt->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 				togglefloating(NULL);
 			if(!lt->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
@@ -1191,7 +1193,7 @@ resizemouse(Client *c) {
 			XSync(dpy, False);
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-			if(!c->isfloating && lt->arrange && (abs(nw - c->w) > SNAP || abs(nh - c->h) > SNAP)) {
+			if(!c->isfloating && lt->arrange && (abs(nw - c->w) > snap || abs(nh - c->h) > snap)) {
 				togglefloating(NULL);
 			}
 			if(!lt->arrange || c->isfloating)
@@ -1455,6 +1457,14 @@ textw(const char *text) {
 }
 
 void
+togglebar(const char *arg) {
+	showbar = !showbar;
+	updategeom();
+	updatebar();
+	arrange();
+}
+
+void
 togglefloating(const char *arg) {
 	if(!sel)
 		return;
@@ -1564,16 +1574,20 @@ void
 updategeom(void) {
 	unsigned int i;
 
-	/* bar geometry */
+#ifdef DEFGEOM /* define your own if you are Xinerama user */
+	DEFGEOM
+#else
+	/* bar geometry*/
 	bx = 0;
-	by = 0;
+	by = showbar ? (topbar ? 0 : sh - bh) : -bh;
 	bw = sw;
 
 	/* window area geometry */
 	wx = sx;
-	wy = sy + bh;
+	wy = showbar && topbar ? sy + bh : sy;
 	ww = sw;
-	wh = sh - bh;
+	wh = showbar ? sh - bh : sh;
+#endif
 
 	/* update layout geometries */
 	for(i = 0; i < LENGTH(layouts); i++)

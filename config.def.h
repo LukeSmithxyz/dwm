@@ -1,7 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-#define BORDERPX        1
 #define FONT            "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*"
 #define NORMBORDERCOLOR "#cccccc"
 #define NORMBGCOLOR     "#cccccc"
@@ -9,7 +8,10 @@
 #define SELBORDERCOLOR  "#0066ff"
 #define SELBGCOLOR      "#0066ff"
 #define SELFGCOLOR      "#ffffff"
-#define SNAP            32    /* snap pixel */
+unsigned int borderpx  = 1;        /* border pixel of windows */
+unsigned int snap      = 32;       /* snap pixel */
+Bool showbar           = True;     /* False means no bar */
+Bool topbar            = True;     /* False means bottom bar */
 
 /* tagging */
 const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -20,9 +22,11 @@ Rule rules[] = {
 };
 
 /* layout(s) */
-#define RESIZEHINTS True  /* False - respect size hints in tiled resizals */
-#define MFACT       0.55  /* master factor [0.1 .. 0.9] */
+double mfact           = 0.55;
+Bool resizehints       = True;     /* False means respect size hints in tiled resizals */
+
 #include "tile.c"
+
 Layout layouts[] = {
 	/* symbol     arrange  geom */
 	{ "[]=",      tile,    updatetilegeom }, /* first entry is default */
@@ -35,6 +39,7 @@ Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          "exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          "exec uxterm" },
+	{ MODKEY,                       XK_b,      togglebar,      NULL },
 	{ MODKEY,                       XK_j,      focusnext,      NULL },
 	{ MODKEY,                       XK_k,      focusprev,      NULL },
 	{ MODKEY,                       XK_h,      setmfact,       "-0.05" },

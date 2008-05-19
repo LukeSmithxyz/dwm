@@ -1,5 +1,4 @@
 /* See LICENSE file for copyright and license details. */
-double mfact = MFACT;
 int bx, by, bw, bh, blw, mx, my, mw, mh, tx, ty, tw, th, wx, wy, ww, wh;
 
 void setmfact(const char *arg);
@@ -11,10 +10,8 @@ void
 setmfact(const char *arg) {
 	double d;
 
-	if(lt->arrange != tile)
+	if(!arg || lt->arrange != tile)
 		return;
-	if(!arg)
-		mfact = MFACT;
 	else {
 		d = strtod(arg, NULL);
 		if(arg[0] == '-' || arg[0] == '+')
@@ -66,8 +63,8 @@ tile(void) {
 
 void
 tileresize(Client *c, int x, int y, int w, int h) {
-	resize(c, x, y, w, h, RESIZEHINTS);
-	if((RESIZEHINTS) && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
+	resize(c, x, y, w, h, resizehints);
+	if(resizehints && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
 		/* client doesn't accept size constraints */
 		resize(c, x, y, w, h, False);
 }
@@ -89,6 +86,9 @@ zoom(const char *arg) {
 
 void
 updatetilegeom(void) {
+#ifdef TILEGEOM /* define your own if you are Xinerama user */
+	TILEGEOM
+#else
 	/* master area geometry */
 	mx = wx;
 	my = wy;
@@ -100,4 +100,5 @@ updatetilegeom(void) {
 	ty = wy;
 	tw = ww - mw;
 	th = wh;
+#endif
 }
