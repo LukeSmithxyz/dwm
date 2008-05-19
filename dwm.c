@@ -963,7 +963,7 @@ manage(Window w, XWindowAttributes *wa) {
 		if(c->y + c->h + 2 * c->bw > sy + sh)
 			c->y = sy + sh - c->h - 2 * c->bw;
 		c->x = MAX(c->x, sx);
-		c->y = MAX(c->y, sy);
+		c->y = MAX(c->y, by == 0 ? bh : sy);
 		c->bw = borderpx;
 	}
 
