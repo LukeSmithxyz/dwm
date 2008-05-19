@@ -1671,9 +1671,9 @@ updategeom(void) {
 		wh = showbar ? sh - bh : sh;
 	}
 
-	/* bar geometry*/
+	/* bar geometry */
 	bx = wx;
-	by = showbar ? (topbar ? 0 : wy + wh) : -bh;
+	by = showbar ? (topbar ? wy - bh : wy + wh) : -bh;
 	bw = ww;
 
 	/* update layout geometries */
