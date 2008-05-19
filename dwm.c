@@ -53,7 +53,6 @@
 #define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
 
 /* enums */
-enum { BarTop, BarBot, BarOff, BarLast };               /* bar appearance */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
@@ -165,11 +164,14 @@ void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
+void setmfact(const char *arg);
 void setup(void);
 void spawn(const char *arg);
 void tag(const char *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
+void tile(void);
+void tileresize(Client *c, int x, int y, int w, int h);
 void togglebar(const char *arg);
 void togglefloating(const char *arg);
 void togglelayout(const char *arg);
@@ -181,6 +183,7 @@ void unmapnotify(XEvent *e);
 void updatebar(void);
 void updategeom(void);
 void updatesizehints(Client *c);
+void updatetilegeom(void);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
 void view(const char *arg);
@@ -194,6 +197,7 @@ void zoom(const char *arg);
 char stext[256];
 int screen, sx, sy, sw, sh;
 int bx, by, bw, bh, blw, wx, wy, ww, wh;
+int mx, my, mw, mh, tx, ty, tw, th;
 int seltags = 0;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int numlockmask = 0;
@@ -1333,6 +1337,24 @@ setclientstate(Client *c, long state) {
 }
 
 void
+setmfact(const char *arg) {
+	double d;
+
+	if(!arg || lt->arrange != tile)
+		return;
+	else {
+		d = strtod(arg, NULL);
+		if(arg[0] == '-' || arg[0] == '+')
+			d += mfact;
+		if(d < 0.1 || d > 0.9)
+			return;
+		mfact = d;
+	}
+	updatetilegeom();
+	arrange();
+}
+
+void
 setup(void) {
 	unsigned int i, w;
 	XSetWindowAttributes wa;
@@ -1464,6 +1486,53 @@ textnw(const char *text, unsigned int len) {
 unsigned int
 textw(const char *text) {
 	return textnw(text, strlen(text)) + dc.font.height;
+}
+
+void
+tile(void) {
+	int x, y, h, w;
+	unsigned int i, n;
+	Client *c;
+
+	for(n = 0, c = nextunfloating(clients); c; c = nextunfloating(c->next), n++);
+	if(n == 0)
+		return;
+
+	/* master */
+	c = nextunfloating(clients);
+
+	if(n == 1)
+		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
+	else
+		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
+
+	if(--n == 0)
+		return;
+
+	/* tile stack */
+	x = (tx > c->x + c->w) ? c->x + c->w + 2 * c->bw : tw;
+	y = ty;
+	w = (tx > c->x + c->w) ? wx + ww - x : tw;
+	h = th / n;
+	if(h < bh)
+		h = th;
+
+	for(i = 0, c = nextunfloating(c->next); c; c = nextunfloating(c->next), i++) {
+		if(i + 1 == n) /* remainder */
+			tileresize(c, x, y, w - 2 * c->bw, (ty + th) - y - 2 * c->bw);
+		else
+			tileresize(c, x, y, w - 2 * c->bw, h - 2 * c->bw);
+		if(h != th)
+			y = c->y + c->h + 2 * c->bw;
+	}
+}
+
+void
+tileresize(Client *c, int x, int y, int w, int h) {
+	resize(c, x, y, w, h, resizehints);
+	if(resizehints && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
+		/* client doesn't accept size constraints */
+		resize(c, x, y, w, h, False);
 }
 
 void
@@ -1668,6 +1737,21 @@ updatesizehints(Client *c) {
 }
 
 void
+updatetilegeom(void) {
+	/* master area geometry */
+	mx = wx;
+	my = wy;
+	mw = mfact * ww;
+	mh = wh;
+
+	/* tile area geometry */
+	tx = mx + mw;
+	ty = wy;
+	tw = ww - mw;
+	th = wh;
+}
+
+void
 updatetitle(Client *c) {
 	if(!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
 		gettextprop(c->win, wmatom[WMName], c->name, sizeof c->name);
@@ -1731,6 +1815,21 @@ int
 xerrorstart(Display *dpy, XErrorEvent *ee) {
 	otherwm = True;
 	return -1;
+}
+
+void
+zoom(const char *arg) {
+	Client *c = sel;
+
+	if(c == nextunfloating(clients))
+		if(!c || !(c = nextunfloating(c->next)))
+			return;
+	if(lt->arrange == tile && !sel->isfloating) {
+		detach(c);
+		attach(c);
+		focus(c);
+	}
+	arrange();
 }
 
 int

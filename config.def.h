@@ -25,12 +25,10 @@ Rule rules[] = {
 double mfact           = 0.55;
 Bool resizehints       = True;     /* False means respect size hints in tiled resizals */
 
-#include "tile.c"
-
 Layout layouts[] = {
 	/* symbol     arrange  geom */
 	{ "[]=",      tile,    updatetilegeom }, /* first entry is default */
-	{ "><>",      NULL,                   }, /* no layout function means floating behavior */
+	{ "><>",      NULL,    NULL           }, /* no layout function means floating behavior */
 };
 
 /* key definitions */
