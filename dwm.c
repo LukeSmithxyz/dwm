@@ -958,12 +958,12 @@ manage(Window w, XWindowAttributes *wa) {
 		c->bw = wa->border_width;
 	}
 	else {
-		if(c->x + c->w + 2 * c->bw > wx + ww)
-			c->x = wx + ww - c->w - 2 * c->bw;
-		if(c->y + c->h + 2 * c->bw > wy + wh)
-			c->y = wy + wh - c->h - 2 * c->bw;
-		c->x = MAX(c->x, wx);
-		c->y = MAX(c->y, wy);
+		if(c->x + c->w + 2 * c->bw > sx + sw)
+			c->x = sx + sw - c->w - 2 * c->bw;
+		if(c->y + c->h + 2 * c->bw > sy + sh)
+			c->y = sy + sh - c->h - 2 * c->bw;
+		c->x = MAX(c->x, sx);
+		c->y = MAX(c->y, sy);
 		c->bw = borderpx;
 	}
 
