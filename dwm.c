@@ -1574,8 +1574,8 @@ void
 updategeom(void) {
 	unsigned int i;
 
-#ifdef DEFGEOM /* define your own if you are Xinerama user */
-	DEFGEOM
+#ifdef CUSTOMGEOM /* define your own if you are Xinerama user */
+	CUSTOMGEOM
 #else
 	/* bar geometry*/
 	bx = 0;
