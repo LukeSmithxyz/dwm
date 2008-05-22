@@ -60,6 +60,7 @@ enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
 /* typedefs */
+typedef unsigned int uint;
 typedef struct Client Client;
 struct Client {
 	char name[256];
@@ -67,9 +68,9 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
-	unsigned int bw, oldbw;
+	uint bw, oldbw;
 	Bool isbanned, isfixed, isfloating, isurgent;
-	unsigned int tags;
+	uint tags;
 	Client *next;
 	Client *prev;
 	Client *snext;
@@ -108,7 +109,7 @@ typedef struct {
 	const char *class;
 	const char *instance;
 	const char *title;
-	unsigned int tags;
+	uint tags;
 	Bool isfloating;
 } Rule;
 
@@ -130,7 +131,7 @@ void detachstack(Client *c);
 void drawbar(void);
 void drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
 void drawtext(const char *text, unsigned long col[ColLast], Bool invert);
-void *emallocz(unsigned int size);
+void *emallocz(uint size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
 void expose(XEvent *e);
@@ -141,13 +142,13 @@ void focusprev(const void *arg);
 Client *getclient(Window w);
 unsigned long getcolor(const char *colstr);
 long getstate(Window w);
-Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
+Bool gettextprop(Window w, Atom atom, char *text, uint size);
 void grabbuttons(Client *c, Bool focused);
 void grabkeys(void);
 void initfont(const char *fontstr);
-Bool isoccupied(unsigned int t);
+Bool isoccupied(uint t);
 Bool isprotodel(Client *c);
-Bool isurgent(unsigned int t);
+Bool isurgent(uint t);
 Bool isvisible(Client *c);
 void keypress(XEvent *e);
 void killclient(const void *arg);
@@ -168,8 +169,8 @@ void setmfact(const void *arg);
 void setup(void);
 void spawn(const void *arg);
 void tag(const void *arg);
-unsigned int textnw(const char *text, unsigned int len);
-unsigned int textw(const char *text);
+uint textnw(const char *text, uint len);
+uint textw(const char *text);
 void tile(void);
 void tileresize(Client *c, int x, int y, int w, int h);
 void togglebar(const void *arg);
@@ -198,9 +199,9 @@ char stext[256];
 int screen, sx, sy, sw, sh;
 int bx, by, bw, bh, blw, wx, wy, ww, wh;
 int mx, my, mw, mh, tx, ty, tw, th;
-unsigned int seltags = 0;
+uint seltags = 0;
 int (*xerrorxlib)(Display *, XErrorEvent *);
-unsigned int numlockmask = 0;
+uint numlockmask = 0;
 void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ConfigureRequest] = configurerequest,
@@ -218,7 +219,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 Atom wmatom[WMLast], netatom[NetLast];
 Bool otherwm, readin;
 Bool running = True;
-unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
+uint tagset[] = {1, 1}; /* after start, first tag is selected */
 Client *clients = NULL;
 Client *sel = NULL;
 Client *stack = NULL;
@@ -232,14 +233,14 @@ Window root, barwin;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-/* check if all tags will fit into a unsigned int bitarray. */
+/* check if all tags will fit into a uint bitarray. */
 static char tags_is_a_sign_that_your_IQ[sizeof(int) * 8 < LENGTH(tags) ? -1 : 1];
 
 /* function implementations */
 
 void
 applyrules(Client *c) {
-	unsigned int i;
+	uint i;
 	Rule *r;
 	XClassHint ch = { 0 };
 
@@ -305,7 +306,7 @@ ban(Client *c) {
 
 void
 buttonpress(XEvent *e) {
-	unsigned int i, x, mask;
+	uint i, x, mask;
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
@@ -561,7 +562,7 @@ drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
 void
 drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	int x, y, w, h;
-	unsigned int len, olen;
+	uint len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 	char buf[256];
 
@@ -596,7 +597,7 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 }
 
 void *
-emallocz(unsigned int size) {
+emallocz(uint size) {
 	void *res = calloc(1, size);
 
 	if(!res)
@@ -735,7 +736,7 @@ getstate(Window w) {
 }
 
 Bool
-gettextprop(Window w, Atom atom, char *text, unsigned int size) {
+gettextprop(Window w, Atom atom, char *text, uint size) {
 	char **list = NULL;
 	int n;
 	XTextProperty name;
@@ -763,8 +764,8 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 void
 grabbuttons(Client *c, Bool focused) {
 	int i, j;
-	unsigned int buttons[]   = { Button1, Button2, Button3 };
-	unsigned int modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask,
+	uint buttons[]   = { Button1, Button2, Button3 };
+	uint modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask,
 				MODKEY|numlockmask|LockMask} ;
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
@@ -780,7 +781,7 @@ grabbuttons(Client *c, Bool focused) {
 
 void
 grabkeys(void) {
-	unsigned int i, j;
+	uint i, j;
 	KeyCode code;
 	XModifierKeymap *modmap;
 
@@ -848,7 +849,7 @@ initfont(const char *fontstr) {
 }
 
 Bool
-isoccupied(unsigned int t) {
+isoccupied(uint t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -873,7 +874,7 @@ isprotodel(Client *c) {
 }
 
 Bool
-isurgent(unsigned int t) {
+isurgent(uint t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -889,7 +890,7 @@ isvisible(Client *c) {
 
 void
 keypress(XEvent *e) {
-	unsigned int i;
+	uint i;
 	KeySym keysym;
 	XKeyEvent *ev;
 
@@ -1004,7 +1005,7 @@ maprequest(XEvent *e) {
 void
 movemouse(Client *c) {
 	int x1, y1, ocx, ocy, di, nx, ny;
-	unsigned int dui;
+	uint dui;
 	Window dummy;
 	XEvent ev;
 
@@ -1230,7 +1231,7 @@ run(void) {
 	char sbuf[sizeof stext];
 	fd_set rd;
 	int r, xfd;
-	unsigned int len, offset;
+	uint len, offset;
 	XEvent ev;
 
 	/* main event loop, also reads status text from stdin */
@@ -1286,7 +1287,7 @@ run(void) {
 
 void
 scan(void) {
-	unsigned int i, num;
+	uint i, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
@@ -1336,7 +1337,7 @@ setmfact(const void *arg) {
 
 void
 setup(void) {
-	unsigned int i, w;
+	uint i, w;
 	XSetWindowAttributes wa;
 
 	/* init screen */
@@ -1441,8 +1442,8 @@ tag(const void *arg) {
 	}
 }
 
-unsigned int
-textnw(const char *text, unsigned int len) {
+uint
+textnw(const char *text, uint len) {
 	XRectangle r;
 
 	if(dc.font.set) {
@@ -1452,7 +1453,7 @@ textnw(const char *text, unsigned int len) {
 	return XTextWidth(dc.font.xfont, text, len);
 }
 
-unsigned int
+uint
 textw(const char *text) {
 	return textnw(text, strlen(text)) + dc.font.height;
 }
@@ -1460,7 +1461,7 @@ textw(const char *text) {
 void
 tile(void) {
 	int x, y, h, w;
-	unsigned int i, n;
+	uint i, n;
 	Client *c;
 
 	for(n = 0, c = nextunfloating(clients); c; c = nextunfloating(c->next), n++);
@@ -1524,7 +1525,7 @@ togglefloating(const void *arg) {
 
 void
 togglelayout(const void *arg) {
-	unsigned int i;
+	uint i;
 
 	if(!arg) {
 		if(++lt == &layouts[LENGTH(layouts)])
