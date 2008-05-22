@@ -234,11 +234,10 @@ Window root, barwin;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-/* check if all tags will fit into a uint bitarray. */
-static char tags_is_a_sign_that_your_IQ[sizeof(int) * 8 < LENGTH(tags) ? -1 : 1];
+/* compile-time check if all tags fit into an uint bit array. */
+struct NumTags { char limitexceeded[sizeof(uint) * 8 < LENGTH(tags) ? -1 : 1]; };
 
 /* function implementations */
-
 void
 applyrules(Client *c) {
 	uint i;
@@ -1548,14 +1547,6 @@ togglelayout(const void *arg) {
 
 void
 toggletag(const void *arg) {
-	int i, m = *(int *)arg;
-	for(i = 0; i < sizeof(int) * 8; i++)
-		fputc(m & 1 << i ? '1' : '0', stdout);
-	puts("");
-	for(i = 0; i < sizeof(int) * 8; i++)
-		fputc(TAGMASK & 1 << i ? '1' : '0', stdout);
-	puts("aaa");
-
 	if(sel && (sel->tags ^ ((*(int *)arg) & TAGMASK))) {
 		sel->tags ^= (*(int *)arg) & TAGMASK;
 		arrange();
