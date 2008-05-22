@@ -69,7 +69,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
 	long flags;
-	uint bw, oldbw;
+	int bw, oldbw;
 	Bool isbanned, isfixed, isfloating, isurgent;
 	uint tags;
 	Client *next;
@@ -94,7 +94,7 @@ typedef struct {
 } DC; /* draw context */
 
 typedef struct {
-	ulong mod;
+	uint mod;
 	KeySym keysym;
 	void (*func)(const void *arg);
 	const void *arg;
