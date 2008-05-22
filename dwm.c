@@ -94,8 +94,8 @@ typedef struct {
 typedef struct {
 	unsigned long mod;
 	KeySym keysym;
-	void (*func)(void *arg);
-	void *arg;
+	void (*func)(const void *arg);
+	const void *arg;
 } Key;
 
 typedef struct {
@@ -136,8 +136,8 @@ void eprint(const char *errstr, ...);
 void expose(XEvent *e);
 void focus(Client *c);
 void focusin(XEvent *e);
-void focusnext(void *arg);
-void focusprev(void *arg);
+void focusnext(const void *arg);
+void focusprev(const void *arg);
 Client *getclient(Window w);
 unsigned long getcolor(const char *colstr);
 long getstate(Window w);
@@ -150,33 +150,33 @@ Bool isprotodel(Client *c);
 Bool isurgent(unsigned int t);
 Bool isvisible(Client *c);
 void keypress(XEvent *e);
-void killclient(void *arg);
+void killclient(const void *arg);
 void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
 void movemouse(Client *c);
 Client *nextunfloating(Client *c);
 void propertynotify(XEvent *e);
-void quit(void *arg);
+void quit(const void *arg);
 void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
 void resizemouse(Client *c);
 void restack(void);
 void run(void);
 void scan(void);
 void setclientstate(Client *c, long state);
-void setmfact(void *arg);
+void setmfact(const void *arg);
 void setup(void);
-void spawn(void *arg);
-void tag(void *arg);
+void spawn(const void *arg);
+void tag(const void *arg);
 unsigned int textnw(const char *text, unsigned int len);
 unsigned int textw(const char *text);
 void tile(void);
 void tileresize(Client *c, int x, int y, int w, int h);
-void togglebar(void *arg);
-void togglefloating(void *arg);
-void togglelayout(void *arg);
-void toggletag(void *arg);
-void toggleview(void *arg);
+void togglebar(const void *arg);
+void togglefloating(const void *arg);
+void togglelayout(const void *arg);
+void toggletag(const void *arg);
+void toggleview(const void *arg);
 void unban(Client *c);
 void unmanage(Client *c);
 void unmapnotify(XEvent *e);
@@ -186,12 +186,12 @@ void updatesizehints(Client *c);
 void updatetilegeom(void);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
-void view(void *arg);
-void viewprevtag(void *arg);
+void view(const void *arg);
+void viewprevtag(const void *arg);
 int xerror(Display *dpy, XErrorEvent *ee);
 int xerrordummy(Display *dpy, XErrorEvent *ee);
 int xerrorstart(Display *dpy, XErrorEvent *ee);
-void zoom(void *arg);
+void zoom(const void *arg);
 
 /* variables */
 char stext[256];
@@ -667,7 +667,7 @@ focusin(XEvent *e) { /* there are some broken focus acquiring clients */
 }
 
 void
-focusnext(void *arg) {
+focusnext(const void *arg) {
 	Client *c;
 
 	if(!sel)
@@ -682,7 +682,7 @@ focusnext(void *arg) {
 }
 
 void
-focusprev(void *arg) {
+focusprev(const void *arg) {
 	Client *c;
 
 	if(!sel)
@@ -905,7 +905,7 @@ keypress(XEvent *e) {
 }
 
 void
-killclient(void *arg) {
+killclient(const void *arg) {
 	XEvent ev;
 
 	if(!sel)
@@ -1088,7 +1088,7 @@ propertynotify(XEvent *e) {
 }
 
 void
-quit(void *arg) {
+quit(const void *arg) {
 	readin = running = False;
 }
 
@@ -1321,7 +1321,7 @@ setclientstate(Client *c, long state) {
 
 /* arg > 1.0 will set mfact absolutly */
 void
-setmfact(void *arg) {
+setmfact(const void *arg) {
 	double d = *((double*) arg);
 
 	if(!d || lt->arrange != tile)
@@ -1412,7 +1412,7 @@ setup(void) {
 }
 
 void
-spawn(void *arg) {
+spawn(const void *arg) {
 	static char *shell = NULL;
 
 	if(!shell && !(shell = getenv("SHELL")))
@@ -1434,7 +1434,7 @@ spawn(void *arg) {
 }
 
 void
-tag(void *arg) {
+tag(const void *arg) {
 	if(sel && *(int *)arg & TAGMASK) {
 		sel->tags = *(int *)arg & TAGMASK;
 		arrange();
@@ -1505,7 +1505,7 @@ tileresize(Client *c, int x, int y, int w, int h) {
 }
 
 void
-togglebar(void *arg) {
+togglebar(const void *arg) {
 	showbar = !showbar;
 	updategeom();
 	updatebar();
@@ -1513,7 +1513,7 @@ togglebar(void *arg) {
 }
 
 void
-togglefloating(void *arg) {
+togglefloating(const void *arg) {
 	if(!sel)
 		return;
 	sel->isfloating = !sel->isfloating;
@@ -1523,7 +1523,7 @@ togglefloating(void *arg) {
 }
 
 void
-togglelayout(void *arg) {
+togglelayout(const void *arg) {
 	unsigned int i;
 
 	if(!arg) {
@@ -1545,7 +1545,7 @@ togglelayout(void *arg) {
 }
 
 void
-toggletag(void *arg) {
+toggletag(const void *arg) {
 	int i, m = *(int *)arg;
 	for(i = 0; i < sizeof(int) * 8; i++)
 		fputc(m & 1 << i ? '1' : '0', stdout);
@@ -1561,7 +1561,7 @@ toggletag(void *arg) {
 }
 
 void
-toggleview(void *arg) {
+toggleview(const void *arg) {
 	if((tagset[seltags] ^ ((*(int *)arg) & TAGMASK))) {
 		tagset[seltags] ^= (*(int *)arg) & TAGMASK;
 		arrange();
@@ -1737,7 +1737,7 @@ updatewmhints(Client *c) {
 }
 
 void
-view(void *arg) {
+view(const void *arg) {
 	if(*(int *)arg & TAGMASK) {
 		seltags ^= 1; /* toggle sel tagset */
 		tagset[seltags] = *(int *)arg & TAGMASK;
@@ -1746,7 +1746,7 @@ view(void *arg) {
 }
 
 void
-viewprevtag(void *arg) {
+viewprevtag(const void *arg) {
 	seltags ^= 1; /* toggle sel tagset */
 	arrange();
 }
@@ -1785,7 +1785,7 @@ xerrorstart(Display *dpy, XErrorEvent *ee) {
 }
 
 void
-zoom(void *arg) {
+zoom(const void *arg) {
 	Client *c = sel;
 
 	if(c == nextunfloating(clients))
