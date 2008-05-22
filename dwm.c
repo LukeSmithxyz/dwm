@@ -132,7 +132,6 @@ void detachstack(Client *c);
 void drawbar(void);
 void drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]);
 void drawtext(const char *text, ulong col[ColLast], Bool invert);
-void *emallocz(uint size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
 void expose(XEvent *e);
@@ -596,15 +595,6 @@ drawtext(const char *text, ulong col[ColLast], Bool invert) {
 		XDrawString(dpy, dc.drawable, dc.gc, x, y, buf, len);
 }
 
-void *
-emallocz(uint size) {
-	void *res = calloc(1, size);
-
-	if(!res)
-		eprint("fatal: could not malloc() %u bytes\n", size);
-	return res;
-}
-
 void
 enternotify(XEvent *e) {
 	Client *c;
@@ -931,7 +921,8 @@ manage(Window w, XWindowAttributes *wa) {
 	Window trans;
 	XWindowChanges wc;
 
-	c = emallocz(sizeof(Client));
+	if(!(c = calloc(1, sizeof(Client))))
+		eprint("fatal: could not calloc() %u bytes\n", sizeof(Client));
 	c->win = w;
 
 	/* geometry */
