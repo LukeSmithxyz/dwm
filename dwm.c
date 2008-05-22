@@ -61,6 +61,7 @@ enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 
 /* typedefs */
 typedef unsigned int uint;
+typedef unsigned long ulong;
 typedef struct Client Client;
 struct Client {
 	char name[256];
@@ -79,8 +80,8 @@ struct Client {
 
 typedef struct {
 	int x, y, w, h;
-	unsigned long norm[ColLast];
-	unsigned long sel[ColLast];
+	ulong norm[ColLast];
+	ulong sel[ColLast];
 	Drawable drawable;
 	GC gc;
 	struct {
@@ -93,7 +94,7 @@ typedef struct {
 } DC; /* draw context */
 
 typedef struct {
-	unsigned long mod;
+	ulong mod;
 	KeySym keysym;
 	void (*func)(const void *arg);
 	const void *arg;
@@ -129,8 +130,8 @@ void destroynotify(XEvent *e);
 void detach(Client *c);
 void detachstack(Client *c);
 void drawbar(void);
-void drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
-void drawtext(const char *text, unsigned long col[ColLast], Bool invert);
+void drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]);
+void drawtext(const char *text, ulong col[ColLast], Bool invert);
 void *emallocz(uint size);
 void enternotify(XEvent *e);
 void eprint(const char *errstr, ...);
@@ -140,7 +141,7 @@ void focusin(XEvent *e);
 void focusnext(const void *arg);
 void focusprev(const void *arg);
 Client *getclient(Window w);
-unsigned long getcolor(const char *colstr);
+ulong getcolor(const char *colstr);
 long getstate(Window w);
 Bool gettextprop(Window w, Atom atom, char *text, uint size);
 void grabbuttons(Client *c, Bool focused);
@@ -539,7 +540,7 @@ drawbar(void) {
 }
 
 void
-drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
+drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]) {
 	int x;
 	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
@@ -560,7 +561,7 @@ drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
 }
 
 void
-drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
+drawtext(const char *text, ulong col[ColLast], Bool invert) {
 	int x, y, w, h;
 	uint len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
@@ -707,7 +708,7 @@ getclient(Window w) {
 	return c;
 }
 
-unsigned long
+ulong
 getcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
@@ -722,7 +723,7 @@ getstate(Window w) {
 	int format, status;
 	long result = -1;
 	unsigned char *p = NULL;
-	unsigned long n, extra;
+	ulong n, extra;
 	Atom real;
 
 	status = XGetWindowProperty(dpy, w, wmatom[WMState], 0L, 2L, False, wmatom[WMState],
