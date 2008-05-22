@@ -20,10 +20,10 @@ LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 ${XINERAMALIBS}
 
 # flags
 CPPFLAGS = -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
-CFLAGS = -Os ${INCS} ${CPPFLAGS}
-LDFLAGS = -s ${LIBS}
-#CFLAGS = -g -std=c99 -pedantic -Wall -O2 ${INCS} ${CPPFLAGS}
-#LDFLAGS = -g ${LIBS}
+#CFLAGS = -Os ${INCS} ${CPPFLAGS}
+#LDFLAGS = -s ${LIBS}
+CFLAGS = -g -std=c99 -pedantic -Wall -O2 ${INCS} ${CPPFLAGS}
+LDFLAGS = -g ${LIBS}
 
 # Solaris
 #CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
