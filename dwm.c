@@ -52,6 +52,7 @@
 #define MAXTAGLEN       16
 #define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
 #define TAGMASK         ((int)((1LL << LENGTH(tags)) - 1))
+#define VISIBLE(x)      ((x)->tags & tagset[seltags])
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
@@ -149,7 +150,6 @@ void initfont(const char *fontstr);
 Bool isoccupied(uint t);
 Bool isprotodel(Client *c);
 Bool isurgent(uint t);
-Bool isvisible(Client *c);
 void keypress(XEvent *e);
 void killclient(const void *arg);
 void manage(Window w, XWindowAttributes *wa);
@@ -267,7 +267,7 @@ arrange(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(isvisible(c)) {
+		if(VISIBLE(c)) {
 			unban(c);
 			if(!lt->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
@@ -444,7 +444,7 @@ configurerequest(XEvent *e) {
 			if((ev->value_mask & (CWX|CWY))
 			&& !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
-			if(isvisible(c))
+			if(VISIBLE(c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else
@@ -497,7 +497,7 @@ drawbar(void) {
 	Client *c;
 
 	dc.x = 0;
-	for(c = stack; c && !isvisible(c); c = c->snext);
+	for(c = stack; c && !VISIBLE(c); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = textw(tags[i]);
 		if(tagset[seltags] & 1 << i) {
@@ -628,8 +628,8 @@ expose(XEvent *e) {
 
 void
 focus(Client *c) {
-	if(!c || (c && !isvisible(c)))
-		for(c = stack; c && !isvisible(c); c = c->snext);
+	if(!c || (c && !VISIBLE(c)))
+		for(c = stack; c && !VISIBLE(c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -663,9 +663,9 @@ focusnext(const void *arg) {
 
 	if(!sel)
 		return;
-	for(c = sel->next; c && !isvisible(c); c = c->next);
+	for(c = sel->next; c && !VISIBLE(c); c = c->next);
 	if(!c)
-		for(c = clients; c && !isvisible(c); c = c->next);
+		for(c = clients; c && !VISIBLE(c); c = c->next);
 	if(c) {
 		focus(c);
 		restack();
@@ -678,10 +678,10 @@ focusprev(const void *arg) {
 
 	if(!sel)
 		return;
-	for(c = sel->prev; c && !isvisible(c); c = c->prev);
+	for(c = sel->prev; c && !VISIBLE(c); c = c->prev);
 	if(!c) {
 		for(c = clients; c && c->next; c = c->next);
-		for(; c && !isvisible(c); c = c->prev);
+		for(; c && !VISIBLE(c); c = c->prev);
 	}
 	if(c) {
 		focus(c);
@@ -873,11 +873,6 @@ isurgent(uint t) {
 	return False;
 }
 
-Bool
-isvisible(Client *c) {
-	return c->tags & tagset[seltags];
-}
-
 void
 keypress(XEvent *e) {
 	uint i;
@@ -1043,7 +1038,7 @@ movemouse(Client *c) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->isfloating || !isvisible(c)); c = c->next);
+	for(; c && (c->isfloating || !VISIBLE(c)); c = c->next);
 	return c;
 }
 
@@ -1207,7 +1202,7 @@ restack(void) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
-			if(!c->isfloating && isvisible(c)) {
+			if(!c->isfloating && VISIBLE(c)) {
 				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
 				wc.sibling = c->win;
 			}
