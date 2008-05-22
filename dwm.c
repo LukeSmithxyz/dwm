@@ -156,7 +156,7 @@ void manage(Window w, XWindowAttributes *wa);
 void mappingnotify(XEvent *e);
 void maprequest(XEvent *e);
 void movemouse(Client *c);
-Client *nextunfloating(Client *c);
+Client *nexttiled(Client *c);
 void propertynotify(XEvent *e);
 void quit(const void *arg);
 void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
@@ -1051,7 +1051,7 @@ movemouse(Client *c) {
 }
 
 Client *
-nextunfloating(Client *c) {
+nexttiled(Client *c) {
 	for(; c && (c->isfloating || !isvisible(c)); c = c->next);
 	return c;
 }
@@ -1464,12 +1464,12 @@ tile(void) {
 	uint i, n;
 	Client *c;
 
-	for(n = 0, c = nextunfloating(clients); c; c = nextunfloating(c->next), n++);
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
 	if(n == 0)
 		return;
 
 	/* master */
-	c = nextunfloating(clients);
+	c = nexttiled(clients);
 
 	if(n == 1)
 		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
@@ -1487,7 +1487,7 @@ tile(void) {
 	if(h < bh)
 		h = th;
 
-	for(i = 0, c = nextunfloating(c->next); c; c = nextunfloating(c->next), i++) {
+	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		if(i + 1 == n) /* remainder */
 			tileresize(c, x, y, w - 2 * c->bw, (ty + th) - y - 2 * c->bw);
 		else
@@ -1789,14 +1789,14 @@ void
 zoom(const void *arg) {
 	Client *c = sel;
 
-	if(c == nextunfloating(clients))
-		if(!c || !(c = nextunfloating(c->next)))
+	if(!lt->arrange || sel->isfloating)
+		return;
+	if(c == nexttiled(clients))
+		if(!c || !(c = nexttiled(c->next)))
 			return;
-	if(lt->arrange == tile && !sel->isfloating) {
-		detach(c);
-		attach(c);
-		focus(c);
-	}
+	detach(c);
+	attach(c);
+	focus(c);
 	arrange();
 }
 
