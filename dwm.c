@@ -193,7 +193,7 @@ void zoom(const void *arg);
 /* variables */
 char stext[256];
 int screen, sx, sy, sw, sh;
-int bx, by, bw, bh, blw, wx, wy, ww, wh;
+int by, bh, blw, wx, wy, ww, wh;
 uint seltags = 0;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 uint numlockmask = 0;
@@ -506,10 +506,10 @@ drawbar(void) {
 	else
 		x = dc.x;
 	dc.w = TEXTW(stext);
-	dc.x = bw - dc.w;
+	dc.x = ww - dc.w;
 	if(dc.x < x) {
 		dc.x = x;
-		dc.w = bw - x;
+		dc.w = ww - x;
 	}
 	drawtext(stext, dc.norm, False);
 	if((dc.w = dc.x - x) > bh) {
@@ -521,7 +521,7 @@ drawbar(void) {
 		else
 			drawtext(NULL, dc.norm, False);
 	}
-	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, bw, bh, 0, 0);
+	XCopyArea(dpy, dc.drawable, barwin, dc.gc, 0, 0, ww, bh, 0, 0);
 	XSync(dpy, False);
 }
 
@@ -1372,7 +1372,7 @@ setup(void) {
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask|ExposureMask;
 
-	barwin = XCreateWindow(dpy, root, bx, by, bw, bh, 0, DefaultDepth(dpy, screen),
+	barwin = XCreateWindow(dpy, root, wx, by, ww, bh, 0, DefaultDepth(dpy, screen),
 			CopyFromParent, DefaultVisual(dpy, screen),
 			CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
 	XDefineCursor(dpy, barwin, cursor[CurNormal]);
@@ -1567,8 +1567,8 @@ void
 updatebar(void) {
 	if(dc.drawable != 0)
 		XFreePixmap(dpy, dc.drawable);
-	dc.drawable = XCreatePixmap(dpy, root, bw, bh, DefaultDepth(dpy, screen));
-	XMoveResizeWindow(dpy, barwin, bx, by, bw, bh);
+	dc.drawable = XCreatePixmap(dpy, root, ww, bh, DefaultDepth(dpy, screen));
+	XMoveResizeWindow(dpy, barwin, wx, by, ww, bh);
 }
 
 void
@@ -1595,10 +1595,8 @@ updategeom(void) {
 		wh = showbar ? sh - bh : sh;
 	}
 
-	/* bar geometry */
-	bx = wx;
+	/* bar position */
 	by = showbar ? (topbar ? wy - bh : wy + wh) : -bh;
-	bw = ww;
 }
 
 void
