@@ -52,6 +52,7 @@
 #define MAXTAGLEN       16
 #define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
 #define TAGMASK         ((int)((1LL << LENGTH(tags)) - 1))
+#define TEXTW(x)        (textnw(x, strlen(x)) + dc.font.height)
 #define VISIBLE(x)      ((x)->tags & tagset[seltags])
 
 /* enums */
@@ -169,7 +170,6 @@ void setup(void);
 void spawn(const void *arg);
 void tag(const void *arg);
 uint textnw(const char *text, uint len);
-uint textw(const char *text);
 void tile(void);
 void tileresize(Client *c, int x, int y, int w, int h);
 void togglebar(const void *arg);
@@ -305,7 +305,7 @@ buttonpress(XEvent *e) {
 	if(ev->window == barwin) {
 		x = 0;
 		for(i = 0; i < LENGTH(tags); i++) {
-			x += textw(tags[i]);
+			x += TEXTW(tags[i]);
 			if(ev->x < x) {
 				mask = 1 << i;
 				if(ev->button == Button1) {
@@ -491,7 +491,7 @@ drawbar(void) {
 	dc.x = 0;
 	for(c = stack; c && !VISIBLE(c); c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
-		dc.w = textw(tags[i]);
+		dc.w = TEXTW(tags[i]);
 		if(tagset[seltags] & 1 << i) {
 			drawtext(tags[i], dc.sel, isurgent(i));
 			drawsquare(c && c->tags & 1 << i, isoccupied(i), isurgent(i), dc.sel);
@@ -509,7 +509,7 @@ drawbar(void) {
 	}
 	else
 		x = dc.x;
-	dc.w = textw(stext);
+	dc.w = TEXTW(stext);
 	dc.x = bw - dc.w;
 	if(dc.x < x) {
 		dc.x = x;
@@ -1365,7 +1365,7 @@ setup(void) {
 
 	/* init bar */
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
-		w = textw(layouts[i].symbol);
+		w = TEXTW(layouts[i].symbol);
 		blw = MAX(blw, w);
 	}
 
@@ -1435,11 +1435,6 @@ textnw(const char *text, uint len) {
 		return r.width;
 	}
 	return XTextWidth(dc.font.xfont, text, len);
-}
-
-uint
-textw(const char *text) {
-	return textnw(text, strlen(text)) + dc.font.height;
 }
 
 void
