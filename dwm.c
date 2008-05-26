@@ -170,7 +170,6 @@ void spawn(const void *arg);
 void tag(const void *arg);
 uint textnw(const char *text, uint len);
 void tile(void);
-void tileresize(Client *c, int x, int y, int w, int h);
 void togglebar(const void *arg);
 void togglefloating(const void *arg);
 void togglelayout(const void *arg);
@@ -1123,6 +1122,10 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		x = sx;
 	if(y + h + 2 * c->bw < sy)
 		y = sy;
+	if(h < bh)
+		h = bh;
+	if(w < bh)
+		w = bh;
 	if(c->x != x || c->y != y || c->w != w || c->h != h || c->isbanned || c->ismax) {
 		c->isbanned = c->ismax = False;
 		c->x = wc.x = x;
@@ -1435,7 +1438,7 @@ textnw(const char *text, uint len) {
 
 void
 tile(void) {
-	int x, y, h, w, mx, my, mw, mh, tx, ty, tw, th;
+	int x, y, h, w, mw;
 	uint i, n;
 	Client *c;
 
@@ -1443,53 +1446,28 @@ tile(void) {
 	if(n == 0)
 		return;
 
-	/* master area geometry */
-	mx = wx;
-	my = wy;
-	mw = mfact * ww;
-	mh = wh;
-
-	/* tile area geometry */
-	tx = mx + mw;
-	ty = wy;
-	tw = ww - mw;
-	th = wh;
-
 	/* master */
 	c = nexttiled(clients);
-
-	if(n == 1)
-		tileresize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
-	else
-		tileresize(c, mx, my, mw - 2 * c->bw, mh - 2 * c->bw);
+	mw = mfact * ww;
+	resize(c, wx, wy, ((n == 1) ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
 
 	if(--n == 0)
 		return;
 
 	/* tile stack */
-	x = (tx > c->x + c->w) ? c->x + c->w + 2 * c->bw : tw;
-	y = ty;
-	w = (tx > c->x + c->w) ? wx + ww - x : tw;
-	h = th / n;
+	x = (wx + mw > c->x + c->w) ? c->x + c->w + 2 * c->bw : ww - mw;
+	y = wy;
+	w = (wx + mw > c->x + c->w) ? wx + ww - x : ww - mw;
+	h = wh / n;
 	if(h < bh)
-		h = th;
+		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		if(i + 1 == n) /* remainder */
-			tileresize(c, x, y, w - 2 * c->bw, (ty + th) - y - 2 * c->bw);
-		else
-			tileresize(c, x, y, w - 2 * c->bw, h - 2 * c->bw);
-		if(h != th)
+		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
+		       ? (wy + wh) - y : h) - 2 * c->bw, resizehints);
+		if(h != wh)
 			y = c->y + c->h + 2 * c->bw;
 	}
-}
-
-void
-tileresize(Client *c, int x, int y, int w, int h) {
-	resize(c, x, y, w, h, resizehints);
-	if(resizehints && ((c->h < bh) || (c->h > h) || (c->w < bh) || (c->w > w)))
-		/* client doesn't accept size constraints */
-		resize(c, x, y, w, h, False);
 }
 
 void
