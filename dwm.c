@@ -212,7 +212,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 Atom wmatom[WMLast], netatom[NetLast];
-Bool domax = False;
+Bool ismax = False;
 Bool otherwm, readin;
 Bool running = True;
 uint tagset[] = {1, 1}; /* after start, first tag is selected */
@@ -273,7 +273,7 @@ arrange(void) {
 		}
 
 	focus(NULL);
-	if(lt->arrange && !domax)
+	if(lt->arrange && !ismax)
 		lt->arrange();
 	restack();
 }
@@ -328,7 +328,7 @@ buttonpress(XEvent *e) {
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
-		if(CLEANMASK(ev->state) != MODKEY || domax)
+		if(CLEANMASK(ev->state) != MODKEY || ismax)
 			return;
 		if(ev->button == Button1)
 			movemouse(c);
@@ -500,7 +500,7 @@ drawbar(void) {
 	}
 	if(blw > 0) {
 		dc.w = blw;
-		drawtext(lt->symbol, dc.norm, domax);
+		drawtext(lt->symbol, dc.norm, ismax);
 		x = dc.x + dc.w;
 	}
 	else
@@ -629,7 +629,7 @@ focus(Client *c) {
 	}
 	sel = c;
 	if(c) {
-		if(domax) {
+		if(ismax) {
 			XMoveResizeWindow(dpy, c->win, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
 			c->ismax = True;
 		}
@@ -1194,9 +1194,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(domax || sel->isfloating || !lt->arrange)
+	if(ismax || sel->isfloating || !lt->arrange)
 		XRaiseWindow(dpy, sel->win);
-	if(!domax && lt->arrange) {
+	if(!ismax && lt->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
@@ -1512,7 +1512,7 @@ togglelayout(const void *arg) {
 
 void
 togglemax(const void *arg) {
-	domax = !domax;
+	ismax = !ismax;
 	arrange();
 }
 
