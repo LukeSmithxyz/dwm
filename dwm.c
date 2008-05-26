@@ -349,7 +349,6 @@ checkotherwm(void) {
 	XSync(dpy, False);
 	if(otherwm)
 		eprint("dwm: another window manager is already running\n");
-	XSync(dpy, False);
 	XSetErrorHandler(NULL);
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
@@ -875,11 +874,9 @@ keypress(XEvent *e) {
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < LENGTH(keys); i++)
 		if(keysym == keys[i].keysym
-		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state))
-		{
-			if(keys[i].func)
-				keys[i].func(keys[i].arg);
-		}
+		   && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
+		   && keys[i].func)
+			keys[i].func(keys[i].arg);
 }
 
 void
