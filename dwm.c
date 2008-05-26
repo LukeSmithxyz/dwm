@@ -16,8 +16,8 @@
  * Each child of the root window is called a client, except windows which have
  * set the override_redirect flag.  Clients are organized in a global
  * doubly-linked client list, the focus history is remembered through a global
- * stack list. Each client contains an array of Bools of the same size as the
- * global tags array to indicate the tags of a client.
+ * stack list. Each client contains a bit array to indicate the tags of a
+ * client.
  *
  * Keys and tagging rules are organized as arrays and defined in config.h.
  *
