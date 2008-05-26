@@ -71,7 +71,7 @@ struct Client {
 	int minax, maxax, minay, maxay;
 	long flags;
 	int bw, oldbw;
-	Bool isbanned, isfixed, isfloating, isurgent;
+	Bool isbanned, isfixed, isfloating, ismax, isurgent;
 	uint tags;
 	Client *next;
 	Client *prev;
@@ -120,7 +120,6 @@ void applyrules(Client *c);
 void arrange(void);
 void attach(Client *c);
 void attachstack(Client *c);
-void ban(Client *c);
 void buttonpress(XEvent *e);
 void checkotherwm(void);
 void cleanup(void);
@@ -176,9 +175,9 @@ void tileresize(Client *c, int x, int y, int w, int h);
 void togglebar(const void *arg);
 void togglefloating(const void *arg);
 void togglelayout(const void *arg);
+void togglemax(const void *arg);
 void toggletag(const void *arg);
 void toggleview(const void *arg);
-void unban(Client *c);
 void unmanage(Client *c);
 void unmapnotify(XEvent *e);
 void updatebar(void);
@@ -217,6 +216,7 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 Atom wmatom[WMLast], netatom[NetLast];
+Bool domax = False;
 Bool otherwm, readin;
 Bool running = True;
 uint tagset[] = {1, 1}; /* after start, first tag is selected */
@@ -268,15 +268,16 @@ arrange(void) {
 
 	for(c = clients; c; c = c->next)
 		if(VISIBLE(c)) {
-			unban(c);
 			if(!lt->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
 		}
-		else
-			ban(c);
+		else if(!c->isbanned) {
+			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+			c->isbanned = True;
+		}
 
 	focus(NULL);
-	if(lt->arrange)
+	if(lt->arrange && !domax)
 		lt->arrange();
 	restack();
 }
@@ -293,14 +294,6 @@ void
 attachstack(Client *c) {
 	c->snext = stack;
 	stack = c;
-}
-
-void
-ban(Client *c) {
-	if(c->isbanned)
-		return;
-	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-	c->isbanned = True;
 }
 
 void
@@ -330,23 +323,23 @@ buttonpress(XEvent *e) {
 				return;
 			}
 		}
-		if((ev->x < x + blw) && ev->button == Button1) 
-			togglelayout(NULL);
+		if(ev->x < x + blw) {
+			if(ev->button == Button1) 
+				togglelayout(NULL);
+			else if(ev->button == Button3) 
+				togglemax(NULL);
+		}
 	}
 	else if((c = getclient(ev->window))) {
 		focus(c);
-		if(CLEANMASK(ev->state) != MODKEY)
+		if(CLEANMASK(ev->state) != MODKEY || domax)
 			return;
-		if(ev->button == Button1) {
-			restack();
+		if(ev->button == Button1)
 			movemouse(c);
-		}
 		else if(ev->button == Button2)
 			togglefloating(NULL);
-		else if(ev->button == Button3 && !c->isfixed) {
-			restack();
+		else if(ev->button == Button3 && !c->isfixed)
 			resizemouse(c);
-		}
 	}
 }
 
@@ -369,10 +362,9 @@ checkotherwm(void) {
 void
 cleanup(void) {
 	close(STDIN_FILENO);
-	while(stack) {
-		unban(stack);
+	view(NULL);
+	while(stack)
 		unmanage(stack);
-	}
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
 	else
@@ -512,7 +504,7 @@ drawbar(void) {
 	}
 	if(blw > 0) {
 		dc.w = blw;
-		drawtext(lt->symbol, dc.norm, False);
+		drawtext(lt->symbol, dc.norm, domax);
 		x = dc.x + dc.w;
 	}
 	else
@@ -641,6 +633,10 @@ focus(Client *c) {
 	}
 	sel = c;
 	if(c) {
+		if(domax) {
+			XMoveResizeWindow(dpy, c->win, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
+			c->ismax = True;
+		}
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
@@ -960,7 +956,6 @@ manage(Window w, XWindowAttributes *wa) {
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
-	ban(c);
 	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
 	arrange();
@@ -995,6 +990,7 @@ movemouse(Client *c) {
 	Window dummy;
 	XEvent ev;
 
+	restack();
 	ocx = nx = c->x;
 	ocy = ny = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
@@ -1130,7 +1126,8 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		x = sx;
 	if(y + h + 2 * c->bw < sy)
 		y = sy;
-	if(c->x != x || c->y != y || c->w != w || c->h != h) {
+	if(c->x != x || c->y != y || c->w != w || c->h != h || c->isbanned || c->ismax) {
+		c->isbanned = c->ismax = False;
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
@@ -1149,6 +1146,7 @@ resizemouse(Client *c) {
 	int nw, nh;
 	XEvent ev;
 
+	restack();
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
@@ -1196,9 +1194,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(sel->isfloating || !lt->arrange)
+	if(domax || sel->isfloating || !lt->arrange)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange) {
+	if(!domax && lt->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
@@ -1532,6 +1530,12 @@ togglelayout(const void *arg) {
 }
 
 void
+togglemax(const void *arg) {
+	domax = !domax;
+	arrange();
+}
+
+void
 toggletag(const void *arg) {
 	if(sel && (sel->tags ^ ((*(int *)arg) & TAGMASK))) {
 		sel->tags ^= (*(int *)arg) & TAGMASK;
@@ -1545,14 +1549,6 @@ toggleview(const void *arg) {
 		tagset[seltags] ^= (*(int *)arg) & TAGMASK;
 		arrange();
 	}
-}
-
-void
-unban(Client *c) {
-	if(!c->isbanned)
-		return;
-	XMoveWindow(dpy, c->win, c->x, c->y);
-	c->isbanned = False;
 }
 
 void
