@@ -105,7 +105,6 @@ typedef struct {
 typedef struct {
 	const char *symbol;
 	void (*arrange)(void);
-	void (*updategeom)(void);
 } Layout;
 
 typedef struct {
@@ -183,7 +182,6 @@ void unmapnotify(XEvent *e);
 void updatebar(void);
 void updategeom(void);
 void updatesizehints(Client *c);
-void updatetilegeom(void);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
 void view(const void *arg);
@@ -197,7 +195,6 @@ void zoom(const void *arg);
 char stext[256];
 int screen, sx, sy, sw, sh;
 int bx, by, bw, bh, blw, wx, wy, ww, wh;
-int mx, my, mw, mh, tx, ty, tw, th;
 uint seltags = 0;
 int (*xerrorxlib)(Display *, XErrorEvent *);
 uint numlockmask = 0;
@@ -1315,7 +1312,6 @@ setmfact(const void *arg) {
 	if(d < 0.1 || d > 0.9)
 		return;
 	mfact = d;
-	updatetilegeom();
 	arrange();
 }
 
@@ -1439,13 +1435,25 @@ textnw(const char *text, uint len) {
 
 void
 tile(void) {
-	int x, y, h, w;
+	int x, y, h, w, mx, my, mw, mh, tx, ty, tw, th;
 	uint i, n;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
 	if(n == 0)
 		return;
+
+	/* master area geometry */
+	mx = wx;
+	my = wy;
+	mw = mfact * ww;
+	mh = wh;
+
+	/* tile area geometry */
+	tx = mx + mw;
+	ty = wy;
+	tw = ww - mw;
+	th = wh;
 
 	/* master */
 	c = nexttiled(clients);
@@ -1613,11 +1621,6 @@ updategeom(void) {
 	bx = wx;
 	by = showbar ? (topbar ? wy - bh : wy + wh) : -bh;
 	bw = ww;
-
-	/* update layout geometries */
-	for(i = 0; i < LENGTH(layouts); i++)
-		if(layouts[i].updategeom)
-			layouts[i].updategeom();
 }
 
 void
@@ -1670,21 +1673,6 @@ updatesizehints(Client *c) {
 		c->minax = c->maxax = c->minay = c->maxay = 0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh
 			&& c->maxw == c->minw && c->maxh == c->minh);
-}
-
-void
-updatetilegeom(void) {
-	/* master area geometry */
-	mx = wx;
-	my = wy;
-	mw = mfact * ww;
-	mh = wh;
-
-	/* tile area geometry */
-	tx = mx + mw;
-	ty = wy;
-	tw = ww - mw;
-	th = wh;
 }
 
 void

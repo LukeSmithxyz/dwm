@@ -27,9 +27,9 @@ double mfact           = 0.55;
 Bool resizehints       = True;     /* False means respect size hints in tiled resizals */
 
 Layout layouts[] = {
-	/* symbol     arrange  geom */
-	{ "[]=",      tile,    updatetilegeom }, /* first entry is default */
-	{ "><>",      NULL,    NULL           }, /* no layout function means floating behavior */
+	/* symbol     arrange function */
+	{ "[]=",      tile }, /* first entry is default */
+	{ "><>",      NULL }, /* no layout function means floating behavior */
 };
 
 /* key definitions */
