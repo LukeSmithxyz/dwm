@@ -357,7 +357,7 @@ checkotherwm(void) {
 void
 cleanup(void) {
 	close(STDIN_FILENO);
-	view(NULL);
+	view((uint[]){~0});
 	while(stack)
 		unmanage(stack);
 	if(dc.font.set)
