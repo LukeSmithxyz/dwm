@@ -267,7 +267,7 @@ arrange(void) {
 				XMoveResizeWindow(dpy, c->win, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
 				c->ismoved = True;
 			}
-			else if(!lt->arrange || ismax || c->isfloating)
+			else if(!lt->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
 			c->isbanned = False;
 		}
