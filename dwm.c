@@ -1306,7 +1306,7 @@ void
 setmfact(const void *arg) {
 	double d = *((double*) arg);
 
-	if(!d || lt->arrange)
+	if(!d || !lt->arrange)
 		return;
 	d = d < 1.0 ? d + mfact : d - 1.0;
 	if(d < 0.1 || d > 0.9)
