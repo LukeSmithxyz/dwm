@@ -24,7 +24,7 @@ Rule rules[] = {
 
 /* layout(s) */
 double mfact           = 0.55;
-Bool resizehints       = True;     /* False means respect size hints in tiled resizals */
+Bool resizehints       = False;     /* False means respect size hints in tiled resizals */
 
 Layout layouts[] = {
 	/* symbol     arrange function */
