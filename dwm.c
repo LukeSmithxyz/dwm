@@ -572,7 +572,7 @@ drawtext(const char *text, ulong col[ColLast], Bool invert) {
 	if(!len)
 		return;
 	if(len < olen)
-		strncpy(&buf[MAX(0, len - 3)], "...", len);
+		memcpy(&buf[MAX(0, len - 3)], "...", 3);
 	XSetForeground(dpy, dc.gc, col[invert ? ColBG : ColFG]);
 	if(dc.font.set)
 		XmbDrawString(dpy, dc.drawable, dc.font.set, dc.gc, x, y, buf, len);
