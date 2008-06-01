@@ -1442,13 +1442,13 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
-	resize(c, wx, wy, ((n == 1) ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
+	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
 
 	if(--n == 0)
 		return;
 
 	/* tile stack */
-	x = (wx + mw > c->x + c->w) ? c->x + c->w + 2 * c->bw : ww - mw;
+	x = (wx + mw > c->x + c->w) ? c->x + c->w + 2 * c->bw : wx + mw;
 	y = wy;
 	w = (wx + mw > c->x + c->w) ? wx + ww - x : ww - mw;
 	h = wh / n;
