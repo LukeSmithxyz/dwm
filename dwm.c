@@ -69,7 +69,6 @@ struct Client {
 	int x, y, w, h;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, maxax, minay, maxay;
-	long flags;
 	int bw, oldbw;
 	Bool isbanned, isfixed, isfloating, ismoved, isurgent;
 	uint tags;
@@ -183,7 +182,6 @@ void updatesizehints(Client *c);
 void updatetitle(Client *c);
 void updatewmhints(Client *c);
 void view(const void *arg);
-void viewprevtag(const void *arg);
 int xerror(Display *dpy, XErrorEvent *ee);
 int xerrordummy(Display *dpy, XErrorEvent *ee);
 int xerrorstart(Display *dpy, XErrorEvent *ee);
@@ -419,7 +417,9 @@ configurerequest(XEvent *e) {
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
-		if(c->isfixed || c->isfloating || !lt->arrange) {
+		if(ismax && !c->isbanned && !c->isfixed)
+			XMoveResizeWindow(dpy, c->win, wx, wy, ww - 2 * c->bw, wh + 2 * c->bw);
+		else if(c->isfloating || !lt->arrange) {
 			if(ev->value_mask & CWX)
 				c->x = sx + ev->x;
 			if(ev->value_mask & CWY)
@@ -946,6 +946,8 @@ manage(Window w, XWindowAttributes *wa) {
 		applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = (rettrans == Success) || c->isfixed;
+	if(c->isfloating)
+		XRaiseWindow(dpy, c->win);
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h); /* some windows require this */
@@ -1124,7 +1126,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	if(w < bh)
 		w = bh;
 	if(c->x != x || c->y != y || c->w != w || c->h != h || c->ismoved) {
-		c->isbanned = c->ismoved = False;
+		c->ismoved = False;
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
@@ -1601,42 +1603,40 @@ updatesizehints(Client *c) {
 	long msize;
 	XSizeHints size;
 
-	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
-		size.flags = PSize;
-	c->flags = size.flags;
-	if(c->flags & PBaseSize) {
+	XGetWMNormalHints(dpy, c->win, &size, &msize);
+	if(size.flags & PBaseSize) {
 		c->basew = size.base_width;
 		c->baseh = size.base_height;
 	}
-	else if(c->flags & PMinSize) {
+	else if(size.flags & PMinSize) {
 		c->basew = size.min_width;
 		c->baseh = size.min_height;
 	}
 	else
 		c->basew = c->baseh = 0;
-	if(c->flags & PResizeInc) {
+	if(size.flags & PResizeInc) {
 		c->incw = size.width_inc;
 		c->inch = size.height_inc;
 	}
 	else
 		c->incw = c->inch = 0;
-	if(c->flags & PMaxSize) {
+	if(size.flags & PMaxSize) {
 		c->maxw = size.max_width;
 		c->maxh = size.max_height;
 	}
 	else
 		c->maxw = c->maxh = 0;
-	if(c->flags & PMinSize) {
+	if(size.flags & PMinSize) {
 		c->minw = size.min_width;
 		c->minh = size.min_height;
 	}
-	else if(c->flags & PBaseSize) {
+	else if(size.flags & PBaseSize) {
 		c->minw = size.base_width;
 		c->minh = size.base_height;
 	}
 	else
 		c->minw = c->minh = 0;
-	if(c->flags & PAspect) {
+	if(size.flags & PAspect) {
 		c->minax = size.min_aspect.x;
 		c->maxax = size.max_aspect.x;
 		c->minay = size.min_aspect.y;
@@ -1669,16 +1669,9 @@ updatewmhints(Client *c) {
 
 void
 view(const void *arg) {
-	if(*(int *)arg & TAGMASK) {
-		seltags ^= 1; /* toggle sel tagset */
-		tagset[seltags] = *(int *)arg & TAGMASK;
-		arrange();
-	}
-}
-
-void
-viewprevtag(const void *arg) {
 	seltags ^= 1; /* toggle sel tagset */
+	if(arg && (*(int *)arg & TAGMASK))
+		tagset[seltags] = *(int *)arg & TAGMASK;
 	arrange();
 }
 

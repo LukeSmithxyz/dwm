@@ -51,7 +51,7 @@ Key keys[] = {
 	{ MODKEY,                       XK_l,      setmfact,       (double[]){+0.05} },
 	{ MODKEY,                       XK_m,      togglemax,      NULL },
 	{ MODKEY,                       XK_Return, zoom,           NULL },
-	{ MODKEY,                       XK_Tab,    viewprevtag,    NULL },
+	{ MODKEY,                       XK_Tab,    view,           NULL },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     NULL },
 	{ MODKEY,                       XK_space,  togglelayout,   NULL },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, NULL },
