@@ -551,7 +551,7 @@ drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]) {
 
 void
 drawtext(const char *text, ulong col[ColLast], Bool invert) {
-	int x, y, w, h;
+	int i, x, y, h;
 	uint len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 	char buf[256];
@@ -563,16 +563,15 @@ drawtext(const char *text, ulong col[ColLast], Bool invert) {
 	olen = strlen(text);
 	len = MIN(olen, sizeof buf);
 	memcpy(buf, text, len);
-	w = 0;
 	h = dc.font.ascent + dc.font.descent;
 	y = dc.y + (dc.h / 2) - (h / 2) + dc.font.ascent;
 	x = dc.x + (h / 2);
 	/* shorten text if necessary */
-	for(; len && (w = textnw(buf, len)) > dc.w - h; len--);
+	for(; len && (i = textnw(buf, len)) > dc.w - h; len--);
 	if(!len)
 		return;
 	if(len < olen)
-		memcpy(&buf[MAX(0, len - 3)], "...", 3);
+		for(i = len; i >= MAX(0, len - 3); buf[i--] = '.');
 	XSetForeground(dpy, dc.gc, col[invert ? ColBG : ColFG]);
 	if(dc.font.set)
 		XmbDrawString(dpy, dc.drawable, dc.font.set, dc.gc, x, y, buf, len);
