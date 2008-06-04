@@ -551,8 +551,7 @@ drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]) {
 
 void
 drawtext(const char *text, ulong col[ColLast], Bool invert) {
-	int i, x, y, h;
-	uint len, olen;
+	int i, x, y, h, len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 	char buf[256];
 
@@ -612,7 +611,7 @@ expose(XEvent *e) {
 
 void
 focus(Client *c) {
-	if(!c || (c && c->isbanned))
+	if(!c || c->isbanned)
 		for(c = stack; c && c->isbanned; c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
@@ -622,14 +621,12 @@ focus(Client *c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
-	}
-	sel = c;
-	if(c) {
 		XSetWindowBorder(dpy, c->win, dc.sel[ColBorder]);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	sel = c;
 	drawbar();
 }
 
@@ -1565,8 +1562,8 @@ updatebar(void) {
 
 void
 updategeom(void) {
-	int i;
 #ifdef XINERAMA
+	int i;
 	XineramaScreenInfo *info = NULL;
 
 	/* window area geometry */
