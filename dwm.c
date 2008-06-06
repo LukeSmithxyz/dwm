@@ -736,8 +736,7 @@ void
 grabbuttons(Client *c, Bool focused) {
 	int i, j;
 	uint buttons[]   = { Button1, Button2, Button3 };
-	uint modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask,
-				MODKEY|numlockmask|LockMask} ;
+	uint modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask, MODKEY|numlockmask|LockMask };
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	if(focused)
