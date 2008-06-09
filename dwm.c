@@ -166,7 +166,7 @@ void setmfact(const void *arg);
 void setup(void);
 void spawn(const void *arg);
 void tag(const void *arg);
-uint textnw(const char *text, uint len);
+int textnw(const char *text, uint len);
 void tile(void);
 void togglebar(const void *arg);
 void togglefloating(const void *arg);
@@ -296,7 +296,8 @@ attachstack(Client *c) {
 
 void
 buttonpress(XEvent *e) {
-	uint i, x, mask;
+	uint i, mask;
+	int x;
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
@@ -1308,7 +1309,8 @@ setmfact(const void *arg) {
 
 void
 setup(void) {
-	uint i, w;
+	uint i;
+	int w;
 	XSetWindowAttributes wa;
 
 	/* init screen */
@@ -1413,7 +1415,7 @@ tag(const void *arg) {
 	}
 }
 
-uint
+int
 textnw(const char *text, uint len) {
 	XRectangle r;
 
