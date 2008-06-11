@@ -10,8 +10,8 @@
 #define SELFGCOLOR      "#ffffff"
 static uint borderpx  = 1;        /* border pixel of windows */
 static uint snap      = 32;       /* snap pixel */
-static Bool showbar           = True;     /* False means no bar */
-static Bool topbar            = True;     /* False means bottom bar */
+static Bool showbar   = True;     /* False means no bar */
+static Bool topbar    = True;     /* False means bottom bar */
 
 /* tagging */
 static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -42,8 +42,8 @@ static Layout layouts[] = {
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.c = "exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" }},
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.c = "exec uxterm" }},
+	{ MODKEY,                       XK_p,      spawn,          {.v = (char *[]){"dmenu_run", "-fn", FONT, "-nb", NORMBGCOLOR, "-nf", NORMFGCOLOR, "-sb", SELBGCOLOR, "-sf", SELFGCOLOR, NULL}} },
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = (char *[]){"uxterm", NULL}} },
 	{ MODKEY,                       XK_b,      togglebar,      {0}},
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1  }},
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1  }},

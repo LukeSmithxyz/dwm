@@ -93,11 +93,10 @@ typedef struct {
 } DC; /* draw context */
 
 typedef union {
-	const char *c;
 	int i;
 	uint ui;
 	float f;
-	void *aux;
+	void *v;
 } Arg;
 
 typedef struct {
@@ -1388,10 +1387,6 @@ setup(void) {
 
 void
 spawn(const Arg *arg) {
-	static char *shell = NULL;
-
-	if(!shell && !(shell = getenv("SHELL")))
-		shell = "/bin/sh";
 	/* The double-fork construct avoids zombie processes and keeps the code
 	 * clean from stupid signal handlers. */
 	if(fork() == 0) {
@@ -1399,8 +1394,8 @@ spawn(const Arg *arg) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
-			execl(shell, shell, "-c", arg->c, (char *)NULL);
-			fprintf(stderr, "dwm: execl '%s -c %s'", shell, arg->c);
+			execvp(((char **)arg->v)[0], (char **)arg->v);
+			fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
 			perror(" failed");
 		}
 		exit(0);
@@ -1481,20 +1476,8 @@ togglefloating(const Arg *arg) {
 
 void
 togglelayout(const Arg *arg) {
-	uint i;
-
-	if(!arg->c) {
-		if(++lt == &layouts[LENGTH(layouts)])
-			lt = &layouts[0];
-	}
-	else {
-		for(i = 0; i < LENGTH(layouts); i++)
-			if(!strcmp(arg->c, layouts[i].symbol))
-				break;
-		if(i == LENGTH(layouts))
-			return;
-		lt = &layouts[i];
-	}
+	if(++lt == &layouts[LENGTH(layouts)])
+		lt = &layouts[0];
 	if(sel)
 		arrange();
 	else
