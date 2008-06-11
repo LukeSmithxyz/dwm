@@ -363,8 +363,11 @@ checkotherwm(void) {
 void
 cleanup(void) {
 	Arg a = {.i = ~0};
+	Layout foo = { 0 };
+
 	close(STDIN_FILENO);
 	view(&a);
+	lt = &foo;
 	while(stack)
 		unmanage(stack);
 	if(dc.font.set)
@@ -1476,7 +1479,9 @@ togglefloating(const Arg *arg) {
 
 void
 togglelayout(const Arg *arg) {
-	if(++lt == &layouts[LENGTH(layouts)])
+	if(arg->v)
+		lt = (Layout *)arg->v;
+	else if(++lt == &layouts[LENGTH(layouts)])
 		lt = &layouts[0];
 	if(sel)
 		arrange();
