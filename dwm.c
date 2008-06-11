@@ -324,9 +324,9 @@ buttonpress(XEvent *e) {
 			}
 		}
 		if(ev->x < x + blw) {
-			if(ev->button == Button1) 
+			if(ev->button == Button1)
 				togglelayout(NULL);
-			else if(ev->button == Button3) 
+			else if(ev->button == Button3)
 				togglemax(NULL);
 		}
 	}
@@ -662,7 +662,7 @@ focusstack(const Arg *arg) {
 		for(i = clients; i != sel; i = i->next)
 			if (!i->isbanned)
 				c = i;
-		if(!c) 
+		if(!c)
 			for(; i; i = i->next)
 				if (!i->isbanned)
 					c = i;
