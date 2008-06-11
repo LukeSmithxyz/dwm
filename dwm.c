@@ -51,6 +51,7 @@
 #define LENGTH(x)       (sizeof x / sizeof x[0])
 #define MAXTAGLEN       16
 #define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
+#define SHCMD(cmd)      { .v = (char*[]){ "/bin/sh", "-c", cmd, NULL } }
 #define TAGMASK         ((int)((1LL << LENGTH(tags)) - 1))
 #define TEXTW(x)        (textnw(x, strlen(x)) + dc.font.height)
 
