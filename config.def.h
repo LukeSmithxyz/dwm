@@ -8,25 +8,25 @@
 #define SELBORDERCOLOR  "#0066ff"
 #define SELBGCOLOR      "#0066ff"
 #define SELFGCOLOR      "#ffffff"
-unsigned int borderpx  = 1;        /* border pixel of windows */
-unsigned int snap      = 32;       /* snap pixel */
-Bool showbar           = True;     /* False means no bar */
-Bool topbar            = True;     /* False means bottom bar */
+static uint borderpx  = 1;        /* border pixel of windows */
+static uint snap      = 32;       /* snap pixel */
+static Bool showbar           = True;     /* False means no bar */
+static Bool topbar            = True;     /* False means bottom bar */
 
 /* tagging */
-const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-Rule rules[] = {
+static Rule rules[] = {
 	/* class      instance    title       tags ref      isfloating */
 	{ "Gimp",     NULL,       NULL,       0,            True },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       True },
 };
 
 /* layout(s) */
-double mfact           = 0.55;
-Bool resizehints       = False;     /* False means respect size hints in tiled resizals */
+static float mfact           = 0.55;
+static Bool resizehints       = False;     /* False means respect size hints in tiled resizals */
 
-Layout layouts[] = {
+static Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile }, /* first entry is default */
 	{ "><>",      NULL }, /* no layout function means floating behavior */
@@ -40,31 +40,31 @@ Layout layouts[] = {
         { MODKEY|ShiftMask,             KEY,      tag,            TAG }, \
         { MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      TAG },
 
-Key keys[] = {
+static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          (char *)"exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" },
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          (char *)"exec uxterm" },
-	{ MODKEY,                       XK_b,      togglebar,      NULL },
-	{ MODKEY,                       XK_j,      focusnext,      NULL },
-	{ MODKEY,                       XK_k,      focusprev,      NULL },
-	{ MODKEY,                       XK_h,      setmfact,       (double[]){-0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       (double[]){+0.05} },
-	{ MODKEY,                       XK_m,      togglemax,      NULL },
-	{ MODKEY,                       XK_Return, zoom,           NULL },
-	{ MODKEY,                       XK_Tab,    view,           NULL },
-	{ MODKEY|ShiftMask,             XK_c,      killclient,     NULL },
-	{ MODKEY,                       XK_space,  togglelayout,   NULL },
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, NULL },
-	{ MODKEY,                       XK_0,      view,           (uint[]){ ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      tag,            (uint[]){ ~0 } },
-	TAGKEYS(                        XK_1,                      (uint[]){ 1 << 0} )
-	TAGKEYS(                        XK_2,                      (uint[]){ 1 << 1} )
-	TAGKEYS(                        XK_3,                      (uint[]){ 1 << 2} )
-	TAGKEYS(                        XK_4,                      (uint[]){ 1 << 3} )
-	TAGKEYS(                        XK_5,                      (uint[]){ 1 << 4} )
-	TAGKEYS(                        XK_6,                      (uint[]){ 1 << 5} )
-	TAGKEYS(                        XK_7,                      (uint[]){ 1 << 6} )
-	TAGKEYS(                        XK_8,                      (uint[]){ 1 << 7} )
-	TAGKEYS(                        XK_9,                      (uint[]){ 1 << 8} )
-	{ MODKEY|ShiftMask,             XK_q,      quit,           NULL },
+	{ MODKEY,                       XK_p,      spawn,          {.c = "exec dmenu_run -fn '"FONT"' -nb '"NORMBGCOLOR"' -nf '"NORMFGCOLOR"' -sb '"SELBGCOLOR"' -sf '"SELFGCOLOR"'" }},
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.c = "exec uxterm" }},
+	{ MODKEY,                       XK_b,      togglebar,      {0}},
+	{ MODKEY,                       XK_j,      focusstack,     {.i = +1  }},
+	{ MODKEY,                       XK_k,      focusstack,     {.i = -1  }},
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05}},
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05}},
+	{ MODKEY,                       XK_m,      togglemax,      {0}},
+	{ MODKEY,                       XK_Return, zoom,           {0}},
+	{ MODKEY,                       XK_Tab,    view,           {0}},
+	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0}},
+	{ MODKEY,                       XK_space,  togglelayout,   {0}},
+	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0}},
+	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
+	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+	TAGKEYS(                        XK_1,                      {.ui = 1 << 0} )
+	TAGKEYS(                        XK_2,                      {.ui = 1 << 1} )
+	TAGKEYS(                        XK_3,                      {.ui = 1 << 2} )
+	TAGKEYS(                        XK_4,                      {.ui = 1 << 3} )
+	TAGKEYS(                        XK_5,                      {.ui = 1 << 4} )
+	TAGKEYS(                        XK_6,                      {.ui = 1 << 5} )
+	TAGKEYS(                        XK_7,                      {.ui = 1 << 6} )
+	TAGKEYS(                        XK_8,                      {.ui = 1 << 7} )
+	TAGKEYS(                        XK_9,                      {.ui = 1 << 8} )
+	{ MODKEY|ShiftMask,             XK_q,      quit,           {0}},
 };

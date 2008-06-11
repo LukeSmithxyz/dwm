@@ -68,12 +68,11 @@ struct Client {
 	char name[256];
 	int x, y, w, h;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int minax, maxax, minay, maxay;
+	float mina, maxa;
 	int bw, oldbw;
 	Bool isbanned, isfixed, isfloating, ismoved, isurgent;
 	uint tags;
 	Client *next;
-	Client *prev;
 	Client *snext;
 	Window win;
 };
@@ -93,11 +92,19 @@ typedef struct {
 	} font;
 } DC; /* draw context */
 
+typedef union {
+	const char *c;
+	int i;
+	uint ui;
+	float f;
+	void *aux;
+} Arg;
+
 typedef struct {
 	uint mod;
 	KeySym keysym;
-	void (*func)(const void *arg);
-	const void *arg;
+	void (*func)(const Arg *);
+	const Arg arg;
 } Key;
 
 typedef struct {
@@ -114,87 +121,86 @@ typedef struct {
 } Rule;
 
 /* function declarations */
-void applyrules(Client *c);
-void arrange(void);
-void attach(Client *c);
-void attachstack(Client *c);
-void buttonpress(XEvent *e);
-void checkotherwm(void);
-void cleanup(void);
-void configure(Client *c);
-void configurenotify(XEvent *e);
-void configurerequest(XEvent *e);
-void destroynotify(XEvent *e);
-void detach(Client *c);
-void detachstack(Client *c);
-void drawbar(void);
-void drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]);
-void drawtext(const char *text, ulong col[ColLast], Bool invert);
-void enternotify(XEvent *e);
-void eprint(const char *errstr, ...);
-void expose(XEvent *e);
-void focus(Client *c);
-void focusin(XEvent *e);
-void focusnext(const void *arg);
-void focusprev(const void *arg);
-Client *getclient(Window w);
-ulong getcolor(const char *colstr);
-long getstate(Window w);
-Bool gettextprop(Window w, Atom atom, char *text, uint size);
-void grabbuttons(Client *c, Bool focused);
-void grabkeys(void);
-void initfont(const char *fontstr);
-Bool isoccupied(uint t);
-Bool isprotodel(Client *c);
-Bool isurgent(uint t);
-void keypress(XEvent *e);
-void killclient(const void *arg);
-void manage(Window w, XWindowAttributes *wa);
-void mappingnotify(XEvent *e);
-void maprequest(XEvent *e);
-void movemouse(Client *c);
-Client *nexttiled(Client *c);
-void propertynotify(XEvent *e);
-void quit(const void *arg);
-void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
-void resizemouse(Client *c);
-void restack(void);
-void run(void);
-void scan(void);
-void setclientstate(Client *c, long state);
-void setmfact(const void *arg);
-void setup(void);
-void spawn(const void *arg);
-void tag(const void *arg);
-int textnw(const char *text, uint len);
-void tile(void);
-void togglebar(const void *arg);
-void togglefloating(const void *arg);
-void togglelayout(const void *arg);
-void togglemax(const void *arg);
-void toggletag(const void *arg);
-void toggleview(const void *arg);
-void unmanage(Client *c);
-void unmapnotify(XEvent *e);
-void updatebar(void);
-void updategeom(void);
-void updatesizehints(Client *c);
-void updatetitle(Client *c);
-void updatewmhints(Client *c);
-void view(const void *arg);
-int xerror(Display *dpy, XErrorEvent *ee);
-int xerrordummy(Display *dpy, XErrorEvent *ee);
-int xerrorstart(Display *dpy, XErrorEvent *ee);
-void zoom(const void *arg);
+static void applyrules(Client *c);
+static void arrange(void);
+static void attach(Client *c);
+static void attachstack(Client *c);
+static void buttonpress(XEvent *e);
+static void checkotherwm(void);
+static void cleanup(void);
+static void configure(Client *c);
+static void configurenotify(XEvent *e);
+static void configurerequest(XEvent *e);
+static void destroynotify(XEvent *e);
+static void detach(Client *c);
+static void detachstack(Client *c);
+static void drawbar(void);
+static void drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]);
+static void drawtext(const char *text, ulong col[ColLast], Bool invert);
+static void enternotify(XEvent *e);
+static void eprint(const char *errstr, ...);
+static void expose(XEvent *e);
+static void focus(Client *c);
+static void focusin(XEvent *e);
+static void focusstack(const Arg *arg);
+static Client *getclient(Window w);
+static ulong getcolor(const char *colstr);
+static long getstate(Window w);
+static Bool gettextprop(Window w, Atom atom, char *text, uint size);
+static void grabbuttons(Client *c, Bool focused);
+static void grabkeys(void);
+static void initfont(const char *fontstr);
+static Bool isoccupied(uint t);
+static Bool isprotodel(Client *c);
+static Bool isurgent(uint t);
+static void keypress(XEvent *e);
+static void killclient(const Arg *arg);
+static void manage(Window w, XWindowAttributes *wa);
+static void mappingnotify(XEvent *e);
+static void maprequest(XEvent *e);
+static void movemouse(Client *c);
+static Client *nexttiled(Client *c);
+static void propertynotify(XEvent *e);
+static void quit(const Arg *arg);
+static void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
+static void resizemouse(Client *c);
+static void restack(void);
+static void run(void);
+static void scan(void);
+static void setclientstate(Client *c, long state);
+static void setmfact(const Arg *arg);
+static void setup(void);
+static void spawn(const Arg *arg);
+static void tag(const Arg *arg);
+static int textnw(const char *text, uint len);
+static void tile(void);
+static void togglebar(const Arg *arg);
+static void togglefloating(const Arg *arg);
+static void togglelayout(const Arg *arg);
+static void togglemax(const Arg *arg);
+static void toggletag(const Arg *arg);
+static void toggleview(const Arg *arg);
+static void unmanage(Client *c);
+static void unmapnotify(XEvent *e);
+static void updatebar(void);
+static void updategeom(void);
+static void updatesizehints(Client *c);
+static void updatetitle(Client *c);
+static void updatewmhints(Client *c);
+static void view(const Arg *arg);
+static int xerror(Display *dpy, XErrorEvent *ee);
+static int xerrordummy(Display *dpy, XErrorEvent *ee);
+static int xerrorstart(Display *dpy, XErrorEvent *ee);
+static void zoom(const Arg *arg);
 
 /* variables */
-char stext[256];
-int screen, sx, sy, sw, sh;
-int by, bh, blw, wx, wy, ww, wh;
-uint seltags = 0;
-int (*xerrorxlib)(Display *, XErrorEvent *);
-uint numlockmask = 0;
-void (*handler[LASTEvent]) (XEvent *) = {
+static char stext[256];
+static int screen, sx, sy, sw, sh;
+static int by, bh, blw, wx, wy, ww, wh;
+static uint seltags = 0;
+static int (*xerrorxlib)(Display *, XErrorEvent *);
+static uint numlockmask = 0;
+static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ConfigureRequest] = configurerequest,
 	[ConfigureNotify] = configurenotify,
@@ -208,23 +214,23 @@ void (*handler[LASTEvent]) (XEvent *) = {
 	[PropertyNotify] = propertynotify,
 	[UnmapNotify] = unmapnotify
 };
-Atom wmatom[WMLast], netatom[NetLast];
-Bool ismax = False;
-Bool otherwm, readin;
-Bool running = True;
-uint tagset[] = {1, 1}; /* after start, first tag is selected */
-Client *clients = NULL;
-Client *sel = NULL;
-Client *stack = NULL;
-Cursor cursor[CurLast];
-Display *dpy;
-DC dc = {0};
-Layout layouts[];
-Layout *lt = layouts;
-Window root, barwin;
+static Atom wmatom[WMLast], netatom[NetLast];
+static Bool ismax = False;
+static Bool otherwm, readin;
+static Bool running = True;
+static uint tagset[] = {1, 1}; /* after start, first tag is selected */
+static Client *clients = NULL;
+static Client *sel = NULL;
+static Client *stack = NULL;
+static Cursor cursor[CurLast];
+static Display *dpy;
+static DC dc = {0};
+static Window root, barwin;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+static Layout *lt = layouts;
 
 /* compile-time check if all tags fit into an uint bit array. */
 struct NumTags { char limitexceeded[sizeof(uint) * 8 < LENGTH(tags) ? -1 : 1]; };
@@ -282,8 +288,6 @@ arrange(void) {
 
 void
 attach(Client *c) {
-	if(clients)
-		clients->prev = c;
 	c->next = clients;
 	clients = c;
 }
@@ -309,15 +313,15 @@ buttonpress(XEvent *e) {
 				mask = 1 << i;
 				if(ev->button == Button1) {
 					if(ev->state & MODKEY)
-						tag(&mask);
+						tag((Arg*)&mask);
 					else
-						view(&mask);
+						view((Arg*)&mask);
 				}
 				else if(ev->button == Button3) {
 					if(ev->state & MODKEY)
-						toggletag(&mask);
+						toggletag((Arg*)&mask);
 					else
-						toggleview(&mask);
+						toggleview((Arg*)&mask);
 				}
 				return;
 			}
@@ -359,8 +363,9 @@ checkotherwm(void) {
 
 void
 cleanup(void) {
+	Arg a = {.i = ~0};
 	close(STDIN_FILENO);
-	view((uint[]){~0});
+	view(&a);
 	while(stack)
 		unmanage(stack);
 	if(dc.font.set)
@@ -466,13 +471,16 @@ destroynotify(XEvent *e) {
 
 void
 detach(Client *c) {
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	if(c == clients)
+	Client *i;
+
+	if (c != clients) {
+		for(i = clients; i->next != c; i = i->next);
+		i->next = c->next;
+	}
+	else {
 		clients = c->next;
-	c->next = c->prev = NULL;
+	}
+	c->next =  NULL;
 }
 
 void
@@ -640,30 +648,24 @@ focusin(XEvent *e) { /* there are some broken focus acquiring clients */
 }
 
 void
-focusnext(const void *arg) {
-	Client *c;
+focusstack(const Arg *arg) {
+	Client *c = NULL, *i;
 
 	if(!sel)
 		return;
-	for(c = sel->next; c && c->isbanned; c = c->next);
-	if(!c)
-		for(c = clients; c && c->isbanned; c = c->next);
-	if(c) {
-		focus(c);
-		restack();
+	if (arg->i > 0) {
+		for(c = sel->next; c && c->isbanned; c = c->next);
+		if(!c)
+			for(c = clients; c && c->isbanned; c = c->next);
 	}
-}
-
-void
-focusprev(const void *arg) {
-	Client *c;
-
-	if(!sel)
-		return;
-	for(c = sel->prev; c && c->isbanned; c = c->prev);
-	if(!c) {
-		for(c = clients; c && c->next; c = c->next);
-		for(; c && c->isbanned; c = c->prev);
+	else {
+		for(i = clients; i != sel; i = i->next)
+			if (!i->isbanned)
+				c = i;
+		if(!c) 
+			for(; i; i = i->next)
+				if (!i->isbanned)
+					c = i;
 	}
 	if(c) {
 		focus(c);
@@ -866,11 +868,11 @@ keypress(XEvent *e) {
 		if(keysym == keys[i].keysym
 		   && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
 		   && keys[i].func)
-			keys[i].func(keys[i].arg);
+			keys[i].func(&(keys[i].arg));
 }
 
 void
-killclient(const void *arg) {
+killclient(const Arg *arg) {
 	XEvent ev;
 
 	if(!sel)
@@ -1056,7 +1058,7 @@ propertynotify(XEvent *e) {
 }
 
 void
-quit(const void *arg) {
+quit(const Arg *arg) {
 	readin = running = False;
 }
 
@@ -1074,12 +1076,11 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		h -= c->baseh;
 
 		/* adjust for aspect limits */
-		if(c->minax != c->maxax && c->minay != c->maxay 
-		&& c->minax > 0 && c->maxax > 0 && c->minay > 0 && c->maxay > 0) {
-			if(w * c->maxay > h * c->maxax)
-				w = h * c->maxax / c->maxay;
-			else if(w * c->minay < h * c->minax)
-				h = w * c->minay / c->minax;
+		if(c->mina > 0 && c->maxa > 0) {
+			if(c->maxa < (float) w/h)
+				w = h * c->maxa;
+			else if(c->mina > (float) h/w)
+				h = w * c->mina;
 		}
 
 		/* adjust for increment value */
@@ -1295,15 +1296,15 @@ setclientstate(Client *c, long state) {
 
 /* arg > 1.0 will set mfact absolutly */
 void
-setmfact(const void *arg) {
-	double d = *((double*) arg);
+setmfact(const Arg *arg) {
+	float f;
 
-	if(!d || !lt->arrange)
+	if(!arg || !lt->arrange)
 		return;
-	d = d < 1.0 ? d + mfact : d - 1.0;
-	if(d < 0.1 || d > 0.9)
+	f = arg->f < 1.0 ? arg->f + mfact : arg->f - 1.0;
+	if(f < 0.1 || f > 0.9)
 		return;
-	mfact = d;
+	mfact = f;
 	arrange();
 }
 
@@ -1386,7 +1387,7 @@ setup(void) {
 }
 
 void
-spawn(const void *arg) {
+spawn(const Arg *arg) {
 	static char *shell = NULL;
 
 	if(!shell && !(shell = getenv("SHELL")))
@@ -1398,8 +1399,8 @@ spawn(const void *arg) {
 			if(dpy)
 				close(ConnectionNumber(dpy));
 			setsid();
-			execl(shell, shell, "-c", (char *)arg, (char *)NULL);
-			fprintf(stderr, "dwm: execl '%s -c %s'", shell, (char *)arg);
+			execl(shell, shell, "-c", arg->c, (char *)NULL);
+			fprintf(stderr, "dwm: execl '%s -c %s'", shell, arg->c);
 			perror(" failed");
 		}
 		exit(0);
@@ -1408,9 +1409,9 @@ spawn(const void *arg) {
 }
 
 void
-tag(const void *arg) {
-	if(sel && *(int *)arg & TAGMASK) {
-		sel->tags = *(int *)arg & TAGMASK;
+tag(const Arg *arg) {
+	if(sel && arg->ui & TAGMASK) {
+		sel->tags = arg->ui & TAGMASK;
 		arrange();
 	}
 }
@@ -1461,7 +1462,7 @@ tile(void) {
 }
 
 void
-togglebar(const void *arg) {
+togglebar(const Arg *arg) {
 	showbar = !showbar;
 	updategeom();
 	updatebar();
@@ -1469,7 +1470,7 @@ togglebar(const void *arg) {
 }
 
 void
-togglefloating(const void *arg) {
+togglefloating(const Arg *arg) {
 	if(!sel)
 		return;
 	sel->isfloating = !sel->isfloating || sel->isfixed;
@@ -1479,16 +1480,16 @@ togglefloating(const void *arg) {
 }
 
 void
-togglelayout(const void *arg) {
+togglelayout(const Arg *arg) {
 	uint i;
 
-	if(!arg) {
+	if(!arg->c) {
 		if(++lt == &layouts[LENGTH(layouts)])
 			lt = &layouts[0];
 	}
 	else {
 		for(i = 0; i < LENGTH(layouts); i++)
-			if(!strcmp((char *)arg, layouts[i].symbol))
+			if(!strcmp(arg->c, layouts[i].symbol))
 				break;
 		if(i == LENGTH(layouts))
 			return;
@@ -1501,25 +1502,21 @@ togglelayout(const void *arg) {
 }
 
 void
-togglemax(const void *arg) {
+togglemax(const Arg *arg) {
 	ismax = !ismax;
 	arrange();
 }
 
 void
-toggletag(const void *arg) {
-	if(sel && (sel->tags ^ ((*(int *)arg) & TAGMASK))) {
-		sel->tags ^= (*(int *)arg) & TAGMASK;
+toggletag(const Arg *arg) {
+	if(sel && (sel->tags ^= (arg->ui & TAGMASK)))
 		arrange();
-	}
 }
 
 void
-toggleview(const void *arg) {
-	if((tagset[seltags] ^ ((*(int *)arg) & TAGMASK))) {
-		tagset[seltags] ^= (*(int *)arg) & TAGMASK;
+toggleview(const Arg *arg) {
+	if((tagset[seltags] ^= (arg->ui & TAGMASK)))
 		arrange();
-	}
 }
 
 void
@@ -1628,13 +1625,11 @@ updatesizehints(Client *c) {
 	else
 		c->minw = c->minh = 0;
 	if(size.flags & PAspect) {
-		c->minax = size.min_aspect.x;
-		c->maxax = size.max_aspect.x;
-		c->minay = size.min_aspect.y;
-		c->maxay = size.max_aspect.y;
+		c->mina = (float)size.min_aspect.y / (float)size.min_aspect.x;
+		c->maxa = (float)size.max_aspect.x / (float)size.max_aspect.y;
 	}
 	else
-		c->minax = c->maxax = c->minay = c->maxay = 0;
+		c->maxa = c->mina = 0.0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh
 			&& c->maxw == c->minw && c->maxh == c->minh);
 }
@@ -1659,10 +1654,10 @@ updatewmhints(Client *c) {
 }
 
 void
-view(const void *arg) {
+view(const Arg *arg) {
 	seltags ^= 1; /* toggle sel tagset */
-	if(arg && (*(int *)arg & TAGMASK))
-		tagset[seltags] = *(int *)arg & TAGMASK;
+	if(arg && (arg->ui & TAGMASK))
+		tagset[seltags] = arg->i & TAGMASK;
 	arrange();
 }
 
@@ -1700,7 +1695,7 @@ xerrorstart(Display *dpy, XErrorEvent *ee) {
 }
 
 void
-zoom(const void *arg) {
+zoom(const Arg *arg) {
 	Client *c = sel;
 
 	if(ismax || !lt->arrange || (sel && sel->isfloating))
