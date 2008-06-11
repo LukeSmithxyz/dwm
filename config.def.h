@@ -8,10 +8,14 @@
 #define SELBORDERCOLOR  "#0066ff"
 #define SELBGCOLOR      "#0066ff"
 #define SELFGCOLOR      "#ffffff"
-static uint borderpx  = 1;        /* border pixel of windows */
-static uint snap      = 32;       /* snap pixel */
-static Bool showbar   = True;     /* False means no bar */
-static Bool topbar    = True;     /* False means bottom bar */
+static uint borderpx    = 1;        /* border pixel of windows */
+static uint snap        = 32;       /* snap pixel */
+static Bool showbar     = True;     /* False means no bar */
+static Bool topbar      = True;     /* False means bottom bar */
+
+#ifdef XINERAMA
+static uint xidx        = 0;        /* Xinerama screen index to use */
+#endif
 
 /* tagging */
 static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
