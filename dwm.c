@@ -363,7 +363,7 @@ checkotherwm(void) {
 void
 cleanup(void) {
 	Arg a = {.i = ~0};
-	Layout foo = { 0 };
+	Layout foo = { "", NULL };
 
 	close(STDIN_FILENO);
 	view(&a);
