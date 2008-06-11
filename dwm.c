@@ -1478,7 +1478,7 @@ togglefloating(const Arg *arg) {
 
 void
 togglelayout(const Arg *arg) {
-	if(arg->v)
+	if(arg && arg->v)
 		lt = (Layout *)arg->v;
 	else if(++lt == &layouts[LENGTH(layouts)])
 		lt = &layouts[0];
