@@ -224,12 +224,10 @@ static Client *stack = NULL;
 static Cursor cursor[CurLast];
 static Display *dpy;
 static DC dc = {0};
+static Layout *lt = NULL;
 static Window root, barwin;
-
 /* configuration, allows nested code to access above variables */
 #include "config.h"
-
-static Layout *lt = layouts;
 
 /* compile-time check if all tags fit into an uint bit array. */
 struct NumTags { char limitexceeded[sizeof(uint) * 8 < LENGTH(tags) ? -1 : 1]; };
@@ -1325,6 +1323,7 @@ setup(void) {
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.font.height + 2;
+	lt = layouts;
 	updategeom();
 
 	/* init atoms */
