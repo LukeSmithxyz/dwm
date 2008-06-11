@@ -40,6 +40,9 @@ static Layout layouts[] = {
         { MODKEY|ShiftMask,             KEY,      tag,            TAG }, \
         { MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      TAG },
 
+/* helper for spawning shell commands */
+#define SHCMD(cmd) { .v = (char*[]){ "/bin/sh", "-c", cmd, NULL } }
+
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = (char *[]){"dmenu_run", "-fn", FONT, "-nb", NORMBGCOLOR, "-nf", NORMFGCOLOR, "-sb", SELBGCOLOR, "-sf", SELFGCOLOR, NULL}} },
