@@ -59,10 +59,28 @@ enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
+enum { ClkLtSymbol = -1, ClkStatusText = -2, ClkWinTitle = -3,
+       ClkClientWin = -4, ClkRootWin = -5, ClkLast = -6};/* clicks */
 
 /* typedefs */
 typedef unsigned int uint;
 typedef unsigned long ulong;
+
+typedef union {
+	int i;
+	uint ui;
+	float f;
+	void *v;
+} Arg;
+
+typedef struct {
+	uint click;
+	uint mask;
+	uint button;
+	void (*func)(const Arg *arg);
+	const Arg arg;
+} Button;
+
 typedef struct Client Client;
 struct Client {
 	char name[256];
@@ -91,13 +109,6 @@ typedef struct {
 		XFontStruct *xfont;
 	} font;
 } DC; /* draw context */
-
-typedef union {
-	int i;
-	uint ui;
-	float f;
-	void *v;
-} Arg;
 
 typedef struct {
 	uint mod;
@@ -157,12 +168,12 @@ static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
-static void movemouse(Client *c);
+static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
-static void resizemouse(Client *c);
+static void resizemouse(const Arg *arg);
 static void restack(void);
 static void run(void);
 static void scan(void);
@@ -297,50 +308,31 @@ attachstack(Client *c) {
 
 void
 buttonpress(XEvent *e) {
-	uint i, mask;
-	int x;
+	uint i, x, click;
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
+	click = ClkRootWin;
 	if(ev->window == barwin) {
 		x = 0;
-		for(i = 0; i < LENGTH(tags); i++) {
+		for(i = 0; i < LENGTH(tags) && ev->x >= x; i++) {
 			x += TEXTW(tags[i]);
-			if(ev->x < x) {
-				mask = 1 << i;
-				if(ev->button == Button1) {
-					if(ev->state & MODKEY)
-						tag((Arg*)&mask);
-					else
-						view((Arg*)&mask);
-				}
-				else if(ev->button == Button3) {
-					if(ev->state & MODKEY)
-						toggletag((Arg*)&mask);
-					else
-						toggleview((Arg*)&mask);
-				}
-				return;
-			}
-		}
-		if(ev->x < x + blw) {
-			if(ev->button == Button1)
-				togglelayout(NULL);
-			else if(ev->button == Button3)
-				togglemax(NULL);
+			if(i < LENGTH(tags) || ev->x <= x)
+				click = i - 1;
+			else if(ev->x < x + blw)
+				click = ClkLtSymbol;
+			else if(ev->x > wx + ww - TEXTW(stext))
+				click = ClkStatusText;
+			else
+				click = ClkWinTitle;
 		}
 	}
-	else if((c = getclient(ev->window))) {
-		focus(c);
-		if(CLEANMASK(ev->state) != MODKEY || (ismax && !c->isfixed))
-			return;
-		if(ev->button == Button1)
-			movemouse(c);
-		else if(ev->button == Button2)
-			togglefloating(NULL);
-		else if(ev->button == Button3 && !c->isfixed)
-			resizemouse(c);
-	}
+	else if((c = getclient(ev->window)))
+		click = ClkClientWin;
+
+	for(i = 0; i < LENGTH(buttons); i++)
+		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
+			buttons[i].func(&buttons[i].arg);
 }
 
 void
@@ -971,12 +963,15 @@ maprequest(XEvent *e) {
 }
 
 void
-movemouse(Client *c) {
+movemouse(const Arg *arg) {
 	int x1, y1, ocx, ocy, di, nx, ny;
 	uint dui;
+	Client *c;
 	Window dummy;
 	XEvent ev;
 
+	if(!(c = sel))
+		return;
 	restack();
 	ocx = nx = c->x;
 	ocy = ny = c->y;
@@ -984,6 +979,11 @@ movemouse(Client *c) {
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
+	if(x1 < c->x || x1 > c->x + c->w || y1 < c->y || y1 > c->y + c->h) {
+		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, 0, 0);
+		x1 = c->x + 1;
+		y1 = c->y + 1;
+	}
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -1131,11 +1131,14 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 }
 
 void
-resizemouse(Client *c) {
+resizemouse(const Arg *arg) {
 	int ocx, ocy;
 	int nw, nh;
+	Client *c;
 	XEvent ev;
 
+	if(!(c = sel))
+		return;
 	restack();
 	ocx = c->x;
 	ocy = c->y;
@@ -1377,7 +1380,7 @@ setup(void) {
 			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* select for events */
-	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
+	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask
 			|EnterWindowMask|LeaveWindowMask|StructureNotifyMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
@@ -1643,7 +1646,7 @@ updatewmhints(Client *c) {
 void
 view(const Arg *arg) {
 	seltags ^= 1; /* toggle sel tagset */
-	if(arg && (arg->ui & TAGMASK))
+	if(arg && (arg->ui & TAGMASK) && (arg->ui & TAGMASK) != tagset[seltags ^ 1])
 		tagset[seltags] = arg->i & TAGMASK;
 	arrange();
 }
