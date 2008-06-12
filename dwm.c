@@ -59,8 +59,8 @@ enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
-enum { ClkLtSymbol = -1, ClkStatusText = -2, ClkWinTitle = -3,
-       ClkClientWin = -4, ClkRootWin = -5, ClkLast = -6};/* clicks */
+enum { ClkLtSymbol = 64, ClkStatusText, ClkWinTitle,
+       ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
 
 /* typedefs */
 typedef unsigned int uint;
@@ -314,11 +314,12 @@ buttonpress(XEvent *e) {
 
 	click = ClkRootWin;
 	if(ev->window == barwin) {
-		x = 0;
-		for(i = 0; i < LENGTH(tags) && ev->x >= x; i++)
+		i = x = 0;
+		do
 			x += TEXTW(tags[i]);
-		if(i < LENGTH(tags) || ev->x <= x)
-			click = i - 1;
+		while(ev->x >= x && ++i < LENGTH(tags));
+		if(i < LENGTH(tags))
+			click = i;
 		else if(ev->x < x + blw)
 			click = ClkLtSymbol;
 		else if(ev->x > wx + ww - TEXTW(stext))
