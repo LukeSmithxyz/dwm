@@ -315,23 +315,23 @@ buttonpress(XEvent *e) {
 	click = ClkRootWin;
 	if(ev->window == barwin) {
 		x = 0;
-		for(i = 0; i < LENGTH(tags) && ev->x >= x; i++) {
+		for(i = 0; i < LENGTH(tags) && ev->x >= x; i++)
 			x += TEXTW(tags[i]);
-			if(i < LENGTH(tags) || ev->x <= x)
-				click = i - 1;
-			else if(ev->x < x + blw)
-				click = ClkLtSymbol;
-			else if(ev->x > wx + ww - TEXTW(stext))
-				click = ClkStatusText;
-			else
-				click = ClkWinTitle;
-		}
+		if(i < LENGTH(tags) || ev->x <= x)
+			click = i - 1;
+		else if(ev->x < x + blw)
+			click = ClkLtSymbol;
+		else if(ev->x > wx + ww - TEXTW(stext))
+			click = ClkStatusText;
+		else
+			click = ClkWinTitle;
 	}
 	else if((c = getclient(ev->window)))
 		click = ClkClientWin;
 
 	for(i = 0; i < LENGTH(buttons); i++)
-		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
+		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
+		   && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
 			buttons[i].func(&buttons[i].arg);
 }
 
@@ -1646,7 +1646,7 @@ updatewmhints(Client *c) {
 void
 view(const Arg *arg) {
 	seltags ^= 1; /* toggle sel tagset */
-	if(arg && (arg->ui & TAGMASK) && (arg->ui & TAGMASK) != tagset[seltags ^ 1])
+	if(arg && (arg->ui & TAGMASK))
 		tagset[seltags] = arg->i & TAGMASK;
 	arrange();
 }
