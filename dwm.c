@@ -980,11 +980,6 @@ movemouse(const Arg *arg) {
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
-	if(x1 < c->x || x1 > c->x + c->w || y1 < c->y || y1 > c->y + c->h) {
-		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, 0, 0);
-		x1 = c->x + 1;
-		y1 = c->y + 1;
-	}
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
