@@ -1321,12 +1321,12 @@ setup(void) {
 	/* init screen */
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
-	initfont(FONT);
+	initfont(font);
 	sx = 0;
 	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	bh = dc.font.height + 2;
+	bh = dc.h = dc.font.height + 2;
 	lt = layouts;
 	updategeom();
 
@@ -1344,14 +1344,12 @@ setup(void) {
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
 	/* init appearance */
-	dc.norm[ColBorder] = getcolor(NORMBORDERCOLOR);
-	dc.norm[ColBG] = getcolor(NORMBGCOLOR);
-	dc.norm[ColFG] = getcolor(NORMFGCOLOR);
-	dc.sel[ColBorder] = getcolor(SELBORDERCOLOR);
-	dc.sel[ColBG] = getcolor(SELBGCOLOR);
-	dc.sel[ColFG] = getcolor(SELFGCOLOR);
-	initfont(FONT);
-	dc.h = bh;
+	dc.norm[ColBorder] = getcolor(normbordercolor);
+	dc.norm[ColBG] = getcolor(normbgcolor);
+	dc.norm[ColFG] = getcolor(normfgcolor);
+	dc.sel[ColBorder] = getcolor(selbordercolor);
+	dc.sel[ColBG] = getcolor(selbgcolor);
+	dc.sel[ColFG] = getcolor(selfgcolor);
 	dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, 0);
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);

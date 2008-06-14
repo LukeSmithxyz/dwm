@@ -1,20 +1,20 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-#define FONT            "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*"
-#define NORMBORDERCOLOR "#cccccc"
-#define NORMBGCOLOR     "#cccccc"
-#define NORMFGCOLOR     "#000000"
-#define SELBORDERCOLOR  "#0066ff"
-#define SELBGCOLOR      "#0066ff"
-#define SELFGCOLOR      "#ffffff"
-static uint borderpx    = 1;        /* border pixel of windows */
-static uint snap        = 32;       /* snap pixel */
-static Bool showbar     = True;     /* False means no bar */
-static Bool topbar      = True;     /* False means bottom bar */
+static const char font[]            = "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*";
+static const char normbordercolor[] = "#cccccc";
+static const char normbgcolor[]     = "#cccccc";
+static const char normfgcolor[]     = "#000000";
+static const char selbordercolor[]  = "#0066ff";
+static const char selbgcolor[]      = "#0066ff";
+static const char selfgcolor[]      = "#ffffff";
+static uint borderpx                = 1;        /* border pixel of windows */
+static uint snap                    = 32;       /* snap pixel */
+static Bool showbar                 = True;     /* False means no bar */
+static Bool topbar                  = True;     /* False means bottom bar */
 
 #ifdef XINERAMA
-static uint xidx        = 0;        /* Xinerama screen index to use */
+static uint xidx                    = 0;        /* Xinerama screen index to use */
 #endif
 
 /* tagging */
@@ -45,12 +45,16 @@ static Layout layouts[] = {
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (char*[]){ "/bin/sh", "-c", cmd, NULL } }
+#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+
+/* commands */
+static const char *dmenucmd[] = { "dmenu_run", "-fn", font, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
+static const char *termcmd[]  = { "uxterm", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = (char *[]){"dmenu_run", "-fn", FONT, "-nb", NORMBGCOLOR, "-nf", NORMFGCOLOR, "-sb", SELBGCOLOR, "-sf", SELFGCOLOR, NULL}} },
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = (char *[]){"uxterm", NULL}} },
+	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -89,15 +93,14 @@ static Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	{ ClkLtSymbol,          0,              Button1,        togglelayout,   {0} },
 	{ ClkLtSymbol,          0,              Button3,        togglemax,      {0} },
-	{ ClkWinTitle,          0,              Button1,        movemouse,      {0} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
-	{ ClkWinTitle,          0,              Button3,        resizemouse,    {0} },
+	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
 	{ ClkWinTitle,          0,              Button4,        focusstack,     {.i = +1 } },
 	{ ClkWinTitle,          0,              Button5,        focusstack,     {.i = -1 } },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
-	{ ClkRootWin,           Button1Mask,    Button3,        spawn,          {.v = (char *[]){"uxterm", NULL}} },
+	{ ClkRootWin,           Button1Mask,    Button3,        spawn,          {.v = termcmd } },
 	TAGBUTTONS(0)
 	TAGBUTTONS(1)
 	TAGBUTTONS(2)
