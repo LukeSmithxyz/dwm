@@ -1379,7 +1379,7 @@ setup(void) {
 			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* select for events */
-	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask
+	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
 			|EnterWindowMask|LeaveWindowMask|StructureNotifyMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
