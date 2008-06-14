@@ -100,7 +100,6 @@ static Button buttons[] = {
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
-	{ ClkRootWin,           Button1Mask,    Button3,        spawn,          {.v = termcmd } },
 	TAGBUTTONS(0)
 	TAGBUTTONS(1)
 	TAGBUTTONS(2)

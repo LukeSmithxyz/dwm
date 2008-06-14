@@ -60,7 +60,7 @@ enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 enum { ClkLtSymbol = 64, ClkStatusText, ClkWinTitle,
-       ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
+       ClkClientWin, ClkLast };                         /* clicks */
 
 /* typedefs */
 typedef unsigned int uint;
@@ -312,7 +312,7 @@ buttonpress(XEvent *e) {
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	click = ClkRootWin;
+	click = ClkLast;
 	if(ev->window == barwin) {
 		i = x = 0;
 		do
