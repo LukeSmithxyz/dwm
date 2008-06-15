@@ -60,7 +60,7 @@ enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 enum { ClkLtSymbol = 64, ClkStatusText, ClkWinTitle,
-       ClkClientWin, ClkLast };                         /* clicks */
+       ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
 
 /* typedefs */
 typedef unsigned int uint;
@@ -84,12 +84,12 @@ typedef struct {
 typedef struct Client Client;
 struct Client {
 	char name[256];
+	float mina, maxa;
 	int x, y, w, h;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	float mina, maxa;
 	int bw, oldbw;
-	Bool isbanned, isfixed, isfloating, ismoved, isurgent;
 	uint tags;
+	Bool isbanned, isfixed, isfloating, ismoved, isurgent;
 	Client *next;
 	Client *snext;
 	Window win;
@@ -312,7 +312,7 @@ buttonpress(XEvent *e) {
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	click = ClkLast;
+	click = ClkRootWin;
 	if(ev->window == barwin) {
 		i = x = 0;
 		do
@@ -327,8 +327,10 @@ buttonpress(XEvent *e) {
 		else
 			click = ClkWinTitle;
 	}
-	else if((c = getclient(ev->window)))
+	else if((c = getclient(ev->window))) {
+		focus(c);
 		click = ClkClientWin;
+	}
 
 	for(i = 0; i < LENGTH(buttons); i++)
 		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
@@ -1374,7 +1376,7 @@ setup(void) {
 			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* select for events */
-	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask
+	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask
 			|EnterWindowMask|LeaveWindowMask|StructureNotifyMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
