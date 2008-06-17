@@ -913,7 +913,8 @@ manage(Window w, XWindowAttributes *wa) {
 		if(c->y + c->h + 2 * c->bw > sy + sh)
 			c->y = sy + sh - c->h - 2 * c->bw;
 		c->x = MAX(c->x, sx);
-		c->y = MAX(c->y, by == 0 ? bh : sy);
+		/* only fix client y-offset, if the client center might cover the bar */
+		c->y = MAX(c->y, ((by == 0) && (c->x + (c->w / 2) >= wx) && (c->x + (c->w / 2) < wx + ww)) ? bh : sy);
 		c->bw = borderpx;
 	}
 
