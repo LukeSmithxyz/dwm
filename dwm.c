@@ -1094,11 +1094,11 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 		w = MAX(w, c->minw);
 		h = MAX(h, c->minh);
-		
-		if (c->maxw)
+
+		if(c->maxw)
 			w = MIN(w, c->maxw);
 
-		if (c->maxh)
+		if(c->maxh)
 			h = MIN(h, c->maxh);
 	}
 	if(w <= 0 || h <= 0)

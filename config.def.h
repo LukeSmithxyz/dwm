@@ -27,8 +27,8 @@ static Rule rules[] = {
 };
 
 /* layout(s) */
-static float mfact           = 0.55;
-static Bool resizehints       = False;     /* False means respect size hints in tiled resizals */
+static float mfact      = 0.55;
+static Bool resizehints = True; /* False means respect size hints in tiled resizals */
 
 static Layout layouts[] = {
 	/* symbol     arrange function */
