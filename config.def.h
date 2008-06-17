@@ -21,7 +21,7 @@ static uint xidx                    = 0;        /* Xinerama screen index to use 
 static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static Rule rules[] = {
-	/* class      instance    title       tags ref      isfloating */
+	/* class      instance    title       tags mask     isfloating */
 	{ "Gimp",     NULL,       NULL,       0,            True },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       True },
 };
