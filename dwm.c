@@ -207,7 +207,7 @@ static void zoom(const Arg *arg);
 static char stext[256];
 static int screen, sx, sy, sw, sh;
 static int by, bh, blw, wx, wy, ww, wh;
-static uint seltags = 0;
+static uint seltags = 0, sellt = 0;
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static uint numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
@@ -234,7 +234,7 @@ static Client *stack = NULL;
 static Cursor cursor[CurLast];
 static Display *dpy;
 static DC dc = {0};
-static Layout *lt = NULL;
+static Layout *lt[] = { NULL, NULL };
 static Window root, barwin;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -274,7 +274,7 @@ arrange(void) {
 
 	for(c = clients; c; c = c->next)
 		if(c->tags & tagset[seltags]) { /* is visible */
-			if(!lt->arrange || c->isfloating)
+			if(!lt[sellt]->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
 			c->isbanned = False;
 		}
@@ -284,8 +284,8 @@ arrange(void) {
 		}
 
 	focus(NULL);
-	if(lt->arrange)
-		lt->arrange();
+	if(lt[sellt]->arrange)
+		lt[sellt]->arrange();
 	restack();
 }
 
@@ -355,7 +355,7 @@ cleanup(void) {
 
 	close(STDIN_FILENO);
 	view(&a);
-	lt = &foo;
+	lt[sellt] = &foo;
 	while(stack)
 		unmanage(stack);
 	if(dc.font.set)
@@ -413,7 +413,7 @@ configurerequest(XEvent *e) {
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
-		else if(c->isfloating || !lt->arrange) {
+		else if(c->isfloating || !lt[sellt]->arrange) {
 			if(ev->value_mask & CWX)
 				c->x = sx + ev->x;
 			if(ev->value_mask & CWY)
@@ -500,7 +500,7 @@ drawbar(void) {
 	}
 	if(blw > 0) {
 		dc.w = blw;
-		drawtext(lt->symbol, dc.norm, False);
+		drawtext(lt[sellt]->symbol, dc.norm, False);
 		x = dc.x + dc.w;
 	}
 	else
@@ -1009,10 +1009,10 @@ movemouse(const Arg *arg) {
 					ny = wy;
 				else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < snap)
 					ny = wy + wh - c->h - 2 * c->bw;
-				if(!c->isfloating && lt->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
+				if(!c->isfloating && lt[sellt]->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 					togglefloating(NULL);
 			}
-			if(!lt->arrange || c->isfloating)
+			if(!lt[sellt]->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, False);
 			break;
 		}
@@ -1166,11 +1166,11 @@ resizemouse(const Arg *arg) {
 
 			if(snap && nw >= wx && nw <= wx + ww
 			        && nh >= wy && nh <= wy + wh) {
-				if(!c->isfloating && lt->arrange
+				if(!c->isfloating && lt[sellt]->arrange
 				   && (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
 					togglefloating(NULL);
 			}
-			if(!lt->arrange || c->isfloating)
+			if(!lt[sellt]->arrange || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
@@ -1186,9 +1186,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(sel->isfloating || !lt->arrange)
+	if(sel->isfloating || !lt[sellt]->arrange)
 		XRaiseWindow(dpy, sel->win);
-	if(lt->arrange) {
+	if(lt[sellt]->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
@@ -1298,14 +1298,9 @@ setclientstate(Client *c, long state) {
 
 void
 setlayout(const Arg *arg) {
-	static Layout *prevlt = &layouts[1 % LENGTH(layouts)];
-
-	if(!arg || !arg->v || arg->v == lt)
-		lt = prevlt;
-	else {
-		prevlt = lt;
-		lt = (Layout *)arg->v;
-	}
+	sellt ^= 1;
+	if(arg && arg->v && arg->v != lt[sellt])
+		lt[sellt] = (Layout *)arg->v;
 	if(sel)
 		arrange();
 	else
@@ -1317,7 +1312,7 @@ void
 setmfact(const Arg *arg) {
 	float f;
 
-	if(!arg || !lt->arrange)
+	if(!arg || !lt[sellt]->arrange)
 		return;
 	f = arg->f < 1.0 ? arg->f + mfact : arg->f - 1.0;
 	if(f < 0.1 || f > 0.9)
@@ -1341,7 +1336,8 @@ setup(void) {
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.h = dc.font.height + 2;
-	lt = layouts;
+	lt[0] = &layouts[0];
+	lt[1] = &layouts[1 % LENGTH(layouts)];
 	updategeom();
 
 	/* init atoms */
@@ -1691,7 +1687,7 @@ void
 zoom(const Arg *arg) {
 	Client *c = sel;
 
-	if(!lt->arrange || lt->arrange == monocle || (sel && sel->isfloating))
+	if(!lt[sellt]->arrange || lt[sellt]->arrange == monocle || (sel && sel->isfloating))
 		return;
 	if(c == nexttiled(clients))
 		if(!c || !(c = nexttiled(c->next)))
