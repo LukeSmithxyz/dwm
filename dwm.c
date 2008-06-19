@@ -53,6 +53,7 @@
 #define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
 #define TAGMASK         ((int)((1LL << LENGTH(tags)) - 1))
 #define TEXTW(x)        (textnw(x, strlen(x)) + dc.font.height)
+#define ISVISIBLE(x)    (x->tags & tagset[seltags])
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
@@ -89,7 +90,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
 	uint tags;
-	Bool isbanned, isfixed, isfloating, isurgent;
+	Bool isfixed, isfloating, isurgent;
 	Client *next;
 	Client *snext;
 	Window win;
@@ -273,14 +274,13 @@ arrange(void) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
-		if(c->tags & tagset[seltags]) { /* is visible */
-			c->isbanned = False;
+		if(ISVISIBLE(c)) {
+			XMoveWindow(dpy, c->win, c->x, c->y);
 			if(!lt[sellt]->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
 		}
-		else if(!c->isbanned) {
+		else {
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-			c->isbanned = True;
 		}
 
 	focus(NULL);
@@ -428,7 +428,7 @@ configurerequest(XEvent *e) {
 				c->y = sy + (sh / 2 - c->h / 2); /* center in y direction */
 			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
-			if(!c->isbanned)
+			if(ISVISIBLE(c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else
@@ -605,8 +605,8 @@ expose(XEvent *e) {
 
 void
 focus(Client *c) {
-	if(!c || c->isbanned)
-		for(c = stack; c && c->isbanned; c = c->snext);
+	if(!c || !ISVISIBLE(c))
+		for(c = stack; c && !ISVISIBLE(c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -639,17 +639,17 @@ focusstack(const Arg *arg) {
 	if(!sel)
 		return;
 	if (arg->i > 0) {
-		for(c = sel->next; c && c->isbanned; c = c->next);
+		for(c = sel->next; c && !ISVISIBLE(c); c = c->next);
 		if(!c)
-			for(c = clients; c && c->isbanned; c = c->next);
+			for(c = clients; c && !ISVISIBLE(c); c = c->next);
 	}
 	else {
 		for(i = clients; i != sel; i = i->next)
-			if (!i->isbanned)
+			if(ISVISIBLE(i))
 				c = i;
 		if(!c)
 			for(; i; i = i->next)
-				if (!i->isbanned)
+				if(ISVISIBLE(i))
 					c = i;
 	}
 	if(c) {
@@ -1018,7 +1018,7 @@ movemouse(const Arg *arg) {
 
 Client *
 nexttiled(Client *c) {
-	for(; c && (c->isfloating || c->isbanned); c = c->next);
+	for(; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
 	return c;
 }
 
@@ -1113,7 +1113,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		h = bh;
 	if(w < bh)
 		w = bh;
-	if(!c->isbanned || c->x != x || c->y != y || c->w != w || c->h != h) {
+	if(c->x != x || c->y != y || c->w != w || c->h != h) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
@@ -1189,7 +1189,7 @@ restack(void) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
-			if(!c->isfloating && !c->isbanned) {
+			if(!c->isfloating && ISVISIBLE(c)) {
 				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
 				wc.sibling = c->win;
 			}
