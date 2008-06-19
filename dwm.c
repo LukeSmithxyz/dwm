@@ -481,19 +481,17 @@ detachstack(Client *c) {
 void
 drawbar(void) {
 	int i, x;
-	Client *c;
 
 	dc.x = 0;
-	for(c = stack; c && c->isbanned; c = c->snext);
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i]);
 		if(tagset[seltags] & 1 << i) {
 			drawtext(tags[i], dc.sel, isurgent(i));
-			drawsquare(c && c->tags & 1 << i, isoccupied(i), isurgent(i), dc.sel);
+			drawsquare(sel && sel->tags & 1 << i, isoccupied(i), isurgent(i), dc.sel);
 		}
 		else {
 			drawtext(tags[i], dc.norm, isurgent(i));
-			drawsquare(c && c->tags & 1 << i, isoccupied(i), isurgent(i), dc.norm);
+			drawsquare(sel && sel->tags & 1 << i, isoccupied(i), isurgent(i), dc.norm);
 		}
 		dc.x += dc.w;
 	}
@@ -513,9 +511,9 @@ drawbar(void) {
 	drawtext(stext, dc.norm, False);
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
-		if(c) {
-			drawtext(c->name, dc.sel, False);
-			drawsquare(c->isfixed, c->isfloating, False, dc.sel);
+		if(sel) {
+			drawtext(sel->name, dc.sel, False);
+			drawsquare(sel->isfixed, sel->isfloating, False, dc.sel);
 		}
 		else
 			drawtext(NULL, dc.norm, False);
