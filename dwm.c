@@ -89,7 +89,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
 	uint tags;
-	Bool isbanned, isfixed, isfloating, ismoved, isurgent;
+	Bool isbanned, isfixed, isfloating, isurgent;
 	Client *next;
 	Client *snext;
 	Window win;
@@ -168,6 +168,7 @@ static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
+static void monocle(void);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void propertynotify(XEvent *e);
@@ -178,6 +179,7 @@ static void restack(void);
 static void run(void);
 static void scan(void);
 static void setclientstate(Client *c, long state);
+static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
 static void spawn(const Arg *arg);
@@ -186,8 +188,6 @@ static int textnw(const char *text, uint len);
 static void tile(void);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
-static void togglelayout(const Arg *arg);
-static void togglemax(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unmanage(Client *c);
@@ -225,7 +225,6 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 static Atom wmatom[WMLast], netatom[NetLast];
-static Bool ismax = False;
 static Bool otherwm, readin;
 static Bool running = True;
 static uint tagset[] = {1, 1}; /* after start, first tag is selected */
@@ -275,21 +274,17 @@ arrange(void) {
 
 	for(c = clients; c; c = c->next)
 		if(c->tags & tagset[seltags]) { /* is visible */
-			if(ismax && !c->isfixed) {
-				XMoveResizeWindow(dpy, c->win, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
-				c->ismoved = True;
-			}
-			else if(!lt->arrange || c->isfloating)
+			if(!lt->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
 			c->isbanned = False;
 		}
 		else if(!c->isbanned) {
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-			c->isbanned = c->ismoved = True;
+			c->isbanned = True;
 		}
 
 	focus(NULL);
-	if(lt->arrange && !ismax)
+	if(lt->arrange)
 		lt->arrange();
 	restack();
 }
@@ -418,8 +413,6 @@ configurerequest(XEvent *e) {
 	if((c = getclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
-		if(ismax && !c->isbanned && !c->isfixed)
-			XMoveResizeWindow(dpy, c->win, wx, wy, ww - 2 * c->bw, wh + 2 * c->bw);
 		else if(c->isfloating || !lt->arrange) {
 			if(ev->value_mask & CWX)
 				c->x = sx + ev->x;
@@ -507,7 +500,7 @@ drawbar(void) {
 	}
 	if(blw > 0) {
 		dc.w = blw;
-		drawtext(lt->symbol, dc.norm, ismax);
+		drawtext(lt->symbol, dc.norm, False);
 		x = dc.x + dc.w;
 	}
 	else
@@ -967,6 +960,14 @@ maprequest(XEvent *e) {
 }
 
 void
+monocle(void) {
+	Client *c;
+
+	for(c = nexttiled(clients); c; c = nexttiled(c->next))
+		resize(c, wx, wy, ww, wh, resizehints);
+}
+
+void
 movemouse(const Arg *arg) {
 	int x1, y1, ocx, ocy, di, nx, ny;
 	uint dui;
@@ -1115,8 +1116,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		h = bh;
 	if(w < bh)
 		w = bh;
-	if(c->x != x || c->y != y || c->w != w || c->h != h || c->ismoved) {
-		c->ismoved = False;
+	if(c->x != x || c->y != y || c->w != w || c->h != h) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
@@ -1186,9 +1186,9 @@ restack(void) {
 	drawbar();
 	if(!sel)
 		return;
-	if(ismax || sel->isfloating || !lt->arrange)
+	if(sel->isfloating || !lt->arrange)
 		XRaiseWindow(dpy, sel->win);
-	if(!ismax && lt->arrange) {
+	if(lt->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = barwin;
 		for(c = stack; c; c = c->snext)
@@ -1294,6 +1294,22 @@ setclientstate(Client *c, long state) {
 
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
 			PropModeReplace, (unsigned char *)data, 2);
+}
+
+void
+setlayout(const Arg *arg) {
+	static Layout *prevlt = &layouts[1 % LENGTH(layouts)];
+
+	if(!arg || !arg->v || arg->v == lt)
+		lt = prevlt;
+	else {
+		prevlt = lt;
+		lt = (Layout *)arg->v;
+	}
+	if(sel)
+		arrange();
+	else
+		drawbar();
 }
 
 /* arg > 1.0 will set mfact absolutly */
@@ -1473,24 +1489,6 @@ togglefloating(const Arg *arg) {
 	sel->isfloating = !sel->isfloating || sel->isfixed;
 	if(sel->isfloating)
 		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
-	arrange();
-}
-
-void
-togglelayout(const Arg *arg) {
-	if(arg && arg->v)
-		lt = (Layout *)arg->v;
-	else if(++lt == &layouts[LENGTH(layouts)])
-		lt = &layouts[0];
-	if(sel)
-		arrange();
-	else
-		drawbar();
-}
-
-void
-togglemax(const Arg *arg) {
-	ismax = !ismax;
 	arrange();
 }
 
@@ -1693,7 +1691,7 @@ void
 zoom(const Arg *arg) {
 	Client *c = sel;
 
-	if(ismax || !lt->arrange || (sel && sel->isfloating))
+	if(!lt->arrange || lt->arrange == monocle || (sel && sel->isfloating))
 		return;
 	if(c == nexttiled(clients))
 		if(!c || !(c = nexttiled(c->next)))
