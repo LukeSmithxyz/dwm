@@ -274,9 +274,9 @@ arrange(void) {
 
 	for(c = clients; c; c = c->next)
 		if(c->tags & tagset[seltags]) { /* is visible */
+			c->isbanned = False;
 			if(!lt[sellt]->arrange || c->isfloating)
 				resize(c, c->x, c->y, c->w, c->h, True);
-			c->isbanned = False;
 		}
 		else if(!c->isbanned) {
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
