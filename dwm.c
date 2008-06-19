@@ -426,8 +426,7 @@ configurerequest(XEvent *e) {
 				c->x = sx + (sw / 2 - c->w / 2); /* center in x direction */
 			if((c->y - sy + c->h) > sh && c->isfloating)
 				c->y = sy + (sh / 2 - c->h / 2); /* center in y direction */
-			if((ev->value_mask & (CWX|CWY))
-			&& !(ev->value_mask & (CWWidth|CWHeight)))
+			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
 			if(!c->isbanned)
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
@@ -1116,7 +1115,7 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 		h = bh;
 	if(w < bh)
 		w = bh;
-	if(c->x != x || c->y != y || c->w != w || c->h != h) {
+	if(!c->isbanned || c->x != x || c->y != y || c->w != w || c->h != h) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
