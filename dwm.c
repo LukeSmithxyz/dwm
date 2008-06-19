@@ -1496,14 +1496,22 @@ togglemax(const Arg *arg) {
 
 void
 toggletag(const Arg *arg) {
-	if(sel && (sel->tags ^= (arg->ui & TAGMASK)))
+	uint mask = sel->tags ^ (arg->ui & TAGMASK);
+
+	if(sel && mask) {
+		sel->tags = mask;
 		arrange();
+	}
 }
 
 void
 toggleview(const Arg *arg) {
-	if((tagset[seltags] ^= (arg->ui & TAGMASK)))
+	uint mask = tagset[seltags] ^ (arg->ui & TAGMASK);
+
+	if(mask) {
+		tagset[seltags] = mask;
 		arrange();
+	}
 }
 
 void
