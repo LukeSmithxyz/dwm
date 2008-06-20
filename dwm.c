@@ -60,7 +60,7 @@ enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
-enum { ClkLtSymbol = 64, ClkStatusText, ClkWinTitle,
+enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
 
 /* typedefs */
@@ -304,17 +304,18 @@ attachstack(Client *c) {
 void
 buttonpress(XEvent *e) {
 	uint i, x, click;
+	Arg arg = {0};
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	click = ClkRootWin;
 	if(ev->window == barwin) {
-		i = x = 0;
-		do
+		for(i = x = 0; ev->x >= x && ++i < LENGTH(tags); i++)
 			x += TEXTW(tags[i]);
-		while(ev->x >= x && ++i < LENGTH(tags));
-		if(i < LENGTH(tags))
-			click = i;
+		if(i < LENGTH(tags)) {
+			click = ClkTagBar;
+			arg.ui = 1 << i;
+		}
 		else if(ev->x < x + blw)
 			click = ClkLtSymbol;
 		else if(ev->x > wx + ww - TEXTW(stext))
@@ -330,7 +331,7 @@ buttonpress(XEvent *e) {
 	for(i = 0; i < LENGTH(buttons); i++)
 		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 		   && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
-			buttons[i].func(&buttons[i].arg);
+			buttons[i].func(click == ClkTagBar ? &arg : &buttons[i].arg);
 }
 
 void
@@ -1295,8 +1296,9 @@ setclientstate(Client *c, long state) {
 
 void
 setlayout(const Arg *arg) {
-	sellt ^= 1;
-	if(arg && arg->v && arg->v != lt[sellt])
+	if(!arg || !arg->v || arg->v != lt[sellt])
+		sellt ^= 1;
+	if(arg && arg->v)
 		lt[sellt] = (Layout *)arg->v;
 	if(sel)
 		arrange();

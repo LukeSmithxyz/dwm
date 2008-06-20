@@ -84,12 +84,6 @@ static Key keys[] = {
 };
 
 /* button definitions */
-#define TAGBUTTONS(TAG) \
-	{ TAG,                  0,              Button1,        view,           {.ui = 1 << TAG} }, \
-	{ TAG,                  0,              Button3,        toggleview,     {.ui = 1 << TAG} }, \
-	{ TAG,                  MODKEY,         Button1,        tag,            {.ui = 1 << TAG} }, \
-	{ TAG,                  MODKEY,         Button3,        toggletag,      {.ui = 1 << TAG} },
-
 /* click can be a tag number (starting at 0),
  * ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
 static Button buttons[] = {
@@ -101,14 +95,9 @@ static Button buttons[] = {
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
-	TAGBUTTONS(0)
-	TAGBUTTONS(1)
-	TAGBUTTONS(2)
-	TAGBUTTONS(3)
-	TAGBUTTONS(4)
-	TAGBUTTONS(5)
-	TAGBUTTONS(6)
-	TAGBUTTONS(7)
-	TAGBUTTONS(8)
+	{ ClkTagBar,            0,              Button1,        view,           {0} }, \
+	{ ClkTagBar,            0,              Button3,        toggleview,     {0} }, \
+	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} }, \
+	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
 
