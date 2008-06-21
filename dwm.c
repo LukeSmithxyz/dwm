@@ -310,8 +310,8 @@ buttonpress(XEvent *e) {
 
 	click = ClkRootWin;
 	if(ev->window == barwin) {
-		for(i = x = 0; ev->x >= x && ++i < LENGTH(tags); i++)
-			x += TEXTW(tags[i]);
+		i = x = 0;
+		do x += TEXTW(tags[i]); while(ev->x >= x && ++i < LENGTH(tags));
 		if(i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
