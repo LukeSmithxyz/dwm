@@ -1704,7 +1704,9 @@ main(int argc, char *argv[]) {
 	else if(argc != 1)
 		eprint("usage: dwm [-v]\n");
 
-	setlocale(LC_CTYPE, "");
+	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+		fprintf(stderr, "warning: no locale support\n");
+
 	if(!(dpy = XOpenDisplay(0)))
 		eprint("dwm: cannot open display\n");
 
