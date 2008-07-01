@@ -723,19 +723,18 @@ gettextprop(Window w, Atom atom, char *text, uint size) {
 
 void
 grabbuttons(Client *c, Bool focused) {
-	int i, j;
-	uint buttons[]   = { Button1, Button2, Button3 };
-	uint modifiers[] = { MODKEY, MODKEY|LockMask, MODKEY|numlockmask, MODKEY|numlockmask|LockMask };
+	uint i, j;
+	uint modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	if(focused)
+	if(focused) {
 		for(i = 0; i < LENGTH(buttons); i++)
-			for(j = 0; j < LENGTH(modifiers); j++)
-				XGrabButton(dpy, buttons[i], modifiers[j], c->win, False,
-					BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
-	else
+			if(buttons[i].click == ClkClientWin)
+				for(j = 0; j < LENGTH(modifiers); j++)
+					XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+        } else
 		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
-			BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+		            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 }
 
 void
