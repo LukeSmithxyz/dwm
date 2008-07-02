@@ -94,6 +94,8 @@ struct Client {
 	Client *next;
 	Client *snext;
 	Window win;
+	void *aux;
+	void (*freeaux)(void *);
 };
 
 typedef struct {
@@ -1519,6 +1521,8 @@ unmanage(Client *c) {
 	detachstack(c);
 	if(sel == c)
 		focus(NULL);
+	if(c->aux && c->freeaux)
+		c->freeaux(c->aux);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
 	free(c);
@@ -1642,6 +1646,8 @@ updatewmhints(Client *c) {
 
 void
 view(const Arg *arg) {
+	if(arg && (arg->i & TAGMASK) == tagset[seltags])
+		return;
 	seltags ^= 1; /* toggle sel tagset */
 	if(arg && (arg->ui & TAGMASK))
 		tagset[seltags] = arg->i & TAGMASK;
