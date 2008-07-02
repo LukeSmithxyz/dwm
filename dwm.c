@@ -94,8 +94,6 @@ struct Client {
 	Client *next;
 	Client *snext;
 	Window win;
-	void *aux;
-	void (*freeaux)(void *);
 };
 
 typedef struct {
@@ -1521,8 +1519,6 @@ unmanage(Client *c) {
 	detachstack(c);
 	if(sel == c)
 		focus(NULL);
-	if(c->aux && c->freeaux)
-		c->freeaux(c->aux);
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
 	free(c);
