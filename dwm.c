@@ -145,11 +145,11 @@ static void configurerequest(XEvent *e);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
+static void die(const char *errstr, ...);
 static void drawbar(void);
 static void drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]);
 static void drawtext(const char *text, ulong col[ColLast], Bool invert);
 static void enternotify(XEvent *e);
-static void eprint(const char *errstr, ...);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
@@ -343,7 +343,7 @@ checkotherwm(void) {
 	XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
 	XSync(dpy, False);
 	if(otherwm)
-		eprint("dwm: another window manager is already running\n");
+		die("dwm: another window manager is already running\n");
 	XSetErrorHandler(NULL);
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
@@ -474,6 +474,16 @@ detachstack(Client *c) {
 }
 
 void
+die(const char *errstr, ...) {
+	va_list ap;
+
+	va_start(ap, errstr);
+	vfprintf(stderr, errstr, ap);
+	va_end(ap);
+	exit(EXIT_FAILURE);
+}
+
+void
 drawbar(void) {
 	int i, x;
 
@@ -581,16 +591,6 @@ enternotify(XEvent *e) {
 }
 
 void
-eprint(const char *errstr, ...) {
-	va_list ap;
-
-	va_start(ap, errstr);
-	vfprintf(stderr, errstr, ap);
-	va_end(ap);
-	exit(EXIT_FAILURE);
-}
-
-void
 expose(XEvent *e) {
 	XExposeEvent *ev = &e->xexpose;
 
@@ -667,7 +667,7 @@ getcolor(const char *colstr) {
 	XColor color;
 
 	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
-		eprint("error, cannot allocate color '%s'\n", colstr);
+		die("error, cannot allocate color '%s'\n", colstr);
 	return color.pixel;
 }
 
@@ -793,7 +793,7 @@ initfont(const char *fontstr) {
 		dc.font.xfont = NULL;
 		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr))
 		&& !(dc.font.xfont = XLoadQueryFont(dpy, "fixed")))
-			eprint("error, cannot load font: '%s'\n", fontstr);
+			die("error, cannot load font: '%s'\n", fontstr);
 		dc.font.ascent = dc.font.xfont->ascent;
 		dc.font.descent = dc.font.xfont->descent;
 	}
@@ -877,7 +877,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XWindowChanges wc;
 
 	if(!(c = calloc(1, sizeof(Client))))
-		eprint("fatal: could not calloc() %u bytes\n", sizeof(Client));
+		die("fatal: could not calloc() %u bytes\n", sizeof(Client));
 	c->win = w;
 
 	/* geometry */
@@ -1216,7 +1216,7 @@ run(void) {
 		if(select(xfd + 1, &rd, NULL, NULL, NULL) == -1) {
 			if(errno == EINTR)
 				continue;
-			eprint("select failed\n");
+			die("select failed\n");
 		}
 		if(FD_ISSET(STDIN_FILENO, &rd)) {
 			switch((r = read(STDIN_FILENO, sbuf + offset, len - offset))) {
@@ -1695,15 +1695,15 @@ zoom(const Arg *arg) {
 int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		eprint("dwm-"VERSION", © 2006-2008 dwm engineers, see LICENSE for details\n");
+		die("dwm-"VERSION", © 2006-2008 dwm engineers, see LICENSE for details\n");
 	else if(argc != 1)
-		eprint("usage: dwm [-v]\n");
+		die("usage: dwm [-v]\n");
 
 	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fprintf(stderr, "warning: no locale support\n");
 
 	if(!(dpy = XOpenDisplay(0)))
-		eprint("dwm: cannot open display\n");
+		die("dwm: cannot open display\n");
 
 	checkotherwm();
 	setup();
