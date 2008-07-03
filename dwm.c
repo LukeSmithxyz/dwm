@@ -459,16 +459,10 @@ destroynotify(XEvent *e) {
 
 void
 detach(Client *c) {
-	Client *i;
+	Client **tc;
 
-	if (c != clients) {
-		for(i = clients; i->next != c; i = i->next);
-		i->next = c->next;
-	}
-	else {
-		clients = c->next;
-	}
-	c->next =  NULL;
+	for(tc = &clients; *tc && *tc != c; tc = &(*tc)->next);
+	*tc = c->next;
 }
 
 void
