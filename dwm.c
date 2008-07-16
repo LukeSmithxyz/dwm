@@ -44,16 +44,17 @@
 #endif
 
 /* macros */
-#define MAX(a, b)       ((a) > (b) ? (a) : (b))
-#define MIN(a, b)       ((a) < (b) ? (a) : (b))
-#define BUTTONMASK      (ButtonPressMask|ButtonReleaseMask)
-#define CLEANMASK(mask) (mask & ~(numlockmask|LockMask))
-#define LENGTH(x)       (sizeof x / sizeof x[0])
-#define MAXTAGLEN       16
-#define MOUSEMASK       (BUTTONMASK|PointerMotionMask)
-#define TAGMASK         ((int)((1LL << LENGTH(tags)) - 1))
-#define TEXTW(x)        (textnw(x, strlen(x)) + dc.font.height)
-#define ISVISIBLE(x)    (x->tags & tagset[seltags])
+#define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
+#define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
+#define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
+#define ISVISIBLE(x)            (x->tags & tagset[seltags])
+#define LENGTH(x)               (sizeof x / sizeof x[0])
+#define MAX(a, b)               ((a) > (b) ? (a) : (b))
+#define MIN(a, b)               ((a) < (b) ? (a) : (b))
+#define MAXTAGLEN               16
+#define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
+#define TAGMASK                 ((int)((1LL << LENGTH(tags)) - 1))
+#define TEXTW(x)                (textnw(x, strlen(x)) + dc.font.height)
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
@@ -974,7 +975,7 @@ monocle(void) {
 
 void
 movemouse(const Arg *arg) {
-	int x1, y1, ocx, ocy, di, nx, ny;
+	int x, y, ocx, ocy, di, nx, ny;
 	unsigned int dui;
 	Client *c;
 	Window dummy;
@@ -988,7 +989,7 @@ movemouse(const Arg *arg) {
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
+	XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -1002,8 +1003,8 @@ movemouse(const Arg *arg) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			nx = ocx + (ev.xmotion.x - x1);
-			ny = ocy + (ev.xmotion.y - y1);
+			nx = ocx + (ev.xmotion.x - x);
+			ny = ocy + (ev.xmotion.y - y);
 			if(snap && nx >= wx && nx <= wx + ww
 			        && ny >= wy && ny <= wy + wh) {
 				if(abs(wx - nx) < snap)
@@ -1557,12 +1558,24 @@ updatebar(void) {
 void
 updategeom(void) {
 #ifdef XINERAMA
-	int i;
+	int n;
+	unsigned int xidx = 0;
 	XineramaScreenInfo *info = NULL;
 
 	/* window area geometry */
 	if(XineramaIsActive(dpy)) {
-		info = XineramaQueryScreens(dpy, &i);
+		info = XineramaQueryScreens(dpy, &n);
+		if(n > 1) {
+			int di, i, x, y;
+			unsigned int dui;
+			Window dummy;
+			if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui))
+				for(i = 0; i < n; i++)
+					if(INRECT(x, y, info[i].x_org, info[i].y_org, info[i].width, info[i].height)) {
+						xidx = i;
+						break;
+					}
+		}
 		wx = info[xidx].x_org;
 		wy = showbar && topbar ?  info[xidx].y_org + bh : info[xidx].y_org;
 		ww = info[xidx].width;
