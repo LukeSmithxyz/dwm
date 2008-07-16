@@ -63,21 +63,17 @@ enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
 
-/* typedefs */
-typedef unsigned int uint;
-typedef unsigned long ulong;
-
 typedef union {
 	int i;
-	uint ui;
+	unsigned int ui;
 	float f;
 	void *v;
 } Arg;
 
 typedef struct {
-	uint click;
-	uint mask;
-	uint button;
+	unsigned int click;
+	unsigned int mask;
+	unsigned int button;
 	void (*func)(const Arg *arg);
 	const Arg arg;
 } Button;
@@ -89,7 +85,7 @@ struct Client {
 	int x, y, w, h;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
-	uint tags;
+	unsigned int tags;
 	Bool isfixed, isfloating, isurgent;
 	Client *next;
 	Client *snext;
@@ -98,8 +94,8 @@ struct Client {
 
 typedef struct {
 	int x, y, w, h;
-	ulong norm[ColLast];
-	ulong sel[ColLast];
+	unsigned long norm[ColLast];
+	unsigned long sel[ColLast];
 	Drawable drawable;
 	GC gc;
 	struct {
@@ -112,7 +108,7 @@ typedef struct {
 } DC; /* draw context */
 
 typedef struct {
-	uint mod;
+	unsigned int mod;
 	KeySym keysym;
 	void (*func)(const Arg *);
 	const Arg arg;
@@ -127,7 +123,7 @@ typedef struct {
 	const char *class;
 	const char *instance;
 	const char *title;
-	uint tags;
+	unsigned int tags;
 	Bool isfloating;
 } Rule;
 
@@ -148,23 +144,23 @@ static void detach(Client *c);
 static void detachstack(Client *c);
 static void die(const char *errstr, ...);
 static void drawbar(void);
-static void drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]);
-static void drawtext(const char *text, ulong col[ColLast], Bool invert);
+static void drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
+static void drawtext(const char *text, unsigned long col[ColLast], Bool invert);
 static void enternotify(XEvent *e);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusstack(const Arg *arg);
 static Client *getclient(Window w);
-static ulong getcolor(const char *colstr);
+static unsigned long getcolor(const char *colstr);
 static long getstate(Window w);
-static Bool gettextprop(Window w, Atom atom, char *text, uint size);
+static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
 static void initfont(const char *fontstr);
-static Bool isoccupied(uint t);
+static Bool isoccupied(unsigned int t);
 static Bool isprotodel(Client *c);
-static Bool isurgent(uint t);
+static Bool isurgent(unsigned int t);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
@@ -186,7 +182,7 @@ static void setmfact(const Arg *arg);
 static void setup(void);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
-static int textnw(const char *text, uint len);
+static int textnw(const char *text, unsigned int len);
 static void tile(void);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
@@ -209,9 +205,9 @@ static void zoom(const Arg *arg);
 static char stext[256];
 static int screen, sx, sy, sw, sh;
 static int by, bh, blw, wx, wy, ww, wh;
-static uint seltags = 0, sellt = 0;
+static unsigned int seltags = 0, sellt = 0;
 static int (*xerrorxlib)(Display *, XErrorEvent *);
-static uint numlockmask = 0;
+static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ConfigureRequest] = configurerequest,
@@ -229,7 +225,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 static Atom wmatom[WMLast], netatom[NetLast];
 static Bool otherwm, readin;
 static Bool running = True;
-static uint tagset[] = {1, 1}; /* after start, first tag is selected */
+static unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
 static Client *clients = NULL;
 static Client *sel = NULL;
 static Client *stack = NULL;
@@ -241,13 +237,13 @@ static Window root, barwin;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
-/* compile-time check if all tags fit into an uint bit array. */
-struct NumTags { char limitexceeded[sizeof(uint) * 8 < LENGTH(tags) ? -1 : 1]; };
+/* compile-time check if all tags fit into an unsigned int bit array. */
+struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1 : 1]; };
 
 /* function implementations */
 void
 applyrules(Client *c) {
-	uint i;
+	unsigned int i;
 	Rule *r;
 	XClassHint ch = { 0 };
 
@@ -304,7 +300,7 @@ attachstack(Client *c) {
 
 void
 buttonpress(XEvent *e) {
-	uint i, x, click;
+	unsigned int i, x, click;
 	Arg arg = {0};
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
@@ -546,7 +542,7 @@ drawbar(void) {
 }
 
 void
-drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]) {
+drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
 	int x;
 	XGCValues gcv;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
@@ -567,7 +563,7 @@ drawsquare(Bool filled, Bool empty, Bool invert, ulong col[ColLast]) {
 }
 
 void
-drawtext(const char *text, ulong col[ColLast], Bool invert) {
+drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	int i, x, y, h, len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 	char buf[256];
@@ -679,7 +675,7 @@ getclient(Window w) {
 	return c;
 }
 
-ulong
+unsigned long
 getcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
@@ -694,7 +690,7 @@ getstate(Window w) {
 	int format, status;
 	long result = -1;
 	unsigned char *p = NULL;
-	ulong n, extra;
+	unsigned long n, extra;
 	Atom real;
 
 	status = XGetWindowProperty(dpy, w, wmatom[WMState], 0L, 2L, False, wmatom[WMState],
@@ -708,7 +704,7 @@ getstate(Window w) {
 }
 
 Bool
-gettextprop(Window w, Atom atom, char *text, uint size) {
+gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 	char **list = NULL;
 	int n;
 	XTextProperty name;
@@ -735,8 +731,8 @@ gettextprop(Window w, Atom atom, char *text, uint size) {
 
 void
 grabbuttons(Client *c, Bool focused) {
-	uint i, j;
-	uint modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
+	unsigned int i, j;
+	unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	if(focused) {
@@ -751,7 +747,7 @@ grabbuttons(Client *c, Bool focused) {
 
 void
 grabkeys(void) {
-	uint i, j;
+	unsigned int i, j;
 	KeyCode code;
 	XModifierKeymap *modmap;
 
@@ -819,7 +815,7 @@ initfont(const char *fontstr) {
 }
 
 Bool
-isoccupied(uint t) {
+isoccupied(unsigned int t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -844,7 +840,7 @@ isprotodel(Client *c) {
 }
 
 Bool
-isurgent(uint t) {
+isurgent(unsigned int t) {
 	Client *c;
 
 	for(c = clients; c; c = c->next)
@@ -855,7 +851,7 @@ isurgent(uint t) {
 
 void
 keypress(XEvent *e) {
-	uint i;
+	unsigned int i;
 	KeySym keysym;
 	XKeyEvent *ev;
 
@@ -979,7 +975,7 @@ monocle(void) {
 void
 movemouse(const Arg *arg) {
 	int x1, y1, ocx, ocy, di, nx, ny;
-	uint dui;
+	unsigned int dui;
 	Client *c;
 	Window dummy;
 	XEvent ev;
@@ -1216,7 +1212,7 @@ run(void) {
 	char sbuf[sizeof stext];
 	fd_set rd;
 	int r, xfd;
-	uint len, offset;
+	unsigned int len, offset;
 	XEvent ev;
 
 	/* main event loop, also reads status text from stdin */
@@ -1272,7 +1268,7 @@ run(void) {
 
 void
 scan(void) {
-	uint i, num;
+	unsigned int i, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
@@ -1333,7 +1329,7 @@ setmfact(const Arg *arg) {
 
 void
 setup(void) {
-	uint i;
+	unsigned int i;
 	int w;
 	XSetWindowAttributes wa;
 
@@ -1436,7 +1432,7 @@ tag(const Arg *arg) {
 }
 
 int
-textnw(const char *text, uint len) {
+textnw(const char *text, unsigned int len) {
 	XRectangle r;
 
 	if(dc.font.set) {
@@ -1449,7 +1445,7 @@ textnw(const char *text, uint len) {
 void
 tile(void) {
 	int x, y, h, w, mw;
-	uint i, n;
+	unsigned int i, n;
 	Client *c;
 
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next), n++);
@@ -1500,7 +1496,7 @@ togglefloating(const Arg *arg) {
 
 void
 toggletag(const Arg *arg) {
-	uint mask = sel->tags ^ (arg->ui & TAGMASK);
+	unsigned int mask = sel->tags ^ (arg->ui & TAGMASK);
 
 	if(sel && mask) {
 		sel->tags = mask;
@@ -1510,7 +1506,7 @@ toggletag(const Arg *arg) {
 
 void
 toggleview(const Arg *arg) {
-	uint mask = tagset[seltags] ^ (arg->ui & TAGMASK);
+	unsigned int mask = tagset[seltags] ^ (arg->ui & TAGMASK);
 
 	if(mask) {
 		tagset[seltags] = mask;
