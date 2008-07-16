@@ -1558,28 +1558,25 @@ updatebar(void) {
 void
 updategeom(void) {
 #ifdef XINERAMA
-	int n;
-	unsigned int xidx = 0;
+	int n, i = 0;
 	XineramaScreenInfo *info = NULL;
 
 	/* window area geometry */
 	if(XineramaIsActive(dpy)) {
 		info = XineramaQueryScreens(dpy, &n);
 		if(n > 1) {
-			int di, i, x, y;
+			int di, x, y;
 			unsigned int dui;
 			Window dummy;
 			if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui))
 				for(i = 0; i < n; i++)
-					if(INRECT(x, y, info[i].x_org, info[i].y_org, info[i].width, info[i].height)) {
-						xidx = i;
+					if(INRECT(x, y, info[i].x_org, info[i].y_org, info[i].width, info[i].height))
 						break;
-					}
 		}
-		wx = info[xidx].x_org;
-		wy = showbar && topbar ?  info[xidx].y_org + bh : info[xidx].y_org;
-		ww = info[xidx].width;
-		wh = showbar ? info[xidx].height - bh : info[xidx].height;
+		wx = info[i].x_org;
+		wy = showbar && topbar ?  info[i].y_org + bh : info[i].y_org;
+		ww = info[i].width;
+		wh = showbar ? info[i].height - bh : info[i].height;
 		XFree(info);
 	}
 	else
