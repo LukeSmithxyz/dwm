@@ -1562,8 +1562,7 @@ updategeom(void) {
 	XineramaScreenInfo *info = NULL;
 
 	/* window area geometry */
-	if(XineramaIsActive(dpy)) {
-		info = XineramaQueryScreens(dpy, &n);
+	if(XineramaIsActive(dpy) && (info = XineramaQueryScreens(dpy, &n))) { 
 		if(n > 1) {
 			int di, x, y;
 			unsigned int dui;
