@@ -904,7 +904,7 @@ manage(Window w, XWindowAttributes *wa) {
 	if(c->w == sw && c->h == sh) {
 		c->x = sx;
 		c->y = sy;
-		c->bw = wa->border_width;
+		c->bw = 0;
 	}
 	else {
 		if(c->x + c->w + 2 * c->bw > sx + sw)
