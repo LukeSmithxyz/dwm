@@ -12,6 +12,7 @@ static unsigned int borderpx        = 1;        /* border pixel of windows */
 static unsigned int snap            = 32;       /* snap pixel */
 static Bool showbar                 = True;     /* False means no bar */
 static Bool topbar                  = True;     /* False means bottom bar */
+static Bool readin                  = True;     /* False means do not read stdin */
 
 /* tagging */
 static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };

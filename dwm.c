@@ -224,7 +224,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 static Atom wmatom[WMLast], netatom[NetLast];
-static Bool otherwm, readin;
+static Bool otherwm;
 static Bool running = True;
 static unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
 static Client *clients = NULL;
@@ -1219,7 +1219,6 @@ run(void) {
 	/* main event loop, also reads status text from stdin */
 	XSync(dpy, False);
 	xfd = ConnectionNumber(dpy);
-	readin = True;
 	offset = 0;
 	len = sizeof stext - 1;
 	sbuf[len] = stext[len] = '\0'; /* 0-terminator is never touched */
