@@ -159,9 +159,7 @@ static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
 static void initfont(const char *fontstr);
-static Bool isoccupied(unsigned int t);
 static Bool isprotodel(Client *c);
-static Bool isurgent(unsigned int t);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
@@ -500,19 +498,23 @@ die(const char *errstr, ...) {
 
 void
 drawbar(void) {
-	int i, x;
+	int x;
+	unsigned int i, occ = 0, urg = 0;
+	unsigned long *col;
+	Client *c;
+
+	for(c = clients; c; c = c->next) {
+		occ |= c->tags;
+		if(c->isurgent)
+			urg |= c->tags;
+	}
 
 	dc.x = 0;
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i]);
-		if(tagset[seltags] & 1 << i) {
-			drawtext(tags[i], dc.sel, isurgent(i));
-			drawsquare(sel && sel->tags & 1 << i, isoccupied(i), isurgent(i), dc.sel);
-		}
-		else {
-			drawtext(tags[i], dc.norm, isurgent(i));
-			drawsquare(sel && sel->tags & 1 << i, isoccupied(i), isurgent(i), dc.norm);
-		}
+		col = tagset[seltags] & 1 << i ? dc.sel : dc.norm;
+		drawtext(tags[i], col, urg & 1 << i);
+		drawsquare(sel && sel->tags & 1 << i, occ & 1 << i, urg & 1 << i, col);
 		dc.x += dc.w;
 	}
 	if(blw > 0) {
@@ -741,7 +743,7 @@ grabbuttons(Client *c, Bool focused) {
 			if(buttons[i].click == ClkClientWin)
 				for(j = 0; j < LENGTH(modifiers); j++)
 					XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
-        } else
+	} else
 		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
 		            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 }
@@ -749,6 +751,7 @@ grabbuttons(Client *c, Bool focused) {
 void
 grabkeys(void) {
 	unsigned int i, j;
+	unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 	KeyCode code;
 	XModifierKeymap *modmap;
 
@@ -764,14 +767,9 @@ grabkeys(void) {
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	for(i = 0; i < LENGTH(keys); i++) {
 		code = XKeysymToKeycode(dpy, keys[i].keysym);
-		XGrabKey(dpy, code, keys[i].mod, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod|LockMask, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod|numlockmask, root, True,
-				GrabModeAsync, GrabModeAsync);
-		XGrabKey(dpy, code, keys[i].mod|numlockmask|LockMask, root, True,
-				GrabModeAsync, GrabModeAsync);
+		for(j = 0; j < LENGTH(modifiers); j++)
+			XGrabKey(dpy, code, keys[i].mod | modifiers[j], root, True,
+			         GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -816,16 +814,6 @@ initfont(const char *fontstr) {
 }
 
 Bool
-isoccupied(unsigned int t) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->tags & 1 << t)
-			return True;
-	return False;
-}
-
-Bool
 isprotodel(Client *c) {
 	int i, n;
 	Atom *protocols;
@@ -838,16 +826,6 @@ isprotodel(Client *c) {
 		XFree(protocols);
 	}
 	return ret;
-}
-
-Bool
-isurgent(unsigned int t) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->isurgent && c->tags & 1 << t)
-			return True;
-	return False;
 }
 
 void
