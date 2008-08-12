@@ -347,7 +347,7 @@ checkotherwm(void) {
 
 void
 cleanup(void) {
-	Arg a = {.i = ~0};
+	Arg a = {.ui = ~0};
 	Layout foo = { "", NULL };
 
 	close(STDIN_FILENO);
@@ -1640,11 +1640,11 @@ updatewmhints(Client *c) {
 
 void
 view(const Arg *arg) {
-	if(arg && (arg->i & TAGMASK) == tagset[seltags])
+	if(arg && (arg->ui & TAGMASK) == tagset[seltags])
 		return;
 	seltags ^= 1; /* toggle sel tagset */
 	if(arg && (arg->ui & TAGMASK))
-		tagset[seltags] = arg->i & TAGMASK;
+		tagset[seltags] = arg->ui & TAGMASK;
 	clearurgent();
 	arrange();
 }
