@@ -865,7 +865,6 @@ killclient(const Arg *arg) {
 void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t = NULL;
-	Status rettrans;
 	Window trans;
 	XWindowChanges wc;
 
@@ -903,14 +902,14 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, False);
 	updatetitle(c);
-	if((rettrans = XGetTransientForHint(dpy, w, &trans)) == Success)
+	if(XGetTransientForHint(dpy, w, &trans))
 		t = getclient(trans);
 	if(t)
 		c->tags = t->tags;
 	else
 		applyrules(c);
 	if(!c->isfloating)
-		c->isfloating = (rettrans == Success) || c->isfixed;
+		c->isfloating = trans || c->isfixed;
 	if(c->isfloating)
 		XRaiseWindow(dpy, c->win);
 	attach(c);
