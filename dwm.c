@@ -903,8 +903,8 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, False);
 	updatetitle(c);
-	if((rettrans = XGetTransientForHint(dpy, w, &trans) == Success))
-		for(t = clients; t && t->win != trans; t = t->next);
+	if((rettrans = XGetTransientForHint(dpy, w, &trans)) == Success)
+		t = getclient(trans);
 	if(t)
 		c->tags = t->tags;
 	else
