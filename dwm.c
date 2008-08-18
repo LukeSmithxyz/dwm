@@ -202,8 +202,10 @@ static void zoom(const Arg *arg);
 
 /* variables */
 static char stext[256];
-static int screen, sx, sy, sw, sh;
-static int by, bh, blw, wx, wy, ww, wh;
+static int screen;
+static int sx, sy, sw, sh; /* display geometry x, y, width, height */ 
+static int by, bh, blw;    /* bar geometry y, height and layout symbol width */
+static int wx, wy, ww, wh; /* window area geometry x, y, width, height, bar excluded */
 static unsigned int seltags = 0, sellt = 0;
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
