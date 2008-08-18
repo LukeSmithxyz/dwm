@@ -865,7 +865,7 @@ killclient(const Arg *arg) {
 void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t = NULL;
-	Window trans;
+	Window trans = 0;
 	XWindowChanges wc;
 
 	if(!(c = calloc(1, sizeof(Client))))
