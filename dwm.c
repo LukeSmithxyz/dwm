@@ -24,7 +24,6 @@
  * To understand everything else, start reading main().
  */
 #include <errno.h>
-#include <locale.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1705,7 +1704,7 @@ main(int argc, char *argv[]) {
 	else if(argc != 1)
 		die("usage: dwm [-v]\n");
 
-	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+	if(!XSupportsLocale())
 		fprintf(stderr, "warning: no locale support\n");
 
 	if(!(dpy = XOpenDisplay(0)))
