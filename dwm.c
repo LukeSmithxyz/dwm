@@ -581,7 +581,7 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	y = dc.y + (dc.h / 2) - (h / 2) + dc.font.ascent;
 	x = dc.x + (h / 2);
 	/* shorten text if necessary */
-	for(len = MIN(olen, sizeof buf); len && textnw(buf, len) > dc.w - h; len--);
+	for(len = MIN(olen, sizeof buf); len && textnw(text, len) > dc.w - h; len--);
 	if(!len)
 		return;
 	memcpy(buf, text, len);
