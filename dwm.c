@@ -865,7 +865,7 @@ killclient(const Arg *arg) {
 void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t = NULL;
-	Window trans = 0;
+	Window trans = None;
 	XWindowChanges wc;
 
 	if(!(c = calloc(1, sizeof(Client))))
@@ -909,7 +909,7 @@ manage(Window w, XWindowAttributes *wa) {
 	else
 		applyrules(c);
 	if(!c->isfloating)
-		c->isfloating = trans || c->isfixed;
+		c->isfloating = trans != None || c->isfixed;
 	if(c->isfloating)
 		XRaiseWindow(dpy, c->win);
 	attach(c);
