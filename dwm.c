@@ -568,8 +568,8 @@ drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
 
 void
 drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
-	int i, x, y, h, len, olen;
 	char buf[256];
+	int i, x, y, h, len, olen;
 	XRectangle r = { dc.x, dc.y, dc.w, dc.h };
 
 	XSetForeground(dpy, dc.gc, col[invert ? ColFG : ColBG]);
