@@ -202,7 +202,7 @@ static void zoom(const Arg *arg);
 /* variables */
 static char stext[256];
 static int screen;
-static int sx, sy, sw, sh; /* display geometry x, y, width, height */ 
+static int sx, sy, sw, sh; /* X display screen geometry x, y, width, height */ 
 static int by, bh, blw;    /* bar geometry y, height and layout symbol width */
 static int wx, wy, ww, wh; /* window area geometry x, y, width, height, bar excluded */
 static unsigned int seltags = 0, sellt = 0;
