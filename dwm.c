@@ -1128,7 +1128,7 @@ resizemouse(const Arg *arg) {
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	do {
-		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask , &ev);
+		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch(ev.type) {
 		case ConfigureRequest:
 		case Expose:
