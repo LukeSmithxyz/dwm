@@ -961,18 +961,15 @@ movemouse(const Arg *arg) {
 	if(!(c = sel))
 		return;
 	restack();
-	ocx = nx = c->x;
-	ocy = ny = c->y;
+	ocx = c->x;
+	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui);
-	for(;;) {
+	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
-		case ButtonRelease:
-			XUngrabPointer(dpy, CurrentTime);
-			return;
 		case ConfigureRequest:
 		case Expose:
 		case MapRequest:
@@ -1000,6 +997,8 @@ movemouse(const Arg *arg) {
 			break;
 		}
 	}
+	while(ev.type != ButtonRelease);
+	XUngrabPointer(dpy, CurrentTime);
 }
 
 Client *
