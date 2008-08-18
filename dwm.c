@@ -577,15 +577,14 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 	if(!text)
 		return;
 	olen = strlen(text);
-	len = MIN(olen, sizeof buf);
-	memcpy(buf, text, len);
 	h = dc.font.ascent + dc.font.descent;
 	y = dc.y + (dc.h / 2) - (h / 2) + dc.font.ascent;
 	x = dc.x + (h / 2);
 	/* shorten text if necessary */
-	for(; len && (i = textnw(buf, len)) > dc.w - h; len--);
+	for(len = MIN(olen, sizeof buf); len && (i = textnw(buf, len)) > dc.w - h; len--);
 	if(!len)
 		return;
+	memcpy(buf, text, len);
 	if(len < olen)
 		for(i = len; i && i > len - 3; buf[--i] = '.');
 	XSetForeground(dpy, dc.gc, col[invert ? ColBG : ColFG]);
