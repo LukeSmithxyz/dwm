@@ -1640,10 +1640,10 @@ updatewmhints(Client *c) {
 
 void
 view(const Arg *arg) {
-	if(arg && (arg->ui & TAGMASK) == tagset[seltags])
+	if((arg->ui & TAGMASK) == tagset[seltags])
 		return;
 	seltags ^= 1; /* toggle sel tagset */
-	if(arg && (arg->ui & TAGMASK))
+	if(arg->ui & TAGMASK)
 		tagset[seltags] = arg->ui & TAGMASK;
 	clearurgent();
 	arrange();
