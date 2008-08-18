@@ -1246,10 +1246,9 @@ run(void) {
 void
 scan(void) {
 	unsigned int i, num;
-	Window *wins, d1, d2;
+	Window d1, d2, *wins = NULL;
 	XWindowAttributes wa;
 
-	wins = NULL;
 	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
 		for(i = 0; i < num; i++) {
 			if(!XGetWindowAttributes(dpy, wins[i], &wa)
@@ -1265,9 +1264,9 @@ scan(void) {
 			&& (wa.map_state == IsViewable || getstate(wins[i]) == IconicState))
 				manage(wins[i], &wa);
 		}
+		if(wins)
+			XFree(wins);
 	}
-	if(wins)
-		XFree(wins);
 }
 
 void
