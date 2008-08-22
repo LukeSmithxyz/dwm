@@ -1469,8 +1469,12 @@ togglefloating(const Arg *arg) {
 
 void
 toggletag(const Arg *arg) {
-	unsigned int mask = sel->tags ^ (arg->ui & TAGMASK);
+	unsigned int mask;
 
+	if (!sel)
+		return;
+	
+	mask = sel->tags ^ (arg->ui & TAGMASK);
 	if(sel && mask) {
 		sel->tags = mask;
 		arrange();
