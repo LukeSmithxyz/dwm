@@ -1046,23 +1046,34 @@ quit(const Arg *arg) {
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
+	float a;
 	XWindowChanges wc;
 
 	if(sizehints) {
+		/* see last two sentences in ICCCM 4.1.2.3 */
+		Bool baseismin = c->basew == c->minw && c->baseh == c->minh;
+
 		/* set minimum possible */
 		w = MAX(1, w);
 		h = MAX(1, h);
 
-		/* temporarily remove base dimensions */
-		w -= c->basew;
-		h -= c->baseh;
+		if(!baseismin) { /* temporarily remove base dimensions */
+			w -= c->basew;
+			h -= c->baseh;
+		}
 
 		/* adjust for aspect limits */
 		if(c->mina > 0 && c->maxa > 0) {
-			if(c->maxa < (float) w/h)
+			a = (float) w/h;
+			if(a > c->maxa)
 				w = h * c->maxa;
-			else if(c->mina > (float) h/w)
-				h = w * c->mina;
+			else if(a < c->mina)
+				h = w / c->mina;
+		}
+
+		if(baseismin) { /* increment calculation requires this */
+			w -= c->basew;
+			h -= c->baseh;
 		}
 
 		/* adjust for increment value */
