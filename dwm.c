@@ -158,7 +158,6 @@ static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
 static void initfont(const char *fontstr);
-static void initmodmap(void);
 static Bool isprotodel(Client *c);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
@@ -752,15 +751,27 @@ grabbuttons(Client *c, Bool focused) {
 void
 grabkeys(void) {
 	unsigned int i, j;
-	unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
-	KeyCode code;
+	XModifierKeymap *modmap;
 
-	XUngrabKey(dpy, AnyKey, AnyModifier, root);
-	for(i = 0; i < LENGTH(keys); i++) {
-		code = XKeysymToKeycode(dpy, keys[i].keysym);
-		for(j = 0; j < LENGTH(modifiers); j++)
-			XGrabKey(dpy, code, keys[i].mod | modifiers[j], root, True,
-			         GrabModeAsync, GrabModeAsync);
+	/* update modifier map */
+	modmap = XGetModifierMapping(dpy);
+	for(i = 0; i < 8; i++)
+		for(j = 0; j < modmap->max_keypermod; j++)
+			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+				numlockmask = (1 << i);
+	XFreeModifiermap(modmap);
+
+	{ /* grab keys */
+		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
+		KeyCode code;
+
+		XUngrabKey(dpy, AnyKey, AnyModifier, root);
+		for(i = 0; i < LENGTH(keys); i++) {
+			code = XKeysymToKeycode(dpy, keys[i].keysym);
+			for(j = 0; j < LENGTH(modifiers); j++)
+				XGrabKey(dpy, code, keys[i].mod | modifiers[j], root, True,
+					 GrabModeAsync, GrabModeAsync);
+		}
 	}
 }
 
@@ -802,19 +813,6 @@ initfont(const char *fontstr) {
 		dc.font.descent = dc.font.xfont->descent;
 	}
 	dc.font.height = dc.font.ascent + dc.font.descent;
-}
-
-void
-initmodmap(void) {
-	unsigned int i, j;
-	XModifierKeymap *modmap;
-
-	modmap = XGetModifierMapping(dpy);
-	for(i = 0; i < 8; i++)
-		for(j = 0; j < modmap->max_keypermod; j++)
-			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
-				numlockmask = (1 << i);
-	XFreeModifiermap(modmap);
 }
 
 Bool
@@ -929,10 +927,8 @@ mappingnotify(XEvent *e) {
 	XMappingEvent *ev = &e->xmapping;
 
 	XRefreshKeyboardMapping(ev);
-	if(ev->request == MappingKeyboard) {
-		initmodmap();
+	if(ev->request == MappingKeyboard)
 		grabkeys();
-	}
 }
 
 void
@@ -1379,7 +1375,6 @@ setup(void) {
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
 
-	initmodmap();
 	grabkeys();
 }
 
