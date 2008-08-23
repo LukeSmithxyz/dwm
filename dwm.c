@@ -781,8 +781,6 @@ initfont(const char *fontstr) {
 	int i, n;
 
 	missing = NULL;
-	if(dc.font.set)
-		XFreeFontSet(dpy, dc.font.set);
 	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
 	if(missing) {
 		while(n--)
