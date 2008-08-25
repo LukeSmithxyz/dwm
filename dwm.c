@@ -191,6 +191,7 @@ static void unmanage(Client *c);
 static void unmapnotify(XEvent *e);
 static void updatebar(void);
 static void updategeom(void);
+static void updatenumlockmask(void);
 static void updatesizehints(Client *c);
 static void updatetitle(Client *c);
 static void updatewmhints(Client *c);
@@ -735,34 +736,27 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 
 void
 grabbuttons(Client *c, Bool focused) {
-	unsigned int i, j;
-	unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
-
-	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	if(focused) {
-		for(i = 0; i < LENGTH(buttons); i++)
-			if(buttons[i].click == ClkClientWin)
-				for(j = 0; j < LENGTH(modifiers); j++)
-					XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
-	} else
-		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
-		            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+	updatenumlockmask();
+	{
+		unsigned int i, j;
+		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
+		XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+		if(focused) {
+			for(i = 0; i < LENGTH(buttons); i++)
+				if(buttons[i].click == ClkClientWin)
+					for(j = 0; j < LENGTH(modifiers); j++)
+						XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+		} else
+			XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
+			            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+	}
 }
 
 void
 grabkeys(void) {
-	unsigned int i, j;
-	XModifierKeymap *modmap;
-
-	/* update modifier map */
-	modmap = XGetModifierMapping(dpy);
-	for(i = 0; i < 8; i++)
-		for(j = 0; j < modmap->max_keypermod; j++)
-			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
-				numlockmask = (1 << i);
-	XFreeModifiermap(modmap);
-
+	updatenumlockmask();
 	{ /* grab keys */
+		unsigned int i, j;
 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 		KeyCode code;
 
@@ -1573,6 +1567,20 @@ updategeom(void) {
 
 	/* bar position */
 	by = showbar ? (topbar ? wy - bh : wy + wh) : -bh;
+}
+
+void
+updatenumlockmask(void) {
+	unsigned int i, j;
+	XModifierKeymap *modmap;
+
+	numlockmask = 0;
+	modmap = XGetModifierMapping(dpy);
+	for(i = 0; i < 8; i++)
+		for(j = 0; j < modmap->max_keypermod; j++)
+			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+				numlockmask = (1 << i);
+	XFreeModifiermap(modmap);
 }
 
 void
