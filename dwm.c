@@ -24,6 +24,7 @@
  * To understand everything else, start reading main().
  */
 #include <errno.h>
+#include <locale.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1046,7 +1047,6 @@ quit(const Arg *arg) {
 
 void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
-	float a;
 	XWindowChanges wc;
 
 	if(sizehints) {
@@ -1064,11 +1064,10 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 		/* adjust for aspect limits */
 		if(c->mina > 0 && c->maxa > 0) {
-			a = (float) w/h;
-			if(a > c->maxa)
+			if(c->maxa < (float)(w / h))
 				w = h * c->maxa;
-			else if(a < c->mina)
-				h = w / c->mina;
+			else if(c->mina < (float)(h / w))
+				h = w * c->mina;
 		}
 
 		if(baseismin) { /* increment calculation requires this */
@@ -1712,7 +1711,7 @@ main(int argc, char *argv[]) {
 	else if(argc != 1)
 		die("usage: dwm [-v]\n");
 
-	if(!XSupportsLocale())
+	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fprintf(stderr, "warning: no locale support\n");
 
 	if(!(dpy = XOpenDisplay(0)))
