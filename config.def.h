@@ -16,6 +16,7 @@ static Bool readin                  = True;     /* False means do not read stdin
 
 /* tagging */
 static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
 
 static Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating */
