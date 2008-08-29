@@ -233,7 +233,7 @@ static Client *sel = NULL;
 static Client *stack = NULL;
 static Cursor cursor[CurLast];
 static Display *dpy;
-static DC dc = {0};
+static DC dc;
 static Layout *lt[] = { NULL, NULL };
 static Window root, barwin;
 /* configuration, allows nested code to access above variables */
@@ -250,7 +250,8 @@ applyrules(Client *c) {
 	XClassHint ch = { 0 };
 
 	/* rule matching */
-	XGetClassHint(dpy, c->win, &ch);
+	if(XGetClassHint(dpy, c->win, &ch) == 0)
+		return;
 	for(i = 0; i < LENGTH(rules); i++) {
 		r = &rules[i];
 		if((!r->title || strstr(c->name, r->title))
@@ -796,9 +797,6 @@ initfont(const char *fontstr) {
 		}
 	}
 	else {
-		if(dc.font.xfont)
-			XFreeFont(dpy, dc.font.xfont);
-		dc.font.xfont = NULL;
 		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr))
 		&& !(dc.font.xfont = XLoadQueryFont(dpy, "fixed")))
 			die("error, cannot load font: '%s'\n", fontstr);
