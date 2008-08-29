@@ -250,21 +250,21 @@ applyrules(Client *c) {
 	XClassHint ch = { 0 };
 
 	/* rule matching */
-	if(XGetClassHint(dpy, c->win, &ch) == 0)
-		return;
-	for(i = 0; i < LENGTH(rules); i++) {
-		r = &rules[i];
-		if((!r->title || strstr(c->name, r->title))
-		&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
-		&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
-			c->isfloating = r->isfloating;
-			c->tags |= r->tags & TAGMASK;
+	if(XGetClassHint(dpy, c->win, &ch)) {
+		for(i = 0; i < LENGTH(rules); i++) {
+			r = &rules[i];
+			if((!r->title || strstr(c->name, r->title))
+			&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
+			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
+				c->isfloating = r->isfloating;
+				c->tags |= r->tags & TAGMASK;
+			}
 		}
+		if(ch.res_class)
+			XFree(ch.res_class);
+		if(ch.res_name)
+			XFree(ch.res_name);
 	}
-	if(ch.res_class)
-		XFree(ch.res_class);
-	if(ch.res_name)
-		XFree(ch.res_name);
 	if(!c->tags)
 		c->tags = tagset[seltags];
 }
