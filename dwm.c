@@ -61,7 +61,7 @@
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
-enum { WMProtocols, WMDelete, WMName, WMState, WMLast };/* default atoms */
+enum { WMProtocols, WMDelete, WMState, WMLast };        /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
 
@@ -233,7 +233,7 @@ static Client *sel = NULL;
 static Client *stack = NULL;
 static Cursor cursor[CurLast];
 static Display *dpy;
-static DC dc = {0};
+static DC dc;
 static Layout *lt[] = { NULL, NULL };
 static Window root, barwin;
 /* configuration, allows nested code to access above variables */
@@ -250,20 +250,21 @@ applyrules(Client *c) {
 	XClassHint ch = { 0 };
 
 	/* rule matching */
-	XGetClassHint(dpy, c->win, &ch);
-	for(i = 0; i < LENGTH(rules); i++) {
-		r = &rules[i];
-		if((!r->title || strstr(c->name, r->title))
-		&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
-		&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
-			c->isfloating = r->isfloating;
-			c->tags |= r->tags & TAGMASK;
+	if(XGetClassHint(dpy, c->win, &ch)) {
+		for(i = 0; i < LENGTH(rules); i++) {
+			r = &rules[i];
+			if((!r->title || strstr(c->name, r->title))
+			&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
+			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
+				c->isfloating = r->isfloating;
+				c->tags |= r->tags & TAGMASK;
+			}
 		}
+		if(ch.res_class)
+			XFree(ch.res_class);
+		if(ch.res_name)
+			XFree(ch.res_name);
 	}
-	if(ch.res_class)
-		XFree(ch.res_class);
-	if(ch.res_name)
-		XFree(ch.res_name);
 	if(!c->tags)
 		c->tags = tagset[seltags];
 }
@@ -796,9 +797,6 @@ initfont(const char *fontstr) {
 		}
 	}
 	else {
-		if(dc.font.xfont)
-			XFreeFont(dpy, dc.font.xfont);
-		dc.font.xfont = NULL;
 		if(!(dc.font.xfont = XLoadQueryFont(dpy, fontstr))
 		&& !(dc.font.xfont = XLoadQueryFont(dpy, "fixed")))
 			die("error, cannot load font: '%s'\n", fontstr);
@@ -1326,7 +1324,6 @@ setup(void) {
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-	wmatom[WMName] = XInternAtom(dpy, "WM_NAME", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
@@ -1634,7 +1631,7 @@ updatesizehints(Client *c) {
 void
 updatetitle(Client *c) {
 	if(!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
-		gettextprop(c->win, wmatom[WMName], c->name, sizeof c->name);
+		gettextprop(c->win, XA_WM_NAME, c->name, sizeof c->name);
 }
 
 void
