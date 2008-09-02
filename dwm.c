@@ -1056,9 +1056,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 
 		/* adjust for aspect limits */
 		if(c->mina > 0 && c->maxa > 0) {
-			if(c->maxa < (float)(w / h))
+			if(c->maxa < (float)w / h)
 				w = h * c->maxa;
-			else if(c->mina < (float)(h / w))
+			else if(c->mina < (float)h / w)
 				h = w * c->mina;
 		}
 
