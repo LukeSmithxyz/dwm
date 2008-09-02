@@ -763,10 +763,10 @@ grabkeys(void) {
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for(i = 0; i < LENGTH(keys); i++) {
-			code = XKeysymToKeycode(dpy, keys[i].keysym);
-			for(j = 0; j < LENGTH(modifiers); j++)
-				XGrabKey(dpy, code, keys[i].mod | modifiers[j], root, True,
-					 GrabModeAsync, GrabModeAsync);
+			if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
+				for(j = 0; j < LENGTH(modifiers); j++)
+					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
+						 True, GrabModeAsync, GrabModeAsync);
 		}
 	}
 }
