@@ -337,15 +337,14 @@ buttonpress(XEvent *e) {
 void
 checkotherwm(void) {
 	otherwm = False;
-	XSetErrorHandler(xerrorstart);
+	xerrorxlib = XSetErrorHandler(xerrorstart);
 
 	/* this causes an error if some other window manager is running */
 	XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
 	XSync(dpy, False);
 	if(otherwm)
 		die("dwm: another window manager is already running\n");
-	XSetErrorHandler(NULL);
-	xerrorxlib = XSetErrorHandler(xerror);
+	XSetErrorHandler(xerror);
 	XSync(dpy, False);
 }
 
@@ -1625,7 +1624,7 @@ updatesizehints(Client *c) {
 	else
 		c->maxa = c->mina = 0.0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh
-			&& c->maxw == c->minw && c->maxh == c->minh);
+	             && c->maxw == c->minw && c->maxh == c->minh);
 }
 
 void
