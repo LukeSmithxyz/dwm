@@ -180,6 +180,7 @@ static void setclientstate(Client *c, long state);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
+static void showhide(Client *c);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
 static int textnw(const char *text, unsigned int len);
@@ -271,18 +272,8 @@ applyrules(Client *c) {
 
 void
 arrange(void) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(ISVISIBLE(c)) {
-			XMoveWindow(dpy, c->win, c->x, c->y);
-			if(!lt[sellt]->arrange || c->isfloating)
-				resize(c, c->x, c->y, c->w, c->h, True);
-		}
-		else {
-			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
-		}
-
+	if(stack)
+		showhide(stack);
 	focus(NULL);
 	if(lt[sellt]->arrange)
 		lt[sellt]->arrange();
@@ -1374,6 +1365,19 @@ setup(void) {
 	XSelectInput(dpy, root, wa.event_mask);
 
 	grabkeys();
+}
+
+void
+showhide(Client *c) {
+	if(ISVISIBLE(c)) { /* show clients top down */
+		XMoveWindow(dpy, c->win, c->x, c->y);
+		if(!lt[sellt]->arrange || c->isfloating)
+			resize(c, c->x, c->y, c->w, c->h, True);
+	}
+	if(c->snext) /* hide clients bottom up */
+		showhide(c->snext);
+	if(!ISVISIBLE(c))
+		XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 }
 
 void
