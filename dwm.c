@@ -272,8 +272,7 @@ applyrules(Client *c) {
 
 void
 arrange(void) {
-	if(stack)
-		showhide(stack);
+	showhide(stack);
 	focus(NULL);
 	if(lt[sellt]->arrange)
 		lt[sellt]->arrange();
@@ -1369,15 +1368,18 @@ setup(void) {
 
 void
 showhide(Client *c) {
+	if(!c)
+		return;
 	if(ISVISIBLE(c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h, True);
-	}
-	if(c->snext) /* hide clients bottom up */
 		showhide(c->snext);
-	if(!ISVISIBLE(c))
+	}
+	else { /* hide clients bottom up */
+		showhide(c->snext);
 		XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
+	}
 }
 
 void
