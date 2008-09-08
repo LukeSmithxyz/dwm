@@ -846,12 +846,14 @@ killclient(const Arg *arg) {
 
 void
 manage(Window w, XWindowAttributes *wa) {
+	static Client cz;
 	Client *c, *t = NULL;
 	Window trans = None;
 	XWindowChanges wc;
 
-	if(!(c = calloc(1, sizeof(Client))))
-		die("fatal: could not calloc() %u bytes\n", sizeof(Client));
+	if(!(c = malloc(sizeof(Client))))
+		die("fatal: could not malloc() %u bytes\n", sizeof(Client));
+	*c = cz;
 	c->win = w;
 
 	/* geometry */
