@@ -53,7 +53,8 @@
 #define MIN(a, b)               ((a) < (b) ? (a) : (b))
 #define MAXTAGLEN               16
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
-#define NOBORDER(x)             ((x) - 2 * c->bw)
+#define WIDTH(x)                ((x)->w + 2*(x)->bw)
+#define HEIGHT(x)               ((x)->h + 2*(x)->bw)
 #define TAGMASK                 ((int)((1LL << LENGTH(tags)) - 1))
 #define TEXTW(x)                (textnw(x, strlen(x)) + dc.font.height)
 
@@ -868,10 +869,10 @@ manage(Window w, XWindowAttributes *wa) {
 		c->bw = 0;
 	}
 	else {
-		if(c->x + c->w + 2 * c->bw > sx + sw)
-			c->x = sx + sw - NOBORDER(c->w);
-		if(c->y + c->h + 2 * c->bw > sy + sh)
-			c->y = sy + sh - NOBORDER(c->h);
+		if(c->x + WIDTH(c) > sx + sw)
+			c->x = sx + sw - WIDTH(c);
+		if(c->y + HEIGHT(c) > sy + sh)
+			c->y = sy + sh - HEIGHT(c);
 		c->x = MAX(c->x, sx);
 		/* only fix client y-offset, if the client center might cover the bar */
 		c->y = MAX(c->y, ((by == 0) && (c->x + (c->w / 2) >= wx) && (c->x + (c->w / 2) < wx + ww)) ? bh : sy);
@@ -931,7 +932,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = nexttiled(clients); c; c = nexttiled(c->next))
-		resize(c, wx, wy, NOBORDER(ww), NOBORDER(wh), resizehints);
+		resize(c, wx, wy, ww - 2*c->bw, wh - 2*c->bw, resizehints);
 }
 
 void
@@ -967,12 +968,12 @@ movemouse(const Arg *arg) {
 			        && ny >= wy && ny <= wy + wh) {
 				if(abs(wx - nx) < snap)
 					nx = wx;
-				else if(abs((wx + ww) - (nx + c->w + 2 * c->bw)) < snap)
-					nx = wx + ww - NOBORDER(c->w);
+				else if(abs((wx + ww) - (nx + WIDTH(c))) < snap)
+					nx = wx + ww - WIDTH(c);
 				if(abs(wy - ny) < snap)
 					ny = wy;
-				else if(abs((wy + wh) - (ny + c->h + 2 * c->bw)) < snap)
-					ny = wy + wh - NOBORDER(c->h);
+				else if(abs((wy + wh) - (ny + HEIGHT(c))) < snap)
+					ny = wy + wh - HEIGHT(c);
 				if(!c->isfloating && lt[sellt]->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 					togglefloating(NULL);
 			}
@@ -1080,9 +1081,9 @@ resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	if(w <= 0 || h <= 0)
 		return;
 	if(x > sx + sw)
-		x = sw - NOBORDER(w);
+		x = sw - WIDTH(c);
 	if(y > sy + sh)
-		y = sh - NOBORDER(h);
+		y = sh - HEIGHT(c);
 	if(x + w + 2 * c->bw < sx)
 		x = sx;
 	if(y + h + 2 * c->bw < sy)
@@ -1130,8 +1131,8 @@ resizemouse(const Arg *arg) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			nw = MAX(ev.xmotion.x - NOBORDER(ocx) + 1, 1);
-			nh = MAX(ev.xmotion.y - NOBORDER(ocy) + 1, 1);
+			nw = MAX(ev.xmotion.x - ocx - 2*c->bw + 1, 1);
+			nh = MAX(ev.xmotion.y - ocy - 2*c->bw + 1, 1);
 
 			if(snap && nw >= wx && nw <= wx + ww
 			        && nh >= wy && nh <= wy + wh) {
@@ -1434,7 +1435,7 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
-	resize(c, wx, wy, NOBORDER(n == 1 ? ww : mw), NOBORDER(wh), resizehints);
+	resize(c, wx, wy, (n == 1 ? ww : mw) - 2*c->bw, wh - 2*c->bw, resizehints);
 
 	if(--n == 0)
 		return;
@@ -1448,10 +1449,10 @@ tile(void) {
 		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		resize(c, x, y, NOBORDER(w), /* remainder */ ((i + 1 == n)
-		       ? NOBORDER(wy + wh) - y : h), resizehints);
+		resize(c, x, y, w - 2*c->bw, /* remainder */ ((i + 1 == n)
+		       ? wy + wh - y : h) - 2*c->bw, resizehints);
 		if(h != wh)
-			y = c->y + c->h + 2 * c->bw;
+			y = c->y + HEIGHT(c);
 	}
 }
 
