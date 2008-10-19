@@ -13,6 +13,8 @@ static unsigned int snap            = 32;       /* snap pixel */
 static Bool showbar                 = True;     /* False means no bar */
 static Bool topbar                  = True;     /* False means bottom bar */
 static Bool readin                  = True;     /* False means do not read stdin */
+static Bool usegrab                 = False;    /* True means grabbing the X server
+                                                   during mouse-based resizals */
 
 /* tagging */
 static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };

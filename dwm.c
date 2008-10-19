@@ -53,8 +53,8 @@
 #define MIN(a, b)               ((a) < (b) ? (a) : (b))
 #define MAXTAGLEN               16
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
-#define WIDTH(x)                ((x)->w + 2*(x)->bw)
-#define HEIGHT(x)               ((x)->h + 2*(x)->bw)
+#define WIDTH(x)                ((x)->w + 2 * (x)->bw)
+#define HEIGHT(x)               ((x)->h + 2 * (x)->bw)
 #define TAGMASK                 ((int)((1LL << LENGTH(tags)) - 1))
 #define TEXTW(x)                (textnw(x, strlen(x)) + dc.font.height)
 
@@ -932,7 +932,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = nexttiled(clients); c; c = nexttiled(c->next))
-		resize(c, wx, wy, ww - 2*c->bw, wh - 2*c->bw, resizehints);
+		resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, resizehints);
 }
 
 void
@@ -952,6 +952,8 @@ movemouse(const Arg *arg) {
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui);
+	if(usegrab)
+		XGrabServer(dpy);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -961,7 +963,6 @@ movemouse(const Arg *arg) {
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			XSync(dpy, False);
 			nx = ocx + (ev.xmotion.x - x);
 			ny = ocy + (ev.xmotion.y - y);
 			if(snap && nx >= wx && nx <= wx + ww
@@ -983,6 +984,8 @@ movemouse(const Arg *arg) {
 		}
 	}
 	while(ev.type != ButtonRelease);
+	if(usegrab)
+		XUngrabServer(dpy);
 	XUngrabPointer(dpy, CurrentTime);
 }
 
@@ -1121,6 +1124,8 @@ resizemouse(const Arg *arg) {
 	None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
+	if(usegrab)
+		XGrabServer(dpy);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch(ev.type) {
@@ -1130,7 +1135,6 @@ resizemouse(const Arg *arg) {
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			XSync(dpy, False);
 			nw = MAX(ev.xmotion.x - ocx - 2*c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2*c->bw + 1, 1);
 
@@ -1146,6 +1150,8 @@ resizemouse(const Arg *arg) {
 		}
 	}
 	while(ev.type != ButtonRelease);
+	if(usegrab)
+		XUngrabServer(dpy);
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
@@ -1435,7 +1441,7 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
-	resize(c, wx, wy, (n == 1 ? ww : mw) - 2*c->bw, wh - 2*c->bw, resizehints);
+	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
 
 	if(--n == 0)
 		return;
@@ -1449,8 +1455,14 @@ tile(void) {
 		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		resize(c, x, y, w - 2*c->bw, /* remainder */ ((i + 1 == n)
-		       ? wy + wh - y : h) - 2*c->bw, resizehints);
+		if(i + 1 == n) { /* remainder */
+			if(wy + wh - y < bh)
+				resize(c, x, y, w - 2 * c->bw, wy + wh - y - 2 * c->bw, False);
+			else
+				resize(c, x, y, w - 2 * c->bw, wy + wh - y - 2 * c->bw, resizehints);
+		}
+		else
+			resize(c, x, y, w - 2 * c->bw, h - 2 * c->bw, resizehints);
 		if(h != wh)
 			y = c->y + HEIGHT(c);
 	}
