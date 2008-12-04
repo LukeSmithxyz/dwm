@@ -182,6 +182,7 @@ static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
 static void showhide(Client *c);
+static void sigchld(int signal);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
 static int textnw(const char *text, unsigned int len);
@@ -1391,22 +1392,24 @@ showhide(Client *c) {
 	}
 }
 
+
+void
+sigchld(int signal) {
+	while(0 < waitpid(-1, NULL, WNOHANG));
+}
+
 void
 spawn(const Arg *arg) {
-	/* The double-fork construct avoids zombie processes and keeps the code
-	 * clean from stupid signal handlers. */
+	signal(SIGCHLD, sigchld);
 	if(fork() == 0) {
-		if(fork() == 0) {
-			if(dpy)
-				close(ConnectionNumber(dpy));
-			setsid();
-			execvp(((char **)arg->v)[0], (char **)arg->v);
-			fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
-			perror(" failed");
-		}
+		if(dpy)
+			close(ConnectionNumber(dpy));
+		setsid();
+		execvp(((char **)arg->v)[0], (char **)arg->v);
+		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
+		perror(" failed");
 		exit(0);
 	}
-	wait(0);
 }
 
 void
@@ -1455,14 +1458,8 @@ tile(void) {
 		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		if(i + 1 == n) { /* remainder */
-			if(wy + wh - y < bh)
-				resize(c, x, y, w - 2 * c->bw, wy + wh - y - 2 * c->bw, False);
-			else
-				resize(c, x, y, w - 2 * c->bw, wy + wh - y - 2 * c->bw, resizehints);
-		}
-		else
-			resize(c, x, y, w - 2 * c->bw, h - 2 * c->bw, resizehints);
+		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
+		       ? wy + wh - y - 2 * c->bw : h - 2 * c->bw), resizehints);
 		if(h != wh)
 			y = c->y + HEIGHT(c);
 	}
