@@ -138,7 +138,7 @@ static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
 static void cleanup(void);
-static void clearurgent(void);
+static void clearurgent(Client *c);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
@@ -365,20 +365,15 @@ cleanup(void) {
 }
 
 void
-clearurgent(void) {
+clearurgent(Client *c) {
 	XWMHints *wmh;
-	Client *c;
 
-	for(c = clients; c; c = c->next)
-		if(ISVISIBLE(c) && c->isurgent) {
-			c->isurgent = False;
-			if (!(wmh = XGetWMHints(dpy, c->win)))
-				continue;
-
-			wmh->flags &= ~XUrgencyHint;
-			XSetWMHints(dpy, c->win, wmh);
-			XFree(wmh);
-		}
+	c->isurgent = False;
+	if(!(wmh = XGetWMHints(dpy, c->win)))
+		return;
+	wmh->flags &= ~XUrgencyHint;
+	XSetWMHints(dpy, c->win, wmh);
+	XFree(wmh);
 }
 
 void
@@ -617,6 +612,8 @@ focus(Client *c) {
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
 	}
 	if(c) {
+		if(c->isurgent)
+			clearurgent(c);
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
@@ -1500,7 +1497,6 @@ toggleview(const Arg *arg) {
 
 	if(mask) {
 		tagset[seltags] = mask;
-		clearurgent();
 		arrange();
 	}
 }
@@ -1673,7 +1669,6 @@ view(const Arg *arg) {
 	seltags ^= 1; /* toggle sel tagset */
 	if(arg->ui & TAGMASK)
 		tagset[seltags] = arg->ui & TAGMASK;
-	clearurgent();
 	arrange();
 }
 
