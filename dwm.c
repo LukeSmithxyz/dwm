@@ -343,7 +343,6 @@ cleanup(void) {
 	Arg a = {.ui = ~0};
 	Layout foo = { "", NULL };
 
-	close(STDIN_FILENO);
 	view(&a);
 	lt[sellt] = &foo;
 	while(stack)
