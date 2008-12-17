@@ -128,6 +128,7 @@ typedef struct {
 } Rule;
 
 /* function declarations */
+static void adjustborder(Client *c, Bool issingle);
 static void applyrules(Client *c);
 static void arrange(void);
 static void attach(Client *c);
@@ -244,6 +245,17 @@ static Window root, barwin;
 struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1 : 1]; };
 
 /* function implementations */
+void
+adjustborder(Client *c, Bool issingle) {
+	XWindowChanges wc;
+
+	wc.border_width = issingle ? 0 : borderpx;
+	if(c->bw != wc.border_width) {
+		c->bw = wc.border_width;
+		XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
+	}
+}
+
 void
 applyrules(Client *c) {
 	unsigned int i;
@@ -924,10 +936,14 @@ maprequest(XEvent *e) {
 
 void
 monocle(void) {
+	unsigned int n;
 	Client *c;
 
-	for(c = nexttiled(clients); c; c = nexttiled(c->next))
+	for(n = 0, c = nexttiled(clients); c && n < 2; c = nexttiled(c->next), n++);
+	for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
+		adjustborder(c, n == 1);
 		resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, resizehints);
+	}
 }
 
 void
@@ -1330,6 +1346,7 @@ showhide(Client *c) {
 	if(!c)
 		return;
 	if(ISVISIBLE(c)) { /* show clients top down */
+		adjustborder(c, False);
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h, True);
@@ -1393,6 +1410,7 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
+	adjustborder(c, n == 1);
 	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
 
 	if(--n == 0)
@@ -1407,6 +1425,7 @@ tile(void) {
 		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
+		adjustborder(c, False);
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
 		       ? wy + wh - y - 2 * c->bw : h - 2 * c->bw), resizehints);
 		if(h != wh)
