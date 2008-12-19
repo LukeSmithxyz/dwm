@@ -270,7 +270,7 @@ applyrules(Client *c) {
 			&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
 			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
 				c->isfloating = r->isfloating;
-				c->tags |= r->tags & TAGMASK;
+				c->tags |= r->tags & TAGMASK ? r->tags & TAGMASK : tagset[seltags]; 
 			}
 		}
 		if(ch.res_class)
