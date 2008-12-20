@@ -41,7 +41,6 @@
 #endif
 
 /* macros */
-#define ADJUSTBORDER(C, BW)     if((C)->bw != (BW)) XSetWindowBorder(dpy, (C)->win, (BW));
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
@@ -129,6 +128,7 @@ typedef struct {
 } Rule;
 
 /* function declarations */
+static void adjustborder(Client *c, unsigned int bw);
 static void applyrules(Client *c);
 static void arrange(void);
 static void attach(Client *c);
@@ -245,6 +245,16 @@ static Window root, barwin;
 struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1 : 1]; };
 
 /* function implementations */
+void
+adjustborder(Client *c, unsigned int bw) {
+	XWindowChanges wc;
+
+	if(c->bw != bw) {
+		c->bw = wc.border_width = bw;
+		XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
+	}
+}
+
 void
 applyrules(Client *c) {
 	unsigned int i;
@@ -930,7 +940,7 @@ monocle(void) {
 
 	for(n = 0, c = nexttiled(clients); c && n < 2; c = nexttiled(c->next), n++);
 	for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
-		ADJUSTBORDER(c, (n == 1 ? 0 : borderpx))
+		adjustborder(c, n == 1 ? 0 : borderpx);
 		resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, resizehints);
 	}
 }
@@ -1137,8 +1147,9 @@ resizemouse(const Arg *arg) {
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
-			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
+			nw = MAX(ev.xmotion.x - ocx - 2*c->bw + 1, 1);
+			nh = MAX(ev.xmotion.y - ocy - 2*c->bw + 1, 1);
+
 			if(snap && nw >= wx && nw <= wx + ww
 			        && nh >= wy && nh <= wy + wh) {
 				if(!c->isfloating && lt[sellt]->arrange
@@ -1334,7 +1345,7 @@ showhide(Client *c) {
 	if(!c)
 		return;
 	if(ISVISIBLE(c)) { /* show clients top down */
-		ADJUSTBORDER(c, borderpx)
+		adjustborder(c, borderpx);
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h, True);
@@ -1398,7 +1409,7 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
-	ADJUSTBORDER(c, (n == 1 ? 0 : borderpx))
+	adjustborder(c, n == 1 ? 0 : borderpx);
 	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
 
 	if(--n == 0)
@@ -1413,7 +1424,7 @@ tile(void) {
 		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		ADJUSTBORDER(c, borderpx)
+		adjustborder(c, borderpx);
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
 		       ? wy + wh - y - 2 * c->bw : h - 2 * c->bw), resizehints);
 		if(h != wh)
