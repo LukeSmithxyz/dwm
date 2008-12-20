@@ -1147,8 +1147,8 @@ resizemouse(const Arg *arg) {
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			nw = MAX(ev.xmotion.x - ocx - 2*c->bw + 1, 1);
-			nh = MAX(ev.xmotion.y - ocy - 2*c->bw + 1, 1);
+			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
+			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
 
 			if(snap && nw >= wx && nw <= wx + ww
 			        && nh >= wy && nh <= wy + wh) {
