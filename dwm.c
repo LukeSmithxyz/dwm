@@ -179,7 +179,7 @@ static void setclientstate(Client *c, long state);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
-static void showhide(Client *c);
+static void showhide(Client *c, unsigned int ntiled);
 static void sigchld(int signal);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
@@ -283,7 +283,11 @@ applyrules(Client *c) {
 
 void
 arrange(void) {
-	showhide(stack);
+	unsigned int nt;
+	Client *c;
+
+	for(nt = 0, c = nexttiled(clients); c; c = nexttiled(c->next), nt++);
+	showhide(stack, nt);
 	focus(NULL);
 	if(lt[sellt]->arrange)
 		lt[sellt]->arrange();
@@ -1341,18 +1345,19 @@ setup(void) {
 }
 
 void
-showhide(Client *c) {
+showhide(Client *c, unsigned int ntiled) {
 	if(!c)
 		return;
 	if(ISVISIBLE(c)) { /* show clients top down */
-		adjustborder(c, borderpx);
+		if(ntiled > 1) /* avoid unnecessary border reverts */
+			adjustborder(c, borderpx);
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h, True);
-		showhide(c->snext);
+		showhide(c->snext, ntiled);
 	}
 	else { /* hide clients bottom up */
-		showhide(c->snext);
+		showhide(c->snext, ntiled);
 		XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	}
 }
