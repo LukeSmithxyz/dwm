@@ -1349,7 +1349,7 @@ showhide(Client *c, unsigned int ntiled) {
 	if(!c)
 		return;
 	if(ISVISIBLE(c)) { /* show clients top down */
-		if(ntiled > 1) /* avoid unnecessary border reverts */
+		if(c->isfloating || ntiled > 1) /* avoid unnecessary border reverts */
 			adjustborder(c, borderpx);
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
@@ -1708,7 +1708,7 @@ zoom(const Arg *arg) {
 int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		die("dwm-"VERSION", © 2006-2008 dwm engineers, see LICENSE for details\n");
+		die("dwm-"VERSION", © 2006-2009 dwm engineers, see LICENSE for details\n");
 	else if(argc != 1)
 		die("usage: dwm [-v]\n");
 
