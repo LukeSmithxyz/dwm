@@ -1015,7 +1015,7 @@ propertynotify(XEvent *e) {
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
 
-	if((ev->window == root) && (ev->atom = XA_WM_NAME))
+	if((ev->window == root) && (ev->atom == XA_WM_NAME))
 		updatestatus();
 	else if(ev->state == PropertyDelete)
 		return; /* ignore */
