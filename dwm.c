@@ -1463,7 +1463,7 @@ toggletag(const Arg *arg) {
 		return;
 	
 	mask = sel->tags ^ (arg->ui & TAGMASK);
-	if(sel && mask) {
+	if(mask) {
 		sel->tags = mask;
 		arrange();
 	}
