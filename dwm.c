@@ -128,7 +128,6 @@ typedef struct {
 } Rule;
 
 /* function declarations */
-static void adjustborder(Client *c, unsigned int bw);
 static void applyrules(Client *c);
 static void arrange(void);
 static void attach(Client *c);
@@ -245,16 +244,6 @@ static Window root, barwin;
 struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1 : 1]; };
 
 /* function implementations */
-void
-adjustborder(Client *c, unsigned int bw) {
-	XWindowChanges wc;
-
-	if(c->bw != bw) {
-		c->bw = wc.border_width = bw;
-		XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
-	}
-}
-
 void
 applyrules(Client *c) {
 	unsigned int i;
@@ -939,12 +928,9 @@ maprequest(XEvent *e) {
 
 void
 monocle(void) {
-	unsigned int n;
 	Client *c;
 
-	for(n = 0, c = nexttiled(clients); c && n < 2; c = nexttiled(c->next), n++);
 	for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
-		adjustborder(c, n == 1 ? 0 : borderpx);
 		resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, resizehints);
 	}
 }
@@ -1349,8 +1335,6 @@ showhide(Client *c, unsigned int ntiled) {
 	if(!c)
 		return;
 	if(ISVISIBLE(c)) { /* show clients top down */
-		if(c->isfloating || ntiled > 1) /* avoid unnecessary border reverts */
-			adjustborder(c, borderpx);
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h, True);
@@ -1414,7 +1398,6 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
-	adjustborder(c, n == 1 ? 0 : borderpx);
 	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
 
 	if(--n == 0)
@@ -1429,7 +1412,6 @@ tile(void) {
 		h = wh;
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		adjustborder(c, borderpx);
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
 		       ? wy + wh - y - 2 * c->bw : h - 2 * c->bw), resizehints);
 		if(h != wh)
@@ -1713,7 +1695,7 @@ main(int argc, char *argv[]) {
 		die("usage: dwm [-v]\n");
 
 	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
-		fprintf(stderr, "warning: no locale support\n");
+		fputs("warning: no locale support\n", stderr);
 
 	if(!(dpy = XOpenDisplay(0)))
 		die("dwm: cannot open display\n");
