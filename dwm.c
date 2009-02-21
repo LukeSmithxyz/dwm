@@ -1305,7 +1305,7 @@ setup(void) {
 		blw = MAX(blw, w);
 	}
 
-	wa.override_redirect = 1;
+	wa.override_redirect = True;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask|ExposureMask;
 
