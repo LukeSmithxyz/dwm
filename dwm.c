@@ -1294,7 +1294,7 @@ setup(void) {
 	dc.sel[ColBG] = getcolor(selbgcolor);
 	dc.sel[ColFG] = getcolor(selfgcolor);
 	dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), bh, DefaultDepth(dpy, screen));
-	dc.gc = XCreateGC(dpy, root, 0, 0);
+	dc.gc = XCreateGC(dpy, root, 0, NULL);
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
 	if(!dc.font.set)
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
@@ -1697,7 +1697,7 @@ main(int argc, char *argv[]) {
 	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 
-	if(!(dpy = XOpenDisplay(0)))
+	if(!(dpy = XOpenDisplay(NULL)))
 		die("dwm: cannot open display\n");
 
 	checkotherwm();
