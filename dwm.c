@@ -129,6 +129,7 @@ typedef struct {
 
 /* function declarations */
 static void applyrules(Client *c);
+static void applysizehints(Client *c, int *w, int *h);
 static void arrange(void);
 static void attach(Client *c);
 static void attachstack(Client *c);
@@ -268,6 +269,55 @@ applyrules(Client *c) {
 	}
 	if(!c->tags)
 		c->tags = tagset[seltags];
+}
+
+void
+applysizehints(Client *c, int *w, int *h) {
+	Bool baseismin;
+
+	/* see last two sentences in ICCCM 4.1.2.3 */
+	baseismin = c->basew == c->minw && c->baseh == c->minh;
+
+	/* set minimum possible */
+	*w = MAX(1, *w);
+	*h = MAX(1, *h);
+
+	if(!baseismin) { /* temporarily remove base dimensions */
+		*w -= c->basew;
+		*h -= c->baseh;
+	}
+
+	/* adjust for aspect limits */
+	if(c->mina > 0 && c->maxa > 0) {
+		if(c->maxa < (float)*w / *h)
+			*w = *h * c->maxa;
+		else if(c->mina < (float)*h / *w)
+			*h = *w * c->mina;
+	}
+
+	if(baseismin) { /* increment calculation requires this */
+		*w -= c->basew;
+		*h -= c->baseh;
+	}
+
+	/* adjust for increment value */
+	if(c->incw)
+		*w -= *w % c->incw;
+	if(c->inch)
+		*h -= *h % c->inch;
+
+	/* restore base dimensions */
+	*w += c->basew;
+	*h += c->baseh;
+
+	*w = MAX(*w, c->minw);
+	*h = MAX(*h, c->minh);
+
+	if(c->maxw)
+		*w = MIN(*w, c->maxw);
+
+	if(c->maxh)
+		*h = MIN(*h, c->maxh);
 }
 
 void
@@ -1038,51 +1088,8 @@ void
 resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
 	XWindowChanges wc;
 
-	if(sizehints) {
-		/* see last two sentences in ICCCM 4.1.2.3 */
-		Bool baseismin = c->basew == c->minw && c->baseh == c->minh;
-
-		/* set minimum possible */
-		w = MAX(1, w);
-		h = MAX(1, h);
-
-		if(!baseismin) { /* temporarily remove base dimensions */
-			w -= c->basew;
-			h -= c->baseh;
-		}
-
-		/* adjust for aspect limits */
-		if(c->mina > 0 && c->maxa > 0) {
-			if(c->maxa < (float)w / h)
-				w = h * c->maxa;
-			else if(c->mina < (float)h / w)
-				h = w * c->mina;
-		}
-
-		if(baseismin) { /* increment calculation requires this */
-			w -= c->basew;
-			h -= c->baseh;
-		}
-
-		/* adjust for increment value */
-		if(c->incw)
-			w -= w % c->incw;
-		if(c->inch)
-			h -= h % c->inch;
-
-		/* restore base dimensions */
-		w += c->basew;
-		h += c->baseh;
-
-		w = MAX(w, c->minw);
-		h = MAX(h, c->minh);
-
-		if(c->maxw)
-			w = MIN(w, c->maxw);
-
-		if(c->maxh)
-			h = MIN(h, c->maxh);
-	}
+	if(sizehints)
+		applysizehints(c, &w, &h);
 	if(w <= 0 || h <= 0)
 		return;
 	if(x > sx + sw)
