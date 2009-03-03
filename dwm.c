@@ -170,7 +170,7 @@ static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
-static void resize(Client *c, int x, int y, int w, int h, Bool sizehints);
+static void resize(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(void);
 static void run(void);
@@ -274,6 +274,9 @@ applyrules(Client *c) {
 void
 applysizehints(Client *c, int *w, int *h) {
 	Bool baseismin;
+
+	if(!resizehints && !c->isfloating)
+		return;
 
 	/* see last two sentences in ICCCM 4.1.2.3 */
 	baseismin = c->basew == c->minw && c->baseh == c->minh;
@@ -981,7 +984,7 @@ monocle(void) {
 	Client *c;
 
 	for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
-		resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw, resizehints);
+		resize(c, wx, wy, ww - 2 * c->bw, wh - 2 * c->bw);
 	}
 }
 
@@ -1029,7 +1032,7 @@ movemouse(const Arg *arg) {
 					togglefloating(NULL);
 			}
 			if(!lt[sellt]->arrange || c->isfloating)
-				resize(c, nx, ny, c->w, c->h, False);
+				resize(c, nx, ny, c->w, c->h);
 			break;
 		}
 	}
@@ -1085,11 +1088,10 @@ quit(const Arg *arg) {
 }
 
 void
-resize(Client *c, int x, int y, int w, int h, Bool sizehints) {
+resize(Client *c, int x, int y, int w, int h) {
 	XWindowChanges wc;
 
-	if(sizehints)
-		applysizehints(c, &w, &h);
+	applysizehints(c, &w, &h);
 	if(w <= 0 || h <= 0)
 		return;
 	if(x > sx + sw)
@@ -1154,7 +1156,7 @@ resizemouse(const Arg *arg) {
 					togglefloating(NULL);
 			}
 			if(!lt[sellt]->arrange || c->isfloating)
-				resize(c, c->x, c->y, nw, nh, True);
+				resize(c, c->x, c->y, nw, nh);
 			break;
 		}
 	}
@@ -1344,7 +1346,7 @@ showhide(Client *c, unsigned int ntiled) {
 	if(ISVISIBLE(c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[sellt]->arrange || c->isfloating)
-			resize(c, c->x, c->y, c->w, c->h, True);
+			resize(c, c->x, c->y, c->w, c->h);
 		showhide(c->snext, ntiled);
 	}
 	else { /* hide clients bottom up */
@@ -1405,7 +1407,7 @@ tile(void) {
 	/* master */
 	c = nexttiled(clients);
 	mw = mfact * ww;
-	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw, resizehints);
+	resize(c, wx, wy, (n == 1 ? ww : mw) - 2 * c->bw, wh - 2 * c->bw);
 
 	if(--n == 0)
 		return;
@@ -1420,7 +1422,7 @@ tile(void) {
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
-		       ? wy + wh - y - 2 * c->bw : h - 2 * c->bw), resizehints);
+		       ? wy + wh - y - 2 * c->bw : h - 2 * c->bw));
 		if(h != wh)
 			y = c->y + HEIGHT(c);
 	}
@@ -1440,7 +1442,7 @@ togglefloating(const Arg *arg) {
 		return;
 	sel->isfloating = !sel->isfloating || sel->isfixed;
 	if(sel->isfloating)
-		resize(sel, sel->x, sel->y, sel->w, sel->h, True);
+		resize(sel, sel->x, sel->y, sel->w, sel->h);
 	arrange();
 }
 
