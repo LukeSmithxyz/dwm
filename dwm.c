@@ -129,7 +129,7 @@ typedef struct {
 
 /* function declarations */
 static void applyrules(Client *c);
-static void applysizehints(Client *c, int *w, int *h);
+static Bool applysizehints(Client *c, int *x, int *y, int *w, int *h);
 static void arrange(void);
 static void attach(Client *c);
 static void attachstack(Client *c);
@@ -252,6 +252,7 @@ applyrules(Client *c) {
 	XClassHint ch = { 0 };
 
 	/* rule matching */
+	c->isfloating = c->tags = 0;
 	if(XGetClassHint(dpy, c->win, &ch)) {
 		for(i = 0; i < LENGTH(rules); i++) {
 			r = &rules[i];
@@ -259,7 +260,7 @@ applyrules(Client *c) {
 			&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
 			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
 				c->isfloating = r->isfloating;
-				c->tags |= r->tags & TAGMASK ? r->tags & TAGMASK : tagset[seltags]; 
+				c->tags |= r->tags; 
 			}
 		}
 		if(ch.res_class)
@@ -267,60 +268,72 @@ applyrules(Client *c) {
 		if(ch.res_name)
 			XFree(ch.res_name);
 	}
-	if(!c->tags)
-		c->tags = tagset[seltags];
+	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : tagset[seltags];
 }
 
-void
-applysizehints(Client *c, int *w, int *h) {
+Bool
+applysizehints(Client *c, int *x, int *y, int *w, int *h) {
 	Bool baseismin;
-
-	if(!resizehints && !c->isfloating)
-		return;
-
-	/* see last two sentences in ICCCM 4.1.2.3 */
-	baseismin = c->basew == c->minw && c->baseh == c->minh;
 
 	/* set minimum possible */
 	*w = MAX(1, *w);
 	*h = MAX(1, *h);
 
-	if(!baseismin) { /* temporarily remove base dimensions */
-		*w -= c->basew;
-		*h -= c->baseh;
+	if(*x > sx + sw)
+		*x = sw - WIDTH(c);
+	if(*y > sy + sh)
+		*y = sh - HEIGHT(c);
+	if(*x + *w + 2 * c->bw < sx)
+		*x = sx;
+	if(*y + *h + 2 * c->bw < sy)
+		*y = sy;
+	if(*h < bh)
+		*h = bh;
+	if(*w < bh)
+		*w = bh;
+
+	if(resizehints || c->isfloating) {
+		/* see last two sentences in ICCCM 4.1.2.3 */
+		baseismin = c->basew == c->minw && c->baseh == c->minh;
+
+		if(!baseismin) { /* temporarily remove base dimensions */
+			*w -= c->basew;
+			*h -= c->baseh;
+		}
+
+		/* adjust for aspect limits */
+		if(c->mina > 0 && c->maxa > 0) {
+			if(c->maxa < (float)*w / *h)
+				*w = *h * c->maxa;
+			else if(c->mina < (float)*h / *w)
+				*h = *w * c->mina;
+		}
+
+		if(baseismin) { /* increment calculation requires this */
+			*w -= c->basew;
+			*h -= c->baseh;
+		}
+
+		/* adjust for increment value */
+		if(c->incw)
+			*w -= *w % c->incw;
+		if(c->inch)
+			*h -= *h % c->inch;
+
+		/* restore base dimensions */
+		*w += c->basew;
+		*h += c->baseh;
+
+		*w = MAX(*w, c->minw);
+		*h = MAX(*h, c->minh);
+
+		if(c->maxw)
+			*w = MIN(*w, c->maxw);
+
+		if(c->maxh)
+			*h = MIN(*h, c->maxh);
 	}
-
-	/* adjust for aspect limits */
-	if(c->mina > 0 && c->maxa > 0) {
-		if(c->maxa < (float)*w / *h)
-			*w = *h * c->maxa;
-		else if(c->mina < (float)*h / *w)
-			*h = *w * c->mina;
-	}
-
-	if(baseismin) { /* increment calculation requires this */
-		*w -= c->basew;
-		*h -= c->baseh;
-	}
-
-	/* adjust for increment value */
-	if(c->incw)
-		*w -= *w % c->incw;
-	if(c->inch)
-		*h -= *h % c->inch;
-
-	/* restore base dimensions */
-	*w += c->basew;
-	*h += c->baseh;
-
-	*w = MAX(*w, c->minw);
-	*h = MAX(*h, c->minh);
-
-	if(c->maxw)
-		*w = MIN(*w, c->maxw);
-
-	if(c->maxh)
-		*h = MIN(*h, c->maxh);
+	return *x != c->x || *y != c->y || *w != c->w || *h != c->h;
 }
 
 void
@@ -1005,8 +1018,6 @@ movemouse(const Arg *arg) {
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui);
-	if(usegrab)
-		XGrabServer(dpy);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -1037,8 +1048,6 @@ movemouse(const Arg *arg) {
 		}
 	}
 	while(ev.type != ButtonRelease);
-	if(usegrab)
-		XUngrabServer(dpy);
 	XUngrabPointer(dpy, CurrentTime);
 }
 
@@ -1091,22 +1100,7 @@ void
 resize(Client *c, int x, int y, int w, int h) {
 	XWindowChanges wc;
 
-	applysizehints(c, &w, &h);
-	if(w <= 0 || h <= 0)
-		return;
-	if(x > sx + sw)
-		x = sw - WIDTH(c);
-	if(y > sy + sh)
-		y = sh - HEIGHT(c);
-	if(x + w + 2 * c->bw < sx)
-		x = sx;
-	if(y + h + 2 * c->bw < sy)
-		y = sy;
-	if(h < bh)
-		h = bh;
-	if(w < bh)
-		w = bh;
-	if(c->x != x || c->y != y || c->w != w || c->h != h) {
+	if(applysizehints(c, &x, &y, &w, &h)) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
@@ -1135,8 +1129,6 @@ resizemouse(const Arg *arg) {
 	None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
-	if(usegrab)
-		XGrabServer(dpy);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch(ev.type) {
@@ -1161,8 +1153,6 @@ resizemouse(const Arg *arg) {
 		}
 	}
 	while(ev.type != ButtonRelease);
-	if(usegrab)
-		XUngrabServer(dpy);
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
