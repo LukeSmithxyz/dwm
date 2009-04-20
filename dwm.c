@@ -797,7 +797,10 @@ grabbuttons(Client *c, Bool focused) {
 			for(i = 0; i < LENGTH(buttons); i++)
 				if(buttons[i].click == ClkClientWin)
 					for(j = 0; j < LENGTH(modifiers); j++)
-						XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+						XGrabButton(dpy, buttons[i].button,
+						            buttons[i].mask | modifiers[j],
+						            c->win, False, BUTTONMASK,
+						            GrabModeAsync, GrabModeSync, None, None);
 		} else
 			XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
 			            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
@@ -936,7 +939,8 @@ manage(Window w, XWindowAttributes *wa) {
 			c->y = sy + sh - HEIGHT(c);
 		c->x = MAX(c->x, sx);
 		/* only fix client y-offset, if the client center might cover the bar */
-		c->y = MAX(c->y, ((by == 0) && (c->x + (c->w / 2) >= wx) && (c->x + (c->w / 2) < wx + ww)) ? bh : sy);
+		c->y = MAX(c->y, ((by == 0) && (c->x + (c->w / 2) >= wx)
+		                            && (c->x + (c->w / 2) < wx + ww)) ? bh : sy);
 		c->bw = borderpx;
 	}
 
@@ -1035,7 +1039,8 @@ movemouse(const Arg *arg) {
 					ny = wy;
 				else if(abs((wy + wh) - (ny + HEIGHT(c))) < snap)
 					ny = wy + wh - HEIGHT(c);
-				if(!c->isfloating && lt[sellt]->arrange && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
+				if(!c->isfloating && lt[sellt]->arrange
+				                  && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 					togglefloating(NULL);
 			}
 			if(!lt[sellt]->arrange || c->isfloating)
@@ -1540,7 +1545,8 @@ updatenumlockmask(void) {
 	modmap = XGetModifierMapping(dpy);
 	for(i = 0; i < 8; i++)
 		for(j = 0; j < modmap->max_keypermod; j++)
-			if(modmap->modifiermap[i * modmap->max_keypermod + j] == XKeysymToKeycode(dpy, XK_Num_Lock))
+			if(modmap->modifiermap[i * modmap->max_keypermod + j]
+			   == XKeysymToKeycode(dpy, XK_Num_Lock))
 				numlockmask = (1 << i);
 	XFreeModifiermap(modmap);
 }
