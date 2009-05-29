@@ -48,7 +48,6 @@
 #define LENGTH(x)               (sizeof x / sizeof x[0])
 #define MAX(a, b)               ((a) > (b) ? (a) : (b))
 #define MIN(a, b)               ((a) < (b) ? (a) : (b))
-#define MAXTAGLEN               16
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(x)                ((x)->w + 2 * (x)->bw)
 #define HEIGHT(x)               ((x)->h + 2 * (x)->bw)

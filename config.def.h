@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const char font[]            = "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*";
+static const char font[]            = "-*-*-medium-*-*-*-14-*-*-*-*-*-*-*";
 static const char normbordercolor[] = "#cccccc";
 static const char normbgcolor[]     = "#cccccc";
 static const char normfgcolor[]     = "#000000";
@@ -14,7 +14,7 @@ static Bool showbar                 = True;     /* False means no bar */
 static Bool topbar                  = True;     /* False means bottom bar */
 
 /* tagging */
-static const char tags[][MAXTAGLEN] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 static unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
 
 static Rule rules[] = {
