@@ -44,8 +44,8 @@
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
-#define ISVISIBLE(x)            (x->tags & tagset[mon[x->mon].seltags])
-#define LENGTH(x)               (sizeof x / sizeof x[0])
+#define ISVISIBLE(M, C)         ((M) == (&mon[C->mon]) && (C->tags & tagset[M->seltags]))
+#define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MAX(a, b)               ((a) > (b) ? (a) : (b))
 #define MIN(a, b)               ((a) < (b) ? (a) : (b))
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
@@ -493,7 +493,7 @@ configurenotify(XEvent *e) {
 		updategeom();
 		if(dc.drawable != 0)
 			XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), bh, DefaultDepth(dpy, screen));
+		dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
 		for(i = 0; i < nmons; i++)
 			XMoveResizeWindow(dpy, mon[i].barwin, mon[i].wx, mon[i].by, mon[i].ww, bh);
 		arrange();
@@ -524,7 +524,7 @@ configurerequest(XEvent *e) {
 				c->y = sy + (sh / 2 - c->h / 2); /* center in y direction */
 			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
-			if(ISVISIBLE(c))
+			if(ISVISIBLE((&mon[c->mon]), c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else
@@ -636,6 +636,7 @@ drawbar(Monitor *m) {
 		}
 	}
 	else {
+		dc.x = x;
 		dc.w = m->ww - x;
 		drawtext(NULL, dc.norm, False);
 	}
@@ -718,17 +719,18 @@ expose(XEvent *e) {
 	unsigned int i;
 	XExposeEvent *ev = &e->xexpose;
 
-	for(i = 0; i < nmons; i++)
-		if(ev->count == 0 && (ev->window == mon[i].barwin)) {
-			drawbar(&mon[i]);
-			break;
-		}
+	if(ev->count == 0)
+		for(i = 0; i < nmons; i++)
+			if(ev->window == mon[i].barwin) {
+				drawbar(&mon[i]);
+				break;
+			}
 }
 
 void
 focus(Client *c) {
-	if(!c || !ISVISIBLE(c))
-		for(c = stack; c && !ISVISIBLE(c); c = c->snext);
+	if(!c || !ISVISIBLE((&mon[c->mon]), c))
+		for(c = stack; c && !ISVISIBLE(selmon, c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, dc.norm[ColBorder]);
@@ -776,17 +778,17 @@ focusstack(const Arg *arg) {
 	if(!sel)
 		return;
 	if(arg->i > 0) {
-		for(c = sel->next; c && !ISVISIBLE(c); c = c->next);
+		for(c = sel->next; c && !ISVISIBLE(selmon, c); c = c->next);
 		if(!c)
-			for(c = clients; c && !ISVISIBLE(c); c = c->next);
+			for(c = clients; c && !ISVISIBLE(selmon, c); c = c->next);
 	}
 	else {
 		for(i = clients; i != sel; i = i->next)
-			if(ISVISIBLE(i))
+			if(ISVISIBLE(selmon, i))
 				c = i;
 		if(!c)
 			for(; i; i = i->next)
-				if(ISVISIBLE(i))
+				if(ISVISIBLE(selmon, i))
 					c = i;
 	}
 	if(c) {
@@ -1126,7 +1128,7 @@ movemouse(const Arg *arg) {
 Client *
 nexttiled(Monitor *m, Client *c) {
 	// TODO: m handling
-	for(; c && (c->isfloating || m != &mon[c->mon] || !ISVISIBLE(c)); c = c->next);
+	for(; c && (c->isfloating || !ISVISIBLE(m, c)); c = c->next);
 	return c;
 }
 
@@ -1246,7 +1248,7 @@ restack(Monitor *m) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
 		for(c = stack; c; c = c->snext)
-			if(!c->isfloating && m == &mon[c->mon] && ISVISIBLE(c)) {
+			if(!c->isfloating && ISVISIBLE(m, c)) {
 				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
 				wc.sibling = c->win;
 			}
@@ -1408,7 +1410,7 @@ void
 showhide(Client *c) {
 	if(!c)
 		return;
-	if(ISVISIBLE(c)) { /* show clients top down */
+	if(ISVISIBLE((&mon[c->mon]), c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[selmon->sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h);
