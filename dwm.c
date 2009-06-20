@@ -44,15 +44,15 @@
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
-#define ISVISIBLE(M, C)         ((M) == (&mon[C->mon]) && (C->tags & tagset[M->seltags]))
+#define ISVISIBLE(M, C)         ((M) == (&mon[C->mon]) && (C->tags & M->tagset[M->seltags]))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
-#define MAX(a, b)               ((a) > (b) ? (a) : (b))
-#define MIN(a, b)               ((a) < (b) ? (a) : (b))
+#define MAX(A, B)               ((A) > (B) ? (A) : (B))
+#define MIN(A, B)               ((A) < (B) ? (A) : (B))
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
-#define WIDTH(x)                ((x)->w + 2 * (x)->bw)
-#define HEIGHT(x)               ((x)->h + 2 * (x)->bw)
+#define WIDTH(X)                ((X)->w + 2 * (X)->bw)
+#define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((int)((1LL << LENGTH(tags)) - 1))
-#define TEXTW(x)                (textnw(x, strlen(x)) + dc.font.height)
+#define TEXTW(X)                (textnw(X, strlen(X)) + dc.font.height)
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
@@ -121,6 +121,7 @@ typedef struct {
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
 	unsigned int sellt;
+	unsigned int tagset[2];
 	Bool showbar;
 	Bool topbar;
 	Window barwin;
@@ -284,7 +285,7 @@ applyrules(Client *c) {
 		if(ch.res_name)
 			XFree(ch.res_name);
 	}
-	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : tagset[mon[c->mon].seltags];
+	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : mon[c->mon].tagset[mon[c->mon].seltags];
 }
 
 Bool
@@ -605,7 +606,7 @@ drawbar(Monitor *m) {
 	m->btx = dc.x;
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i]);
-		col = tagset[m->seltags] & 1 << i ? dc.sel : dc.norm;
+		col = m->tagset[m->seltags] & 1 << i ? dc.sel : dc.norm;
 		drawtext(tags[i], col, urg & 1 << i);
 		drawsquare(m == selmon && sel && sel->tags & 1 << i,
 		           occ & 1 << i, urg & 1 << i, col);
@@ -748,8 +749,6 @@ focus(Client *c) {
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	sel = c;
-	if(c)
-		selmon = &mon[c->mon];
 	drawbars();
 }
 
@@ -1413,7 +1412,7 @@ showhide(Client *c) {
 		return;
 	if(ISVISIBLE((&mon[c->mon]), c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
-		if(!lt[selmon->sellt]->arrange || c->isfloating)
+		if(!lt[mon[c->mon].sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h);
 		showhide(c->snext);
 	}
@@ -1540,10 +1539,10 @@ toggletag(const Arg *arg) {
 
 void
 toggleview(const Arg *arg) {
-	unsigned int mask = tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
+	unsigned int mask = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
 
 	if(mask) {
-		tagset[selmon->seltags] = mask;
+		selmon->tagset[selmon->seltags] = mask;
 		arrange();
 	}
 }
@@ -1595,6 +1594,7 @@ updategeom(void) {
 					c->mon = n - 1;
 			if(!(mon = (Monitor *)realloc(mon, sizeof(Monitor) * n)))
 				die("fatal: could not realloc() %u bytes\n", sizeof(Monitor) * nmons);
+			selmon = NULL;
 		}
 		for(i = 0; i < n ; i++) {
 			/* TODO: consider re-using XineramaScreenInfo */
@@ -1606,6 +1606,7 @@ updategeom(void) {
 				mon[i].mfact = mfact;
 				mon[i].showbar = showbar;
 				mon[i].topbar = topbar;
+				mon[i].tagset[0] = mon[i].tagset[1] = 1;
 			}
 			mon[i].wx = info[i].x_org;
 			mon[i].wy = mon[i].showbar && mon[i].topbar ? info[i].y_org + bh : info[i].y_org;
@@ -1649,6 +1650,7 @@ updategeom(void) {
 			mon[0].mfact = mfact;
 			mon[0].showbar = showbar;
 			mon[0].topbar = topbar;
+			mon[0].tagset[0] = mon[0].tagset[1] = 1;
 		}
 		mon[0].wx = sx;
 		mon[0].wy = mon[0].showbar && mon[0].topbar ? sy + bh : sy;
@@ -1760,11 +1762,11 @@ updatewmhints(Client *c) {
 
 void
 view(const Arg *arg) {
-	if((arg->ui & TAGMASK) == tagset[selmon->seltags])
+	if((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
 		return;
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if(arg->ui & TAGMASK)
-		tagset[selmon->seltags] = arg->ui & TAGMASK;
+		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
 	arrange();
 }
 
