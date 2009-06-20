@@ -116,6 +116,7 @@ typedef struct {
 
 typedef struct {
 	char symbol[4];
+	float mfact;
 	int by, btx;          /* bar geometry */
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
@@ -251,7 +252,7 @@ static Display *dpy;
 static DC dc;
 static Layout *lt[] = { NULL, NULL };
 static Monitor *mon = NULL, *selmon = NULL;
-static unsigned int nmons;
+static unsigned int nmons = 0;
 static Window root;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -1322,10 +1323,10 @@ setmfact(const Arg *arg) {
 
 	if(!arg || !lt[selmon->sellt]->arrange)
 		return;
-	f = arg->f < 1.0 ? arg->f + mfact : arg->f - 1.0;
+	f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
 	if(f < 0.1 || f > 0.9)
 		return;
-	mfact = f;
+	selmon->mfact = f;
 	arrange();
 }
 
@@ -1483,7 +1484,7 @@ tile(Monitor *m) {
 
 	/* master */
 	c = nexttiled(m, clients);
-	mw = mfact * m->ww;
+	mw = m->mfact * m->ww;
 	resize(c, m->wx, m->wy, (n == 1 ? m->ww : mw) - 2 * c->bw, m->wh - 2 * c->bw);
 
 	if(--n == 0)
@@ -1581,30 +1582,31 @@ unmapnotify(XEvent *e) {
 void
 updategeom(void) {
 #ifdef XINERAMA
-	int di, x, y, n;
-	unsigned int dui, i = 0;
-	Bool pquery;
+	int n;
+	unsigned int i = 0;
 	Client *c;
-	Window dummy;
 	XineramaScreenInfo *info = NULL;
 
 	/* window area geometry */
 	if(XineramaIsActive(dpy) && (info = XineramaQueryScreens(dpy, &n))) {
-		nmons = (unsigned int)n;
-		for(c = clients; c; c = c->next)
-			if(c->mon >= nmons)
-				c->mon = nmons - 1;
-		if(!(mon = (Monitor *)realloc(mon, sizeof(Monitor) * nmons)))
-			die("fatal: could not realloc() %u bytes\n", sizeof(Monitor) * nmons);
-		pquery = XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui);
-		for(i = 0; i < nmons; i++) {
+		if(n != nmons) {
+			for(c = clients; c; c = c->next)
+				if(c->mon >= n)
+					c->mon = n - 1;
+			if(!(mon = (Monitor *)realloc(mon, sizeof(Monitor) * n)))
+				die("fatal: could not realloc() %u bytes\n", sizeof(Monitor) * nmons);
+		}
+		for(i = 0; i < n ; i++) {
 			/* TODO: consider re-using XineramaScreenInfo */
 			mon[i].symbol[0] = '[';
 			mon[i].symbol[1] = '0' + info[i].screen_number;
 			mon[i].symbol[2] = ']';
 			mon[i].symbol[3] = 0;
-			mon[i].showbar = showbar;
-			mon[i].topbar = topbar;
+			if(!selmon) { /* not initialised yet */
+				mon[i].mfact = mfact;
+				mon[i].showbar = showbar;
+				mon[i].topbar = topbar;
+			}
 			mon[i].wx = info[i].x_org;
 			mon[i].wy = mon[i].showbar && mon[i].topbar ? info[i].y_org + bh : info[i].y_org;
 			mon[i].ww = info[i].width;
@@ -1615,24 +1617,39 @@ updategeom(void) {
 				mon[i].by = mon[i].topbar ? info[i].y_org : mon[i].wy + mon[i].wh;
 			else
 				mon[i].by = -bh;
-			if(pquery && INRECT(x, y, info[i].x_org, info[i].y_org, info[i].width, info[i].height))
-				selmon = &mon[i];
+		}
+		nmons = (unsigned int)n;
+		if(!selmon) {
+			selmon = &mon[0];
+			int di, x, y;
+			unsigned int dui;
+			Window dummy;
+			if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui)) 
+				for(i = 0; i < nmons; i++)
+					if(INRECT(x, y, info[i].x_org, info[i].y_org, info[i].width, info[i].height)) {
+						selmon = &mon[i];
+						break;
+					}
 		}
 		XFree(info);
 	}
 	else
 #endif /* XINERAMA */
 	{
-		nmons = 1;
-		if(!(mon = (Monitor *)realloc(mon, sizeof(Monitor))))
-			die("fatal: could not realloc() %u bytes\n", sizeof(Monitor));
-		selmon = &mon[0];
-		mon[0].symbol[0] = '[';
-		mon[0].symbol[1] = '0';
-		mon[0].symbol[2] = ']';
-		mon[0].symbol[3] = 0;
-		mon[0].showbar = showbar;
-		mon[0].topbar = topbar;
+		if(!mon) {
+			nmons = 1;
+			if(!(mon = (Monitor *)malloc(sizeof(Monitor))))
+				die("fatal: could not malloc() %u bytes\n", sizeof(Monitor));
+		}
+		if(!selmon) {
+			mon[0].symbol[0] = '[';
+			mon[0].symbol[1] = '0';
+			mon[0].symbol[2] = ']';
+			mon[0].symbol[3] = 0;
+			mon[0].mfact = mfact;
+			mon[0].showbar = showbar;
+			mon[0].topbar = topbar;
+		}
 		mon[0].wx = sx;
 		mon[0].wy = mon[0].showbar && mon[0].topbar ? sy + bh : sy;
 		mon[0].ww = sw;
@@ -1643,6 +1660,7 @@ updategeom(void) {
 			mon[0].by = mon[0].topbar ? sy : mon[0].wy + mon[0].wh;
 		else
 			mon[0].by = -bh;
+		selmon = &mon[0];
 	}
 }
 
