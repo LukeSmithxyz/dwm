@@ -13,6 +13,7 @@ static unsigned int snap            = 32;       /* snap pixel */
 static Bool showbar                 = True;     /* False means no bar */
 static Bool topbar                  = True;     /* False means bottom bar */
 
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 static unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
@@ -20,7 +21,8 @@ static unsigned int tagset[] = {1, 1}; /* after start, first tag is selected */
 static Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating */
 	{ "Gimp",     NULL,       NULL,       0,            True },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       True },
+	{ "Firefox",  NULL,       NULL,       1 << 8,       False },
+
 };
 
 /* layout(s) */
@@ -68,6 +70,12 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
+#ifdef XINERAMA
+	{ MODKEY,                       XK_w,      focusmon,       {.ui = 0 } },
+	{ MODKEY,                       XK_e,      focusmon,       {.ui = 1 } },
+	{ MODKEY|ShiftMask,             XK_w,      tagmon,         {.ui = 0 } },
+	{ MODKEY|ShiftMask,             XK_e,      tagmon,         {.ui = 1 } },
+#endif /* XINERAMA */
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
