@@ -1408,6 +1408,7 @@ setup(void) {
 			PropModeReplace, (unsigned char *) netatom, NetLast);
 
 	/* select for events */
+	wa.cursor = cursor[CurNormal];
 	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask
 			|EnterWindowMask|LeaveWindowMask|StructureNotifyMask
 			|PropertyChangeMask;
@@ -1599,7 +1600,6 @@ updatebars(void) {
 	Monitor *m;
 	XSetWindowAttributes wa;
 
-	wa.cursor = cursor[CurNormal];
 	wa.override_redirect = True;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask|ExposureMask;
