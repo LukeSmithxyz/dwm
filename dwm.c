@@ -124,6 +124,7 @@ struct Monitor {
 	int screen_number;
 	float mfact;
 	int by, btx;          /* bar geometry */
+	int my, mh;           /* vertical screen size*/
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
 	unsigned int sellt;
@@ -209,6 +210,7 @@ static void toggleview(const Arg *arg);
 static void unmanage(Client *c);
 static void unmapnotify(XEvent *e);
 static void updategeom(void);
+static void updatebarpos(Monitor *m);
 static void updatebars(void);
 static void updatenumlockmask(void);
 static void updatesizehints(Client *c);
@@ -389,7 +391,7 @@ buttonpress(XEvent *e) {
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	click = ClkRootWin;
-	if(ev->window == selmon->barwin) {
+	if(ev->window == selmon->barwin && ev->x >= selmon->btx) {
 		i = 0;
 		x = selmon->btx;
 		do
@@ -597,6 +599,7 @@ die(const char *errstr, ...) {
 
 void
 drawbar(Monitor *m) {
+	char buf[2];
 	int x;
 	unsigned int i, occ = 0, urg = 0;
 	unsigned long *col;
@@ -613,11 +616,11 @@ drawbar(Monitor *m) {
 	dc.x = 0;
 #ifdef XINERAMA
 	{
-		/*
-		dc.w = TEXTW(m->symbol);
-		drawtext(NULL, selmon == m ? dc.sel : dc.norm, False);
+		buf[0] = m->screen_number + '0';
+		buf[1] = '\0';
+		dc.w = TEXTW(buf);
+		drawtext(buf, selmon == m ? dc.sel : dc.norm, True);
 		dc.x += dc.w;
-		*/
 	}
 #endif /* XINERAMA */
 	m->btx = dc.x;
@@ -1525,7 +1528,7 @@ tile(Monitor *m) {
 void
 togglebar(const Arg *arg) {
 	selmon->showbar = !selmon->showbar;
-	updategeom();
+	updatebarpos(selmon);
 	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
 	arrange();
 }
@@ -1615,6 +1618,19 @@ updatebars(void) {
 }
 
 void
+updatebarpos(Monitor *m) {
+	m->wy = m->my;
+	m->wh = m->mh;
+	if(m->showbar) {
+		m->wh -= bh;
+		m->by = m->topbar ? m->wy : m->wy + m->wh;
+		m->wy = m->topbar ? m->wy + bh : m->wy;
+	}
+	else
+		m->by = -bh;
+}
+
+void
 updategeom(void) {
 	int i, n;
 	Client *c;
@@ -1639,9 +1655,9 @@ updategeom(void) {
 		for(i = 0, m = newmons; m; m = m->next, i++) {
 			m->screen_number = info[i].screen_number;
 			m->wx = info[i].x_org;
-			m->wy = info[i].y_org;
+			m->my = m->wy = info[i].y_org;
 			m->ww = info[i].width;
-			m->wh = info[i].height;
+			m->mh = m->wh = info[i].height;
 		}
 		XFree(info);
 	}
@@ -1651,9 +1667,9 @@ updategeom(void) {
 	{
 		m->screen_number = 0;
 		m->wx = sx;
-		m->wy = sy;
+		m->my = m->wy = sy;
 		m->ww = sw;
-		m->wh = sh;
+		m->mh = m->wh = sh;
 	}
 
 	/* bar geometry setup */
@@ -1665,13 +1681,7 @@ updategeom(void) {
 		m->mfact = mfact;
 		m->showbar = showbar;
 		m->topbar = topbar;
-		if(m->showbar) {
-			m->wh -= bh;
-			m->by = m->topbar ? m->wy : m->wy + m->wh;
-			m->wy = m->topbar ? m->wy + bh : m->wy;
-		}
-		else
-			m->by = -bh;
+		updatebarpos(m);
 		/* reassign all clients with same screen number */
 		for(c = clients; c; c = c->next)
 			if(c->m->screen_number == m->screen_number)
