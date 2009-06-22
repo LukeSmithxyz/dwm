@@ -44,7 +44,7 @@
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
-#define ISVISIBLE(M, C)         ((M) == (&mon[C->mon]) && (C->tags & M->tagset[M->seltags]))
+#define ISVISIBLE(M, C)         ((M) == (C->m) && (C->tags & M->tagset[M->seltags]))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
@@ -77,6 +77,7 @@ typedef struct {
 	const Arg arg;
 } Button;
 
+typedef struct Monitor Monitor;
 typedef struct Client Client;
 struct Client {
 	char name[256];
@@ -85,10 +86,10 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
 	unsigned int tags;
-	unsigned int mon;
 	Bool isfixed, isfloating, isurgent;
 	Client *next;
 	Client *snext;
+	Monitor *m;
 	Window win;
 };
 
@@ -115,7 +116,12 @@ typedef struct {
 } Key;
 
 typedef struct {
-	char symbol[4];
+	const char *symbol;
+	void (*arrange)(Monitor *);
+} Layout;
+
+struct Monitor {
+	int screen_number;
 	float mfact;
 	int by, btx;          /* bar geometry */
 	int wx, wy, ww, wh;   /* window area  */
@@ -125,12 +131,8 @@ typedef struct {
 	Bool showbar;
 	Bool topbar;
 	Window barwin;
-} Monitor;
-
-typedef struct {
-	const char *symbol;
-	void (*arrange)(Monitor *);
-} Layout;
+	Monitor *next;
+};
 
 typedef struct {
 	const char *class;
@@ -149,6 +151,7 @@ static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
 static void cleanup(void);
+static void cleanupmons(void);
 static void clearurgent(Client *c);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
@@ -206,6 +209,7 @@ static void toggleview(const Arg *arg);
 static void unmanage(Client *c);
 static void unmapnotify(XEvent *e);
 static void updategeom(void);
+static void updatebars(void);
 static void updatenumlockmask(void);
 static void updatesizehints(Client *c);
 static void updatestatus(void);
@@ -252,8 +256,7 @@ static Cursor cursor[CurLast];
 static Display *dpy;
 static DC dc;
 static Layout *lt[] = { NULL, NULL };
-static Monitor *mon = NULL, *selmon = NULL;
-static unsigned int nmons = 0;
+static Monitor *mons = NULL, *selmon = NULL;
 static Window root;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -285,7 +288,7 @@ applyrules(Client *c) {
 		if(ch.res_name)
 			XFree(ch.res_name);
 	}
-	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : mon[c->mon].tagset[mon[c->mon].seltags];
+	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->m->tagset[c->m->seltags];
 }
 
 Bool
@@ -355,13 +358,14 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h) {
 
 void
 arrange(void) {
-	unsigned int i;
+	Monitor *m;
+
 	showhide(stack);
 	focus(NULL);
-	for(i = 0; i < nmons; i++) {
-		if(lt[mon[i].sellt]->arrange)
-			lt[mon[i].sellt]->arrange(&mon[i]);
-		restack(&mon[i]);
+	for(m = mons; m; m = m->next) {
+		if(lt[m->sellt]->arrange)
+			lt[m->sellt]->arrange(m);
+		restack(m);
 	}
 }
 
@@ -429,7 +433,6 @@ checkotherwm(void) {
 
 void
 cleanup(void) {
-	unsigned int i;
 	Arg a = {.ui = ~0};
 	Layout foo = { "", NULL };
 
@@ -447,11 +450,22 @@ cleanup(void) {
 	XFreeCursor(dpy, cursor[CurNormal]);
 	XFreeCursor(dpy, cursor[CurResize]);
 	XFreeCursor(dpy, cursor[CurMove]);
-	for(i = 0; i < nmons; i++)
-		XDestroyWindow(dpy, mon[i].barwin);
-	free(mon);
+	cleanupmons();
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+}
+
+void
+cleanupmons(void) {
+	Monitor *m;
+
+	while(mons) {
+		m = mons->next;
+		XUnmapWindow(dpy, mons->barwin);
+		XDestroyWindow(dpy, mons->barwin);
+		free(mons);
+		mons = m;
+	}
 }
 
 void
@@ -486,7 +500,7 @@ configure(Client *c) {
 
 void
 configurenotify(XEvent *e) {
-	unsigned int i;
+	Monitor *m;
 	XConfigureEvent *ev = &e->xconfigure;
 
 	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
@@ -496,8 +510,9 @@ configurenotify(XEvent *e) {
 		if(dc.drawable != 0)
 			XFreePixmap(dpy, dc.drawable);
 		dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
-		for(i = 0; i < nmons; i++)
-			XMoveResizeWindow(dpy, mon[i].barwin, mon[i].wx, mon[i].by, mon[i].ww, bh);
+		updatebars();
+		for(m = mons; m; m = m->next)
+			XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
 		arrange();
 	}
 }
@@ -526,7 +541,7 @@ configurerequest(XEvent *e) {
 				c->y = sy + (sh / 2 - c->h / 2); /* center in y direction */
 			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
-			if(ISVISIBLE((&mon[c->mon]), c))
+			if(ISVISIBLE((c->m), c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else
@@ -588,7 +603,7 @@ drawbar(Monitor *m) {
 	Client *c;
 
 	for(c = clients; c; c = c->next) {
-		if(m == &mon[c->mon]) {
+		if(m == c->m) {
 			occ |= c->tags;
 			if(c->isurgent)
 				urg |= c->tags;
@@ -598,9 +613,11 @@ drawbar(Monitor *m) {
 	dc.x = 0;
 #ifdef XINERAMA
 	{
+		/*
 		dc.w = TEXTW(m->symbol);
-		drawtext(m->symbol, selmon == m ? dc.sel : dc.norm, False);
+		drawtext(NULL, selmon == m ? dc.sel : dc.norm, False);
 		dc.x += dc.w;
+		*/
 	}
 #endif /* XINERAMA */
 	m->btx = dc.x;
@@ -648,10 +665,10 @@ drawbar(Monitor *m) {
 
 void
 drawbars() {
-	unsigned int i;
+	Monitor *m;
 
-	for(i = 0; i < nmons; i++)
-		drawbar(&mon[i]);
+	for(m = mons; m; m = m->next)
+		drawbar(m);
 }
 
 void
@@ -718,20 +735,20 @@ enternotify(XEvent *e) {
 
 void
 expose(XEvent *e) {
-	unsigned int i;
+	Monitor *m;
 	XExposeEvent *ev = &e->xexpose;
 
 	if(ev->count == 0)
-		for(i = 0; i < nmons; i++)
-			if(ev->window == mon[i].barwin) {
-				drawbar(&mon[i]);
+		for(m = mons; m; m = m->next)
+			if(ev->window == m->barwin) {
+				drawbar(m);
 				break;
 			}
 }
 
 void
 focus(Client *c) {
-	if(!c || !ISVISIBLE((&mon[c->mon]), c))
+	if(!c || !ISVISIBLE((c->m), c))
 		for(c = stack; c && !ISVISIBLE(selmon, c); c = c->snext);
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
@@ -763,11 +780,16 @@ focusin(XEvent *e) { /* there are some broken focus acquiring clients */
 #ifdef XINERAMA
 void
 focusmon(const Arg *arg) {
-	if(arg->ui >= nmons)
-		return;
-	selmon = &mon[arg->ui];
-	focus(NULL);
-	drawbars();
+	unsigned int i;
+	Monitor *m; 
+
+	for(i = 0, m = mons; m; m = m->next, i++)
+		if(i == arg->ui) {
+			selmon = m;
+			focus(NULL);
+			drawbars();
+			break;
+		}
 }
 #endif /* XINERAMA */
 
@@ -993,7 +1015,7 @@ manage(Window w, XWindowAttributes *wa) {
 		die("fatal: could not malloc() %u bytes\n", sizeof(Client));
 	*c = cz;
 	c->win = w;
-	for(c->mon = 0; selmon != &mon[c->mon]; c->mon++);
+	c->m = selmon;
 
 	/* geometry */
 	c->x = wa->x;
@@ -1356,7 +1378,7 @@ setup(void) {
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
 
 	/* init cursors */
-	wa.cursor = cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
+	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 
@@ -1374,22 +1396,11 @@ setup(void) {
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 
 	/* init bars */
-	wa.override_redirect = True;
-	wa.background_pixmap = ParentRelative;
-	wa.event_mask = ButtonPressMask|ExposureMask;
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
 		w = TEXTW(layouts[i].symbol);
 		blw = MAX(blw, w);
 	}
-
-	for(i = 0; i < nmons; i++) {
-		mon[i].barwin = XCreateWindow(dpy, root, mon[i].wx, mon[i].by, mon[i].ww, bh, 0, DefaultDepth(dpy, screen),
-
-		                              CopyFromParent, DefaultVisual(dpy, screen),
-		                              CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
-		XDefineCursor(dpy, mon[i].barwin, cursor[CurNormal]);
-		XMapRaised(dpy, mon[i].barwin);
-	}
+	updatebars();
 	updatestatus();
 
 	/* EWMH support per view */
@@ -1410,9 +1421,9 @@ void
 showhide(Client *c) {
 	if(!c)
 		return;
-	if(ISVISIBLE((&mon[c->mon]), c)) { /* show clients top down */
+	if(ISVISIBLE((c->m), c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
-		if(!lt[mon[c->mon].sellt]->arrange || c->isfloating)
+		if(!lt[c->m->sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h);
 		showhide(c->snext);
 	}
@@ -1453,10 +1464,15 @@ tag(const Arg *arg) {
 #ifdef XINERAMA
 void
 tagmon(const Arg *arg) {
-	if(!sel || arg->ui >= nmons)
-		return;
-	sel->mon = arg->ui;
-	arrange();
+	unsigned int i;
+	Monitor *m;
+
+	for(i = 0, m = mons; m; m = m->next, i++)
+		if(i == arg->ui) {
+			sel->m = m;
+			arrange();
+			break;
+		}
 }
 #endif /* XINERAMA */
 
@@ -1579,91 +1595,111 @@ unmapnotify(XEvent *e) {
 }
 
 void
+updatebars(void) {
+	Monitor *m;
+	XSetWindowAttributes wa;
+
+	wa.cursor = cursor[CurNormal];
+	wa.override_redirect = True;
+	wa.background_pixmap = ParentRelative;
+	wa.event_mask = ButtonPressMask|ExposureMask;
+
+	for(m = mons; m; m = m->next) {
+		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
+
+		                          CopyFromParent, DefaultVisual(dpy, screen),
+		                          CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+		XDefineCursor(dpy, m->barwin, cursor[CurNormal]);
+		XMapRaised(dpy, m->barwin);
+	}
+}
+
+void
 updategeom(void) {
-#ifdef XINERAMA
-	int n;
-	unsigned int i = 0;
+	int i, n;
 	Client *c;
+	Monitor *newmons = NULL, *m;
+
+#ifdef XINERAMA
 	XineramaScreenInfo *info = NULL;
 
-	/* window area geometry */
-	if(XineramaIsActive(dpy) && (info = XineramaQueryScreens(dpy, &n))) {
-		if(n != nmons) {
-			for(c = clients; c; c = c->next)
-				if(c->mon >= n)
-					c->mon = n - 1;
-			if(!(mon = (Monitor *)realloc(mon, sizeof(Monitor) * n)))
-				die("fatal: could not realloc() %u bytes\n", sizeof(Monitor) * nmons);
-			selmon = NULL;
-		}
-		for(i = 0; i < n ; i++) {
-			/* TODO: consider re-using XineramaScreenInfo */
-			mon[i].symbol[0] = '[';
-			mon[i].symbol[1] = '0' + info[i].screen_number;
-			mon[i].symbol[2] = ']';
-			mon[i].symbol[3] = 0;
-			if(!selmon) { /* not initialised yet */
-				mon[i].mfact = mfact;
-				mon[i].showbar = showbar;
-				mon[i].topbar = topbar;
-				mon[i].tagset[0] = mon[i].tagset[1] = 1;
-			}
-			mon[i].wx = info[i].x_org;
-			mon[i].wy = mon[i].showbar && mon[i].topbar ? info[i].y_org + bh : info[i].y_org;
-			mon[i].ww = info[i].width;
-			mon[i].wh = mon[i].showbar ? info[i].height - bh : info[i].height;
-			mon[i].seltags = 0;
-			mon[i].sellt = 0;
-			if(mon[i].showbar)
-				mon[i].by = mon[i].topbar ? info[i].y_org : mon[i].wy + mon[i].wh;
-			else
-				mon[i].by = -bh;
-		}
-		nmons = (unsigned int)n;
-		if(!selmon) {
-			selmon = &mon[0];
-			int di, x, y;
-			unsigned int dui;
-			Window dummy;
-			if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui)) 
-				for(i = 0; i < nmons; i++)
-					if(INRECT(x, y, info[i].x_org, info[i].y_org, info[i].width, info[i].height)) {
-						selmon = &mon[i];
-						break;
-					}
+	if(XineramaIsActive(dpy))
+		info = XineramaQueryScreens(dpy, &n);
+#endif
+	/* allocate monitor(s) for the new geometry setup */
+	for(i = 0; i < n; i++) {
+		m = (Monitor *)malloc(sizeof(Monitor));
+		m->next = newmons;
+		newmons = m;
+	}
+
+	/* initialise monitor(s) */
+#ifdef XINERAMA
+	if(XineramaIsActive(dpy)) {
+		for(i = 0, m = newmons; m; m = m->next, i++) {
+			m->screen_number = info[i].screen_number;
+			m->wx = info[i].x_org;
+			m->wy = info[i].y_org;
+			m->ww = info[i].width;
+			m->wh = info[i].height;
 		}
 		XFree(info);
 	}
 	else
-#endif /* XINERAMA */
+#endif
+	/* default monitor setup */
 	{
-		if(!mon) {
-			nmons = 1;
-			if(!(mon = (Monitor *)malloc(sizeof(Monitor))))
-				die("fatal: could not malloc() %u bytes\n", sizeof(Monitor));
-		}
-		if(!selmon) {
-			mon[0].symbol[0] = '[';
-			mon[0].symbol[1] = '0';
-			mon[0].symbol[2] = ']';
-			mon[0].symbol[3] = 0;
-			mon[0].mfact = mfact;
-			mon[0].showbar = showbar;
-			mon[0].topbar = topbar;
-			mon[0].tagset[0] = mon[0].tagset[1] = 1;
-		}
-		mon[0].wx = sx;
-		mon[0].wy = mon[0].showbar && mon[0].topbar ? sy + bh : sy;
-		mon[0].ww = sw;
-		mon[0].wh = mon[0].showbar ? sh - bh : sh;
-		mon[0].seltags = 0;
-		mon[0].sellt = 0;
-		if(mon[0].showbar)
-			mon[0].by = mon[0].topbar ? sy : mon[0].wy + mon[0].wh;
-		else
-			mon[0].by = -bh;
-		selmon = &mon[0];
+		m->screen_number = 0;
+		m->wx = sx;
+		m->wy = sy;
+		m->ww = sw;
+		m->wh = sh;
 	}
+
+	/* bar geometry setup */
+	for(m = newmons; m; m = m->next) {
+		/* TODO: consider removing the following values from config.h */
+		m->seltags = 0;
+		m->sellt = 0;
+		m->tagset[0] = m->tagset[1] = 1;
+		m->mfact = mfact;
+		m->showbar = showbar;
+		m->topbar = topbar;
+		if(m->showbar) {
+			m->wh -= bh;
+			m->by = m->topbar ? m->wy : m->wy + m->wh;
+			m->wy = m->topbar ? m->wy + bh : m->wy;
+		}
+		else
+			m->by = -bh;
+		/* reassign all clients with same screen number */
+		for(c = clients; c; c = c->next)
+			if(c->m->screen_number == m->screen_number)
+				c->m = m;
+	}
+
+	/* reassign left over clients with disappeared screen number */
+	for(c = clients; c; c = c->next)
+		if(c->m->screen_number >= n)
+			c->m = newmons;
+
+	/* select focused monitor */
+	if(!selmon) {
+		selmon = newmons;
+		int di, x, y;
+		unsigned int dui;
+		Window dummy;
+		if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui)) 
+			for(m = newmons; m; m = m->next)
+				if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh)) {
+					selmon = m;
+					break;
+				}
+	}
+
+	/* final assignment of new monitors */
+	cleanupmons();
+	mons = newmons;
 }
 
 void
