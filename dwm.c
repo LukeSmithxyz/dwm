@@ -1714,18 +1714,12 @@ updategeom(void) {
 
 	/* reassign left over clients of disappeared monitors */
 	for(tm = mons; tm; tm = tm->next) {
-		while(tm->clients) {
-			c = tm->clients->next;
-			tm->clients->next = newmons->clients;
-			tm->clients->mon = newmons;
-			newmons->clients = tm->clients;
-			tm->clients = c;
-		}
-		while(tm->stack) {
-			c = tm->stack->snext;
-			tm->stack->snext = newmons->stack;
-			newmons->sel = newmons->stack = tm->stack;
-			tm->stack = c;
+		while((c = tm->clients)) {
+			detach(c);
+			detachstack(c);
+			c->mon = newmons;
+			attach(c);
+			attachstack(c);
 		}
 	}
 
