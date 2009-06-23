@@ -375,14 +375,14 @@ arrange(void) {
 
 void
 attach(Client *c) {
-	c->next = selmon->clients;
-	selmon->clients = c;
+	c->next = c->mon->clients;
+	c->mon->clients = c;
 }
 
 void
 attachstack(Client *c) {
-	c->snext = selmon->stack;
-	selmon->stack = c;
+	c->snext = c->mon->stack;
+	c->mon->stack = c;
 }
 
 void
@@ -1475,11 +1475,20 @@ tag(const Arg *arg) {
 void
 tagmon(const Arg *arg) {
 	unsigned int i;
+	Client *c;
 	Monitor *m;
 
+	if(!(c = selmon->sel))
+		return;
 	for(i = 0, m = mons; m; m = m->next, i++)
 		if(i == arg->ui) {
-			selmon->sel->m = m;
+			detach(c);
+			detachstack(c);
+			c->mon = m;
+			attach(c);
+			attachstack(c);
+			selmon->sel = selmon->stack;
+			m->sel = c;
 			arrange();
 			break;
 		}
@@ -1695,7 +1704,7 @@ updategeom(void) {
 		for(tm = mons; tm; tm = tm->next)
 			if(tm->screen_number == m->screen_number) {
 				m->clients = tm->clients;
-				m->stack = tm->stack;
+				m->sel = m->stack = tm->stack;
 				tm->clients = NULL;
 				tm->stack = NULL;
 				for(c = m->clients; c; c = c->next)
@@ -1715,7 +1724,7 @@ updategeom(void) {
 		while(tm->stack) {
 			c = tm->stack->snext;
 			tm->stack->snext = newmons->stack;
-			newmons->stack = tm->stack;
+			newmons->sel = newmons->stack = tm->stack;
 			tm->stack = c;
 		}
 	}
