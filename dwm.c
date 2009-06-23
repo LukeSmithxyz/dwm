@@ -1,3 +1,4 @@
+#define XINULATOR /* debug, simulates dual head */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
@@ -1158,7 +1159,6 @@ movemouse(const Arg *arg) {
 
 Client *
 nexttiled(Client *c) {
-	// TODO: m handling
 	for(; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
 	return c;
 }
@@ -1593,8 +1593,10 @@ unmanage(Client *c) {
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
 	detach(c);
 	detachstack(c);
-	if(selmon->sel == c)
+	if(c->mon->sel == c) {
+		c->mon->sel = c->mon->stack;
 		focus(NULL);
+	}
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
 	free(c);
@@ -1651,7 +1653,9 @@ updategeom(void) {
 	Client *c;
 	Monitor *newmons = NULL, *m, *tm;
 
-#ifdef XINERAMA
+#ifdef XINULATOR
+	n = 2;
+#elif defined(XINERAMA)
 	XineramaScreenInfo *info = NULL;
 
 	if(XineramaIsActive(dpy))
@@ -1665,7 +1669,23 @@ updategeom(void) {
 	}
 
 	/* initialise monitor(s) */
-#ifdef XINERAMA
+#ifdef XINULATOR
+	if(1) {
+		m = newmons;
+		m->screen_number = 0;
+		m->wx = sx;
+		m->my = m->wy = sy;
+		m->ww = sw;
+		m->mh = m->wh = sh / 2;
+		m = newmons->next;
+		m->screen_number = 1;
+		m->wx = sx;
+		m->my = m->wy = sy + sh / 2;
+		m->ww = sw;
+		m->mh = m->wh = sh / 2;
+	}
+	else
+#elif defined(XINERAMA)
 	if(XineramaIsActive(dpy)) {
 		for(i = 0, m = newmons; m; m = m->next, i++) {
 			m->screen_number = info[i].screen_number;
