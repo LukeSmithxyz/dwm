@@ -599,7 +599,6 @@ die(const char *errstr, ...) {
 
 void
 drawbar(Monitor *m) {
-	char buf[2];
 	int x;
 	unsigned int i, occ = 0, urg = 0;
 	unsigned long *col;
@@ -616,6 +615,7 @@ drawbar(Monitor *m) {
 	dc.x = 0;
 #ifdef XINERAMA
 	{
+		char buf[2];
 		buf[0] = m->screen_number + '0';
 		buf[1] = '\0';
 		dc.w = TEXTW(buf);
