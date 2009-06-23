@@ -1,4 +1,3 @@
-/* TODO: cleanup nexttiled, ISVISIBLE, etc */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
@@ -45,7 +44,7 @@
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
-#define ISVISIBLE(M, C)         ((M) == (C->mon) && (C->tags & M->tagset[M->seltags]))
+#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
@@ -189,7 +188,7 @@ static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void movemouse(const Arg *arg);
-static Client *nexttiled(Monitor *m, Client *c);
+static Client *nexttiled(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static void resize(Client *c, int x, int y, int w, int h);
@@ -550,7 +549,7 @@ configurerequest(XEvent *e) {
 				c->y = sy + (sh / 2 - c->h / 2); /* center in y direction */
 			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
-			if(ISVISIBLE((c->mon), c))
+			if(ISVISIBLE(c))
 				XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
 		}
 		else
@@ -756,8 +755,8 @@ expose(XEvent *e) {
 
 void
 focus(Client *c) {
-	if(!c || !ISVISIBLE((c->mon), c))
-		for(c = selmon->stack; c && !ISVISIBLE(selmon, c); c = c->snext);
+	if(!c || !ISVISIBLE(c))
+		for(c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
 	if(selmon->sel && selmon->sel != c) {
 		grabbuttons(selmon->sel, False);
 		XSetWindowBorder(dpy, selmon->sel->win, dc.norm[ColBorder]);
@@ -808,17 +807,17 @@ focusstack(const Arg *arg) {
 	if(!selmon->sel)
 		return;
 	if(arg->i > 0) {
-		for(c = selmon->sel->next; c && !ISVISIBLE(selmon, c); c = c->next);
+		for(c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
 		if(!c)
-			for(c = selmon->clients; c && !ISVISIBLE(selmon, c); c = c->next);
+			for(c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
 	}
 	else {
 		for(i = selmon->clients; i != selmon->sel; i = i->next)
-			if(ISVISIBLE(selmon, i))
+			if(ISVISIBLE(i))
 				c = i;
 		if(!c)
 			for(; i; i = i->next)
-				if(ISVISIBLE(selmon, i))
+				if(ISVISIBLE(i))
 					c = i;
 	}
 	if(c) {
@@ -1102,7 +1101,7 @@ void
 monocle(Monitor *m) {
 	Client *c;
 
-	for(c = nexttiled(m, selmon->clients); c; c = nexttiled(m, c->next))
+	for(c = nexttiled(m->clients); c; c = nexttiled(c->next))
 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw);
 }
 
@@ -1158,9 +1157,9 @@ movemouse(const Arg *arg) {
 }
 
 Client *
-nexttiled(Monitor *m, Client *c) {
+nexttiled(Client *c) {
 	// TODO: m handling
-	for(; c && (c->isfloating || !ISVISIBLE(m, c)); c = c->next);
+	for(; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
 	return c;
 }
 
@@ -1280,7 +1279,7 @@ restack(Monitor *m) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
 		for(c = m->stack; c; c = c->snext)
-			if(!c->isfloating && ISVISIBLE(m, c)) {
+			if(!c->isfloating && ISVISIBLE(c)) {
 				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
 				wc.sibling = c->win;
 			}
@@ -1432,7 +1431,7 @@ void
 showhide(Client *c) {
 	if(!c)
 		return;
-	if(ISVISIBLE((c->mon), c)) { /* show clients top down */
+	if(ISVISIBLE(c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[c->mon->sellt]->arrange || c->isfloating)
 			resize(c, c->x, c->y, c->w, c->h);
@@ -1504,12 +1503,12 @@ tile(Monitor *m) {
 	unsigned int i, n;
 	Client *c;
 
-	for(n = 0, c = nexttiled(m, m->clients); c; c = nexttiled(m, c->next), n++);
+	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if(n == 0)
 		return;
 
 	/* master */
-	c = nexttiled(m, m->clients);
+	c = nexttiled(m->clients);
 	mw = m->mfact * m->ww;
 	resize(c, m->wx, m->wy, (n == 1 ? m->ww : mw) - 2 * c->bw, m->wh - 2 * c->bw);
 
@@ -1524,7 +1523,7 @@ tile(Monitor *m) {
 	if(h < bh)
 		h = m->wh;
 
-	for(i = 0, c = nexttiled(m, c->next); c; c = nexttiled(m, c->next), i++) {
+	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
 		       ? m->wy + m->wh - y - 2 * c->bw : h - 2 * c->bw));
 		if(h != m->wh)
@@ -1883,8 +1882,8 @@ zoom(const Arg *arg) {
 
 	if(!lt[selmon->sellt]->arrange || lt[selmon->sellt]->arrange == monocle || (selmon->sel && selmon->sel->isfloating))
 		return;
-	if(c == nexttiled(selmon, selmon->clients))
-		if(!c || !(c = nexttiled(selmon, c->next)))
+	if(c == nexttiled(selmon->clients))
+		if(!c || !(c = nexttiled(c->next)))
 			return;
 	detach(c);
 	attach(c);
