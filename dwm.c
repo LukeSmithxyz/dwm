@@ -1632,7 +1632,7 @@ updatebarpos(Monitor *m) {
 
 void
 updategeom(void) {
-	int i, n;
+	int i, n = 1;
 	Client *c;
 	Monitor *newmons = NULL, *m;
 
