@@ -1045,8 +1045,8 @@ manage(Window w, XWindowAttributes *wa) {
 			c->y = sy + sh - HEIGHT(c);
 		c->x = MAX(c->x, sx);
 		/* only fix client y-offset, if the client center might cover the bar */
-		c->y = MAX(c->y, ((selmon->by == 0) && (c->x + (c->w / 2) >= selmon->wx)
-		           && (c->x + (c->w / 2) < selmon->wx + selmon->ww)) ? bh : sy);
+		c->y = MAX(c->y, ((c->mon->by == 0) && (c->x + (c->w / 2) >= c->mon->wx)
+		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : sy);
 		c->bw = borderpx;
 	}
 
@@ -1271,10 +1271,10 @@ restack(Monitor *m) {
 	XWindowChanges wc;
 
 	drawbars();
-	if(!selmon->sel)
+	if(!m->sel)
 		return;
-	if(m == selmon && (selmon->sel->isfloating || !lt[m->sellt]->arrange))
-		XRaiseWindow(dpy, selmon->sel->win);
+	if(m->sel->isfloating || !lt[m->sellt]->arrange)
+		XRaiseWindow(dpy, m->sel->win);
 	if(lt[m->sellt]->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
