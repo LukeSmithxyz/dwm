@@ -644,7 +644,7 @@ drawbar(Monitor *m) {
 	}
 	else
 		x = dc.x;
-	if(m == selmon) {
+	if(m == selmon) { /* status is only drawn on selected monitor */
 		dc.w = TEXTW(stext);
 		dc.x = m->ww - dc.w;
 		if(dc.x < x) {
@@ -652,20 +652,19 @@ drawbar(Monitor *m) {
 			dc.w = m->ww - x;
 		}
 		drawtext(stext, dc.norm, False);
-		if((dc.w = dc.x - x) > bh) {
-			dc.x = x;
-			if(selmon->sel) {
-				drawtext(selmon->sel->name, dc.sel, False);
-				drawsquare(selmon->sel->isfixed, selmon->sel->isfloating, False, dc.sel);
-			}
-			else
-				drawtext(NULL, dc.norm, False);
-		}
 	}
 	else {
+		dc.x = m->ww;
+	}
+	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
-		dc.w = m->ww - x;
-		drawtext(NULL, dc.norm, False);
+		if(m->sel) {
+			col = m == selmon ? dc.sel : dc.norm;
+			drawtext(m->sel->name, col, False);
+			drawsquare(m->sel->isfixed, m->sel->isfloating, False, col);
+		}
+		else
+			drawtext(NULL, dc.norm, False);
 	}
 	XCopyArea(dpy, dc.drawable, m->barwin, dc.gc, 0, 0, m->ww, bh, 0, 0);
 	XSync(dpy, False);
