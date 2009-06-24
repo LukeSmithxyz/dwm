@@ -829,12 +829,14 @@ focusstack(const Arg *arg) {
 
 Client *
 getclient(Window w) {
-	Client *c = NULL;
+	Client *c;
 	Monitor *m;
 
 	for(m = mons; m; m = m->next)
-		for(c = m->clients; c && c->win != w; c = c->next);
-	return c;
+		for(c = m->clients; c; c = c->next)
+			if(c->win == w)
+				return c;
+	return NULL;
 }
 
 unsigned long
@@ -1726,8 +1728,9 @@ updategeom(void) {
 
 	/* reassign left over clients of disappeared monitors */
 	for(tm = mons; tm; tm = tm->next) {
-		while((c = tm->clients)) {
-			detach(c);
+		while(tm->clients) {
+			c = tm->clients;
+			tm->clients = c->next;
 			detachstack(c);
 			c->mon = newmons;
 			attach(c);
