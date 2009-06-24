@@ -1,4 +1,4 @@
-//#define XINULATOR /* debug, simulates dual head */
+#define XINULATOR /* debug, simulates dual head */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
@@ -211,6 +211,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
+static void unfocus(Client *c);
 static void unmanage(Client *c);
 static void unmapnotify(XEvent *e);
 static void updategeom(void);
@@ -391,9 +392,23 @@ buttonpress(XEvent *e) {
 	unsigned int i, x, click;
 	Arg arg = {0};
 	Client *c;
+	Monitor *m;
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	click = ClkRootWin;
+	/* focus monitor if necessary */
+	for(m = mons; m; m = m->next)
+		if(ev->window == m->barwin) {
+			if(m != selmon) {
+				if(selmon->stack)
+					focus(selmon->stack);
+				else {
+					selmon = m;
+					focus(NULL);
+				}
+			}
+			break;
+		}
 	if(ev->window == selmon->barwin && ev->x >= selmon->btx) {
 		i = 0;
 		x = selmon->btx;
@@ -757,10 +772,8 @@ void
 focus(Client *c) {
 	if(!c || !ISVISIBLE(c))
 		for(c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
-	if(selmon->sel && selmon->sel != c) {
-		grabbuttons(selmon->sel, False);
-		XSetWindowBorder(dpy, selmon->sel->win, dc.norm[ColBorder]);
-	}
+	if(selmon->sel)
+		unfocus(selmon->sel);
 	if(c) {
 		if(c->mon != selmon)
 			selmon = c->mon;
@@ -797,6 +810,7 @@ focusmon(const Arg *arg) {
 			if(m->stack)
 				focus(m->stack);
 			else {
+				unfocus(selmon->stack);
 				selmon = m;
 				focus(NULL);
 			}
@@ -1219,8 +1233,7 @@ resize(Client *c, int x, int y, int w, int h) {
 		c->w = wc.width = w;
 		c->h = wc.height = h;
 		wc.border_width = c->bw;
-		XConfigureWindow(dpy, c->win,
-				CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
+		XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 		configure(c);
 		XSync(dpy, False);
 	}
@@ -1590,6 +1603,14 @@ toggleview(const Arg *arg) {
 }
 
 void
+unfocus(Client *c) {
+	if(!c)
+		return;
+	grabbuttons(c, False);
+	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
+}
+
+void
 unmanage(Client *c) {
 	XWindowChanges wc;
 
@@ -1732,7 +1753,7 @@ updategeom(void) {
 	}
 
 	/* reassign left over clients of disappeared monitors */
-	for(tm = mons; tm; tm = tm->next) {
+	for(tm = mons; tm; tm = tm->next)
 		while(tm->clients) {
 			c = tm->clients;
 			tm->clients = c->next;
@@ -1741,7 +1762,6 @@ updategeom(void) {
 			attach(c);
 			attachstack(c);
 		}
-	}
 
 	/* select focused monitor */
 	selmon = newmons;
