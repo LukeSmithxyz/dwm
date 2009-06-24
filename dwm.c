@@ -1504,8 +1504,9 @@ tagmon(const Arg *arg) {
 			c->mon = m;
 			attach(c);
 			attachstack(c);
-			selmon->sel = selmon->stack;
 			m->sel = c;
+			for(c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
+			selmon->sel = c;
 			arrange();
 			break;
 		}
@@ -1620,7 +1621,10 @@ unmanage(Client *c) {
 	detach(c);
 	detachstack(c);
 	if(c->mon->sel == c) {
-		c->mon->sel = c->mon->stack;
+		/* TODO: consider separate the next code into a function or into detachstack? */
+		Client *tc;
+		for(tc = c->mon->stack; tc && !ISVISIBLE(tc); tc = tc->snext);
+		c->mon->sel = tc;
 		focus(NULL);
 	}
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
