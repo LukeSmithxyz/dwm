@@ -400,12 +400,9 @@ buttonpress(XEvent *e) {
 	for(m = mons; m; m = m->next)
 		if(ev->window == m->barwin) {
 			if(m != selmon) {
-				if(selmon->stack)
-					focus(selmon->stack);
-				else {
-					selmon = m;
-					focus(NULL);
-				}
+				unfocus(selmon->stack);
+				selmon = m;
+				focus(NULL);
 			}
 			break;
 		}
@@ -1608,6 +1605,7 @@ unfocus(Client *c) {
 		return;
 	grabbuttons(c, False);
 	XSetWindowBorder(dpy, c->win, dc.norm[ColBorder]);
+	XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 }
 
 void
