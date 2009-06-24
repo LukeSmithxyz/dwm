@@ -1,4 +1,4 @@
-#define XINULATOR /* debug, simulates dual head */
+//#define XINULATOR /* debug, simulates dual head */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
@@ -1649,9 +1649,11 @@ updatebarpos(Monitor *m) {
 
 void
 updategeom(void) {
-	int i, n = 1;
+	int i, di, n = 1, x, y;
+	unsigned int dui;
 	Client *c;
 	Monitor *newmons = NULL, *m, *tm;
+	Window dummy;
 
 #ifdef XINULATOR
 	n = 2;
@@ -1720,16 +1722,6 @@ updategeom(void) {
 		m->showbar = showbar;
 		m->topbar = topbar;
 		updatebarpos(m);
-		/* reassign all clients with same screen number */
-		for(tm = mons; tm; tm = tm->next)
-			if(tm->screen_number == m->screen_number) {
-				m->clients = tm->clients;
-				m->sel = m->stack = tm->stack;
-				tm->clients = NULL;
-				tm->stack = NULL;
-				for(c = m->clients; c; c = c->next)
-					c->mon = m;
-			}
 	}
 
 	/* reassign left over clients of disappeared monitors */
@@ -1744,18 +1736,13 @@ updategeom(void) {
 	}
 
 	/* select focused monitor */
-	if(!selmon) {
-		selmon = newmons;
-		int di, x, y;
-		unsigned int dui;
-		Window dummy;
-		if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui)) 
-			for(m = newmons; m; m = m->next)
-				if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh)) {
-					selmon = m;
-					break;
-				}
-	}
+	selmon = newmons;
+	if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui)) 
+		for(m = newmons; m; m = m->next)
+			if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh)) {
+				selmon = m;
+				break;
+			}
 
 	/* final assignment of new monitors */
 	cleanupmons();
