@@ -762,6 +762,8 @@ focus(Client *c) {
 		XSetWindowBorder(dpy, selmon->sel->win, dc.norm[ColBorder]);
 	}
 	if(c) {
+		if(c->mon != selmon)
+			selmon = c->mon;
 		if(c->isurgent)
 			clearurgent(c);
 		detachstack(c);
@@ -792,8 +794,12 @@ focusmon(const Arg *arg) {
 
 	for(i = 0, m = mons; m; m = m->next, i++)
 		if(i == arg->ui) {
-			selmon = m;
-			focus(NULL);
+			if(m->stack)
+				focus(m->stack);
+			else {
+				selmon = m;
+				focus(NULL);
+			}
 			drawbars();
 			break;
 		}
