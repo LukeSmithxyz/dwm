@@ -1502,6 +1502,7 @@ tagmon(const Arg *arg) {
 			detach(c);
 			detachstack(c);
 			c->mon = m;
+			c->tags = selmon->seltags; /* assign tags of target monitor */
 			attach(c);
 			attachstack(c);
 			m->sel = c;
