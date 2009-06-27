@@ -176,8 +176,8 @@ static void focusin(XEvent *e);
 static void focusstack(const Arg *arg);
 static Client *getclient(Window w);
 static unsigned long getcolor(const char *colstr);
-static Monitor *getmonitor(Window w);
-static Monitor *getmonitorxy(int x, int y);
+static Monitor *getmon(Window w);
+static Monitor *getmonxy(int x, int y);
 static Bool getrootpointer(int *x, int *y);
 static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
@@ -401,7 +401,7 @@ buttonpress(XEvent *e) {
 
 	click = ClkRootWin;
 	/* focus monitor if necessary */
-	if((m = getmonitor(ev->window)) && m != selmon) {
+	if((m = getmon(ev->window)) && m != selmon) {
 		unfocus(selmon->sel);
 		selmon = m;
 		focus(NULL);
@@ -747,7 +747,7 @@ enternotify(XEvent *e) {
 
 	if((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
 		return;
-	if((m = getmonitor(ev->window)) && m != selmon) {
+	if((m = getmon(ev->window)) && m != selmon) {
 		unfocus(selmon->sel);
 		selmon = m;
 	}
@@ -762,7 +762,7 @@ expose(XEvent *e) {
 	Monitor *m;
 	XExposeEvent *ev = &e->xexpose;
 
-	if(ev->count == 0 && (m = getmonitor(ev->window)))
+	if(ev->count == 0 && (m = getmon(ev->window)))
 		drawbar(m);
 }
 
@@ -864,13 +864,13 @@ getcolor(const char *colstr) {
 }
 
 Monitor *
-getmonitor(Window w) {
+getmon(Window w) {
 	int x, y;
 	Client *c;
 	Monitor *m;
 
 	if(w == root && getrootpointer(&x, &y))
-		return getmonitorxy(x, y);
+		return getmonxy(x, y);
 	for(m = mons; m; m = m->next)
 		if(w == m->barwin)
 			return m;
@@ -880,7 +880,7 @@ getmonitor(Window w) {
 }
 
 Monitor *
-getmonitorxy(int x, int y) {
+getmonxy(int x, int y) {
 	Monitor *m;
 
 	for(m = mons; m; m = m->next)
@@ -1205,7 +1205,7 @@ movemouse(const Arg *arg) {
 	}
 	while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
-	if((m = getmonitorxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
+	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
 		sendmon(c, m);
 }
 
@@ -1314,7 +1314,7 @@ resizemouse(const Arg *arg) {
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-	if((m = getmonitorxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
+	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
 		sendmon(c, m);
 }
 
@@ -1809,7 +1809,7 @@ updategeom(void) {
 	/* select focused monitor */
 	cleanupmons();
 	mons = newmons;
-	selmon = getmonitor(root);
+	selmon = getmon(root);
 }
 
 void
