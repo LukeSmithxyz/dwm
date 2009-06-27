@@ -804,13 +804,11 @@ focusmon(const Arg *arg) {
 
 	for(i = 0, m = mons; m; m = m->next, i++)
 		if(i == arg->ui) {
-			if(m->stack)
-				focus(m->stack);
-			else {
-				unfocus(selmon->stack);
-				selmon = m;
-				focus(NULL);
-			}
+			if(m == selmon)
+				return;
+			unfocus(selmon->sel);
+			selmon = m;
+			focus(NULL);
 			drawbars();
 			break;
 		}
