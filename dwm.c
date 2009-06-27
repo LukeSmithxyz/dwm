@@ -166,7 +166,7 @@ static void detach(Client *c);
 static void detachstack(Client *c);
 static void die(const char *errstr, ...);
 static void drawbar(Monitor *m);
-static void drawbars();
+static void drawbars(void);
 static void drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
 static void drawtext(const char *text, unsigned long col[ColLast], Bool invert);
 static void enternotify(XEvent *e);
@@ -176,6 +176,9 @@ static void focusin(XEvent *e);
 static void focusstack(const Arg *arg);
 static Client *getclient(Window w);
 static unsigned long getcolor(const char *colstr);
+static Monitor *getmonitor(Window w);
+static Monitor *getmonitorxy(int x, int y);
+static Bool getrootpointer(int *x, int *y);
 static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
@@ -197,6 +200,7 @@ static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
 static void run(void);
 static void scan(void);
+static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -397,15 +401,11 @@ buttonpress(XEvent *e) {
 
 	click = ClkRootWin;
 	/* focus monitor if necessary */
-	for(m = mons; m; m = m->next)
-		if(ev->window == m->barwin) {
-			if(m != selmon) {
-				unfocus(selmon->stack);
-				selmon = m;
-				focus(NULL);
-			}
-			break;
-		}
+	if((m = getmonitor(ev->window)) && m != selmon) {
+		unfocus(selmon->sel);
+		selmon = m;
+		focus(NULL);
+	}
 	if(ev->window == selmon->barwin && ev->x >= selmon->btx) {
 		i = 0;
 		x = selmon->btx;
@@ -683,7 +683,7 @@ drawbar(Monitor *m) {
 }
 
 void
-drawbars() {
+drawbars(void) {
 	Monitor *m;
 
 	for(m = mons; m; m = m->next)
@@ -742,10 +742,15 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 void
 enternotify(XEvent *e) {
 	Client *c;
+	Monitor *m;
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
 		return;
+	if((m = getmonitor(ev->window)) && m != selmon) {
+		unfocus(selmon->sel);
+		selmon = m;
+	}
 	if((c = getclient(ev->window)))
 		focus(c);
 	else
@@ -757,12 +762,8 @@ expose(XEvent *e) {
 	Monitor *m;
 	XExposeEvent *ev = &e->xexpose;
 
-	if(ev->count == 0)
-		for(m = mons; m; m = m->next)
-			if(ev->window == m->barwin) {
-				drawbar(m);
-				break;
-			}
+	if(ev->count == 0 && (m = getmonitor(ev->window)))
+		drawbar(m);
 }
 
 void
@@ -809,7 +810,6 @@ focusmon(const Arg *arg) {
 			unfocus(selmon->sel);
 			selmon = m;
 			focus(NULL);
-			drawbars();
 			break;
 		}
 }
@@ -861,6 +861,40 @@ getcolor(const char *colstr) {
 	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
 		die("error, cannot allocate color '%s'\n", colstr);
 	return color.pixel;
+}
+
+Monitor *
+getmonitor(Window w) {
+	int x, y;
+	Client *c;
+	Monitor *m;
+
+	if(w == root && getrootpointer(&x, &y))
+		return getmonitorxy(x, y);
+	for(m = mons; m; m = m->next)
+		if(w == m->barwin)
+			return m;
+	if((c = getclient(w)))
+		return c->mon;
+	return NULL;
+}
+
+Monitor *
+getmonitorxy(int x, int y) {
+	Monitor *m;
+
+	for(m = mons; m; m = m->next)
+		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
+			return m;
+	return NULL;
+}
+
+Bool
+getrootpointer(int *x, int *y) {
+	int di;
+	unsigned int dui;
+	Window dummy;
+	return XQueryPointer(dpy, root, &dummy, &dummy, x, y, &di, &di, &dui);
 }
 
 long
@@ -1124,10 +1158,9 @@ monocle(Monitor *m) {
 
 void
 movemouse(const Arg *arg) {
-	int x, y, ocx, ocy, di, nx, ny;
-	unsigned int dui;
+	int x, y, ocx, ocy, nx, ny;
 	Client *c;
-	Window dummy;
+	Monitor *m;
 	XEvent ev;
 
 	if(!(c = selmon->sel))
@@ -1138,7 +1171,8 @@ movemouse(const Arg *arg) {
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui);
+	if(!getrootpointer(&x, &y))
+		return;
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch (ev.type) {
@@ -1171,6 +1205,8 @@ movemouse(const Arg *arg) {
 	}
 	while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
+	if((m = getmonitorxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
+		sendmon(c, m);
 }
 
 Client *
@@ -1239,6 +1275,7 @@ resizemouse(const Arg *arg) {
 	int ocx, ocy;
 	int nw, nh;
 	Client *c;
+	Monitor *m;
 	XEvent ev;
 
 	if(!(c = selmon->sel))
@@ -1277,6 +1314,8 @@ resizemouse(const Arg *arg) {
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+	if((m = getmonitorxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
+		sendmon(c, m);
 }
 
 void
@@ -1339,6 +1378,20 @@ scan(void) {
 		if(wins)
 			XFree(wins);
 	}
+}
+
+void
+sendmon(Client *c, Monitor *m) {
+	if(c->mon == m)
+		return;
+	detach(c);
+	detachstack(c);
+	c->mon = m;
+	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
+	attach(c);
+	attachstack(c);
+	focus(NULL);
+	arrange();
 }
 
 void
@@ -1497,14 +1550,7 @@ tagmon(const Arg *arg) {
 		return;
 	for(i = 0, m = mons; m; m = m->next, i++)
 		if(i == arg->ui) {
-			detach(c);
-			detachstack(c);
-			c->mon = m;
-			c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
-			attach(c);
-			attachstack(c);
-			focus(NULL);
-			arrange();
+			sendmon(c, m);
 			break;
 		}
 }
@@ -1676,11 +1722,9 @@ updatebarpos(Monitor *m) {
 
 void
 updategeom(void) {
-	int i, di, n = 1, x, y;
-	unsigned int dui;
+	int i, n = 1;
 	Client *c;
 	Monitor *newmons = NULL, *m, *tm;
-	Window dummy;
 
 #ifdef XINULATOR
 	n = 2;
@@ -1763,17 +1807,9 @@ updategeom(void) {
 		}
 
 	/* select focused monitor */
-	selmon = newmons;
-	if(XQueryPointer(dpy, root, &dummy, &dummy, &x, &y, &di, &di, &dui)) 
-		for(m = newmons; m; m = m->next)
-			if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh)) {
-				selmon = m;
-				break;
-			}
-
-	/* final assignment of new monitors */
 	cleanupmons();
 	mons = newmons;
+	selmon = getmonitor(root);
 }
 
 void
@@ -1848,7 +1884,7 @@ updatetitle(Client *c) {
 }
 
 void
-updatestatus() {
+updatestatus(void) {
 	if(!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
 		strcpy(stext, "dwm-"VERSION);
 	drawbar(selmon);
