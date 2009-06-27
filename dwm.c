@@ -177,6 +177,7 @@ static void focusstack(const Arg *arg);
 static Client *getclient(Window w);
 static unsigned long getcolor(const char *colstr);
 static Monitor *getmon(Window w);
+static Monitor *getmonn(unsigned int n);
 static Monitor *getmonxy(int x, int y);
 static Bool getrootpointer(int *x, int *y);
 static long getstate(Window w);
@@ -800,18 +801,13 @@ focusin(XEvent *e) { /* there are some broken focus acquiring clients */
 #ifdef XINERAMA
 void
 focusmon(const Arg *arg) {
-	unsigned int i;
-	Monitor *m; 
+	Monitor *m;
 
-	for(i = 0, m = mons; m; m = m->next, i++)
-		if(i == arg->ui) {
-			if(m == selmon)
-				return;
-			unfocus(selmon->sel);
-			selmon = m;
-			focus(NULL);
-			break;
-		}
+	if(!(m = getmonn(arg->ui)) || m == selmon)
+		return;
+	unfocus(selmon->sel);
+	selmon = m;
+	focus(NULL);
 }
 #endif /* XINERAMA */
 
@@ -877,6 +873,15 @@ getmon(Window w) {
 	if((c = getclient(w)))
 		return c->mon;
 	return NULL;
+}
+
+Monitor *
+getmonn(unsigned int n) {
+	unsigned int i;
+	Monitor *m;
+
+	for(m = mons, i = 0; m && i != n; m = m->next, i++);
+	return m;
 }
 
 Monitor *
@@ -1542,17 +1547,11 @@ tag(const Arg *arg) {
 #ifdef XINERAMA
 void
 tagmon(const Arg *arg) {
-	unsigned int i;
-	Client *c;
 	Monitor *m;
 
-	if(!(c = selmon->sel))
+	if(!selmon->sel || !(m = getmonn(arg->ui)))
 		return;
-	for(i = 0, m = mons; m; m = m->next, i++)
-		if(i == arg->ui) {
-			sendmon(c, m);
-			break;
-		}
+	sendmon(selmon->sel, m);
 }
 #endif /* XINERAMA */
 
