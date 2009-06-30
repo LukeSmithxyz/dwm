@@ -1,6 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
+#define SHOWBAR                       True      /* False means no bar */
+#define TOPBAR                        True      /* False means bottom bar */
 static const char font[]            = "-*-*-medium-*-*-*-14-*-*-*-*-*-*-*";
 static const char normbordercolor[] = "#cccccc";
 static const char normbgcolor[]     = "#cccccc";
@@ -10,9 +12,6 @@ static const char selbgcolor[]      = "#0066ff";
 static const char selfgcolor[]      = "#ffffff";
 static unsigned int borderpx        = 1;        /* border pixel of windows */
 static unsigned int snap            = 32;       /* snap pixel */
-static Bool showbar                 = True;     /* False means no bar */
-static Bool topbar                  = True;     /* False means bottom bar */
-
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };

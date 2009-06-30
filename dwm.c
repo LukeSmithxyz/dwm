@@ -1,4 +1,3 @@
-//#define XINULATOR /* debug, simulates dual head */
 /* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
@@ -174,16 +173,13 @@ static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusstack(const Arg *arg);
-static Client *getclient(Window w);
 static unsigned long getcolor(const char *colstr);
-static Monitor *getmon(Window w);
-static Monitor *getmonn(unsigned int n);
-static Monitor *getmonxy(int x, int y);
 static Bool getrootpointer(int *x, int *y);
 static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
+static Monitor *idxtomon(unsigned int n);
 static void initfont(const char *fontstr);
 static Bool isprotodel(Client *c);
 static void keypress(XEvent *e);
@@ -194,6 +190,7 @@ static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
+static Monitor *pointertomon(int x, int y);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static void resize(Client *c, int x, int y, int w, int h);
@@ -228,6 +225,8 @@ static void updatestatus(void);
 static void updatetitle(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
+static Client *wintoclient(Window w);
+static Monitor *wintomon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
@@ -402,7 +401,7 @@ buttonpress(XEvent *e) {
 
 	click = ClkRootWin;
 	/* focus monitor if necessary */
-	if((m = getmon(ev->window)) && m != selmon) {
+	if((m = wintomon(ev->window)) && m != selmon) {
 		unfocus(selmon->sel);
 		selmon = m;
 		focus(NULL);
@@ -424,7 +423,7 @@ buttonpress(XEvent *e) {
 		else
 			click = ClkWinTitle;
 	}
-	else if((c = getclient(ev->window))) {
+	else if((c = wintoclient(ev->window))) {
 		focus(c);
 		click = ClkClientWin;
 	}
@@ -457,8 +456,6 @@ cleanup(void) {
 
 	view(&a);
 	lt[selmon->sellt] = &foo;
-
-	/* TODO: consider simplifying cleanup code of the stack, perhaps do that in cleanmons() ? */
 	for(m = mons; m; m = m->next)
 		while(m->stack)
 			unmanage(m->stack);
@@ -546,7 +543,7 @@ configurerequest(XEvent *e) {
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
 
-	if((c = getclient(ev->window))) {
+	if((c = wintoclient(ev->window))) {
 		if(ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
 		else if(c->isfloating || !lt[selmon->sellt]->arrange) {
@@ -589,7 +586,7 @@ destroynotify(XEvent *e) {
 	Client *c;
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
-	if((c = getclient(ev->window)))
+	if((c = wintoclient(ev->window)))
 		unmanage(c);
 }
 
@@ -607,6 +604,11 @@ detachstack(Client *c) {
 
 	for(tc = &c->mon->stack; *tc && *tc != c; tc = &(*tc)->snext);
 	*tc = c->snext;
+
+	if(c == c->mon->sel) {
+		for(*tc = c->mon->stack; *tc && !ISVISIBLE((*tc)); *tc = (*tc)->snext);
+		c->mon->sel = *tc;
+	}
 }
 
 void
@@ -750,11 +752,11 @@ enternotify(XEvent *e) {
 
 	if((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
 		return;
-	if((m = getmon(ev->window)) && m != selmon) {
+	if((m = wintomon(ev->window)) && m != selmon) {
 		unfocus(selmon->sel);
 		selmon = m;
 	}
-	if((c = getclient(ev->window)))
+	if((c = wintoclient(ev->window)))
 		focus(c);
 	else
 		focus(NULL);
@@ -765,7 +767,7 @@ expose(XEvent *e) {
 	Monitor *m;
 	XExposeEvent *ev = &e->xexpose;
 
-	if(ev->count == 0 && (m = getmon(ev->window)))
+	if(ev->count == 0 && (m = wintomon(ev->window)))
 		drawbar(m);
 }
 
@@ -805,7 +807,7 @@ void
 focusmon(const Arg *arg) {
 	Monitor *m;
 
-	if(!(m = getmonn(arg->ui)) || m == selmon)
+	if(!(m = idxtomon(arg->ui)) || m == selmon)
 		return;
 	unfocus(selmon->sel);
 	selmon = m;
@@ -839,18 +841,6 @@ focusstack(const Arg *arg) {
 	}
 }
 
-Client *
-getclient(Window w) {
-	Client *c;
-	Monitor *m;
-
-	for(m = mons; m; m = m->next)
-		for(c = m->clients; c; c = c->next)
-			if(c->win == w)
-				return c;
-	return NULL;
-}
-
 unsigned long
 getcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
@@ -859,41 +849,6 @@ getcolor(const char *colstr) {
 	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
 		die("error, cannot allocate color '%s'\n", colstr);
 	return color.pixel;
-}
-
-Monitor *
-getmon(Window w) {
-	int x, y;
-	Client *c;
-	Monitor *m;
-
-	if(w == root && getrootpointer(&x, &y))
-		return getmonxy(x, y);
-	for(m = mons; m; m = m->next)
-		if(w == m->barwin)
-			return m;
-	if((c = getclient(w)))
-		return c->mon;
-	return mons;
-}
-
-Monitor *
-getmonn(unsigned int n) {
-	unsigned int i;
-	Monitor *m;
-
-	for(m = mons, i = 0; m && i != n; m = m->next, i++);
-	return m;
-}
-
-Monitor *
-getmonxy(int x, int y) {
-	Monitor *m;
-
-	for(m = mons; m; m = m->next)
-		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
-			return m;
-	return mons;
 }
 
 Bool
@@ -985,6 +940,15 @@ grabkeys(void) {
 						 True, GrabModeAsync, GrabModeAsync);
 		}
 	}
+}
+
+Monitor *
+idxtomon(unsigned int n) {
+	unsigned int i;
+	Monitor *m;
+
+	for(m = mons, i = 0; m && i != n; m = m->next, i++);
+	return m;
 }
 
 void
@@ -1116,7 +1080,7 @@ manage(Window w, XWindowAttributes *wa) {
 	grabbuttons(c, False);
 	updatetitle(c);
 	if(XGetTransientForHint(dpy, w, &trans))
-		t = getclient(trans);
+		t = wintoclient(trans);
 	if(t)
 		c->tags = t->tags;
 	else
@@ -1151,7 +1115,7 @@ maprequest(XEvent *e) {
 		return;
 	if(wa.override_redirect)
 		return;
-	if(!getclient(ev->window))
+	if(!wintoclient(ev->window))
 		manage(ev->window, &wa);
 }
 
@@ -1212,7 +1176,7 @@ movemouse(const Arg *arg) {
 	}
 	while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
-	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
+	if((m = pointertomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1225,6 +1189,16 @@ nexttiled(Client *c) {
 	return c;
 }
 
+Monitor *
+pointertomon(int x, int y) {
+	Monitor *m;
+
+	for(m = mons; m; m = m->next)
+		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
+			return m;
+	return mons;
+}
+
 void
 propertynotify(XEvent *e) {
 	Client *c;
@@ -1235,12 +1209,12 @@ propertynotify(XEvent *e) {
 		updatestatus();
 	else if(ev->state == PropertyDelete)
 		return; /* ignore */
-	else if((c = getclient(ev->window))) {
+	else if((c = wintoclient(ev->window))) {
 		switch (ev->atom) {
 		default: break;
 		case XA_WM_TRANSIENT_FOR:
 			XGetTransientForHint(dpy, c->win, &trans);
-			if(!c->isfloating && (c->isfloating = (getclient(trans) != NULL)))
+			if(!c->isfloating && (c->isfloating = (wintoclient(trans) != NULL)))
 				arrange();
 			break;
 		case XA_WM_NORMAL_HINTS:
@@ -1324,7 +1298,7 @@ resizemouse(const Arg *arg) {
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
+	if((m = pointertomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1557,7 +1531,7 @@ void
 tagmon(const Arg *arg) {
 	Monitor *m;
 
-	if(!selmon->sel || !(m = getmonn(arg->ui)))
+	if(!selmon->sel || !(m = idxtomon(arg->ui)))
 		return;
 	sendmon(selmon->sel, m);
 }
@@ -1670,19 +1644,13 @@ unmanage(Client *c) {
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
 	detach(c);
 	detachstack(c);
-	if(c->mon->sel == c) {
-		/* TODO: consider separate the next code into a function or into detachstack? */
-		Client *tc;
-		for(tc = c->mon->stack; tc && !ISVISIBLE(tc); tc = tc->snext);
-		c->mon->sel = tc;
-		focus(NULL);
-	}
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 	setclientstate(c, WithdrawnState);
 	free(c);
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
+	focus(NULL);
 	arrange();
 }
 
@@ -1691,7 +1659,7 @@ unmapnotify(XEvent *e) {
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
-	if((c = getclient(ev->window)))
+	if((c = wintoclient(ev->window)))
 		unmanage(c);
 }
 
@@ -1733,14 +1701,12 @@ updategeom(void) {
 	Client *c;
 	Monitor *newmons = NULL, *m, *tm;
 
-#ifdef XINULATOR
-	n = 2;
-#elif defined(XINERAMA)
+#ifdef XINERAMA
 	XineramaScreenInfo *info = NULL;
 
 	if(XineramaIsActive(dpy))
 		info = XineramaQueryScreens(dpy, &n);
-#endif
+#endif /* XINERAMA */
 	/* allocate monitor(s) for the new geometry setup */
 	for(i = 0; i < n; i++) {
 		m = (Monitor *)malloc(sizeof(Monitor));
@@ -1749,23 +1715,7 @@ updategeom(void) {
 	}
 
 	/* initialise monitor(s) */
-#ifdef XINULATOR
-	if(1) {
-		m = newmons;
-		m->screen_number = 0;
-		m->wx = sx;
-		m->my = m->wy = sy;
-		m->ww = sw;
-		m->mh = m->wh = sh / 2;
-		m = newmons->next;
-		m->screen_number = 1;
-		m->wx = sx;
-		m->my = m->wy = sy + sh / 2;
-		m->ww = sw;
-		m->mh = m->wh = sh / 2;
-	}
-	else
-#elif defined(XINERAMA)
+#ifdef XINERAMA
 	if(XineramaIsActive(dpy)) {
 		for(i = 0, m = newmons; m; m = m->next, i++) {
 			m->screen_number = info[i].screen_number;
@@ -1777,7 +1727,7 @@ updategeom(void) {
 		XFree(info);
 	}
 	else
-#endif
+#endif /* XINERAMA */
 	/* default monitor setup */
 	{
 		m->screen_number = 0;
@@ -1789,16 +1739,13 @@ updategeom(void) {
 
 	/* bar geometry setup */
 	for(m = newmons; m; m = m->next) {
-		/* TODO: consider removing the following values from config.h */
-		m->clients = NULL;
-		m->sel = NULL;
-		m->stack = NULL;
+		m->sel = m->stack = m->clients = NULL;
 		m->seltags = 0;
 		m->sellt = 0;
 		m->tagset[0] = m->tagset[1] = 1;
 		m->mfact = mfact;
-		m->showbar = showbar;
-		m->topbar = topbar;
+		m->showbar = SHOWBAR;
+		m->topbar = TOPBAR;
 		updatebarpos(m);
 	}
 
@@ -1816,7 +1763,7 @@ updategeom(void) {
 	/* select focused monitor */
 	cleanupmons();
 	mons = newmons;
-	selmon = getmon(root);
+	selmon = wintomon(root);
 }
 
 void
@@ -1921,6 +1868,34 @@ view(const Arg *arg) {
 	if(arg->ui & TAGMASK)
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
 	arrange();
+}
+
+Client *
+wintoclient(Window w) {
+	Client *c;
+	Monitor *m;
+
+	for(m = mons; m; m = m->next)
+		for(c = m->clients; c; c = c->next)
+			if(c->win == w)
+				return c;
+	return NULL;
+}
+
+Monitor *
+wintomon(Window w) {
+	int x, y;
+	Client *c;
+	Monitor *m;
+
+	if(w == root && getrootpointer(&x, &y))
+		return pointertomon(x, y);
+	for(m = mons; m; m = m->next)
+		if(w == m->barwin)
+			return m;
+	if((c = wintoclient(w)))
+		return c->mon;
+	return mons;
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are
