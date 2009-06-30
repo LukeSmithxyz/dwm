@@ -600,14 +600,14 @@ detach(Client *c) {
 
 void
 detachstack(Client *c) {
-	Client **tc;
+	Client **tc, *t;
 
 	for(tc = &c->mon->stack; *tc && *tc != c; tc = &(*tc)->snext);
 	*tc = c->snext;
 
 	if(c == c->mon->sel) {
-		for(*tc = c->mon->stack; *tc && !ISVISIBLE((*tc)); *tc = (*tc)->snext);
-		c->mon->sel = *tc;
+		for(t = c->mon->stack; t && !ISVISIBLE(t); t = t->snext);
+		c->mon->sel = t;
 	}
 }
 
