@@ -874,7 +874,7 @@ getmon(Window w) {
 			return m;
 	if((c = getclient(w)))
 		return c->mon;
-	return selmon;
+	return mons;
 }
 
 Monitor *
@@ -893,7 +893,7 @@ getmonxy(int x, int y) {
 	for(m = mons; m; m = m->next)
 		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
 			return m;
-	return selmon;
+	return mons;
 }
 
 Bool
