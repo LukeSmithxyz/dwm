@@ -125,7 +125,7 @@ struct Monitor {
 	int screen_number;
 	float mfact;
 	int by, btx;          /* bar geometry */
-	int my, mh;           /* vertical screen size*/
+	int mx, my, mw, mh;           /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
 	unsigned int sellt;
@@ -542,6 +542,7 @@ configurenotify(XEvent *e) {
 void
 configurerequest(XEvent *e) {
 	Client *c;
+	Monitor *m;
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
 
@@ -549,18 +550,19 @@ configurerequest(XEvent *e) {
 		if(ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
 		else if(c->isfloating || !lt[selmon->sellt]->arrange) {
+			m = c->mon;
 			if(ev->value_mask & CWX)
-				c->x = sx + ev->x;
+				c->x = m->mx + ev->x;
 			if(ev->value_mask & CWY)
-				c->y = sy + ev->y;
+				c->y = m->my + ev->y;
 			if(ev->value_mask & CWWidth)
 				c->w = ev->width;
 			if(ev->value_mask & CWHeight)
 				c->h = ev->height;
-			if((c->x - sx + c->w) > sw && c->isfloating)
-				c->x = sx + (sw / 2 - c->w / 2); /* center in x direction */
-			if((c->y - sy + c->h) > sh && c->isfloating)
-				c->y = sy + (sh / 2 - c->h / 2); /* center in y direction */
+			if((c->x - m->mx + c->w) > m->mw && c->isfloating)
+				c->x = m->mx + (m->mw / 2 - c->w / 2); /* center in x direction */
+			if((c->y - m->my + c->h) > m->mh && c->isfloating)
+				c->y = m->my + (m->mh / 2 - c->h / 2); /* center in y direction */
 			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
 			if(ISVISIBLE(c))
@@ -872,7 +874,7 @@ getmon(Window w) {
 			return m;
 	if((c = getclient(w)))
 		return c->mon;
-	return NULL;
+	return selmon;
 }
 
 Monitor *
@@ -891,7 +893,7 @@ getmonxy(int x, int y) {
 	for(m = mons; m; m = m->next)
 		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
 			return m;
-	return NULL;
+	return selmon;
 }
 
 Bool
@@ -1083,25 +1085,25 @@ manage(Window w, XWindowAttributes *wa) {
 	c->mon = selmon;
 
 	/* geometry */
-	c->x = wa->x;
-	c->y = wa->y;
+	c->x = wa->x + selmon->wx;
+	c->y = wa->y + selmon->wy;
 	c->w = wa->width;
 	c->h = wa->height;
 	c->oldbw = wa->border_width;
-	if(c->w == sw && c->h == sh) {
-		c->x = sx;
-		c->y = sy;
+	if(c->w == selmon->mw && c->h == selmon->mh) {
+		c->x = selmon->mx;
+		c->y = selmon->my;
 		c->bw = 0;
 	}
 	else {
-		if(c->x + WIDTH(c) > sx + sw)
-			c->x = sx + sw - WIDTH(c);
-		if(c->y + HEIGHT(c) > sy + sh)
-			c->y = sy + sh - HEIGHT(c);
-		c->x = MAX(c->x, sx);
+		if(c->x + WIDTH(c) > selmon->mx + selmon->mw)
+			c->x = selmon->mx + selmon->mw - WIDTH(c);
+		if(c->y + HEIGHT(c) > selmon->my + selmon->mh)
+			c->y = selmon->my + selmon->mh - HEIGHT(c);
+		c->x = MAX(c->x, selmon->mx);
 		/* only fix client y-offset, if the client center might cover the bar */
 		c->y = MAX(c->y, ((c->mon->by == 0) && (c->x + (c->w / 2) >= c->mon->wx)
-		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : sy);
+		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : selmon->my);
 		c->bw = borderpx;
 	}
 
@@ -1210,8 +1212,11 @@ movemouse(const Arg *arg) {
 	}
 	while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
-	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
+	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
+		selmon = m;
+		focus(NULL);
+	}
 }
 
 Client *
@@ -1319,8 +1324,11 @@ resizemouse(const Arg *arg) {
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon)
+	if((m = getmonxy(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
+		selmon = m;
+		focus(NULL);
+	}
 }
 
 void
@@ -1761,9 +1769,9 @@ updategeom(void) {
 	if(XineramaIsActive(dpy)) {
 		for(i = 0, m = newmons; m; m = m->next, i++) {
 			m->screen_number = info[i].screen_number;
-			m->wx = info[i].x_org;
+			m->mx = m->wx = info[i].x_org;
 			m->my = m->wy = info[i].y_org;
-			m->ww = info[i].width;
+			m->mw = m->ww = info[i].width;
 			m->mh = m->wh = info[i].height;
 		}
 		XFree(info);
