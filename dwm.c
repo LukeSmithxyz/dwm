@@ -636,7 +636,7 @@ drawbar(Monitor *m) {
 
 	dc.x = 0;
 #ifdef XINERAMA
-	{
+	if(mons->next) { /* more than a single monitor */
 		char buf[2];
 		buf[0] = m->screen_number + '0';
 		buf[1] = '\0';
