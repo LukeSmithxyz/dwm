@@ -124,7 +124,7 @@ struct Monitor {
 	int screen_number;
 	float mfact;
 	int by, btx;          /* bar geometry */
-	int mx, my, mw, mh;           /* screen size */
+	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
 	unsigned int sellt;
@@ -239,7 +239,7 @@ static void tagmon(const Arg *arg);
 /* variables */
 static char stext[256];
 static int screen;
-static int sx, sy, sw, sh;   /* X display screen geometry x, y, width, height */
+static int sw, sh;   /* X display screen geometry x, y, width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -302,19 +302,20 @@ applyrules(Client *c) {
 Bool
 applysizehints(Client *c, int *x, int *y, int *w, int *h) {
 	Bool baseismin;
+	Monitor *m = c->mon;
 
 	/* set minimum possible */
 	*w = MAX(1, *w);
 	*h = MAX(1, *h);
 
-	if(*x > sx + sw)
-		*x = sw - WIDTH(c);
-	if(*y > sy + sh)
-		*y = sh - HEIGHT(c);
-	if(*x + *w + 2 * c->bw < sx)
-		*x = sx;
-	if(*y + *h + 2 * c->bw < sy)
-		*y = sy;
+	if(*x > m->mx + m->mw)
+		*x = m->mw - WIDTH(c);
+	if(*y > m->my + m->mh)
+		*y = m->mh - HEIGHT(c);
+	if(*x + *w + 2 * c->bw < m->mx)
+		*x = m->mx;
+	if(*y + *h + 2 * c->bw < m->my)
+		*y = m->my;
 	if(*h < bh)
 		*h = bh;
 	if(*w < bh)
@@ -1429,8 +1430,6 @@ setup(void) {
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 	initfont(font);
-	sx = 0;
-	sy = 0;
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
 	bh = dc.h = dc.font.height + 2;
@@ -1735,8 +1734,8 @@ updategeom(void) {
 	/* default monitor setup */
 	{
 		m->screen_number = 0;
-		m->wx = sx;
-		m->my = m->wy = sy;
+		m->wx = 0;
+		m->my = m->wy = 0;
 		m->ww = sw;
 		m->mh = m->wh = sh;
 	}
