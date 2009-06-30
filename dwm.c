@@ -1046,28 +1046,38 @@ manage(Window w, XWindowAttributes *wa) {
 		die("fatal: could not malloc() %u bytes\n", sizeof(Client));
 	*c = cz;
 	c->win = w;
-	c->mon = selmon;
+
+	if(XGetTransientForHint(dpy, w, &trans))
+		t = wintoclient(trans);
+	if(t) {
+		c->mon = t->mon;
+		c->tags = t->tags;
+	}
+	else {
+		c->mon = selmon;
+		applyrules(c);
+	}
 
 	/* geometry */
-	c->x = wa->x + selmon->wx;
-	c->y = wa->y + selmon->wy;
+	c->x = wa->x + c->mon->wx;
+	c->y = wa->y + c->mon->wy;
 	c->w = wa->width;
 	c->h = wa->height;
 	c->oldbw = wa->border_width;
-	if(c->w == selmon->mw && c->h == selmon->mh) {
-		c->x = selmon->mx;
-		c->y = selmon->my;
+	if(c->w == c->mon->mw && c->h == c->mon->mh) {
+		c->x = c->mon->mx;
+		c->y = c->mon->my;
 		c->bw = 0;
 	}
 	else {
-		if(c->x + WIDTH(c) > selmon->mx + selmon->mw)
-			c->x = selmon->mx + selmon->mw - WIDTH(c);
-		if(c->y + HEIGHT(c) > selmon->my + selmon->mh)
-			c->y = selmon->my + selmon->mh - HEIGHT(c);
-		c->x = MAX(c->x, selmon->mx);
+		if(c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
+			c->x = c->mon->mx + c->mon->mw - WIDTH(c);
+		if(c->y + HEIGHT(c) > c->mon->my + c->mon->mh)
+			c->y = c->mon->my + c->mon->mh - HEIGHT(c);
+		c->x = MAX(c->x, c->mon->mx);
 		/* only fix client y-offset, if the client center might cover the bar */
 		c->y = MAX(c->y, ((c->mon->by == 0) && (c->x + (c->w / 2) >= c->mon->wx)
-		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : selmon->my);
+		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
 		c->bw = borderpx;
 	}
 
@@ -1079,12 +1089,6 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, False);
 	updatetitle(c);
-	if(XGetTransientForHint(dpy, w, &trans))
-		t = wintoclient(trans);
-	if(t)
-		c->tags = t->tags;
-	else
-		applyrules(c);
 	if(!c->isfloating)
 		c->isfloating = trans != None || c->isfixed;
 	if(c->isfloating)
