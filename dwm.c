@@ -172,6 +172,7 @@ static void enternotify(XEvent *e);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
+static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static unsigned long getcolor(const char *colstr);
 static Bool getrootpointer(int *x, int *y);
@@ -179,6 +180,7 @@ static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
+static Monitor *idxtomon(unsigned int n);
 static void initfont(const char *fontstr);
 static Bool isprotodel(Client *c);
 static void keypress(XEvent *e);
@@ -206,6 +208,7 @@ static void showhide(Client *c);
 static void sigchld(int signal);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
+static void tagmon(const Arg *arg);
 static int textnw(const char *text, unsigned int len);
 static void tile(Monitor *);
 static void togglebar(const Arg *arg);
@@ -230,11 +233,6 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
-#ifdef XINERAMA
-static void focusmon(const Arg *arg);
-static Monitor *idxtomon(unsigned int n);
-static void tagmon(const Arg *arg);
-#endif /* XINERAMA */
 
 /* variables */
 static char stext[256];
@@ -309,9 +307,9 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h) {
 	*h = MAX(1, *h);
 
 	if(*x > m->mx + m->mw)
-		*x = m->mw - WIDTH(c);
+		*x = m->mx + m->mw - WIDTH(c);
 	if(*y > m->my + m->mh)
-		*y = m->mh - HEIGHT(c);
+		*y = m->my + m->mh - HEIGHT(c);
 	if(*x + *w + 2 * c->bw < m->mx)
 		*x = m->mx;
 	if(*y + *h + 2 * c->bw < m->my)
@@ -636,7 +634,6 @@ drawbar(Monitor *m) {
 	}
 
 	dc.x = 0;
-#ifdef XINERAMA
 	if(mons->next) { /* more than a single monitor */
 		char buf[2];
 		buf[0] = m->screen_number + '0';
@@ -645,7 +642,6 @@ drawbar(Monitor *m) {
 		drawtext(buf, selmon == m ? dc.sel : dc.norm, True);
 		dc.x += dc.w;
 	}
-#endif /* XINERAMA */
 	m->btx = dc.x;
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i]);
@@ -803,7 +799,6 @@ focusin(XEvent *e) { /* there are some broken focus acquiring clients */
 		XSetInputFocus(dpy, selmon->sel->win, RevertToPointerRoot, CurrentTime);
 }
 
-#ifdef XINERAMA
 void
 focusmon(const Arg *arg) {
 	Monitor *m;
@@ -814,7 +809,6 @@ focusmon(const Arg *arg) {
 	selmon = m;
 	focus(NULL);
 }
-#endif /* XINERAMA */
 
 void
 focusstack(const Arg *arg) {
@@ -943,7 +937,6 @@ grabkeys(void) {
 	}
 }
 
-#ifdef XINERAMA
 Monitor *
 idxtomon(unsigned int n) {
 	unsigned int i;
@@ -952,7 +945,6 @@ idxtomon(unsigned int n) {
 	for(m = mons, i = 0; m && i != n; m = m->next, i++);
 	return m;
 }
-#endif /* XINERAMA */
 
 void
 initfont(const char *fontstr) {
@@ -1378,6 +1370,7 @@ void
 sendmon(Client *c, Monitor *m) {
 	if(c->mon == m)
 		return;
+	unfocus(c);
 	detach(c);
 	detachstack(c);
 	c->mon = m;
@@ -1531,7 +1524,6 @@ tag(const Arg *arg) {
 	}
 }
 
-#ifdef XINERAMA
 void
 tagmon(const Arg *arg) {
 	Monitor *m;
@@ -1540,7 +1532,6 @@ tagmon(const Arg *arg) {
 		return;
 	sendmon(selmon->sel, m);
 }
-#endif /* XINERAMA */
 
 int
 textnw(const char *text, unsigned int len) {
@@ -1736,9 +1727,9 @@ updategeom(void) {
 	/* default monitor setup */
 	{
 		m->screen_number = 0;
-		m->wx = 0;
+		m->mx = m->wx = 0;
 		m->my = m->wy = 0;
-		m->ww = sw;
+		m->mw = m->ww = sw;
 		m->mh = m->wh = sh;
 	}
 
