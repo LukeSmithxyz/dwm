@@ -179,7 +179,6 @@ static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
-static Monitor *idxtomon(unsigned int n);
 static void initfont(const char *fontstr);
 static Bool isprotodel(Client *c);
 static void keypress(XEvent *e);
@@ -233,6 +232,7 @@ static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
 #ifdef XINERAMA
 static void focusmon(const Arg *arg);
+static Monitor *idxtomon(unsigned int n);
 static void tagmon(const Arg *arg);
 #endif /* XINERAMA */
 
@@ -943,6 +943,7 @@ grabkeys(void) {
 	}
 }
 
+#ifdef XINERAMA
 Monitor *
 idxtomon(unsigned int n) {
 	unsigned int i;
@@ -951,6 +952,7 @@ idxtomon(unsigned int n) {
 	for(m = mons, i = 0; m && i != n; m = m->next, i++);
 	return m;
 }
+#endif /* XINERAMA */
 
 void
 initfont(const char *fontstr) {
