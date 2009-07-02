@@ -237,7 +237,7 @@ static void zoom(const Arg *arg);
 /* variables */
 static char stext[256];
 static int screen;
-static int sw, sh;   /* X display screen geometry x, y, width, height */
+static int sw, sh;           /* X display screen geometry x, y, width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -264,6 +264,7 @@ static DC dc;
 static Layout *lt[] = { NULL, NULL };
 static Monitor *mons = NULL, *selmon = NULL;
 static Window root;
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -284,7 +285,8 @@ applyrules(Client *c) {
 			r = &rules[i];
 			if((!r->title || strstr(c->name, r->title))
 			&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
-			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance)))) {
+			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance))))
+			{
 				c->isfloating = r->isfloating;
 				c->tags |= r->tags;
 			}
@@ -305,7 +307,6 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 	/* set minimum possible */
 	*w = MAX(1, *w);
 	*h = MAX(1, *h);
-
 	if(interact) {
 		if(*x > sw)
 			*x = sw - WIDTH(c);
@@ -903,7 +904,8 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 		strncpy(text, (char *)name.value, size - 1);
 	else {
 		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
-		&& n > 0 && *list) {
+		&& n > 0 && *list)
+		{
 			strncpy(text, *list, size - 1);
 			XFreeStringList(list);
 		}
@@ -928,7 +930,8 @@ grabbuttons(Client *c, Bool focused) {
 						            buttons[i].mask | modifiers[j],
 						            c->win, False, BUTTONMASK,
 						            GrabModeAsync, GrabModeSync, None, None);
-		} else
+		}
+		else
 			XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
 			            BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
 	}
@@ -1385,7 +1388,7 @@ sendmon(Client *c, Monitor *m) {
 
 void
 setclientstate(Client *c, long state) {
-	long data[] = {state, None};
+	long data[] = { state, None };
 
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
 			PropModeReplace, (unsigned char *)data, 2);
