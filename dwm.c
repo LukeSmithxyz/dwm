@@ -625,9 +625,10 @@ Monitor *
 dirtomon(int dir) {
 	Monitor *m = NULL;
 
-	if(dir > 0)
+	if(dir > 0) {
 		if(!(m = selmon->next))
 			m = mons;
+	}
 	else {
 		if(selmon == mons)
 			for(m = mons; m->next; m = m->next);
@@ -1521,7 +1522,7 @@ tag(const Arg *arg) {
 void
 tagmon(const Arg *arg) {
 	if(!selmon->sel || !mons->next)
-		return
+		return;
 	sendmon(selmon->sel, dirtomon(arg->i));
 }
 
