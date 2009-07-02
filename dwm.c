@@ -1195,7 +1195,7 @@ pointertomon(int x, int y) {
 	for(m = mons; m; m = m->next)
 		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
 			return m;
-	return mons;
+	return selmon;
 }
 
 void
@@ -1758,7 +1758,7 @@ updategeom(void) {
 
 	/* select focused monitor */
 	cleanupmons();
-	mons = newmons;
+	selmon = mons = newmons;
 	selmon = wintomon(root);
 }
 
@@ -1891,7 +1891,7 @@ wintomon(Window w) {
 			return m;
 	if((c = wintoclient(w)))
 		return c->mon;
-	return mons;
+	return selmon;
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are
