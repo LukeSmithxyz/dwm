@@ -11,9 +11,9 @@
  * in O(1) time.
  *
  * Each child of the root window is called a client, except windows which have
- * set the override_redirect flag.  Clients are organized in a global
- * linked client list, the focus history is remembered through a global
- * stack list. Each client contains a bit array to indicate the tags of a
+ * set the override_redirect flag.  Clients are organized in a linked client
+ * list on each monitor, the focus history is remembered through a stack list
+ * on each monitor. Each client contains a bit array to indicate the tags of a
  * client.
  *
  * Keys and tagging rules are organized as arrays and defined in config.h.
@@ -164,6 +164,7 @@ static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
 static void die(const char *errstr, ...);
+static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
 static void drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]);
@@ -180,7 +181,6 @@ static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
-static Monitor *idxtomon(unsigned int n);
 static void initfont(const char *fontstr);
 static Bool isprotodel(Client *c);
 static void keypress(XEvent *e);
@@ -621,6 +621,22 @@ die(const char *errstr, ...) {
 	exit(EXIT_FAILURE);
 }
 
+Monitor *
+dirtomon(int dir) {
+	Monitor *m = NULL;
+
+	if(dir > 0)
+		if(!(m = selmon->next))
+			m = mons;
+	else {
+		if(selmon == mons)
+			for(m = mons; m->next; m = m->next);
+		else
+			for(m = mons; m->next != selmon; m = m->next);
+	}
+	return m;
+}
+
 void
 drawbar(Monitor *m) {
 	int x;
@@ -797,10 +813,11 @@ focusin(XEvent *e) { /* there are some broken focus acquiring clients */
 
 void
 focusmon(const Arg *arg) {
-	Monitor *m;
+	Monitor *m = NULL;
 
-	if(!(m = idxtomon(arg->ui)) || m == selmon)
+	if(!mons->next)
 		return;
+	m = dirtomon(arg->i);
 	unfocus(selmon->sel);
 	selmon = m;
 	focus(NULL);
@@ -932,15 +949,6 @@ grabkeys(void) {
 						 True, GrabModeAsync, GrabModeAsync);
 		}
 	}
-}
-
-Monitor *
-idxtomon(unsigned int n) {
-	unsigned int i;
-	Monitor *m;
-
-	for(m = mons, i = 0; m && i != n; m = m->next, i++);
-	return m;
 }
 
 void
@@ -1512,11 +1520,9 @@ tag(const Arg *arg) {
 
 void
 tagmon(const Arg *arg) {
-	Monitor *m;
-
-	if(!selmon->sel || !(m = idxtomon(arg->ui)))
-		return;
-	sendmon(selmon->sel, m);
+	if(!selmon->sel || !mons->next)
+		return
+	sendmon(selmon->sel, dirtomon(arg->i));
 }
 
 int

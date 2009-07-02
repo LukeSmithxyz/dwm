@@ -19,14 +19,14 @@ layout applied.
 Windows are grouped by tags. Each window can be tagged with one or multiple
 tags. Selecting certain tags displays all windows with these tags.
 .P
-dwm contains a small status bar which displays all available tags, the layout,
+Each screen contains a small status bar which displays all available tags, the layout,
 the title of the focused window, and the text read from the root window name
-property. A floating window is indicated with an empty square and a maximised
-floating window is indicated with a filled square before the windows title.
-The selected tags are indicated with a different color. The tags of the focused
-window are indicated with a filled square in the top left corner.  The tags
-which are applied to one or more windows are indicated with an empty square in
-the top left corner.
+property, if the screen is focused. A floating window is indicated with an
+empty square and a maximised floating window is indicated with a filled square
+before the windows title.  The selected tags are indicated with a different
+color. The tags of the focused window are indicated with a filled square in the
+top left corner.  The tags which are applied to one or more windows are
+indicated with an empty square in the top left corner.
 .P
 dwm draws a small border around windows to indicate the focus state.
 .SH OPTIONS
@@ -56,6 +56,18 @@ click on a tag label adds/removes that tag to/from the focused window.
 .B Mod1\-Shift\-Return
 Start
 .BR xterm.
+.TP
+.B Mod1\-,
+Focus previous screen, if any.
+.TP
+.B Mod1\-.
+Focus next screen, if any.
+.TP
+.B Mod1\-Shift\-,
+Send focused window to previous screen, if any.
+.TP
+.B Mod1\-Shift\-,
+Send focused window to next screen, if any.
 .TP
 .B Mod1\-b
 Toggles bar on and off.
