@@ -636,7 +636,7 @@ drawbar(Monitor *m) {
 	dc.x = 0;
 	if(mons->next) { /* more than a single monitor */
 		dc.w = TEXTW(monsyms[m->screen_number]);
-		drawtext(monsyms[m->screen_number], selmon == m ? dc.sel : dc.norm, True);
+		drawtext(monsyms[m->screen_number], selmon == m ? dc.sel : dc.norm, False);
 		dc.x += dc.w;
 	}
 	m->btx = dc.x;
