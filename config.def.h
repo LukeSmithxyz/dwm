@@ -14,7 +14,7 @@ static unsigned int borderpx        = 1;        /* border pixel of windows */
 static unsigned int snap            = 32;       /* snap pixel */
 
 /* monitor(s) symbols */
-static const char *monsyms[] = { "i", "ii", "iii", "iv", "v" };
+static const char *monsyms[] = { "0x1", "0x2", "0x3", "0x4", "0x5" };
 
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
