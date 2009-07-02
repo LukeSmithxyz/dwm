@@ -148,7 +148,7 @@ typedef struct {
 
 /* function declarations */
 static void applyrules(Client *c);
-static Bool applysizehints(Client *c, int *x, int *y, int *w, int *h);
+static Bool applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact);
 static void arrange(void);
 static void attach(Client *c);
 static void attachstack(Client *c);
@@ -194,7 +194,7 @@ static Client *nexttiled(Client *c);
 static Monitor *pointertomon(int x, int y);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
-static void resize(Client *c, int x, int y, int w, int h);
+static void resize(Client *c, int x, int y, int w, int h, Bool interact);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
 static void run(void);
@@ -298,7 +298,7 @@ applyrules(Client *c) {
 }
 
 Bool
-applysizehints(Client *c, int *x, int *y, int *w, int *h) {
+applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 	Bool baseismin;
 	Monitor *m = c->mon;
 
@@ -306,14 +306,26 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h) {
 	*w = MAX(1, *w);
 	*h = MAX(1, *h);
 
-	if(*x > m->mx + m->mw)
-		*x = m->mx + m->mw - WIDTH(c);
-	if(*y > m->my + m->mh)
-		*y = m->my + m->mh - HEIGHT(c);
-	if(*x + *w + 2 * c->bw < m->mx)
-		*x = m->mx;
-	if(*y + *h + 2 * c->bw < m->my)
-		*y = m->my;
+	if(interact) {
+		if(*x > sw)
+			*x = sw - WIDTH(c);
+		if(*y > sh)
+			*y = sh - HEIGHT(c);
+		if(*x + *w + 2 * c->bw < 0)
+			*x = 0;
+		if(*y + *h + 2 * c->bw < 0)
+			*y = 0;
+	}
+	else {
+		if(*x > m->mx + m->mw)
+			*x = m->mx + m->mw - WIDTH(c);
+		if(*y > m->my + m->mh)
+			*y = m->my + m->mh - HEIGHT(c);
+		if(*x + *w + 2 * c->bw < m->mx)
+			*x = m->mx;
+		if(*y + *h + 2 * c->bw < m->my)
+			*y = m->my;
+	}
 	if(*h < bh)
 		*h = bh;
 	if(*w < bh)
@@ -1120,7 +1132,7 @@ monocle(Monitor *m) {
 	Client *c;
 
 	for(c = nexttiled(m->clients); c; c = nexttiled(c->next))
-		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw);
+		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, False);
 }
 
 void
@@ -1166,7 +1178,7 @@ movemouse(const Arg *arg) {
 					togglefloating(NULL);
 			}
 			if(!lt[selmon->sellt]->arrange || c->isfloating)
-				resize(c, nx, ny, c->w, c->h);
+				resize(c, nx, ny, c->w, c->h, True);
 			break;
 		}
 	}
@@ -1235,10 +1247,10 @@ quit(const Arg *arg) {
 }
 
 void
-resize(Client *c, int x, int y, int w, int h) {
+resize(Client *c, int x, int y, int w, int h, Bool interact) {
 	XWindowChanges wc;
 
-	if(applysizehints(c, &x, &y, &w, &h)) {
+	if(applysizehints(c, &x, &y, &w, &h, interact)) {
 		c->x = wc.x = x;
 		c->y = wc.y = y;
 		c->w = wc.width = w;
@@ -1286,7 +1298,7 @@ resizemouse(const Arg *arg) {
 					togglefloating(NULL);
 			}
 			if(!lt[selmon->sellt]->arrange || c->isfloating)
-				resize(c, c->x, c->y, nw, nh);
+				resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
 	}
@@ -1484,7 +1496,7 @@ showhide(Client *c) {
 	if(ISVISIBLE(c)) { /* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
 		if(!lt[c->mon->sellt]->arrange || c->isfloating)
-			resize(c, c->x, c->y, c->w, c->h);
+			resize(c, c->x, c->y, c->w, c->h, False);
 		showhide(c->snext);
 	}
 	else { /* hide clients bottom up */
@@ -1554,7 +1566,7 @@ tile(Monitor *m) {
 	/* master */
 	c = nexttiled(m->clients);
 	mw = m->mfact * m->ww;
-	resize(c, m->wx, m->wy, (n == 1 ? m->ww : mw) - 2 * c->bw, m->wh - 2 * c->bw);
+	resize(c, m->wx, m->wy, (n == 1 ? m->ww : mw) - 2 * c->bw, m->wh - 2 * c->bw, False);
 
 	if(--n == 0)
 		return;
@@ -1569,7 +1581,7 @@ tile(Monitor *m) {
 
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
-		       ? m->wy + m->wh - y - 2 * c->bw : h - 2 * c->bw));
+		       ? m->wy + m->wh - y - 2 * c->bw : h - 2 * c->bw), False);
 		if(h != m->wh)
 			y = c->y + HEIGHT(c);
 	}
@@ -1589,7 +1601,8 @@ togglefloating(const Arg *arg) {
 		return;
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
 	if(selmon->sel->isfloating)
-		resize(selmon->sel, selmon->sel->x, selmon->sel->y, selmon->sel->w, selmon->sel->h);
+		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
+		       selmon->sel->w, selmon->sel->h, False);
 	arrange();
 }
 
