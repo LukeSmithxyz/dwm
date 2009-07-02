@@ -13,6 +13,9 @@ static const char selfgcolor[]      = "#ffffff";
 static unsigned int borderpx        = 1;        /* border pixel of windows */
 static unsigned int snap            = 32;       /* snap pixel */
 
+/* monitor(s) symbols */
+static const char *monsyms[] = { "I", "II", "III", "IV", "V" };
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
