@@ -330,16 +330,13 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 		*h = bh;
 	if(*w < bh)
 		*w = bh;
-
 	if(resizehints || c->isfloating) {
 		/* see last two sentences in ICCCM 4.1.2.3 */
 		baseismin = c->basew == c->minw && c->baseh == c->minh;
-
 		if(!baseismin) { /* temporarily remove base dimensions */
 			*w -= c->basew;
 			*h -= c->baseh;
 		}
-
 		/* adjust for aspect limits */
 		if(c->mina > 0 && c->maxa > 0) {
 			if(c->maxa < (float)*w / *h)
@@ -347,28 +344,22 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 			else if(c->mina < (float)*h / *w)
 				*h = *w * c->mina;
 		}
-
 		if(baseismin) { /* increment calculation requires this */
 			*w -= c->basew;
 			*h -= c->baseh;
 		}
-
 		/* adjust for increment value */
 		if(c->incw)
 			*w -= *w % c->incw;
 		if(c->inch)
 			*h -= *h % c->inch;
-
 		/* restore base dimensions */
 		*w += c->basew;
 		*h += c->baseh;
-
 		*w = MAX(*w, c->minw);
 		*h = MAX(*h, c->minh);
-
 		if(c->maxw)
 			*w = MIN(*w, c->maxw);
-
 		if(c->maxh)
 			*h = MIN(*h, c->maxh);
 	}
@@ -438,7 +429,6 @@ buttonpress(XEvent *e) {
 		focus(c);
 		click = ClkClientWin;
 	}
-
 	for(i = 0; i < LENGTH(buttons); i++)
 		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 		   && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
@@ -449,7 +439,6 @@ void
 checkotherwm(void) {
 	otherwm = False;
 	xerrorxlib = XSetErrorHandler(xerrorstart);
-
 	/* this causes an error if some other window manager is running */
 	XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
 	XSync(dpy, False);
@@ -644,7 +633,6 @@ drawbar(Monitor *m) {
 		if(c->isurgent)
 			urg |= c->tags;
 	}
-
 	dc.x = 0;
 	if(mons->next) { /* more than a single monitor */
 		dc.w = TEXTW(monsyms[m->screen_number]);
@@ -676,9 +664,8 @@ drawbar(Monitor *m) {
 		}
 		drawtext(stext, dc.norm, False);
 	}
-	else {
+	else
 		dc.x = m->ww;
-	}
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
 		if(m->sel) {
@@ -860,6 +847,7 @@ getrootpointer(int *x, int *y) {
 	int di;
 	unsigned int dui;
 	Window dummy;
+
 	return XQueryPointer(dpy, root, &dummy, &dummy, x, y, &di, &di, &dui);
 }
 
@@ -931,7 +919,7 @@ grabbuttons(Client *c, Bool focused) {
 void
 grabkeys(void) {
 	updatenumlockmask();
-	{ /* grab keys */
+	{
 		unsigned int i, j;
 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 		KeyCode code;
@@ -1050,7 +1038,6 @@ manage(Window w, XWindowAttributes *wa) {
 		die("fatal: could not malloc() %u bytes\n", sizeof(Client));
 	*c = cz;
 	c->win = w;
-
 	if(XGetTransientForHint(dpy, w, &trans))
 		t = wintoclient(trans);
 	if(t) {
@@ -1061,7 +1048,6 @@ manage(Window w, XWindowAttributes *wa) {
 		c->mon = selmon;
 		applyrules(c);
 	}
-
 	/* geometry */
 	c->x = wa->x + c->mon->wx;
 	c->y = wa->y + c->mon->wy;
@@ -1084,7 +1070,6 @@ manage(Window w, XWindowAttributes *wa) {
 		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
 		c->bw = borderpx;
 	}
-
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
@@ -1290,7 +1275,6 @@ resizemouse(const Arg *arg) {
 		case MotionNotify:
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-
 			if(snap && nw >= selmon->wx && nw <= selmon->wx + selmon->ww
 			        && nh >= selmon->wy && nh <= selmon->wy + selmon->wh) {
 				if(!c->isfloating && lt[selmon->sellt]->arrange
@@ -1440,19 +1424,16 @@ setup(void) {
 	lt[0] = &layouts[0];
 	lt[1] = &layouts[1 % LENGTH(layouts)];
 	updategeom();
-
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
-
 	/* init appearance */
 	dc.norm[ColBorder] = getcolor(normbordercolor);
 	dc.norm[ColBG] = getcolor(normbgcolor);
@@ -1465,7 +1446,6 @@ setup(void) {
 	XSetLineAttributes(dpy, dc.gc, 1, LineSolid, CapButt, JoinMiter);
 	if(!dc.font.set)
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
-
 	/* init bars */
 	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
 		w = TEXTW(layouts[i].symbol);
@@ -1473,11 +1453,9 @@ setup(void) {
 	}
 	updatebars();
 	updatestatus();
-
 	/* EWMH support per view */
 	XChangeProperty(dpy, root, netatom[NetSupported], XA_ATOM, 32,
 			PropModeReplace, (unsigned char *) netatom, NetLast);
-
 	/* select for events */
 	wa.cursor = cursor[CurNormal];
 	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask
@@ -1485,7 +1463,6 @@ setup(void) {
 			|PropertyChangeMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
-
 	grabkeys();
 }
 
@@ -1562,15 +1539,12 @@ tile(Monitor *m) {
 	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if(n == 0)
 		return;
-
 	/* master */
 	c = nexttiled(m->clients);
 	mw = m->mfact * m->ww;
 	resize(c, m->wx, m->wy, (n == 1 ? m->ww : mw) - 2 * c->bw, m->wh - 2 * c->bw, False);
-
 	if(--n == 0)
 		return;
-
 	/* tile stack */
 	x = (m->wx + mw > c->x + c->w) ? c->x + c->w + 2 * c->bw : m->wx + mw;
 	y = m->wy;
@@ -1578,7 +1552,6 @@ tile(Monitor *m) {
 	h = m->wh / n;
 	if(h < bh)
 		h = m->wh;
-
 	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
 		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
 		       ? m->wy + m->wh - y - 2 * c->bw : h - 2 * c->bw), False);
@@ -1612,7 +1585,6 @@ toggletag(const Arg *arg) {
 
 	if(!selmon->sel)
 		return;
-	
 	mask = selmon->sel->tags ^ (arg->ui & TAGMASK);
 	if(mask) {
 		selmon->sel->tags = mask;
@@ -1677,10 +1649,8 @@ updatebars(void) {
 	wa.override_redirect = True;
 	wa.background_pixmap = ParentRelative;
 	wa.event_mask = ButtonPressMask|ExposureMask;
-
 	for(m = mons; m; m = m->next) {
 		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
-
 		                          CopyFromParent, DefaultVisual(dpy, screen),
 		                          CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
 		XDefineCursor(dpy, m->barwin, cursor[CurNormal]);
@@ -1719,7 +1689,6 @@ updategeom(void) {
 		m->next = newmons;
 		newmons = m;
 	}
-
 	/* initialise monitor(s) */
 #ifdef XINERAMA
 	if(XineramaIsActive(dpy)) {
@@ -1742,7 +1711,6 @@ updategeom(void) {
 		m->mw = m->ww = sw;
 		m->mh = m->wh = sh;
 	}
-
 	/* bar geometry setup */
 	for(m = newmons; m; m = m->next) {
 		m->sel = m->stack = m->clients = NULL;
@@ -1754,7 +1722,6 @@ updategeom(void) {
 		m->topbar = TOPBAR;
 		updatebarpos(m);
 	}
-
 	/* reassign left over clients of disappeared monitors */
 	for(tm = mons; tm; tm = tm->next)
 		while(tm->clients) {
@@ -1765,7 +1732,6 @@ updategeom(void) {
 			attach(c);
 			attachstack(c);
 		}
-
 	/* select focused monitor */
 	cleanupmons();
 	selmon = mons = newmons;
@@ -1861,7 +1827,6 @@ updatewmhints(Client *c) {
 		}
 		else
 			c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
-
 		XFree(wmh);
 	}
 }
@@ -1941,7 +1906,9 @@ void
 zoom(const Arg *arg) {
 	Client *c = selmon->sel;
 
-	if(!lt[selmon->sellt]->arrange || lt[selmon->sellt]->arrange == monocle || (selmon->sel && selmon->sel->isfloating))
+	if(!lt[selmon->sellt]->arrange
+	|| lt[selmon->sellt]->arrange == monocle
+	|| (selmon->sel && selmon->sel->isfloating))
 		return;
 	if(c == nexttiled(selmon->clients))
 		if(!c || !(c = nexttiled(c->next)))
@@ -1958,19 +1925,15 @@ main(int argc, char *argv[]) {
 		die("dwm-"VERSION", © 2006-2009 dwm engineers, see LICENSE for details\n");
 	else if(argc != 1)
 		die("usage: dwm [-v]\n");
-
 	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
-
 	if(!(dpy = XOpenDisplay(NULL)))
 		die("dwm: cannot open display\n");
-
 	checkotherwm();
 	setup();
 	scan();
 	run();
 	cleanup();
-
 	XCloseDisplay(dpy);
 	return 0;
 }
