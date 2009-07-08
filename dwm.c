@@ -1329,7 +1329,6 @@ restack(Monitor *m) {
 				wc.sibling = c->win;
 			}
 	}
-	XLowerWindow(dpy, m->barwin);
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
