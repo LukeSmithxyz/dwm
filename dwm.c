@@ -1693,7 +1693,8 @@ updategeom(void) {
 #endif /* XINERAMA */
 	/* allocate monitor(s) for the new geometry setup */
 	for(i = 0; i < n; i++) {
-		m = (Monitor *)malloc(sizeof(Monitor));
+		if(!(m = (Monitor *)malloc(sizeof(Monitor))))
+			die("fatal: could not malloc() %u bytes\n", sizeof(Monitor));
 		m->next = newmons;
 		newmons = m;
 	}
