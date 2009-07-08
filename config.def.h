@@ -1,8 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-#define SHOWBAR                       True      /* False means no bar */
-#define TOPBAR                        True      /* False means bottom bar */
 static const char font[]            = "-*-*-medium-*-*-*-14-*-*-*-*-*-*-*";
 static const char normbordercolor[] = "#cccccc";
 static const char normbgcolor[]     = "#cccccc";
@@ -10,8 +8,10 @@ static const char normfgcolor[]     = "#000000";
 static const char selbordercolor[]  = "#0066ff";
 static const char selbgcolor[]      = "#0066ff";
 static const char selfgcolor[]      = "#ffffff";
-static unsigned int borderpx        = 1;        /* border pixel of windows */
-static unsigned int snap            = 32;       /* snap pixel */
+static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int snap      = 32;       /* snap pixel */
+static const Bool showbar           = True;     /* False means no bar */
+static const Bool topbar            = True;     /* False means bottom bar */
 
 /* monitor(s) symbols */
 static const char *monsyms[] = { "<1>", "<2>", "<3>", "<4>", "<5>" };
@@ -19,18 +19,17 @@ static const char *monsyms[] = { "<1>", "<2>", "<3>", "<4>", "<5>" };
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-static Rule rules[] = {
+static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating */
 	{ "Gimp",     NULL,       NULL,       0,            True },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       False },
-
 };
 
 /* layout(s) */
-static float mfact      = 0.55; /* factor of master area size [0.05..0.95] */
-static Bool resizehints = True; /* False means respect size hints in tiled resizals */
+static const float mfact      = 0.55; /* factor of master area size [0.05..0.95] */
+static const Bool resizehints = True; /* False means respect size hints in tiled resizals */
 
-static Layout layouts[] = {
+static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
 	{ "><>",      NULL },    /* no layout function means floating behavior */

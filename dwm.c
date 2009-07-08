@@ -66,7 +66,7 @@ typedef union {
 	int i;
 	unsigned int ui;
 	float f;
-	void *v;
+	const void *v;
 } Arg;
 
 typedef struct {
@@ -136,7 +136,7 @@ struct Monitor {
 	Client *stack;
 	Monitor *next;
 	Window barwin;
-	Layout *lt[2];
+	const Layout *lt[2];
 };
 
 typedef struct {
@@ -275,7 +275,7 @@ struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1
 void
 applyrules(Client *c) {
 	unsigned int i;
-	Rule *r;
+	const Rule *r;
 	XClassHint ch = { 0 };
 
 	/* rule matching */
@@ -1726,8 +1726,8 @@ updategeom(void) {
 		m->sellt = 0;
 		m->tagset[0] = m->tagset[1] = 1;
 		m->mfact = mfact;
-		m->showbar = SHOWBAR;
-		m->topbar = TOPBAR;
+		m->showbar = showbar;
+		m->topbar = topbar;
 		m->lt[0] = &layouts[0];
 		m->lt[1] = &layouts[1 % LENGTH(layouts)];
 		updatebarpos(m);
