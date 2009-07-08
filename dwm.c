@@ -177,7 +177,7 @@ static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static unsigned long getcolor(const char *colstr);
-static Bool getrootpointer(int *x, int *y);
+static Bool getrootptr(int *x, int *y);
 static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
@@ -192,7 +192,7 @@ static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
-static Monitor *pointertomon(int x, int y);
+static Monitor *ptrtomon(int x, int y);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static void resize(Client *c, int x, int y, int w, int h, Bool interact);
@@ -862,7 +862,7 @@ getcolor(const char *colstr) {
 }
 
 Bool
-getrootpointer(int *x, int *y) {
+getrootptr(int *x, int *y) {
 	int di;
 	unsigned int dui;
 	Window dummy;
@@ -1147,7 +1147,7 @@ movemouse(const Arg *arg) {
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 	None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	if(!getrootpointer(&x, &y))
+	if(!getrootptr(&x, &y))
 		return;
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
@@ -1181,7 +1181,7 @@ movemouse(const Arg *arg) {
 	}
 	while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
-	if((m = pointertomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
+	if((m = ptrtomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1195,7 +1195,7 @@ nexttiled(Client *c) {
 }
 
 Monitor *
-pointertomon(int x, int y) {
+ptrtomon(int x, int y) {
 	Monitor *m;
 
 	for(m = mons; m; m = m->next)
@@ -1302,7 +1302,7 @@ resizemouse(const Arg *arg) {
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-	if((m = pointertomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
+	if((m = ptrtomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1329,6 +1329,7 @@ restack(Monitor *m) {
 				wc.sibling = c->win;
 			}
 	}
+	XLowerWindow(dpy, m->barwin);
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
@@ -1339,10 +1340,9 @@ run(void) {
 
 	/* main event loop */
 	XSync(dpy, False);
-	while(running && !XNextEvent(dpy, &ev)) {
+	while(running && !XNextEvent(dpy, &ev))
 		if(handler[ev.type])
 			(handler[ev.type])(&ev); /* call handler */
-	}
 }
 
 void
@@ -1870,8 +1870,8 @@ wintomon(Window w) {
 	Client *c;
 	Monitor *m;
 
-	if(w == root && getrootpointer(&x, &y))
-		return pointertomon(x, y);
+	if(w == root && getrootptr(&x, &y))
+		return ptrtomon(x, y);
 	for(m = mons; m; m = m->next)
 		if(w == m->barwin)
 			return m;
