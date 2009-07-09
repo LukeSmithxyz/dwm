@@ -236,7 +236,7 @@ static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
 
 /* variables */
-static char stext[256];
+static char stext[256], ntext[8];
 static int screen;
 static int sw, sh;           /* X display screen geometry x, y, width, height */
 static int bh, blw = 0;      /* bar geometry */
@@ -641,11 +641,13 @@ dirtomon(int dir) {
 void
 drawbar(Monitor *m) {
 	int x;
-	unsigned int i, occ = 0, urg = 0;
+	unsigned int i, n = 0, occ = 0, urg = 0;
 	unsigned long *col;
 	Client *c;
 
 	for(c = m->clients; c; c = c->next) {
+		if(ISVISIBLE(c))
+			n++;
 		occ |= c->tags;
 		if(c->isurgent)
 			urg |= c->tags;
@@ -662,10 +664,12 @@ drawbar(Monitor *m) {
 	if(blw > 0) {
 		dc.w = blw;
 		drawtext(m->lt[m->sellt]->symbol, dc.norm, False);
-		x = dc.x + dc.w;
+		dc.x += dc.w;
 	}
-	else
-		x = dc.x;
+	snprintf(ntext, sizeof ntext, "%u", n);
+	dc.w = TEXTW(ntext);
+	drawtext(ntext, dc.norm, False);
+	x = (dc.x += dc.w);
 	if(m == selmon) { /* status is only drawn on selected monitor */
 		dc.w = TEXTW(stext);
 		dc.x = m->ww - dc.w;
