@@ -121,8 +121,8 @@ typedef struct {
 } Layout;
 
 struct Monitor {
-	int screen_number;
 	float mfact;
+	int num;
 	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
@@ -145,6 +145,7 @@ typedef struct {
 	const char *title;
 	unsigned int tags;
 	Bool isfloating;
+	int monitor;
 } Rule;
 
 /* function declarations */
@@ -238,7 +239,7 @@ static void zoom(const Arg *arg);
 /* variables */
 static char stext[256], ntext[8];
 static int screen;
-static int sw, sh;           /* X display screen geometry x, y, width, height */
+static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -276,6 +277,7 @@ void
 applyrules(Client *c) {
 	unsigned int i;
 	const Rule *r;
+	Monitor *m;
 	XClassHint ch = { 0 };
 
 	/* rule matching */
@@ -289,6 +291,9 @@ applyrules(Client *c) {
 			{
 				c->isfloating = r->isfloating;
 				c->tags |= r->tags;
+				for(m = mons; m && m->num != r->monitor; m = m->next);
+				if(m)
+					c->mon = m;
 			}
 		}
 		if(ch.res_class)
@@ -1698,7 +1703,7 @@ updategeom(void) {
 #ifdef XINERAMA
 	if(XineramaIsActive(dpy)) {
 		for(i = 0, m = newmons; m; m = m->next, i++) {
-			m->screen_number = info[i].screen_number;
+			m->num = info[i].screen_number;
 			m->mx = m->wx = info[i].x_org;
 			m->my = m->wy = info[i].y_org;
 			m->mw = m->ww = info[i].width;
@@ -1710,7 +1715,7 @@ updategeom(void) {
 #endif /* XINERAMA */
 	/* default monitor setup */
 	{
-		m->screen_number = 0;
+		m->num = 0;
 		m->mx = m->wx = 0;
 		m->my = m->wy = 0;
 		m->mw = m->ww = sw;
