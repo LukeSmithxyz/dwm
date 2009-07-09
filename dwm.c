@@ -1679,7 +1679,7 @@ void
 updategeom(void) {
 	int i, n = 1;
 	Client *c;
-	Monitor *newmons = NULL, *m, *tm;
+	Monitor *newmons = NULL, *m = NULL, *tm;
 
 #ifdef XINERAMA
 	XineramaScreenInfo *info = NULL;
