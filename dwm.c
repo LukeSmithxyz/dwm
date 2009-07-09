@@ -1690,6 +1690,8 @@ updategeom(void) {
 	if(XineramaIsActive(dpy))
 		info = XineramaQueryScreens(dpy, &n);
 #endif /* XINERAMA */
+	if(n > LENGTH(monsyms))
+		n = LENGTH(monsyms);
 	/* allocate monitor(s) for the new geometry setup */
 	for(i = 0; i < n; i++) {
 		if(!(m = (Monitor *)malloc(sizeof(Monitor))))
