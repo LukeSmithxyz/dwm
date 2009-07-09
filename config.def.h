@@ -13,9 +13,6 @@ static const unsigned int snap      = 32;       /* snap pixel */
 static const Bool showbar           = True;     /* False means no bar */
 static const Bool topbar            = True;     /* False means bottom bar */
 
-/* monitor(s) symbols */
-static const char *monsyms[] = { "<1>", "<2>", "<3>", "<4>" };
-
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 

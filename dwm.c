@@ -123,7 +123,7 @@ typedef struct {
 struct Monitor {
 	int screen_number;
 	float mfact;
-	int by, btx;          /* bar geometry */
+	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
 	unsigned int seltags;
@@ -409,9 +409,8 @@ buttonpress(XEvent *e) {
 		selmon = m;
 		focus(NULL);
 	}
-	if(ev->window == selmon->barwin && ev->x >= selmon->btx) {
-		i = 0;
-		x = selmon->btx;
+	if(ev->window == selmon->barwin) {
+		i = x = 0;
 		do
 			x += TEXTW(tags[i]);
 		while(ev->x >= x && ++i < LENGTH(tags));
@@ -652,12 +651,6 @@ drawbar(Monitor *m) {
 			urg |= c->tags;
 	}
 	dc.x = 0;
-	if(mons->next) { /* more than a single monitor */
-		dc.w = TEXTW(monsyms[m->screen_number]);
-		drawtext(monsyms[m->screen_number], selmon == m ? dc.sel : dc.norm, False);
-		dc.x += dc.w;
-	}
-	m->btx = dc.x;
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i]);
 		col = m->tagset[m->seltags] & 1 << i ? dc.sel : dc.norm;
@@ -1690,8 +1683,6 @@ updategeom(void) {
 	if(XineramaIsActive(dpy))
 		info = XineramaQueryScreens(dpy, &n);
 #endif /* XINERAMA */
-	if(n > LENGTH(monsyms))
-		n = LENGTH(monsyms);
 	/* allocate monitor(s) for the new geometry setup */
 	for(i = 0; i < n; i++) {
 		if(!(m = (Monitor *)malloc(sizeof(Monitor))))
