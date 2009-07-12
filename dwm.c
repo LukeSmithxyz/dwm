@@ -1052,6 +1052,7 @@ manage(Window w, XWindowAttributes *wa) {
 		die("fatal: could not malloc() %u bytes\n", sizeof(Client));
 	*c = cz;
 	c->win = w;
+	updatetitle(c);
 	if(XGetTransientForHint(dpy, w, &trans))
 		t = wintoclient(trans);
 	if(t) {
@@ -1091,7 +1092,6 @@ manage(Window w, XWindowAttributes *wa) {
 	updatesizehints(c);
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, False);
-	updatetitle(c);
 	if(!c->isfloating)
 		c->isfloating = trans != None || c->isfixed;
 	if(c->isfloating)
