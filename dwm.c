@@ -237,6 +237,7 @@ static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
 
 /* variables */
+static const char broken[] = "broken";
 static char stext[256], ntext[8];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
@@ -275,6 +276,7 @@ struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1
 /* function implementations */
 void
 applyrules(Client *c) {
+	const char *class, *instance;
 	unsigned int i;
 	const Rule *r;
 	Monitor *m;
@@ -283,11 +285,13 @@ applyrules(Client *c) {
 	/* rule matching */
 	c->isfloating = c->tags = 0;
 	if(XGetClassHint(dpy, c->win, &ch)) {
+		class = ch.res_class ? ch.res_class : broken;
+		instance = ch.res_name ? ch.res_name : broken;
 		for(i = 0; i < LENGTH(rules); i++) {
 			r = &rules[i];
 			if((!r->title || strstr(c->name, r->title))
-			&& (!r->class || (ch.res_class && strstr(ch.res_class, r->class)))
-			&& (!r->instance || (ch.res_name && strstr(ch.res_name, r->instance))))
+			&& (!r->class || strstr(class, r->class))
+			&& (!r->instance || strstr(instance, r->instance)))
 			{
 				c->isfloating = r->isfloating;
 				c->tags |= r->tags;
@@ -1819,6 +1823,8 @@ void
 updatetitle(Client *c) {
 	if(!gettextprop(c->win, netatom[NetWMName], c->name, sizeof c->name))
 		gettextprop(c->win, XA_WM_NAME, c->name, sizeof c->name);
+	if(c->name[0] == '\0') /* hack to mark broken clients */
+		strcpy(c->name, broken);
 }
 
 void
