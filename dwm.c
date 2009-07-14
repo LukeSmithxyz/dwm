@@ -51,7 +51,7 @@
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
-#define TAGMASK                 ((int)((1LL << LENGTH(tags)) - 1))
+#define TAGMASK                 ((int)((1 << LENGTH(tags)) - 1))
 #define TEXTW(X)                (textnw(X, strlen(X)) + dc.font.height)
 
 /* enums */
@@ -271,7 +271,7 @@ static Window root;
 #include "config.h"
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
-struct NumTags { char limitexceeded[sizeof(unsigned int) * 8 < LENGTH(tags) ? -1 : 1]; };
+struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 
 /* function implementations */
 void
@@ -420,9 +420,9 @@ buttonpress(XEvent *e) {
 	}
 	if(ev->window == selmon->barwin) {
 		i = x = 0;
-		do
+		do {
 			x += TEXTW(tags[i]);
-		while(ev->x >= x && ++i < LENGTH(tags));
+		} while(ev->x >= x && ++i < LENGTH(tags));
 		if(i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
@@ -977,6 +977,7 @@ initfont(const char *fontstr) {
 		XFontSetExtents *font_extents;
 		XFontStruct **xfonts;
 		char **font_names;
+
 		dc.font.ascent = dc.font.descent = 0;
 		font_extents = XExtentsOfFontSet(dc.font.set);
 		n = XFontsOfFontSet(dc.font.set, &xfonts, &font_names);
@@ -1184,8 +1185,7 @@ movemouse(const Arg *arg) {
 				resize(c, nx, ny, c->w, c->h, True);
 			break;
 		}
-	}
-	while(ev.type != ButtonRelease);
+	} while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
 	if((m = ptrtomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
 		sendmon(c, m);
@@ -1303,8 +1303,7 @@ resizemouse(const Arg *arg) {
 				resize(c, c->x, c->y, nw, nh, True);
 			break;
 		}
-	}
-	while(ev.type != ButtonRelease);
+	} while(ev.type != ButtonRelease);
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
@@ -1347,7 +1346,7 @@ run(void) {
 	XSync(dpy, False);
 	while(running && !XNextEvent(dpy, &ev))
 		if(handler[ev.type])
-			(handler[ev.type])(&ev); /* call handler */
+			handler[ev.type](&ev); /* call handler */
 }
 
 void
