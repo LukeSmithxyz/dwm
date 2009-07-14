@@ -380,7 +380,6 @@ void
 arrange(void) {
 	Monitor *m;
 
-	/* optimise two loops into one, check focus(NULL) */
 	for(m = mons; m; m = m->next)
 		showhide(m->stack);
 	focus(NULL);
@@ -440,7 +439,7 @@ buttonpress(XEvent *e) {
 	}
 	for(i = 0; i < LENGTH(buttons); i++)
 		if(click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
-		   && CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
+		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
 			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
 }
 
@@ -885,7 +884,7 @@ getstate(Window w) {
 	Atom real;
 
 	status = XGetWindowProperty(dpy, w, wmatom[WMState], 0L, 2L, False, wmatom[WMState],
-			&real, &format, &n, &extra, (unsigned char **)&p);
+	                            &real, &format, &n, &extra, (unsigned char **)&p);
 	if(status != Success)
 		return -1;
 	if(n != 0)
@@ -909,9 +908,7 @@ gettextprop(Window w, Atom atom, char *text, unsigned int size) {
 	if(name.encoding == XA_STRING)
 		strncpy(text, (char *)name.value, size - 1);
 	else {
-		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success
-		&& n > 0 && *list)
-		{
+		if(XmbTextPropertyToTextList(dpy, &name, &list, &n) >= Success && n > 0 && *list) {
 			strncpy(text, *list, size - 1);
 			XFreeStringList(list);
 		}
@@ -1022,8 +1019,8 @@ keypress(XEvent *e) {
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < LENGTH(keys); i++)
 		if(keysym == keys[i].keysym
-		   && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-		   && keys[i].func)
+		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
+		&& keys[i].func)
 			keys[i].func(&(keys[i].arg));
 }
 
@@ -1168,7 +1165,7 @@ movemouse(const Arg *arg) {
 			nx = ocx + (ev.xmotion.x - x);
 			ny = ocy + (ev.xmotion.y - y);
 			if(snap && nx >= selmon->wx && nx <= selmon->wx + selmon->ww
-			        && ny >= selmon->wy && ny <= selmon->wy + selmon->wh) {
+			&& ny >= selmon->wy && ny <= selmon->wy + selmon->wh) {
 				if(abs(selmon->wx - nx) < snap)
 					nx = selmon->wx;
 				else if(abs((selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap)
@@ -1178,7 +1175,7 @@ movemouse(const Arg *arg) {
 				else if(abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap)
 					ny = selmon->wy + selmon->wh - HEIGHT(c);
 				if(!c->isfloating && selmon->lt[selmon->sellt]->arrange
-				                  && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
+				&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 					togglefloating(NULL);
 			}
 			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating)
@@ -1279,7 +1276,7 @@ resizemouse(const Arg *arg) {
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-	None, cursor[CurResize], CurrentTime) != GrabSuccess)
+	                None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	do {
@@ -1294,9 +1291,10 @@ resizemouse(const Arg *arg) {
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
 			if(snap && nw >= selmon->wx && nw <= selmon->wx + selmon->ww
-			        && nh >= selmon->wy && nh <= selmon->wy + selmon->wh) {
+			&& nh >= selmon->wy && nh <= selmon->wy + selmon->wh)
+			{
 				if(!c->isfloating && selmon->lt[selmon->sellt]->arrange
-				   && (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
+				&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
 					togglefloating(NULL);
 			}
 			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating)
@@ -1473,8 +1471,8 @@ setup(void) {
 	/* select for events */
 	wa.cursor = cursor[CurNormal];
 	wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask
-			|EnterWindowMask|LeaveWindowMask|StructureNotifyMask
-			|PropertyChangeMask;
+	                |EnterWindowMask|LeaveWindowMask|StructureNotifyMask
+	                |PropertyChangeMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
