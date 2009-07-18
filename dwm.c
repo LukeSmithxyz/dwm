@@ -350,9 +350,9 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 		/* adjust for aspect limits */
 		if(c->mina > 0 && c->maxa > 0) {
 			if(c->maxa < (float)*w / *h)
-				*w = *h * c->maxa;
+				*w = *h * c->maxa + 0.5;
 			else if(c->mina < (float)*h / *w)
-				*h = *w * c->mina;
+				*h = *w * c->mina + 0.5;
 		}
 		if(baseismin) { /* increment calculation requires this */
 			*w -= c->basew;
@@ -1807,8 +1807,8 @@ updatesizehints(Client *c) {
 	else
 		c->minw = c->minh = 0;
 	if(size.flags & PAspect) {
-		c->mina = (float)size.min_aspect.y / (float)size.min_aspect.x;
-		c->maxa = (float)size.max_aspect.x / (float)size.max_aspect.y;
+		c->mina = (float)size.min_aspect.y / size.min_aspect.x;
+		c->maxa = (float)size.max_aspect.x / size.max_aspect.y;
 	}
 	else
 		c->maxa = c->mina = 0.0;
