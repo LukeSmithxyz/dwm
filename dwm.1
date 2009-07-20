@@ -38,7 +38,9 @@ prints version information to standard output, then exits.
 .SS Status bar
 .TP
 .B X root window name
-is read and displayed in the status text area.
+is read and displayed in the status text area. It can be set with the
+.BR xsetroot (1)
+command.
 .TP
 .B Button1
 click on a tag label to display all windows with that tag, click on the layout
@@ -56,7 +58,7 @@ click on a tag label adds/removes that tag to/from the focused window.
 .TP
 .B Mod1\-Shift\-Return
 Start
-.BR uxterm .
+.BR uxterm (1).
 .TP
 .B Mod1\-,
 Focus previous screen, if any.
