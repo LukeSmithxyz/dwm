@@ -1696,7 +1696,7 @@ updategeom(void) {
 		if(info[i - 1].x_org == info[i].x_org && info[i - 1].y_org == info[i].y_org
 		&& info[i - 1].width == info[i].width && info[i - 1].height == info[i].height)
 			--nn;
-	n = nn; /* we only consider unique geometrys as separate screens */
+	n = nn; /* we only consider unique geometries as separate screens */
 #endif /* XINERAMA */
 	/* allocate monitor(s) for the new geometry setup */
 	for(i = 0; i < n; i++) {
