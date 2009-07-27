@@ -1683,11 +1683,12 @@ updatebarpos(Monitor *m) {
 
 void
 updategeom(void) {
-	int i, n = 1, nn;
+	int i, n = 1;
 	Client *c;
 	Monitor *newmons = NULL, *m = NULL, *tm;
 
 #ifdef XINERAMA
+	int nn;
 	XineramaScreenInfo *info = NULL;
 
 	if(XineramaIsActive(dpy))
