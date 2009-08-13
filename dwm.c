@@ -207,7 +207,7 @@ static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
 static void showhide(Client *c);
-static void sigchld(int signal);
+static void sigchld(int unused);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
@@ -1428,6 +1428,10 @@ setup(void) {
 	int w;
 	XSetWindowAttributes wa;
 
+	/* clean up any zombies immediately */
+	signal(SIGCHLD, sigchld);
+	sigchld(0);
+
 	/* init screen */
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
@@ -1496,13 +1500,13 @@ showhide(Client *c) {
 
 
 void
-sigchld(int signal) {
+sigchld(int unused) {
 	while(0 < waitpid(-1, NULL, WNOHANG));
+	signal(SIGCHLD, sigchld);
 }
 
 void
 spawn(const Arg *arg) {
-	signal(SIGCHLD, sigchld);
 	if(fork() == 0) {
 		if(dpy)
 			close(ConnectionNumber(dpy));
