@@ -1429,7 +1429,6 @@ setup(void) {
 	XSetWindowAttributes wa;
 
 	/* clean up any zombies immediately */
-	signal(SIGCHLD, sigchld);
 	sigchld(0);
 
 	/* init screen */
@@ -1501,8 +1500,9 @@ showhide(Client *c) {
 
 void
 sigchld(int unused) {
+	if(signal(SIGCHLD, sigchld) == SIG_ERR)
+		die("Can't install SIGCHLD handler");
 	while(0 < waitpid(-1, NULL, WNOHANG));
-	signal(SIGCHLD, sigchld);
 }
 
 void
