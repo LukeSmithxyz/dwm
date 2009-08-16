@@ -564,9 +564,9 @@ configurerequest(XEvent *e) {
 				c->w = ev->width;
 			if(ev->value_mask & CWHeight)
 				c->h = ev->height;
-			if((c->x - m->mx + c->w) > m->mw && c->isfloating)
+			if((c->x + c->w) > m->mx + m->mw && c->isfloating)
 				c->x = m->mx + (m->mw / 2 - c->w / 2); /* center in x direction */
-			if((c->y - m->my + c->h) > m->mh && c->isfloating)
+			if((c->y + c->h) > m->my + m->mh && c->isfloating)
 				c->y = m->my + (m->mh / 2 - c->h / 2); /* center in y direction */
 			if((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
@@ -1595,23 +1595,23 @@ togglefloating(const Arg *arg) {
 
 void
 toggletag(const Arg *arg) {
-	unsigned int mask;
+	unsigned int newtags;
 
 	if(!selmon->sel)
 		return;
-	mask = selmon->sel->tags ^ (arg->ui & TAGMASK);
-	if(mask) {
-		selmon->sel->tags = mask;
+	newtags = selmon->sel->tags ^ (arg->ui & TAGMASK);
+	if(newtags) {
+		selmon->sel->tags = newtags;
 		arrange();
 	}
 }
 
 void
 toggleview(const Arg *arg) {
-	unsigned int mask = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
+	unsigned int newtagset = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
 
-	if(mask) {
-		selmon->tagset[selmon->seltags] = mask;
+	if(newtagset) {
+		selmon->tagset[selmon->seltags] = newtagset;
 		arrange();
 	}
 }
