@@ -1235,7 +1235,7 @@ propertynotify(XEvent *e) {
 		}
 		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
-			if(c == selmon->sel)
+			if(c == c->mon->sel)
 				drawbars();
 		}
 	}
