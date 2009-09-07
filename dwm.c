@@ -530,7 +530,7 @@ configurenotify(XEvent *e) {
 	Monitor *m;
 	XConfigureEvent *ev = &e->xconfigure;
 
-	if(ev->window == root && (ev->width != sw || ev->height != sh)) {
+	if(ev->window == root) {
 		sw = ev->width;
 		sh = ev->height;
 		updategeom();
