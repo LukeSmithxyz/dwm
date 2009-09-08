@@ -1041,6 +1041,7 @@ killclient(const Arg *arg) {
 	}
 	else
 		XKillClient(dpy, selmon->sel->win);
+	XSync(dpy, False);
 }
 
 void
