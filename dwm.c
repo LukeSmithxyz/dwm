@@ -218,7 +218,7 @@ static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c);
-static void unmanage(Client *c);
+static void unmanage(Client *c, Bool isdestroyed);
 static void unmapnotify(XEvent *e);
 static void updategeom(void);
 static void updatebarpos(Monitor *m);
@@ -466,7 +466,7 @@ cleanup(void) {
 	selmon->lt[selmon->sellt] = &foo;
 	for(m = mons; m; m = m->next)
 		while(m->stack)
-			unmanage(m->stack);
+			unmanage(m->stack, False);
 	if(dc.font.set)
 		XFreeFontSet(dpy, dc.font.set);
 	else
@@ -595,7 +595,7 @@ destroynotify(XEvent *e) {
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
 	if((c = wintoclient(ev->window)))
-		unmanage(c);
+		unmanage(c, True);
 }
 
 void
@@ -1626,24 +1626,25 @@ unfocus(Client *c) {
 }
 
 void
-unmanage(Client *c) {
+unmanage(Client *c, Bool isdestroyed) {
 	XWindowChanges wc;
 
-	wc.border_width = c->oldbw;
 	/* The server grab construct avoids race conditions. */
-	XGrabServer(dpy);
-	XSetErrorHandler(xerrordummy);
-	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
 	detach(c);
 	detachstack(c);
-	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	setclientstate(c, WithdrawnState);
+	if(!isdestroyed) {
+		wc.border_width = c->oldbw;
+		XGrabServer(dpy);
+		XSetErrorHandler(xerrordummy);
+		XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
+		XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+		setclientstate(c, WithdrawnState);
+		XSync(dpy, False);
+		XSetErrorHandler(xerror);
+		XUngrabServer(dpy);
+	}
 	free(c);
-	XSync(dpy, False);
-	XSetErrorHandler(xerror);
-	XUngrabServer(dpy);
 	focus(NULL);
-	arrange();
 }
 
 void
@@ -1652,7 +1653,7 @@ unmapnotify(XEvent *e) {
 	XUnmapEvent *ev = &e->xunmap;
 
 	if((c = wintoclient(ev->window)))
-		unmanage(c);
+		unmanage(c, False);
 }
 
 void
