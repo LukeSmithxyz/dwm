@@ -1039,9 +1039,15 @@ killclient(const Arg *arg) {
 		ev.xclient.data.l[1] = CurrentTime;
 		XSendEvent(dpy, selmon->sel->win, False, NoEventMask, &ev);
 	}
-	else
+	else {
+		XGrabServer(dpy);
+		XSetErrorHandler(xerrordummy);
+		XSetCloseDownMode(dpy, DestroyAll);
 		XKillClient(dpy, selmon->sel->win);
-	XSync(dpy, False);
+		XSync(dpy, False);
+		XSetErrorHandler(xerror);
+		XUngrabServer(dpy);
+	}
 }
 
 void
