@@ -218,7 +218,7 @@ static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c);
-static void unmanage(Client *c, Bool isdestroyed);
+static void unmanage(Client *c, Bool destroyed);
 static void unmapnotify(XEvent *e);
 static void updategeom(void);
 static void updatebarpos(Monitor *m);
@@ -1627,13 +1627,13 @@ unfocus(Client *c) {
 }
 
 void
-unmanage(Client *c, Bool isdestroyed) {
+unmanage(Client *c, Bool destroyed) {
 	XWindowChanges wc;
 
 	/* The server grab construct avoids race conditions. */
 	detach(c);
 	detachstack(c);
-	if(!isdestroyed) {
+	if(!destroyed) {
 		wc.border_width = c->oldbw;
 		XGrabServer(dpy);
 		XSetErrorHandler(xerrordummy);
