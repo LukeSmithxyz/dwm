@@ -1652,6 +1652,7 @@ unmanage(Client *c, Bool destroyed) {
 	}
 	free(c);
 	focus(NULL);
+	arrange();
 }
 
 void
