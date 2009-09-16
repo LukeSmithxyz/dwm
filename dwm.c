@@ -121,6 +121,7 @@ typedef struct {
 } Layout;
 
 struct Monitor {
+	const char *ltsymbol;
 	float mfact;
 	int num;
 	int by;               /* bar geometry */
@@ -238,7 +239,7 @@ static void zoom(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
-static char stext[256], ntext[8];
+static char stext[256];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
@@ -384,6 +385,7 @@ arrange(void) {
 		showhide(m->stack);
 	focus(NULL);
 	for(m = mons; m; m = m->next) {
+		m->ltsymbol = m->lt[m->sellt]->symbol;
 		if(m->lt[m->sellt]->arrange)
 			m->lt[m->sellt]->arrange(m);
 		restack(m);
@@ -649,13 +651,11 @@ dirtomon(int dir) {
 void
 drawbar(Monitor *m) {
 	int x;
-	unsigned int i, n = 0, occ = 0, urg = 0;
+	unsigned int i, occ = 0, urg = 0;
 	unsigned long *col;
 	Client *c;
 
 	for(c = m->clients; c; c = c->next) {
-		if(ISVISIBLE(c))
-			n++;
 		occ |= c->tags;
 		if(c->isurgent)
 			urg |= c->tags;
@@ -669,15 +669,10 @@ drawbar(Monitor *m) {
 		           occ & 1 << i, urg & 1 << i, col);
 		dc.x += dc.w;
 	}
-	if(blw > 0) {
-		dc.w = blw;
-		drawtext(m->lt[m->sellt]->symbol, dc.norm, False);
-		dc.x += dc.w;
-	}
-	snprintf(ntext, sizeof ntext, "%u", n);
-	dc.w = TEXTW(ntext);
-	drawtext(ntext, dc.norm, False);
-	x = (dc.x += dc.w);
+	dc.w = blw = TEXTW(m->ltsymbol);
+	drawtext(m->ltsymbol, dc.norm, False);
+	dc.x += dc.w;
+	x = dc.x;
 	if(m == selmon) { /* status is only drawn on selected monitor */
 		dc.w = TEXTW(stext);
 		dc.x = m->ww - dc.w;
@@ -1137,8 +1132,17 @@ maprequest(XEvent *e) {
 
 void
 monocle(Monitor *m) {
+	static char ntext[8];
+	unsigned int n = 0;
 	Client *c;
 
+	for(c = m->clients; c; c = c->next)
+		if(ISVISIBLE(c))
+			n++;
+	if(n > 0) { /* override layout symbol */
+		snprintf(ntext, sizeof ntext, "[%d]", n);
+		m->ltsymbol = ntext;
+	}
 	for(c = nexttiled(m->clients); c; c = nexttiled(c->next))
 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, False);
 }
@@ -1431,8 +1435,6 @@ setmfact(const Arg *arg) {
 
 void
 setup(void) {
-	unsigned int i;
-	int w;
 	XSetWindowAttributes wa;
 
 	/* clean up any zombies immediately */
@@ -1469,10 +1471,6 @@ setup(void) {
 	if(!dc.font.set)
 		XSetFont(dpy, dc.gc, dc.font.xfont->fid);
 	/* init bars */
-	for(blw = i = 0; LENGTH(layouts) > 1 && i < LENGTH(layouts); i++) {
-		w = TEXTW(layouts[i].symbol);
-		blw = MAX(blw, w);
-	}
 	updatebars();
 	updatestatus();
 	/* EWMH support per view */
@@ -1752,6 +1750,7 @@ updategeom(void) {
 		m->topbar = topbar;
 		m->lt[0] = &layouts[0];
 		m->lt[1] = &layouts[1 % LENGTH(layouts)];
+		m->ltsymbol = layouts[0].symbol;
 		updatebarpos(m);
 	}
 	/* reassign left over clients of disappeared monitors */
