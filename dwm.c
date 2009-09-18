@@ -221,7 +221,7 @@ static void toggleview(const Arg *arg);
 static void unfocus(Client *c);
 static void unmanage(Client *c, Bool destroyed);
 static void unmapnotify(XEvent *e);
-static void updategeom(void);
+static Bool updategeom(void);
 static void updatebarpos(Monitor *m);
 static void updatebars(void);
 static void updatenumlockmask(void);
@@ -535,14 +535,15 @@ configurenotify(XEvent *e) {
 	if(ev->window == root) {
 		sw = ev->width;
 		sh = ev->height;
-		updategeom();
-		if(dc.drawable != 0)
-			XFreePixmap(dpy, dc.drawable);
-		dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
-		updatebars();
-		for(m = mons; m; m = m->next)
-			XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
-		arrange();
+		if(updategeom()) {
+			if(dc.drawable != 0)
+				XFreePixmap(dpy, dc.drawable);
+			dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
+			updatebars();
+			for(m = mons; m; m = m->next)
+				XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+			arrange();
+		}
 	}
 }
 
@@ -1692,26 +1693,73 @@ updatebarpos(Monitor *m) {
 		m->by = -bh;
 }
 
-void
+Bool
 updategeom(void) {
-	int i, n = 1;
+	int i, j, nn = 1, n = 1;
 	Client *c;
 	Monitor *newmons = NULL, *m = NULL, *tm;
 
 #ifdef XINERAMA
-	int nn;
 	XineramaScreenInfo *info = NULL;
+	Bool *flags = NULL;
 
 	if(XineramaIsActive(dpy))
 		info = XineramaQueryScreens(dpy, &n);
-	for(i = 1, nn = n; i < n; i++)
-		if(info[i - 1].x_org == info[i].x_org && info[i - 1].y_org == info[i].y_org
-		&& info[i - 1].width == info[i].width && info[i - 1].height == info[i].height)
-			--nn;
-	n = nn; /* we only consider unique geometries as separate screens */
+	flags = (Bool *)malloc(sizeof(Bool) * n);
+	for(i = 0; i < n; i++)
+		flags[i] = False;
+	/* next double-loop seeks any combination of retrieved Xinerama info
+	 * with existing monitors, this is used to avoid unnecessary
+	 * re-allocations of monitor structs */
+	for(i = 0, nn = n; i < n; i++)
+		for(j = 0, m = mons; m; m = m->next, j++)
+			if(!flags[j]) {
+				if((flags[j] = (
+					info[i].x_org == m->mx
+					&& info[i].y_org == m->my
+					&& info[i].width == m->mw
+					&& info[i].height == m->mh)
+				))
+					--nn;
+			}
+	if(nn == 0) { /* no need to re-allocate monitors */
+		j = 0;
+		for(i = 0, m = mons; m; m = m->next, i++) {
+			m->num = info[i].screen_number;
+			if(info[i].x_org != m->mx
+			|| info[i].y_org != m->my
+			|| info[i].width != m->mw
+			|| info[i].height != m->mh)
+			{
+				m->mx = m->wx = info[i].x_org;
+				m->my = m->wy = info[i].y_org;
+				m->mw = m->ww = info[i].width;
+				m->mh = m->wh = info[i].height;
+				updatebarpos(m);
+				j++;
+			}
+		}
+		XFree(info);
+		free(flags);
+		return j > 0;
+	}
+	/* next algorithm only considers unique geometries as separate screens */
+	for(i = 0; i < n; i++)
+		flags[i] = False; /* used for ignoring certain monitors */
+	for(i = 0, nn = n; i < n; i++)
+		for(j = 0; j < n; j++)
+			if(i != j && !flags[i]) {
+				if((flags[i] = (
+					info[i].x_org == info[j].x_org
+					&& info[i].y_org == info[j].y_org
+					&& info[i].width == info[j].width
+					&& info[i].height == info[j].height)
+				))
+					--nn;
+			}
 #endif /* XINERAMA */
 	/* allocate monitor(s) for the new geometry setup */
-	for(i = 0; i < n; i++) {
+	for(i = 0; i < nn; i++) {
 		if(!(m = (Monitor *)malloc(sizeof(Monitor))))
 			die("fatal: could not malloc() %u bytes\n", sizeof(Monitor));
 		m->next = newmons;
@@ -1720,14 +1768,18 @@ updategeom(void) {
 	/* initialise monitor(s) */
 #ifdef XINERAMA
 	if(XineramaIsActive(dpy)) {
-		for(i = 0, m = newmons; m; m = m->next, i++) {
-			m->num = info[i].screen_number;
-			m->mx = m->wx = info[i].x_org;
-			m->my = m->wy = info[i].y_org;
-			m->mw = m->ww = info[i].width;
-			m->mh = m->wh = info[i].height;
+		for(i = 0, m = newmons; m && i < n; i++) {
+			if(!flags[i]) { /* only use screens that aren't dublettes */
+				m->num = info[i].screen_number;
+				m->mx = m->wx = info[i].x_org;
+				m->my = m->wy = info[i].y_org;
+				m->mw = m->ww = info[i].width;
+				m->mh = m->wh = info[i].height;
+				m = m->next;
+			}
 		}
 		XFree(info);
+		free(flags);
 	}
 	else
 #endif /* XINERAMA */
@@ -1767,6 +1819,7 @@ updategeom(void) {
 	cleanupmons();
 	selmon = mons = newmons;
 	selmon = wintomon(root);
+	return True;
 }
 
 void
