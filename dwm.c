@@ -1699,6 +1699,40 @@ updategeom(void) {
 	Client *c;
 	Monitor *newmons = NULL, *m = NULL, *tm;
 
+	/* TODO:
+	 * This function needs to be seriously re-designed:
+	 *
+	 * #ifdef XINERAMA
+	 * 1. Determine number of already existing monitors n
+	 * 2. Determine number of monitors Xinerama reports nn
+	 * 3. if(n <= nn) {
+	 *       if(n < nn) {
+	 *          append nn-n monitors to current struct
+	 *          flag dirty
+	 *       }
+	 *       for(i = 0; i < nn; i++) {
+	 *           if(oldgeom != newgeom) {
+	 *               apply newgeom;
+	 *               flag dirty;
+	 *           }
+	 *       }
+	 *    }
+	 *    else {
+	 *       detach all clients
+	 *       destroy current monitor struct
+	 *       create new monitor struct 
+	 *       attach all clients to first monitor
+	 *       flag dirty;
+	 *    }
+	 *    return dirty flag to caller
+	 *        if dirty is seen by caller:
+	 *           re-arrange bars/pixmaps
+	 *           arrange()
+	 * #else
+	 *    don't share between XINERAMA and non-XINERAMA handling if it gets
+	 *    too ugly
+	 * #endif
+	 */
 #ifdef XINERAMA
 	XineramaScreenInfo *info = NULL;
 	Bool *flags = NULL;
