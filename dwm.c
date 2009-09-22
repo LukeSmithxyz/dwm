@@ -1769,6 +1769,7 @@ updategeom(void) {
 		else { /* less monitors available */
 			cleanup();
 			setup();
+			scan();
 		}
 		free(unique);
 	}
