@@ -158,7 +158,7 @@ static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
 static void cleanup(void);
-static void cleanupmons(void);
+static void cleanupmon(Monitor *mon);
 static void clearurgent(Client *c);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
@@ -480,22 +480,25 @@ cleanup(void) {
 	XFreeCursor(dpy, cursor[CurNormal]);
 	XFreeCursor(dpy, cursor[CurResize]);
 	XFreeCursor(dpy, cursor[CurMove]);
-	cleanupmons();
+	while(mons)
+		cleanupmon(mons);
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 }
 
 void
-cleanupmons(void) {
+cleanupmon(Monitor *mon) {
 	Monitor *m;
 
-	while(mons) {
-		m = mons->next;
-		XUnmapWindow(dpy, mons->barwin);
-		XDestroyWindow(dpy, mons->barwin);
-		free(mons);
-		mons = m;
+	if(mon == mons)
+		mons = mons->next;
+	else {
+		for(m = mons; m && m->next != mon; m = m->next);
+		m->next = mon->next;
 	}
+	XUnmapWindow(dpy, mon->barwin);
+	XDestroyWindow(dpy, mon->barwin);
+	free(mon);
 }
 
 void
@@ -1727,6 +1730,7 @@ updategeom(void) {
 #ifdef XINERAMA
 	if(XineramaIsActive(dpy)) {
 		int i, j, n, nn;
+		Client *c;
 		Monitor *m;
 		XineramaScreenInfo *info = XineramaQueryScreens(dpy, &nn);
 		XineramaScreenInfo *unique = NULL;
@@ -1755,7 +1759,7 @@ updategeom(void) {
 				    || unique[i].width != m->mw || unique[i].height != m->mh))
 				{
 					dirty = True;
-					m->num = unique[i].screen_number;
+					m->num = i;
 					m->mx = m->wx = unique[i].x_org;
 					m->my = m->wy = unique[i].y_org;
 					m->mw = m->ww = unique[i].width;
@@ -1763,10 +1767,22 @@ updategeom(void) {
 					updatebarpos(m);
 				}
 		}
-		else { /* less monitors available */
-			cleanup();
-			setup();
-			scan();
+		else { /* less monitors available nn < n */
+			for(i = nn; i < n; i++) {
+				for(m = mons; m && m->next; m = m->next);
+				while(m->clients) {
+					dirty = True;
+					c = m->clients;
+					m->clients = c->next;
+					detachstack(c);
+					c->mon = mons;
+					attach(c);
+					attachstack(c);
+				}
+				if(m == selmon)
+					selmon = mons;
+				cleanupmon(m);
+			}
 		}
 		free(unique);
 	}
