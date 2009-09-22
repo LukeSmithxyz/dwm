@@ -121,7 +121,7 @@ typedef struct {
 } Layout;
 
 struct Monitor {
-	const char *ltsymbol;
+	char ltsymbol[16];
 	float mfact;
 	int num;
 	int by;               /* bar geometry */
@@ -386,7 +386,7 @@ arrange(void) {
 		showhide(m->stack);
 	focus(NULL);
 	for(m = mons; m; m = m->next) {
-		m->ltsymbol = m->lt[m->sellt]->symbol;
+		strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
 		if(m->lt[m->sellt]->arrange)
 			m->lt[m->sellt]->arrange(m);
 		restack(m);
@@ -605,7 +605,7 @@ createmon(void) {
 	m->topbar = topbar;
 	m->lt[0] = &layouts[0];
 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
-	m->ltsymbol = layouts[0].symbol;
+	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
 	return m;
 }
 
@@ -1163,17 +1163,14 @@ maprequest(XEvent *e) {
 
 void
 monocle(Monitor *m) {
-	static char ntext[8];
 	unsigned int n = 0;
 	Client *c;
 
 	for(c = m->clients; c; c = c->next)
 		if(ISVISIBLE(c))
 			n++;
-	if(n > 0) { /* override layout symbol */
-		snprintf(ntext, sizeof ntext, "[%d]", n);
-		m->ltsymbol = ntext;
-	}
+	if(n > 0) /* override layout symbol */
+		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
 	for(c = nexttiled(m->clients); c; c = nexttiled(c->next))
 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, False);
 }
