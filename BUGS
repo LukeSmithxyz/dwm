@@ -1,0 +1,31 @@
+18:17 < Biolunar> when i change my resolution in dwm (to a smaller one) and then back to the native, the top bar is not repainted. that's since 5.7.2, in 5.6 it worked fine
+18:19 < Biolunar> is it just happening to me or a (known) bug?
+18:24 < Biolunar> and in addition, mplayers fullscreen is limited to the small resolution after i changed it back to the native
+
+reproducible with xrandr -s but not with --output and --mode, strange
+
+
+> enternotify is handled even when the entered window is already focused
+> (eg moving the mouse to the bar and back, scrolling on the border..)
+	>
+	> focusing might be expensive for some clients (eg dim/light up)
+	>
+	> a possible solution is to modify enternotify:
+	>
+	> +       c = wintoclient(ev->window);
+	>        if((m = wintomon(ev->window)) && m != selmon) {
+		>                unfocus(selmon->sel);
+		>                selmon = m;
+		>        }
+		> +       else if (c == selmon->sel || c == NULL)
+	> +               return;
+
+
+
+> another corner case:
+
+a tiled client can be resized with mod+right click, but it only works
+on the main monitor
+
+dmenu appears on the monitor where the pointer is and not on selmon
+
