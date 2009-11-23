@@ -29,3 +29,9 @@ on the main monitor
 
 dmenu appears on the monitor where the pointer is and not on selmon
 
+
+yet another corner case:
+open a terminal, focus another monitor, but without moving the mouse
+pointer there
+if there is no client on the other monitor to get the focus, then the
+terminal will be unfocused but it will accept input
