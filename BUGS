@@ -35,3 +35,12 @@ open a terminal, focus another monitor, but without moving the mouse
 pointer there
 if there is no client on the other monitor to get the focus, then the
 terminal will be unfocused but it will accept input
+
+
+---
+
+Donald Allen reported this:
+
+starting emacs from dmenu in archlinux results in missing configure of emacs, but mod1-space or mod1-shift-space fix this problem. this problem is new and did not happen in 1.6 xorg servers
+
+Starting emacs from xterm doesnt show this problem, he uses tag 8 for emacs
