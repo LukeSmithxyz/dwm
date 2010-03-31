@@ -41,6 +41,7 @@
 #endif /* XINERAMA */
 
 /* macros */
+#define D                       if(1)
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
@@ -814,8 +815,8 @@ void
 focus(Client *c) {
 	if(!c || !ISVISIBLE(c))
 		for(c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
-	if(selmon->sel)
-		unfocus(selmon->sel);
+//	if(selmon->sel)
+//		unfocus(selmon->sel);
 	if(c) {
 		if(c->mon != selmon)
 			selmon = c->mon;
@@ -1388,12 +1389,27 @@ restack(Monitor *m) {
 void
 run(void) {
 	XEvent ev;
-
+	static const char *evname[LASTEvent] = {
+		[ButtonPress] = "buttonpress",
+		[ConfigureRequest] = "configurerequest",
+		[ConfigureNotify] = "configurenotify",
+		[DestroyNotify] = "destroynotify",
+		[EnterNotify] = "enternotify",
+		[Expose] = "expose",
+		[FocusIn] = "focusin",
+		[KeyPress] = "keypress",
+		[MappingNotify] = "mappingnotify",
+		[MapRequest] = "maprequest",
+		[PropertyNotify] = "propertynotify",
+		[UnmapNotify] = "unmapnotify"
+	};
 	/* main event loop */
 	XSync(dpy, False);
-	while(running && !XNextEvent(dpy, &ev))
+	while(running && !XNextEvent(dpy, &ev)) {
+		D fprintf(stderr, "run event %s\n", evname[ev.type]);
 		if(handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
+	}
 }
 
 void
