@@ -815,8 +815,12 @@ void
 focus(Client *c) {
 	if(!c || !ISVISIBLE(c))
 		for(c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
-/*	if(selmon->sel)
-		unfocus(selmon->sel);*/
+	if(c && c == selmon->sel) {
+		D fprintf(stderr, "focus, optimising focus away\n");
+		return;
+	}
+	if(selmon->sel)
+		unfocus(selmon->sel);
 	if(c) {
 		if(c->mon != selmon)
 			selmon = c->mon;
@@ -848,7 +852,8 @@ focusmon(const Arg *arg) {
 
 	if(!mons->next)
 		return;
-	m = dirtomon(arg->i);
+	if((m = dirtomon(arg->i)) == selmon)
+		return;
 	unfocus(selmon->sel);
 	selmon = m;
 	focus(NULL);
@@ -1406,7 +1411,7 @@ run(void) {
 	/* main event loop */
 	XSync(dpy, False);
 	while(running && !XNextEvent(dpy, &ev)) {
-		D fprintf(stderr, "run event %s\n", evname[ev.type]);
+		D fprintf(stderr, "run event %s %ld\n", evname[ev.type], ev.xany.window);
 		if(handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
 	}
