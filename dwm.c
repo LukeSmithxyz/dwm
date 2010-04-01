@@ -815,10 +815,6 @@ void
 focus(Client *c) {
 	if(!c || !ISVISIBLE(c))
 		for(c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
-	if(c && c == selmon->sel) {
-		D fprintf(stderr, "focus, optimising focus away\n");
-		return;
-	}
 	if(selmon->sel)
 		unfocus(selmon->sel);
 	if(c) {
