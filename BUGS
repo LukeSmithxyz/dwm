@@ -74,3 +74,24 @@ SDL seems to not like non-reparenting WMs:
 Patching SDL, bugging them?
 
 ---
+
+voltaic reports this:
+
+When I use two monitors, one larger in resolution than the other, the
+bar is drawn using the smaller x-dimension on both screens. I think
+what's happening is that there are two bars drawn, but the short bar
+is always on top of the long bar such that I can't see the information
+under the short bar. If I switch to the small screen, hide the short
+bar, and then switch to the large screen, the long bar is drawn
+correctly.
+
+A similar problem occurs when I have started dwm on a small resolution
+monitor (laptop screen) and then I switch to a large external display.
+When I do this, the bar itself is drawn for the original smaller
+resolution, but the information to be printed on the bar is
+right-aligned for a longer bar. So what I see is a bar that has the
+right hand side of it cut-off. See attached screenshot.
+
+I am using standard options for xrandr such as --output VGA1 --auto, etc.
+
+---
