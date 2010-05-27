@@ -41,7 +41,6 @@
 #endif /* XINERAMA */
 
 /* macros */
-#define D                       if(1)
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask))
 #define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
@@ -58,7 +57,8 @@
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
-enum { NetSupported, NetWMName, NetLast };              /* EWMH atoms */
+enum { NetSupported, NetWMName, NetWMState,
+       NetWMFullscreen, NetLast };                      /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMLast };        /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
@@ -162,6 +162,7 @@ static void checkotherwm(void);
 static void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clearurgent(Client *c);
+static void clientmessage(XEvent *e);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
@@ -250,6 +251,7 @@ static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
+	[ClientMessage] = clientmessage,
 	[ConfigureRequest] = configurerequest,
 	[ConfigureNotify] = configurenotify,
 	[DestroyNotify] = destroynotify,
@@ -1293,6 +1295,20 @@ propertynotify(XEvent *e) {
 }
 
 void
+clientmessage(XEvent *e) {
+	XClientMessageEvent *cme = &e->xclient;
+
+	if(cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]) {
+		if(cme->data.l[0])
+			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
+			                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+		else
+			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
+			                PropModeReplace, (unsigned char*)0, 0);
+	}
+}
+
+void
 quit(const Arg *arg) {
 	running = False;
 }
@@ -1392,6 +1408,7 @@ run(void) {
 	XEvent ev;
 	static const char *evname[LASTEvent] = {
 		[ButtonPress] = "buttonpress",
+		[ClientMessage] = "clientmessage",
 		[ConfigureRequest] = "configurerequest",
 		[ConfigureNotify] = "configurenotify",
 		[DestroyNotify] = "destroynotify",
@@ -1407,7 +1424,6 @@ run(void) {
 	/* main event loop */
 	XSync(dpy, False);
 	while(running && !XNextEvent(dpy, &ev)) {
-		D fprintf(stderr, "run event %s %ld\n", evname[ev.type], ev.xany.window);
 		if(handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
 	}
@@ -1510,6 +1526,8 @@ setup(void) {
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+	netatom[NetWMState] = XInternAtom(dpy, "_NET_WM_STATE", False);
+	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
