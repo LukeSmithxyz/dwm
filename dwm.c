@@ -1406,21 +1406,6 @@ restack(Monitor *m) {
 void
 run(void) {
 	XEvent ev;
-	static const char *evname[LASTEvent] = {
-		[ButtonPress] = "buttonpress",
-		[ClientMessage] = "clientmessage",
-		[ConfigureRequest] = "configurerequest",
-		[ConfigureNotify] = "configurenotify",
-		[DestroyNotify] = "destroynotify",
-		[EnterNotify] = "enternotify",
-		[Expose] = "expose",
-		[FocusIn] = "focusin",
-		[KeyPress] = "keypress",
-		[MappingNotify] = "mappingnotify",
-		[MapRequest] = "maprequest",
-		[PropertyNotify] = "propertynotify",
-		[UnmapNotify] = "unmapnotify"
-	};
 	/* main event loop */
 	XSync(dpy, False);
 	while(running && !XNextEvent(dpy, &ev)) {
@@ -2036,7 +2021,7 @@ zoom(const Arg *arg) {
 int
 main(int argc, char *argv[]) {
 	if(argc == 2 && !strcmp("-v", argv[1]))
-		die("dwm-"VERSION", © 2006-2009 dwm engineers, see LICENSE for details\n");
+		die("dwm-"VERSION", © 2006-2010 dwm engineers, see LICENSE for details\n");
 	else if(argc != 1)
 		die("usage: dwm [-v]\n");
 	if(!setlocale(LC_CTYPE, "") || !XSupportsLocale())
