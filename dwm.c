@@ -1791,7 +1791,6 @@ updategeom(void) {
 		XineramaScreenInfo *info = XineramaQueryScreens(dpy, &nn);
 		XineramaScreenInfo *unique = NULL;
 
-		info = XineramaQueryScreens(dpy, &nn);
 		for(n = 0, m = mons; m; m = m->next, n++);
 		/* only consider unique geometries as separate screens */
 		if(!(unique = (XineramaScreenInfo *)malloc(sizeof(XineramaScreenInfo) * nn)))
