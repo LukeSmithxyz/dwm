@@ -799,7 +799,7 @@ enternotify(XEvent *e) {
 		unfocus(selmon->sel, True);
 		selmon = m;
 	}
-	focus(wintoclient(ev->window));
+	focus((wintoclient(ev->window)));
 }
 
 void
