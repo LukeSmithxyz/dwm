@@ -25,13 +25,6 @@ reproducible with xrandr -s but not with --output and --mode, strange
 
 ---
 
-> another corner case:
-
-a tiled client can be resized with mod+right click, but it only works
-on the main monitor
-
----
-
 dmenu appears on the monitor where the pointer is and not on selmon
 
 ---
