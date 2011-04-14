@@ -58,7 +58,7 @@
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetWMState,
-       NetWMFullscreen, NetLast };                      /* EWMH atoms */
+       NetWMFullscreen, NetActiveWindow, NetLast };     /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
@@ -1259,11 +1259,11 @@ propertynotify(XEvent *e) {
 void
 clientmessage(XEvent *e) {
 	XClientMessageEvent *cme = &e->xclient;
-	Client *c;
+	Client *c = wintoclient(cme->window);
 
-	if((c = wintoclient(cme->window))
-	&& (cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]))
-	{
+	if(!c)
+		return;
+	if(cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]) {
 		if(cme->data.l[0]) {
 			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
 			                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
@@ -1286,6 +1286,16 @@ clientmessage(XEvent *e) {
 			resizeclient(c, c->x, c->y, c->w, c->h);
 			arrange(c->mon);
 		}
+	}
+	else if(cme->message_type == netatom[NetActiveWindow]) {
+		if(!ISVISIBLE(c)) {
+			Arg a = { .ui = c->tags };
+			view(&a); 
+		}
+		detach(c);
+		attach(c);
+		focus(c);
+		arrange(c->mon);
 	}
 }
 
@@ -1460,7 +1470,7 @@ sendevent(Client *c, Atom proto) {
 			exists = protocols[n] == proto;
 		XFree(protocols);
 	}
-	if (exists) {
+	if(exists) {
 		ev.type = ClientMessage;
 		ev.xclient.window = c->win;
 		ev.xclient.message_type = wmatom[WMProtocols];
@@ -1474,7 +1484,7 @@ sendevent(Client *c, Atom proto) {
 
 void
 setfocus(Client *c) {
-	if (!c->neverfocus)
+	if(!c->neverfocus)
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	sendevent(c, wmatom[WMTakeFocus]);
 }
@@ -1525,6 +1535,7 @@ setup(void) {
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
 	wmatom[WMState] = XInternAtom(dpy, "WM_STATE", False);
+        netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
 	wmatom[WMTakeFocus] = XInternAtom(dpy, "WM_TAKE_FOCUS", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
@@ -1942,8 +1953,10 @@ updatewmhints(Client *c) {
 		}
 		else
 			c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
-		if (wmh->flags & InputHint) c->neverfocus = !wmh->input;
-		else                        c->neverfocus = False;
+		if(wmh->flags & InputHint)
+			c->neverfocus = !wmh->input;
+		else
+			c->neverfocus = False;
 		XFree(wmh);
 	}
 }
