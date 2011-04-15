@@ -521,6 +521,46 @@ clearurgent(Client *c) {
 }
 
 void
+clientmessage(XEvent *e) {
+	XClientMessageEvent *cme = &e->xclient;
+	Client *c = wintoclient(cme->window);
+
+	if(!c)
+		return;
+	if(cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]) {
+		if(cme->data.l[0]) {
+			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
+			                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+			c->oldstate = c->isfloating;
+			c->oldbw = c->bw;
+			c->bw = 0;
+			c->isfloating = True;
+			resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
+			XRaiseWindow(dpy, c->win);
+		}
+		else {
+			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
+			                PropModeReplace, (unsigned char*)0, 0);
+			c->isfloating = c->oldstate;
+			c->bw = c->oldbw;
+			c->x = c->oldx;
+			c->y = c->oldy;
+			c->w = c->oldw;
+			c->h = c->oldh;
+			resizeclient(c, c->x, c->y, c->w, c->h);
+			arrange(c->mon);
+		}
+	}
+	else if(cme->message_type == netatom[NetActiveWindow]) {
+		if(!ISVISIBLE(c)) {
+			c->mon->seltags ^= 1;                                   
+			c->mon->tagset[c->mon->seltags] = c->tags;   
+		}
+		pop(c);
+	}
+}
+
+void
 configure(Client *c) {
 	XConfigureEvent ce;
 
@@ -1212,14 +1252,12 @@ nexttiled(Client *c) {
 	return c;
 }
 
-Monitor *
-ptrtomon(int x, int y) {
-	Monitor *m;
-
-	for(m = mons; m; m = m->next)
-		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
-			return m;
-	return selmon;
+void
+pop(Client *c) {
+	detach(c);
+	attach(c);
+	focus(c);
+	arrange(c->mon);
 }
 
 void
@@ -1256,49 +1294,15 @@ propertynotify(XEvent *e) {
 	}
 }
 
-void
-clientmessage(XEvent *e) {
-	XClientMessageEvent *cme = &e->xclient;
-	Client *c = wintoclient(cme->window);
+Monitor *
+ptrtomon(int x, int y) {
+	Monitor *m;
 
-	if(!c)
-		return;
-	if(cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]) {
-		if(cme->data.l[0]) {
-			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
-			                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
-			c->oldstate = c->isfloating;
-			c->oldbw = c->bw;
-			c->bw = 0;
-			c->isfloating = True;
-			resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
-			XRaiseWindow(dpy, c->win);
-		}
-		else {
-			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
-			                PropModeReplace, (unsigned char*)0, 0);
-			c->isfloating = c->oldstate;
-			c->bw = c->oldbw;
-			c->x = c->oldx;
-			c->y = c->oldy;
-			c->w = c->oldw;
-			c->h = c->oldh;
-			resizeclient(c, c->x, c->y, c->w, c->h);
-			arrange(c->mon);
-		}
-	}
-	else if(cme->message_type == netatom[NetActiveWindow]) {
-		if(!ISVISIBLE(c)) {
-			Arg a = { .ui = c->tags };
-			view(&a); 
-		}
-		detach(c);
-		attach(c);
-		focus(c);
-		arrange(c->mon);
-	}
+	for(m = mons; m; m = m->next)
+		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
+			return m;
+	return selmon;
 }
-
 void
 quit(const Arg *arg) {
 	running = False;
@@ -2043,10 +2047,7 @@ zoom(const Arg *arg) {
 	if(c == nexttiled(selmon->clients))
 		if(!c || !(c = nexttiled(c->next)))
 			return;
-	detach(c);
-	attach(c);
-	focus(c);
-	arrange(c->mon);
+	pop(c);
 }
 
 int
