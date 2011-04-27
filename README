@@ -43,7 +43,8 @@ like this in your .xinitrc:
         xsetroot -name "`date` `uptime | sed 's/.*,//'`"
         sleep 1
     done &
-    exec dwm
+    dwm
+    kill $!
 
 
 Configuration
