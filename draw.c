@@ -126,13 +126,13 @@ loadfont(DC *dc, const char *fontstr) {
 
 	if(!*fontstr)
 		return False;
-	if((dc->font.set = XCreateFontSet(dc->dpy, fontstr, &missing, &n, &def))) {
+	if((dc->font.set = XCreateFontSet(dc->dpy, fontstr, &missing, &n, &def)))
 		n = XFontsOfFontSet(dc->font.set, &xfonts, &names);
-	}
-	else {
-		dc->font.xfont = XLoadQueryFont(dc->dpy, fontstr);
+	else if((dc->font.xfont = XLoadQueryFont(dc->dpy, fontstr)))
 		xfonts = &dc->font.xfont;
-	}
+	else
+		n = 0;
+
 	for(i = 0; i < n; i++) {
 		dc->font.ascent  = MAX(dc->font.ascent,  xfonts[i]->ascent);
 		dc->font.descent = MAX(dc->font.descent, xfonts[i]->descent);
