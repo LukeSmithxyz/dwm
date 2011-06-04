@@ -781,7 +781,7 @@ void
 drawsquare(Bool filled, Bool empty, Bool invert, unsigned long col[ColLast]) {
 	int x;
 
-	XSetForeground(dpy, dc.gc, col[invert ? ColFG : ColBG]);
+	XSetForeground(dpy, dc.gc, col[invert ? ColBG : ColFG]);
 	x = (dc.font.ascent + dc.font.descent + 2) / 4;
 	if(filled)
 		XFillRectangle(dpy, dc.drawable, dc.gc, dc.x+1, dc.y+1, x+1, x+1);
