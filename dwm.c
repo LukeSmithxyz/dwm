@@ -585,11 +585,13 @@ void
 configurenotify(XEvent *e) {
 	Monitor *m;
 	XConfigureEvent *ev = &e->xconfigure;
+	Bool dirty;
 
 	if(ev->window == root) {
+		dirty = (sw != ev->width);
 		sw = ev->width;
 		sh = ev->height;
-		if(updategeom()) {
+		if(updategeom() || dirty) {
 			if(dc.drawable != 0)
 				XFreePixmap(dpy, dc.drawable);
 			dc.drawable = XCreatePixmap(dpy, root, sw, bh, DefaultDepth(dpy, screen));
