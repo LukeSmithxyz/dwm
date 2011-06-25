@@ -8,27 +8,6 @@ reproducible with xrandr -s but not with --output and --mode, strange
 
 ---
 
-> enternotify is handled even when the entered window is already focused
-> (eg moving the mouse to the bar and back, scrolling on the border..)
->
-> focusing might be expensive for some clients (eg dim/light up)
->
-> a possible solution is to modify enternotify:
->
-> +       c = wintoclient(ev->window);
->        if((m = wintomon(ev->window)) && m != selmon) {
->                unfocus(selmon->sel);
->                selmon = m;
->        }
-> +       else if (c == selmon->sel || c == NULL)
-> +               return;
-
----
-
-dmenu appears on the monitor where the pointer is and not on selmon
-
----
-
 yet another corner case:
 open a terminal, focus another monitor, but without moving the mouse
 pointer there

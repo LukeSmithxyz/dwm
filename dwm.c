@@ -820,15 +820,19 @@ drawtext(const char *text, unsigned long col[ColLast], Bool invert) {
 
 void
 enternotify(XEvent *e) {
+	Client *c;
 	Monitor *m;
 	XCrossingEvent *ev = &e->xcrossing;
 
 	if((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
 		return;
+	c = wintoclient(ev->window);
 	if((m = wintomon(ev->window)) && m != selmon) {
 		unfocus(selmon->sel, True);
 		selmon = m;
 	}
+	else if(c == selmon->sel || c == NULL)
+		return;
 	focus((wintoclient(ev->window)));
 }
 
