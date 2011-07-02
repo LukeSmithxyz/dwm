@@ -529,7 +529,7 @@ clientmessage(XEvent *e) {
 	if(!c)
 		return;
 	if(cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]) {
-		if(cme->data.l[0]) {
+		if(cme->data.l[0] && !c->isfullscreen) {
 			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
 			                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
 			c->isfullscreen = True;
