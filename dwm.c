@@ -1112,8 +1112,8 @@ manage(Window w, XWindowAttributes *wa) {
 		applyrules(c);
 	}
 	/* geometry */
-	c->x = c->oldx = wa->x + c->mon->wx;
-	c->y = c->oldy = wa->y + c->mon->wy;
+	c->x = c->oldx = wa->x;
+	c->y = c->oldy = wa->y;
 	c->w = c->oldw = wa->width;
 	c->h = c->oldh = wa->height;
 	c->oldbw = wa->border_width;
