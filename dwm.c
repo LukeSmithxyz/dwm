@@ -615,14 +615,22 @@ configurerequest(XEvent *e) {
 			c->bw = ev->border_width;
 		else if(c->isfloating || !selmon->lt[selmon->sellt]->arrange) {
 			m = c->mon;
-			if(ev->value_mask & CWX)
+			if(ev->value_mask & CWX) {
+				c->oldx = c->x;
 				c->x = m->mx + ev->x;
-			if(ev->value_mask & CWY)
+			}
+			if(ev->value_mask & CWY) {
+				c->oldy = c->y;
 				c->y = m->my + ev->y;
-			if(ev->value_mask & CWWidth)
+			}
+			if(ev->value_mask & CWWidth) {
+				c->oldw = c->w;
 				c->w = ev->width;
-			if(ev->value_mask & CWHeight)
+			}
+			if(ev->value_mask & CWHeight) {
+				c->oldh = c->h;
 				c->h = ev->height;
+			}
 			if((c->x + c->w) > m->mx + m->mw && c->isfloating)
 				c->x = m->mx + (m->mw / 2 - c->w / 2); /* center in x direction */
 			if((c->y + c->h) > m->my + m->mh && c->isfloating)
