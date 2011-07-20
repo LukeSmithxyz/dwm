@@ -40,7 +40,7 @@ like this in your .xinitrc:
 
     while xsetroot -name "`date` `uptime | sed 's/.*,//'`"
     do
-    	sleep 20
+    	sleep 1
     done &
     exec dwm
 
