@@ -1662,9 +1662,9 @@ tile(Monitor *m) {
 	if(--n == 0)
 		return;
 	/* tile stack */
-	x = (m->wx + mw > c->x + c->w) ? c->x + c->w + 2 * c->bw : m->wx + mw;
+	x = (m->wx > c->x) ? c->x + mw + 2 * c->bw : m->wx + mw;
 	y = m->wy;
-	w = (m->wx + mw > c->x + c->w) ? m->wx + m->ww - x : m->ww - mw;
+	w = (m->wx > c->x) ? m->wx + m->ww - x : m->ww - mw;
 	h = m->wh / n;
 	if(h < bh)
 		h = m->wh;
