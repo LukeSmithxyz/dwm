@@ -1127,6 +1127,7 @@ manage(Window w, XWindowAttributes *wa) {
 	c->h = c->oldh = wa->height;
 	c->oldbw = wa->border_width;
 	if(c->w == c->mon->mw && c->h == c->mon->mh) {
+		c->isfloating = True; // regression with flash, XXXX
 		c->x = c->mon->mx;
 		c->y = c->mon->my;
 		c->bw = 0;
