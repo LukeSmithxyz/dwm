@@ -433,9 +433,9 @@ buttonpress(XEvent *e) {
 	}
 	if(ev->window == selmon->barwin) {
 		i = x = 0;
-		do {
+		do
 			x += TEXTW(tags[i]);
-		} while(ev->x >= x && ++i < LENGTH(tags));
+		while(ev->x >= x && ++i < LENGTH(tags));
 		if(i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
@@ -720,12 +720,10 @@ dirtomon(int dir) {
 		if(!(m = selmon->next))
 			m = mons;
 	}
-	else {
-		if(selmon == mons)
-			for(m = mons; m->next; m = m->next);
-		else
-			for(m = mons; m->next != selmon; m = m->next);
-	}
+	else if(selmon == mons)
+		for(m = mons; m->next; m = m->next);
+	else
+		for(m = mons; m->next != selmon; m = m->next);
 	return m;
 }
 
@@ -1017,12 +1015,11 @@ grabkeys(void) {
 		KeyCode code;
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for(i = 0; i < LENGTH(keys); i++) {
+		for(i = 0; i < LENGTH(keys); i++)
 			if((code = XKeysymToKeycode(dpy, keys[i].keysym)))
 				for(j = 0; j < LENGTH(modifiers); j++)
 					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
 						 True, GrabModeAsync, GrabModeAsync);
-		}
 	}
 }
 
@@ -1031,7 +1028,6 @@ initfont(const char *fontstr) {
 	char *def, **missing;
 	int n;
 
-	missing = NULL;
 	dc.font.set = XCreateFontSet(dpy, fontstr, &missing, &n, &def);
 	if(missing) {
 		while(n--)
@@ -1311,6 +1307,7 @@ ptrtomon(int x, int y) {
 			return m;
 	return selmon;
 }
+
 void
 quit(const Arg *arg) {
 	running = False;
@@ -1415,10 +1412,9 @@ run(void) {
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
-	while(running && !XNextEvent(dpy, &ev)) {
+	while(running && !XNextEvent(dpy, &ev))
 		if(handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
-	}
 }
 
 void
