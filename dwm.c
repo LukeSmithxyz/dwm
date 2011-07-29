@@ -389,7 +389,6 @@ arrange(Monitor *m) {
 		showhide(m->stack);
 	else for(m = mons; m; m = m->next)
 		showhide(m->stack);
-	focus(NULL);
 	if(m)
 		arrangemon(m);
 	else for(m = mons; m; m = m->next)
@@ -598,6 +597,7 @@ configurenotify(XEvent *e) {
 			updatebars();
 			for(m = mons; m; m = m->next)
 				XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+			focus(NULL);
 			arrange(NULL);
 		}
 	}
@@ -1154,9 +1154,13 @@ manage(Window w, XWindowAttributes *wa) {
 	attach(c);
 	attachstack(c);
 	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
-	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
+	if (c->mon == selmon)
+		unfocus(selmon->sel, False);
+	c->mon->sel = c;
 	arrange(c->mon);
+	XMapWindow(dpy, c->win);
+	focus(NULL);
 }
 
 void
@@ -1621,6 +1625,7 @@ void
 tag(const Arg *arg) {
 	if(selmon->sel && arg->ui & TAGMASK) {
 		selmon->sel->tags = arg->ui & TAGMASK;
+		focus(NULL);
 		arrange(selmon);
 	}
 }
@@ -1701,6 +1706,7 @@ toggletag(const Arg *arg) {
 	newtags = selmon->sel->tags ^ (arg->ui & TAGMASK);
 	if(newtags) {
 		selmon->sel->tags = newtags;
+		focus(NULL);
 		arrange(selmon);
 	}
 }
@@ -1711,6 +1717,7 @@ toggleview(const Arg *arg) {
 
 	if(newtagset) {
 		selmon->tagset[selmon->seltags] = newtagset;
+		focus(NULL);
 		arrange(selmon);
 	}
 }
@@ -1976,6 +1983,7 @@ view(const Arg *arg) {
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if(arg->ui & TAGMASK)
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+	focus(NULL);
 	arrange(selmon);
 }
 
