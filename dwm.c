@@ -1761,8 +1761,12 @@ unmapnotify(XEvent *e) {
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
-	if((c = wintoclient(ev->window)))
-		unmanage(c, False);
+	if((c = wintoclient(ev->window))) {
+		if(ev->send_event)
+			setclientstate(c, WithdrawnState);
+		else
+			unmanage(c, False);
+	}
 }
 
 void
