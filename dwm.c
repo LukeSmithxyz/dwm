@@ -349,7 +349,7 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 		*h = bh;
 	if(*w < bh)
 		*w = bh;
-	if(resizehints || c->isfloating) {
+	if(resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange) {
 		/* see last two sentences in ICCCM 4.1.2.3 */
 		baseismin = c->basew == c->minw && c->baseh == c->minh;
 		if(!baseismin) { /* temporarily remove base dimensions */
