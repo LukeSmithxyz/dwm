@@ -125,6 +125,7 @@ typedef struct {
 struct Monitor {
 	char ltsymbol[16];
 	float mfact;
+	int nmaster;
 	int num;
 	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
@@ -189,6 +190,7 @@ static long getstate(Window w);
 static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, Bool focused);
 static void grabkeys(void);
+static void incnmaster(const Arg *arg);
 static void initfont(const char *fontstr);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
@@ -664,6 +666,7 @@ createmon(void) {
 		die("fatal: could not malloc() %u bytes\n", sizeof(Monitor));
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
+	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
 	m->lt[0] = &layouts[0];
@@ -1021,6 +1024,12 @@ grabkeys(void) {
 					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
 						 True, GrabModeAsync, GrabModeAsync);
 	}
+}
+
+void
+incnmaster(const Arg *arg) {
+	selmon->nmaster = MAX(selmon->nmaster + arg->i, 1);
+	arrange(selmon);
 }
 
 void
@@ -1650,32 +1659,23 @@ textnw(const char *text, unsigned int len) {
 
 void
 tile(Monitor *m) {
-	int x, y, h, w, mw;
-	unsigned int i, n;
+	unsigned int i, n, mw, mh, tw, th;
 	Client *c;
 
 	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if(n == 0)
 		return;
-	/* master */
-	c = nexttiled(m->clients);
-	mw = m->mfact * m->ww;
-	resize(c, m->wx, m->wy, (n == 1 ? m->ww : mw) - 2 * c->bw, m->wh - 2 * c->bw, False);
-	if(--n == 0)
-		return;
-	/* tile stack */
-	x = (m->wx > c->x) ? c->x + mw + 2 * c->bw : m->wx + mw;
-	y = m->wy;
-	w = (m->wx > c->x) ? m->wx + m->ww - x : m->ww - mw;
-	h = m->wh / n;
-	if(h < bh)
-		h = m->wh;
-	for(i = 0, c = nexttiled(c->next); c; c = nexttiled(c->next), i++) {
-		resize(c, x, y, w - 2 * c->bw, /* remainder */ ((i + 1 == n)
-		       ? m->wy + m->wh - y - 2 * c->bw : h - 2 * c->bw), False);
-		if(h != m->wh)
-			y = c->y + HEIGHT(c);
-	}
+
+	mh = (n > m->nmaster) ? m->wh / m->nmaster : m->wh / n;
+	mw = (n > m->nmaster) ? m->ww * m->mfact : m->ww;
+	th = (n > m->nmaster) ? m->wh / (n - m->nmaster) : 0;
+	tw = m->ww - mw;
+
+	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+		if(i < m->nmaster)
+			resize(c, m->wx, m->wy + (i*mh), mw - (2*c->bw), mh - (2*c->bw), False);
+		else
+			resize(c, m->wx + mw, m->wy + ((i - m->nmaster)*th), tw - (2*c->bw), th - (2*c->bw), False);
 }
 
 void
