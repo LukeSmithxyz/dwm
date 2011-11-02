@@ -58,7 +58,8 @@
 enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
 enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
 enum { NetSupported, NetWMName, NetWMState,
-       NetWMFullscreen, NetActiveWindow, NetLast };     /* EWMH atoms */
+       NetWMFullscreen, NetActiveWindow, NetWMWindowType,
+       NetWMWindowTypeDialog, NetLast };     /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
@@ -237,6 +238,7 @@ static void updatebars(void);
 static void updatenumlockmask(void);
 static void updatesizehints(Client *c);
 static void updatestatus(void);
+static void updatewindowtype(Client *c);
 static void updatetitle(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
@@ -1152,6 +1154,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
 	configure(c); /* propagates border_width, if size doesn't change */
+	updatewindowtype(c);
 	updatesizehints(c);
 	updatewmhints(c);
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
@@ -1308,6 +1311,8 @@ propertynotify(XEvent *e) {
 			if(c == c->mon->sel)
 				drawbar(c->mon);
 		}
+		if(ev->atom == netatom[NetWMWindowType])
+			updatewindowtype(c);
 	}
 }
 
@@ -1562,6 +1567,8 @@ setup(void) {
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
 	netatom[NetWMState] = XInternAtom(dpy, "_NET_WM_STATE", False);
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
+	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
+	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	/* init cursors */
 	cursor[CurNormal] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursor[CurResize] = XCreateFontCursor(dpy, XC_sizing);
@@ -1964,6 +1971,25 @@ updatestatus(void) {
 	if(!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
 		strcpy(stext, "dwm-"VERSION);
 	drawbar(selmon);
+}
+
+void
+updatewindowtype(Client *c)
+{
+	Atom wtype, real;
+	int format;
+	unsigned long n, extra;
+	unsigned char *p = NULL;
+
+	if(XGetWindowProperty(dpy, c->win, netatom[NetWMWindowType], 0L,
+	                      sizeof(Atom), False, XA_ATOM, &real, &format,
+	                      &n, &extra, (unsigned char **)&p) == Success && p) {
+		wtype = *(Atom *)p;
+		XFree(p);
+
+		if(wtype == netatom[NetWMWindowTypeDialog])
+			c->isfloating = True;
+	}
 }
 
 void
