@@ -340,14 +340,14 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
 			*y = 0;
 	}
 	else {
-		if(*x > m->mx + m->mw)
-			*x = m->mx + m->mw - WIDTH(c);
-		if(*y > m->my + m->mh)
-			*y = m->my + m->mh - HEIGHT(c);
-		if(*x + *w + 2 * c->bw < m->mx)
-			*x = m->mx;
-		if(*y + *h + 2 * c->bw < m->my)
-			*y = m->my;
+		if(*x >= m->wx + m->ww)
+			*x = m->wx + m->ww - WIDTH(c);
+		if(*y >= m->wy + m->wh)
+			*y = m->wy + m->wh - HEIGHT(c);
+		if(*x + *w + 2 * c->bw <= m->wx)
+			*x = m->wx;
+		if(*y + *h + 2 * c->bw <= m->wy)
+			*y = m->wy;
 	}
 	if(*h < bh)
 		*h = bh;
@@ -1146,7 +1146,7 @@ manage(Window w, XWindowAttributes *wa) {
 			c->y = c->mon->my + c->mon->mh - HEIGHT(c);
 		c->x = MAX(c->x, c->mon->mx);
 		/* only fix client y-offset, if the client center might cover the bar */
-		c->y = MAX(c->y, ((c->mon->by == 0) && (c->x + (c->w / 2) >= c->mon->wx)
+		c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
 		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
 		c->bw = borderpx;
 	}
