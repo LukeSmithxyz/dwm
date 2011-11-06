@@ -43,7 +43,8 @@
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask) & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
-#define INRECT(X,Y,RX,RY,RW,RH) ((X) >= (RX) && (X) < (RX) + (RW) && (Y) >= (RY) && (Y) < (RY) + (RH))
+#define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
+                               * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
@@ -203,8 +204,8 @@ static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *);
 static void propertynotify(XEvent *e);
-static Monitor *ptrtomon(int x, int y);
 static void quit(const Arg *arg);
+static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, Bool interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
@@ -1248,7 +1249,7 @@ movemouse(const Arg *arg) {
 		}
 	} while(ev.type != ButtonRelease);
 	XUngrabPointer(dpy, CurrentTime);
-	if((m = ptrtomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
+	if((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -1305,19 +1306,22 @@ propertynotify(XEvent *e) {
 	}
 }
 
-Monitor *
-ptrtomon(int x, int y) {
-	Monitor *m;
-
-	for(m = mons; m; m = m->next)
-		if(INRECT(x, y, m->wx, m->wy, m->ww, m->wh))
-			return m;
-	return selmon;
-}
-
 void
 quit(const Arg *arg) {
 	running = False;
+}
+
+Monitor *
+recttomon(int x, int y, int w, int h) {
+	Monitor *m, *r = selmon;
+	int a, area = 0;
+
+	for(m = mons; m; m = m->next)
+		if((a = INTERSECT(x, y, w, h, m)) > area) {
+			area = a;
+			r = m;
+		}
+	return r;
 }
 
 void
@@ -1383,7 +1387,7 @@ resizemouse(const Arg *arg) {
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-	if((m = ptrtomon(c->x + c->w / 2, c->y + c->h / 2)) != selmon) {
+	if((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
@@ -2051,7 +2055,7 @@ wintomon(Window w) {
 	Monitor *m;
 
 	if(w == root && getrootptr(&x, &y))
-		return ptrtomon(x, y);
+		return recttomon(x, y, 1, 1);
 	for(m = mons; m; m = m->next)
 		if(w == m->barwin)
 			return m;
