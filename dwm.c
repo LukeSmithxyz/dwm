@@ -215,6 +215,7 @@ static Bool sendevent(Client *c, Atom proto);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
+static void setfullscreen(Client *c, Bool fullscreen);
 static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
@@ -531,31 +532,10 @@ clientmessage(XEvent *e) {
 
 	if(!c)
 		return;
-	if(cme->message_type == netatom[NetWMState] && cme->data.l[1] == netatom[NetWMFullscreen]) {
-		if(cme->data.l[0] && !c->isfullscreen) {
-			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
-			                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
-			c->isfullscreen = True;
-			c->oldstate = c->isfloating;
-			c->oldbw = c->bw;
-			c->bw = 0;
-			c->isfloating = True;
-			resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
-			XRaiseWindow(dpy, c->win);
-		}
-		else {
-			XChangeProperty(dpy, cme->window, netatom[NetWMState], XA_ATOM, 32,
-			                PropModeReplace, (unsigned char*)0, 0);
-			c->isfullscreen = False;
-			c->isfloating = c->oldstate;
-			c->bw = c->oldbw;
-			c->x = c->oldx;
-			c->y = c->oldy;
-			c->w = c->oldw;
-			c->h = c->oldh;
-			resizeclient(c, c->x, c->y, c->w, c->h);
-			arrange(c->mon);
-		}
+	if(cme->message_type == netatom[NetWMState]) {
+		if(cme->data.l[1] == netatom[NetWMFullscreen] || cme->data.l[2] == netatom[NetWMFullscreen])
+			setfullscreen(c, (cme->data.l[0] == 1 /* _NET_WM_STATE_ADD    */
+			              || (cme->data.l[0] == 2 /* _NET_WM_STATE_TOGGLE */ && !c->isfullscreen)));
 	}
 	else if(cme->message_type == netatom[NetActiveWindow]) {
 		if(!ISVISIBLE(c)) {
@@ -928,6 +908,21 @@ focusstack(const Arg *arg) {
 	}
 }
 
+Atom
+getatomprop(Client *c, Atom prop) {
+	int di;
+	unsigned long dl;
+	unsigned char *p = NULL;
+	Atom da, atom = None;
+
+	if(XGetWindowProperty(dpy, c->win, prop, 0L, sizeof atom, False, XA_ATOM,
+	                      &da, &di, &dl, &dl, &p) == Success && p) {
+		atom = *(Atom *)p;
+		XFree(p);
+	}
+	return atom;
+}
+
 unsigned long
 getcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
@@ -1133,23 +1128,17 @@ manage(Window w, XWindowAttributes *wa) {
 	c->w = c->oldw = wa->width;
 	c->h = c->oldh = wa->height;
 	c->oldbw = wa->border_width;
-	if(c->w == c->mon->mw && c->h == c->mon->mh) {
-		c->isfloating = True; // regression with flash, XXXX
-		c->x = c->mon->mx;
-		c->y = c->mon->my;
-		c->bw = 0;
-	}
-	else {
-		if(c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
-			c->x = c->mon->mx + c->mon->mw - WIDTH(c);
-		if(c->y + HEIGHT(c) > c->mon->my + c->mon->mh)
-			c->y = c->mon->my + c->mon->mh - HEIGHT(c);
-		c->x = MAX(c->x, c->mon->mx);
-		/* only fix client y-offset, if the client center might cover the bar */
-		c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
-		           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
-		c->bw = borderpx;
-	}
+
+	if(c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
+		c->x = c->mon->mx + c->mon->mw - WIDTH(c);
+	if(c->y + HEIGHT(c) > c->mon->my + c->mon->mh)
+		c->y = c->mon->my + c->mon->mh - HEIGHT(c);
+	c->x = MAX(c->x, c->mon->mx);
+	/* only fix client y-offset, if the client center might cover the bar */
+	c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
+	           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
+	c->bw = borderpx;
+
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, dc.norm[ColBorder]);
@@ -1513,6 +1502,34 @@ setfocus(Client *c) {
 	if(!c->neverfocus)
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	sendevent(c, wmatom[WMTakeFocus]);
+}
+
+void
+setfullscreen(Client *c, Bool fullscreen) {
+	if(fullscreen) {
+		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+		                PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+		c->isfullscreen = True;
+		c->oldstate = c->isfloating;
+		c->oldbw = c->bw;
+		c->bw = 0;
+		c->isfloating = True;
+		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
+		XRaiseWindow(dpy, c->win);
+	}
+	else {
+		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+		                PropModeReplace, (unsigned char*)0, 0);
+		c->isfullscreen = False;
+		c->isfloating = c->oldstate;
+		c->bw = c->oldbw;
+		c->x = c->oldx;
+		c->y = c->oldy;
+		c->w = c->oldw;
+		c->h = c->oldh;
+		resizeclient(c, c->x, c->y, c->w, c->h);
+		arrange(c->mon);
+	}
 }
 
 void
@@ -1974,22 +1991,15 @@ updatestatus(void) {
 }
 
 void
-updatewindowtype(Client *c)
-{
-	Atom wtype, real;
-	int format;
-	unsigned long n, extra;
-	unsigned char *p = NULL;
+updatewindowtype(Client *c) {
+	Atom state = getatomprop(c, netatom[NetWMState]);
+	Atom wtype = getatomprop(c, netatom[NetWMWindowType]);
 
-	if(XGetWindowProperty(dpy, c->win, netatom[NetWMWindowType], 0L,
-	                      sizeof(Atom), False, XA_ATOM, &real, &format,
-	                      &n, &extra, (unsigned char **)&p) == Success && p) {
-		wtype = *(Atom *)p;
-		XFree(p);
+	if(state == netatom[NetWMFullscreen])
+		setfullscreen(c, True);
 
-		if(wtype == netatom[NetWMWindowTypeDialog])
-			c->isfloating = True;
-	}
+	if(wtype == netatom[NetWMWindowTypeDialog])
+		c->isfloating = True;
 }
 
 void
