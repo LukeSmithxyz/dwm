@@ -1261,8 +1261,11 @@ movemouse(const Arg *arg) {
 				&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 					togglefloating(NULL);
 			}
-			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating)
+			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating) {
+				if(c->isfullscreen)
+					setfullscreen(c, False);
 				resize(c, nx, ny, c->w, c->h, True);
+			}
 			break;
 		}
 	} while(ev.type != ButtonRelease);
@@ -1397,8 +1400,11 @@ resizemouse(const Arg *arg) {
 				&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
 					togglefloating(NULL);
 			}
-			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating)
+			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating) {
+				if(c->isfullscreen)
+					setfullscreen(c, False);
 				resize(c, c->x, c->y, nw, nh, True);
+			}
 			break;
 		}
 	} while(ev.type != ButtonRelease);
@@ -1744,6 +1750,8 @@ togglefloating(const Arg *arg) {
 	if(selmon->sel->isfloating)
 		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
 		       selmon->sel->w, selmon->sel->h, False);
+	else if(selmon->sel->isfullscreen)
+		setfullscreen(selmon->sel, False);
 	arrange(selmon);
 }
 
@@ -2020,7 +2028,6 @@ updatewindowtype(Client *c) {
 
 	if(state == netatom[NetWMFullscreen])
 		setfullscreen(c, True);
-
 	if(wtype == netatom[NetWMWindowTypeDialog])
 		c->isfloating = True;
 }
