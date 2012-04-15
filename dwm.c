@@ -884,7 +884,8 @@ focusmon(const Arg *arg) {
 		return;
 	if((m = dirtomon(arg->i)) == selmon)
 		return;
-	unfocus(selmon->sel, True);
+	unfocus(selmon->sel, False); /* s/True/False/ fixes input focus issues
+					in gedit and anjuta */
 	selmon = m;
 	focus(NULL);
 }
