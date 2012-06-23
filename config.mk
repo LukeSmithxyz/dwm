@@ -1,5 +1,5 @@
 # dwm version
-VERSION = 6.0-tip
+VERSION = 6.1
 
 # Customize below to fit your system
 
