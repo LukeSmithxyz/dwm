@@ -575,8 +575,9 @@ configurenotify(XEvent *e) {
 	XConfigureEvent *ev = &e->xconfigure;
 	Bool dirty;
 
+	// TODO: updategeom handling sucks, needs to be simplified
 	if(ev->window == root) {
-		dirty = (sw != ev->width);
+		dirty = (sw != ev->width || sh != ev->height);
 		sw = ev->width;
 		sh = ev->height;
 		if(updategeom() || dirty) {
@@ -1235,6 +1236,8 @@ movemouse(const Arg *arg) {
 
 	if(!(c = selmon->sel))
 		return;
+	if(c->isfullscreen) /* no support moving fullscreen windows by mouse */
+		return;
 	restack(selmon);
 	ocx = c->x;
 	ocy = c->y;
@@ -1268,11 +1271,8 @@ movemouse(const Arg *arg) {
 				&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 					togglefloating(NULL);
 			}
-			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating) {
-				if(c->isfullscreen)
-					setfullscreen(c, False);
+			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, True);
-			}
 			break;
 		}
 	} while(ev.type != ButtonRelease);
@@ -1382,6 +1382,8 @@ resizemouse(const Arg *arg) {
 
 	if(!(c = selmon->sel))
 		return;
+	if(c->isfullscreen) /* no support resizing fullscreen windows by mouse */
+		return;
 	restack(selmon);
 	ocx = c->x;
 	ocy = c->y;
@@ -1407,11 +1409,8 @@ resizemouse(const Arg *arg) {
 				&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
 					togglefloating(NULL);
 			}
-			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating) {
-				if(c->isfullscreen)
-					setfullscreen(c, False);
+			if(!selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, True);
-			}
 			break;
 		}
 	} while(ev.type != ButtonRelease);
@@ -1759,12 +1758,12 @@ void
 togglefloating(const Arg *arg) {
 	if(!selmon->sel)
 		return;
+	if(selmon->sel->isfullscreen) /* no support for fullscreen windows */
+		return;
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
 	if(selmon->sel->isfloating)
 		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
 		       selmon->sel->w, selmon->sel->h, False);
-	else if(selmon->sel->isfullscreen)
-		setfullscreen(selmon->sel, False);
 	arrange(selmon);
 }
 
