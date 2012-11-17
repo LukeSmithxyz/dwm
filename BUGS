@@ -20,31 +20,6 @@ Donald Allen reported this:
 
 starting emacs from dmenu in archlinux results in missing configure of emacs, but mod1-space or mod1-shift-space fix this problem. this problem is new and did not happen in 1.6 xorg servers
 
-Starting emacs from xterm doesnt show this problem, he uses tag 8 for emacs
-
----
-
-2009/12/7 Alexandr Krylovskiy <wing_AT_tversu.ru>: 
->  Fullscreen mode with flash applications (youtube, for example) doesn't 
-> work properly neither in tiled nor in floating mode. 
->  Fullscreen window closes immediately after opening. 
-
-This is a known bug (for some curiosity I received the same report via 
-privmail from 2 other people within one week, really strange). 
-The quick fix is commenting out the code in lines 817/818 in hg tip 
-dwm. I cannot confirm this has no side effects (I think it does) and I 
-will address this issue shortly with a real fix. 
-
----
-
-SDL seems to not like non-reparenting WMs:
-
-> I would like to mention SDL problems, however SDL is not crucial to
-> me anymore; people that really care about it should speak up and
-> propose dwm / SDL patch or cooperation scheme in that matter. 
-
-Patching SDL, bugging them?
-
 ---
 
 voltaic reports this:
