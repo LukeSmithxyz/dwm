@@ -1069,7 +1069,7 @@ keypress(XEvent *e) {
 	XKeyEvent *ev;
 
 	ev = &e->xkey;
-	if(usexkb) {
+	if(usexkb)
 		keysym = XkbKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0, 0);
 	else
 		keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
@@ -1636,7 +1636,7 @@ setup(void) {
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
 	/* init xkb */
-	usexkb = XkbQueryExtension(dpy, &dummy, &dummy, &dummy, &xkb_major, &xkb_minor);
+	usexkb = XkbQueryExtension(dpy, &dummy, &dummy, &dummy, &xkbmajor, &xkbminor);
 	grabkeys();
 }
 
