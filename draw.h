@@ -1,19 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-typedef struct _DDC DDC;
-
-/* X11 types - begin */
-typedef struct _XDraw Draw;
-struct _XDraw {
-	unsigned int w, h;
-	Display *dpy;
-	int screen;
-	Window win;
-	Drawable drawable;
-	GC gc;
-	DDC *dc;
-};
-
 struct _XCol {
 	unsigned long rgb;
 };
@@ -29,15 +15,6 @@ struct _XFont {
 typedef struct _XFont Fnt;
 /* X11 types - end */
 
-struct _DDC {
-	Draw *draw;
-	Col *fg;
-	Col *bg;
-	Fnt *font;
-	Bool fill;
-	DDC *next;
-};
-
 typedef struct {
 	unsigned int w;
 	unsigned int h;
@@ -47,14 +24,25 @@ typedef struct {
 	int yOff;
 } TextExtents;
 
+
+/* X11 types - begin */
+typedef struct _XDraw Draw;
+struct _XDraw {
+	unsigned int w, h;
+	Display *dpy;
+	int screen;
+	Window win;
+	Drawable drawable;
+	GC gc;
+	Col *fg;
+	Col *bg;
+	Fnt *font;
+};
+
 /* Drawable abstraction */
 Draw *draw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h);
 void draw_resize(Draw *draw, unsigned int w, unsigned int h);
 void draw_free(Draw *draw);
-
-/* Drawing context abstraction */
-DDC *dc_create(Draw *draw);
-void dc_free(DDC *dc);
 
 /* Fnt abstraction */
 Fnt *font_create(const char *fontname);
@@ -65,18 +53,17 @@ Col *col_create(const char *colname);
 void col_free(Col *col);
 
 /* Drawing context manipulation */
-void dc_setfont(DDC *dc, Fnt *font);
-void dc_setfg(DDC *dc, Col *col);
-void dc_setbg(DDC *dc, Col *col);
-void dc_setfill(DDC *dc, Bool fill);
+void draw_setfont(Draw *draw, Fnt *font);
+void draw_setfg(Draw *draw, Col *col);
+void draw_setbg(Draw *draw, Col *col);
 
 /* Drawing functions */
-void dc_drawrect(DDC *dc, int x, int y, unsigned int w, unsigned int h);
-void dc_drawtext(DDC *dc, int x, int y, const char *text);
+void draw_rect(Draw *draw, int x, int y, unsigned int w, unsigned int h);
+void draw_text(Draw *draw, int x, int y, const char *text);
 
 /* Map functions */
-void dc_map(DDC *dc, int x, int y, unsigned int w, unsigned int h);
+void draw_map(Draw *draw, int x, int y, unsigned int w, unsigned int h);
 
 /* Text functions */
-void dc_getextents(DDC *dc, const char *text, TextExtents *extents);
+void draw_getextents(Draw *draw, const char *text, TextExtents *extents);
 

@@ -35,28 +35,6 @@ draw_free(Draw *draw) {
 	free(draw);
 }
 
-DDC *
-dc_create(Draw *draw) {
-	DDC *dc = (DDC *)calloc(1, sizeof(DDC));
-	dc->draw = draw;
-	dc->next = draw->dc;
-	draw->dc = dc;
-	return dc;
-}
-
-void
-dc_free(DDC *dc) {
-	DDC **tdc;
-
-	if(!dc)
-		return;
-	/* remove from dc list */
-	for(tdc = &dc->draw->dc; *tdc && *tdc != dc; tdc = &(*tdc)->next);
-	*tdc = dc->next;
-	/* TODO: deallocate any resources of this dc, if needed */
-	free(dc);
-}
-
 Fnt *
 font_create(const char *fontname) {
 	Fnt *font = (Fnt *)calloc(1, sizeof(Fnt));
@@ -88,57 +66,50 @@ col_free(Col *col) {
 }
 
 void
-dc_setfont(DDC *dc, Fnt *font) {
-	if(!dc || !font)
+draw_setfont(Draw *draw, Fnt *font) {
+	if(!draw || !font)
 		return;
-	dc->font = font;
+	draw->font = font;
 }
 
 void
-dc_setfg(DDC *dc, Col *col) {
-	if(!dc || !col) 
+draw_setfg(Draw *draw, Col *col) {
+	if(!draw || !col) 
 		return;
-	dc->fg = col;
+	draw->fg = col;
 }
 
 void
-dc_setbg(DDC *dc, Col *col) {
-	if(!dc || !col)
+draw_setbg(Draw *draw, Col *col) {
+	if(!draw || !col)
 		return;
-	dc->bg = col;
+	draw->bg = col;
 }
 
 void
-dc_setfill(DDC *dc, Bool fill) {
-	if(!dc)
-		return;
-	dc->fill = fill;
-}
-
-void
-dc_drawrect(DDC *dc, int x, int y, unsigned int w, unsigned int h) {
-	if(!dc)
+draw_rect(Draw *draw, int x, int y, unsigned int w, unsigned int h) {
+	if(!draw)
 		return;
 	/* TODO: draw the rectangle */
 }
 
 void
-dc_drawtext(DDC *dc, int x, int y, const char *text) {
-	if(!dc)
+draw_text(Draw *draw, int x, int y, const char *text) {
+	if(!draw)
 		return;
 	/* TODO: draw the text */
 }
 
 void
-dc_map(DDC *dc, int x, int y, unsigned int w, unsigned int h) {
-	if(!dc)
+draw_map(Draw *draw, int x, int y, unsigned int w, unsigned int h) {
+	if(!draw)
 		return;
-	/* TODO: map the dc contents in the region */
+	/* TODO: map the draw contents in the region */
 }
 
 void
-dc_getextents(DDC *dc, const char *text, TextExtents *extents) {
-	if(!dc || !extents)
+draw_getextents(Draw *draw, const char *text, TextExtents *extents) {
+	if(!draw || !extents)
 		return;
 	/* TODO: get extents */
 }
