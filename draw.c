@@ -5,12 +5,16 @@
 #include "draw.h"
 
 Draw *
-draw_create(Display *dpy, Window win, unsigned int w, unsigned int h) {
+draw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h) {
 	Draw *draw = (Draw *)calloc(1, sizeof(Draw));
+	draw->dpy = dpy;
+	draw->screen = screen;
+	draw->win = win;
 	draw->w = w;
 	draw->h = h;
-	/* TODO: drawable creation */
-	/* TODO: gc allocation */
+	draw->drawable = XCreatePixmap(dpy, win, w, h, DefaultDepth(dpy, screen));
+	draw->gc = XCreateGC(dpy, win, 0, NULL);
+	XSetLineAttributes(dpy, draw->gc, 1, LineSolid, CapButt, JoinMiter);
 	return draw;
 }
 
@@ -20,13 +24,14 @@ draw_resize(Draw *draw, unsigned int w, unsigned int h) {
 		return;
 	draw->w = w;
 	draw->h = h;
-	/* TODO: resize drawable */
+	XFreePixmap(draw->dpy, draw->drawable);
+	draw->drawable = XCreatePixmap(draw->dpy, draw->win, w, h, DefaultDepth(draw->dpy, draw->screen));
 }
 
 void
 draw_free(Draw *draw) {
-	/* TODO: deallocate DDCs */
-	/* TODO: deallocate drawable */
+	XFreePixmap(draw->dpy, draw->drawable);
+	XFreeGC(draw->dpy, draw->gc);
 	free(draw);
 }
 

@@ -7,6 +7,8 @@ typedef struct _XDraw Draw;
 struct _XDraw {
 	unsigned int w, h;
 	Display *dpy;
+	int screen;
+	Window win;
 	Drawable drawable;
 	GC gc;
 	DDC *dc;
@@ -46,7 +48,7 @@ typedef struct {
 } TextExtents;
 
 /* Drawable abstraction */
-Draw *draw_create(Display *dpy, Window win, unsigned int w, unsigned int h);
+Draw *draw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h);
 void draw_resize(Draw *draw, unsigned int w, unsigned int h);
 void draw_free(Draw *draw);
 
