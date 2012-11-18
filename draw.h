@@ -1,13 +1,16 @@
 /* See LICENSE file for copyright and license details. */
 
+typedef struct _DDC DDC;
+
 /* X11 types - begin */
+typedef struct _XDraw Draw;
 struct _XDraw {
 	unsigned int w, h;
 	Display *dpy;
 	Drawable drawable;
 	GC gc;
+	DDC *dc;
 };
-typedef struct _XDraw Draw;
 
 struct _XCol {
 	unsigned long rgb;
@@ -24,13 +27,14 @@ struct _XFont {
 typedef struct _XFont Fnt;
 /* X11 types - end */
 
-typedef struct {
+struct _DDC {
 	Draw *draw;
 	Col *fg;
 	Col *bg;
 	Fnt *font;
 	Bool fill;
-} DDC;
+	DDC *next;
+};
 
 typedef struct {
 	unsigned int w;
@@ -60,8 +64,8 @@ void col_free(Col *col);
 
 /* Drawing context manipulation */
 void dc_setfont(DDC *dc, Fnt *font);
-void dc_setfg(DDC *dc, Col col);
-void dc_setbg(DDC *dc, Col col);
+void dc_setfg(DDC *dc, Col *col);
+void dc_setbg(DDC *dc, Col *col);
 void dc_setfill(DDC *dc, Bool fill);
 
 /* Drawing functions */
