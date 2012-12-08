@@ -1,8 +1,10 @@
 /* See LICENSE file for copyright and license details. */
+#include <stdio.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
 
 #include "draw.h"
+#include "util.h"
 
 Draw *
 draw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h) {
@@ -36,32 +38,70 @@ draw_free(Draw *draw) {
 }
 
 Fnt *
-font_create(const char *fontname) {
-	Fnt *font = (Fnt *)calloc(1, sizeof(Fnt));
-	/* TODO: allocate actual font */
+draw_font_create(Draw *draw, const char *fontname) {
+	Fnt *font;
+	char *def, **missing;
+	int n;
+
+	if(!draw)
+		return NULL;
+	font = (Fnt *)calloc(1, sizeof(Fnt));
+	font->set = XCreateFontSet(draw->dpy, fontname, &missing, &n, &def);
+	if(missing) {
+		while(n--)
+			fprintf(stderr, "draw: missing fontset: %s\n", missing[n]);
+		XFreeStringList(missing);
+	}
+	if(font->set) {
+		XFontStruct **xfonts;
+		char **font_names;
+
+		XExtentsOfFontSet(font->set);
+		n = XFontsOfFontSet(font->set, &xfonts, &font_names);
+		while(n--) {
+			font->ascent = MAX(font->ascent, (*xfonts)->ascent);
+			font->descent = MAX(font->descent,(*xfonts)->descent);
+			xfonts++;
+		}
+	}
+	else {
+		if(!(font->xfont = XLoadQueryFont(draw->dpy, fontname))
+		&& !(font->xfont = XLoadQueryFont(draw->dpy, "fixed")))
+			die("error, cannot load font: '%s'\n", fontname);
+		font->ascent = font->xfont->ascent;
+		font->descent = font->xfont->descent;
+	}
+	font->h = font->ascent + font->descent;
 	return font;
 }
 
 void
-font_free(Fnt *font) {
-	if(!font)
+draw_font_free(Draw *draw, Fnt *font) {
+	if(!draw || !font)
 		return;
-	/* TODO: deallocate any font resources */
+	if(font->set)
+		XFreeFontSet(draw->dpy, font->set);
+	else
+		XFreeFont(draw->dpy, font->xfont);
 	free(font);
 }
 
 Col *
-col_create(const char *colname) {
+draw_col_create(Draw *draw, const char *colname) {
 	Col *col = (Col *)calloc(1, sizeof(Col));
-	/* TODO: allocate color */
+	Colormap cmap = DefaultColormap(draw->dpy, draw->screen);
+	XColor color;
+
+	if(!XAllocNamedColor(draw->dpy, cmap, colname, &color, &color))
+		die("error, cannot allocate color '%s'\n", colname);
+	col->rgb = color.pixel;
 	return col;
 }
 
 void
-col_free(Col *col) {
+draw_col_free(Draw *draw, Col *col) {
 	if(!col)
 		return;
-	/* TODO: deallocate any color resource */
 	free(col);
 }
 

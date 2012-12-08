@@ -8,7 +8,7 @@ typedef struct _XCol Col;
 struct _XFont {
 	int ascent;
 	int descent;
-	unsigned int h, w;
+	unsigned int h;
 	XFontSet set;
 	XFontStruct *xfont;
 };
@@ -45,12 +45,12 @@ void draw_resize(Draw *draw, unsigned int w, unsigned int h);
 void draw_free(Draw *draw);
 
 /* Fnt abstraction */
-Fnt *font_create(const char *fontname);
-void font_free(Fnt *font);
+Fnt *draw_font_create(Draw *draw, const char *fontname);
+void draw_font_free(Draw *draw, Fnt *font);
 
 /* Colour abstraction */
-Col *col_create(const char *colname);
-void col_free(Col *col);
+Col *draw_col_create(Draw *draw, const char *colname);
+void draw_col_free(Draw *draw, Col *col);
 
 /* Drawing context manipulation */
 void draw_setfont(Draw *draw, Fnt *font);
