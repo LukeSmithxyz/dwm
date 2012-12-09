@@ -13,19 +13,7 @@ struct _XFont {
 	XFontStruct *xfont;
 };
 typedef struct _XFont Fnt;
-/* X11 types - end */
 
-typedef struct {
-	unsigned int w;
-	unsigned int h;
-	int x;
-	int y;
-	int xOff;
-	int yOff;
-} TextExtents;
-
-
-/* X11 types - begin */
 typedef struct _XDraw Draw;
 struct _XDraw {
 	unsigned int w, h;
@@ -38,6 +26,13 @@ struct _XDraw {
 	Col *bg;
 	Fnt *font;
 };
+
+typedef struct {
+	unsigned int w;
+	unsigned int h;
+	int xOff;
+	int yOff;
+} TextExtents;
 
 /* Drawable abstraction */
 Draw *draw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h);
@@ -58,12 +53,12 @@ void draw_setfg(Draw *draw, Col *col);
 void draw_setbg(Draw *draw, Col *col);
 
 /* Drawing functions */
-void draw_rect(Draw *draw, int x, int y, unsigned int w, unsigned int h);
-void draw_text(Draw *draw, int x, int y, const char *text);
+void draw_rect(Draw *draw, int x, int y, unsigned int w, unsigned int h, Bool filled, Bool empty, Bool invert);
+void draw_text(Draw *draw, int x, int y, unsigned int w, unsigned int h, const char *text, Bool invert);
 
 /* Map functions */
 void draw_map(Draw *draw, int x, int y, unsigned int w, unsigned int h);
 
 /* Text functions */
-void draw_getextents(Draw *draw, const char *text, TextExtents *extents);
+void draw_getextents(Draw *draw, const char *text, unsigned int len, TextExtents *extents);
 
