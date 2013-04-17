@@ -40,7 +40,7 @@
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
 
-#include "draw.h"
+#include "drw.h"
 #include "util.h"
 
 /* macros */
