@@ -5,6 +5,10 @@ typedef struct {
 } Clr;
 
 typedef struct {
+	Cursor cursor;
+} Cur;
+
+typedef struct {
 	int ascent;
 	int descent;
 	unsigned int h;
@@ -13,22 +17,25 @@ typedef struct {
 } Fnt;
 
 typedef struct {
+	Clr *fg;
+	Clr *bg;
+	Clr *border;
+} Theme;
+
+typedef struct {
 	unsigned int w, h;
 	Display *dpy;
 	int screen;
-	Window win;
-	Drawable drwable;
+	Window root;
+	Drawable drawable;
 	GC gc;
-	Clr *fg;
-	Clr *bg;
+	Theme *theme;
 	Fnt *font;
 } Drw;
 
 typedef struct {
 	unsigned int w;
 	unsigned int h;
-	int xOff;
-	int yOff;
 } Extnts;
 
 /* Drawable abstraction */
@@ -37,25 +44,26 @@ void drw_resize(Drw *drw, unsigned int w, unsigned int h);
 void drw_free(Drw *drw);
 
 /* Fnt abstraction */
-Fnt *drw_font_create(Drw *drw, const char *fontname);
-void drw_font_free(Drw *drw, Fnt *font);
+Fnt *drw_font_create(Display *dpy, const char *fontname);
+void drw_font_free(Display *dpy, Fnt *font);
+void drw_font_getexts(Fnt *font, const char *text, unsigned int len, Extnts *extnts);
+unsigned int drw_font_getexts_width(Fnt *font, const char *text, unsigned int len);
 
-/* Clrour abstraction */
+/* Colour abstraction */
 Clr *drw_clr_create(Drw *drw, const char *clrname);
-void drw_clr_free(Drw *drw, Clr *clr);
+void drw_clr_free(Clr *clr);
+
+/* Cursor abstraction */
+Cur *drw_cur_create(Drw *drw, int shape);
+void drw_cur_free(Drw *drw, Cur *cursor);
 
 /* Drawing context manipulation */
 void drw_setfont(Drw *drw, Fnt *font);
-void drw_setfg(Drw *drw, Clr *clr);
-void drw_setbg(Drw *drw, Clr *clr);
+void drw_settheme(Drw *drw, Theme *theme);
 
 /* Drawing functions */
-void drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, Bool filled, Bool empty, Bool invert);
-void drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, const char *text, Bool invert);
+void drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int empty, int invert);
+void drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, const char *text, int invert);
 
 /* Map functions */
-void drw_map(Drw *drw, int x, int y, unsigned int w, unsigned int h);
-
-/* Text functions */
-void drw_getexts(Drw *drw, const char *text, unsigned int len, Extnts *extnts);
-
+void drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h);
