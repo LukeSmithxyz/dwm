@@ -109,9 +109,8 @@ drw_clr_create(Drw *drw, const char *clrname) {
 
 void
 drw_clr_free(Clr *clr) {
-	if(!clr)
-		return;
-	free(clr);
+	if(clr)
+		free(clr);
 }
 
 void
@@ -121,19 +120,18 @@ drw_setfont(Drw *drw, Fnt *font) {
 }
 
 void
-drw_settheme(Drw *drw, Theme *theme) {
-	if(!drw || !theme) 
-		return;
-	drw->theme = theme;
+drw_setscheme(Drw *drw, ClrScheme *scheme) {
+	if(drw && scheme) 
+		drw->scheme = scheme;
 }
 
 void
 drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int empty, int invert) {
 	int dx;
 
-	if(!drw || !drw->font || !drw->theme)
+	if(!drw || !drw->font || !drw->scheme)
 		return;
-	XSetForeground(drw->dpy, drw->gc, invert ? drw->theme->bg->rgb : drw->theme->fg->rgb);
+	XSetForeground(drw->dpy, drw->gc, invert ? drw->scheme->bg->rgb : drw->scheme->fg->rgb);
 	dx = (drw->font->ascent + drw->font->descent + 2) / 4;
 	if(filled)
 		XFillRectangle(drw->dpy, drw->drawable, drw->gc, x+1, y+1, dx+1, dx+1);
@@ -147,9 +145,9 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, const char *tex
 	int i, tx, ty, th, len, olen;
 	Extnts tex;
 
-	if(!drw || !drw->theme)
+	if(!drw || !drw->scheme)
 		return;
-	XSetForeground(drw->dpy, drw->gc, invert ? drw->theme->fg->rgb : drw->theme->bg->rgb);
+	XSetForeground(drw->dpy, drw->gc, invert ? drw->scheme->fg->rgb : drw->scheme->bg->rgb);
 	XFillRectangle(drw->dpy, drw->drawable, drw->gc, x, y, w, h);
 	if(!text || !drw->font)
 		return;
@@ -166,7 +164,7 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, const char *tex
 	memcpy(buf, text, len);
 	if(len < olen)
 		for(i = len; i && i > len - 3; buf[--i] = '.');
-	XSetForeground(drw->dpy, drw->gc, invert ? drw->theme->bg->rgb : drw->theme->fg->rgb);
+	XSetForeground(drw->dpy, drw->gc, invert ? drw->scheme->bg->rgb : drw->scheme->fg->rgb);
 	if(drw->font->set)
 		XmbDrawString(drw->dpy, drw->drawable, drw->font->set, drw->gc, tx, ty, buf, len);
 	else

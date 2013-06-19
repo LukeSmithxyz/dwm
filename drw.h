@@ -20,7 +20,7 @@ typedef struct {
 	Clr *fg;
 	Clr *bg;
 	Clr *border;
-} Theme;
+} ClrScheme;
 
 typedef struct {
 	unsigned int w, h;
@@ -29,7 +29,7 @@ typedef struct {
 	Window root;
 	Drawable drawable;
 	GC gc;
-	Theme *theme;
+	ClrScheme *scheme;
 	Fnt *font;
 } Drw;
 
@@ -59,7 +59,7 @@ void drw_cur_free(Drw *drw, Cur *cursor);
 
 /* Drawing context manipulation */
 void drw_setfont(Drw *drw, Fnt *font);
-void drw_settheme(Drw *drw, Theme *theme);
+void drw_setscheme(Drw *drw, ClrScheme *scheme);
 
 /* Drawing functions */
 void drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int empty, int invert);

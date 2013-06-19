@@ -57,14 +57,14 @@
 #define TEXTW(X)                (drw_font_getexts_width(drw->font, X, strlen(X)) + drw->font->h)
 
 /* enums */
-enum { CurNormal, CurResize, CurMove, CurLast };        /* cursor */
-enum { ColBorder, ColFG, ColBG, ColLast };              /* color */
+enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
+enum { SchemeNorm, SchemeSel, SchemeLast }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetClientList, NetLast };     /* EWMH atoms */
+       NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
-       ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
+       ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
 
 typedef union {
 	int i;
@@ -260,8 +260,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 static Atom wmatom[WMLast], netatom[NetLast];
 static Bool running = True;
 static Cur *cursor[CurLast];
-static Theme thmnorm[ColLast];
-static Theme thmsel[ColLast];
+static ClrScheme scheme[SchemeLast];
 static Display *dpy;
 static Drw *drw;
 static Fnt *fnt;
@@ -476,12 +475,12 @@ cleanup(void) {
 	drw_cur_free(drw, cursor[CurResize]);
 	drw_cur_free(drw, cursor[CurMove]);
 	drw_font_free(dpy, fnt);
-	drw_clr_free(thmnorm->border);
-	drw_clr_free(thmnorm->bg);
-	drw_clr_free(thmnorm->fg);
-	drw_clr_free(thmsel->border);
-	drw_clr_free(thmsel->bg);
-	drw_clr_free(thmsel->fg);
+	drw_clr_free(scheme[SchemeNorm].border);
+	drw_clr_free(scheme[SchemeNorm].bg);
+	drw_clr_free(scheme[SchemeNorm].fg);
+	drw_clr_free(scheme[SchemeSel].border);
+	drw_clr_free(scheme[SchemeSel].bg);
+	drw_clr_free(scheme[SchemeSel].fg);
 	drw_free(drw);
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
@@ -705,14 +704,14 @@ drawbar(Monitor *m) {
 	x = 0;
 	for(i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
-		drw_settheme(drw, m->tagset[m->seltags] & 1 << i ? thmsel : thmnorm);
+		drw_setscheme(drw, m->tagset[m->seltags] & 1 << i ? &scheme[SchemeSel] : &scheme[SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, tags[i], urg & 1 << i);
 		drw_rect(drw, x, 0, w, bh, m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
 		           occ & 1 << i, urg & 1 << i);
 		x += w;
 	}
 	w = blw = TEXTW(m->ltsymbol);
-	drw_settheme(drw, thmnorm);
+	drw_setscheme(drw, &scheme[SchemeNorm]);
 	drw_text(drw, x, 0, w, bh, m->ltsymbol, 0);
 	x += w;
 	xx = x;
@@ -730,12 +729,12 @@ drawbar(Monitor *m) {
 	if((w = x - xx) > bh) {
 		x = xx;
 		if(m->sel) {
-			drw_settheme(drw, m == selmon ? thmsel : thmnorm);
+			drw_setscheme(drw, m == selmon ? &scheme[SchemeSel] : &scheme[SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, m->sel->name, 0);
 			drw_rect(drw, x, 0, w, bh, m->sel->isfixed, m->sel->isfloating, 0);
 		}
 		else {
-			drw_settheme(drw, thmnorm);
+			drw_setscheme(drw, &scheme[SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, NULL, 0);
 		}
 	}
@@ -793,7 +792,7 @@ focus(Client *c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
-		XSetWindowBorder(dpy, c->win, thmsel->border->rgb);
+		XSetWindowBorder(dpy, c->win, scheme[SchemeSel].border->rgb);
 		setfocus(c);
 	}
 	else {
@@ -1041,7 +1040,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, thmnorm->border->rgb);
+	XSetWindowBorder(dpy, w, scheme[SchemeNorm].border->rgb);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatewindowtype(c);
 	updatesizehints(c);
@@ -1523,12 +1522,12 @@ setup(void) {
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 	/* init appearance */
-	thmnorm->border = drw_clr_create(drw, normbordercolor);
-	thmnorm->bg = drw_clr_create(drw, normbgcolor);
-	thmnorm->fg = drw_clr_create(drw, normfgcolor);
-	thmsel->border = drw_clr_create(drw, selbordercolor);
-	thmsel->bg = drw_clr_create(drw, selbgcolor);
-	thmsel->fg = drw_clr_create(drw, selfgcolor);
+	scheme[SchemeNorm].border = drw_clr_create(drw, normbordercolor);
+	scheme[SchemeNorm].bg = drw_clr_create(drw, normbgcolor);
+	scheme[SchemeNorm].fg = drw_clr_create(drw, normfgcolor);
+	scheme[SchemeSel].border = drw_clr_create(drw, selbordercolor);
+	scheme[SchemeSel].bg = drw_clr_create(drw, selbgcolor);
+	scheme[SchemeSel].fg = drw_clr_create(drw, selfgcolor);
 	/* init bars */
 	updatebars();
 	updatestatus();
@@ -1674,7 +1673,7 @@ unfocus(Client *c, Bool setfocus) {
 	if(!c)
 		return;
 	grabbuttons(c, False);
-	XSetWindowBorder(dpy, c->win, thmnorm->border->rgb);
+	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm].border->rgb);
 	if(setfocus) {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 		XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
