@@ -39,6 +39,7 @@
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
+#include <X11/Xft/Xft.h>
 
 #include "drw.h"
 #include "util.h"
@@ -54,7 +55,7 @@
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
-#define TEXTW(X)                (drw_font_getexts_width(drw->font, X, strlen(X)) + drw->font->h)
+#define TEXTW(X)                (drw_text(drw, 0, 0, 0, 0, (X), 0) + drw->fonts[0]->h)
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
@@ -263,7 +264,6 @@ static Cur *cursor[CurLast];
 static ClrScheme scheme[SchemeLast];
 static Display *dpy;
 static Drw *drw;
-static Fnt *fnt;
 static Monitor *mons, *selmon;
 static Window root;
 
@@ -474,7 +474,6 @@ cleanup(void) {
 	drw_cur_free(drw, cursor[CurNormal]);
 	drw_cur_free(drw, cursor[CurResize]);
 	drw_cur_free(drw, cursor[CurMove]);
-	drw_font_free(dpy, fnt);
 	drw_clr_free(scheme[SchemeNorm].border);
 	drw_clr_free(scheme[SchemeNorm].bg);
 	drw_clr_free(scheme[SchemeNorm].fg);
@@ -792,7 +791,7 @@ focus(Client *c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
-		XSetWindowBorder(dpy, c->win, scheme[SchemeSel].border->rgb);
+		XSetWindowBorder(dpy, c->win, scheme[SchemeSel].border->pix);
 		setfocus(c);
 	}
 	else {
@@ -1040,7 +1039,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, scheme[SchemeNorm].border->rgb);
+	XSetWindowBorder(dpy, w, scheme[SchemeNorm].border->pix);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatewindowtype(c);
 	updatesizehints(c);
@@ -1505,13 +1504,14 @@ setup(void) {
 
 	/* init screen */
 	screen = DefaultScreen(dpy);
-	root = RootWindow(dpy, screen);
-	fnt = drw_font_create(dpy, font);
 	sw = DisplayWidth(dpy, screen);
 	sh = DisplayHeight(dpy, screen);
-	bh = fnt->h + 2;
+	root = RootWindow(dpy, screen);
 	drw = drw_create(dpy, screen, root, sw, sh);
-	drw_setfont(drw, fnt);
+	drw_load_fonts(drw, fonts, LENGTH(fonts));
+	if (!drw->fontcount)
+		die("No fonts could be loaded.\n");
+	bh = drw->fonts[0]->h + 2;
 	updategeom();
 	/* init atoms */
 	wmatom[WMProtocols] = XInternAtom(dpy, "WM_PROTOCOLS", False);
@@ -1685,7 +1685,7 @@ unfocus(Client *c, Bool setfocus) {
 	if(!c)
 		return;
 	grabbuttons(c, False);
-	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm].border->rgb);
+	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm].border->pix);
 	if(setfocus) {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 		XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
