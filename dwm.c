@@ -689,9 +689,11 @@ dirtomon(int dir) {
 
 void
 drawbar(Monitor *m) {
-	int x, xx, w;
+	int x, xx, w, dx;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
+
+	dx = (drw->fonts[0]->ascent + drw->fonts[0]->descent + 2) / 4;
 
 	for(c = m->clients; c; c = c->next) {
 		occ |= c->tags;
@@ -703,7 +705,7 @@ drawbar(Monitor *m) {
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, m->tagset[m->seltags] & 1 << i ? &scheme[SchemeSel] : &scheme[SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, tags[i], urg & 1 << i);
-		drw_rect(drw, x, 0, w, bh, m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+		drw_rect(drw, x + 1, 1, dx, dx, m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
 		           occ & 1 << i, urg & 1 << i);
 		x += w;
 	}
@@ -728,11 +730,11 @@ drawbar(Monitor *m) {
 		if(m->sel) {
 			drw_setscheme(drw, m == selmon ? &scheme[SchemeSel] : &scheme[SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, m->sel->name, 0);
-			drw_rect(drw, x, 0, w, bh, m->sel->isfixed, m->sel->isfloating, 0);
+			drw_rect(drw, x + 1, 1, dx, dx, m->sel->isfixed, m->sel->isfloating, 0);
 		}
 		else {
 			drw_setscheme(drw, &scheme[SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, NULL, 0);
+			drw_rect(drw, x, 0, w, bh, 1, 0, 1);
 		}
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
