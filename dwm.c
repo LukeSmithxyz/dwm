@@ -462,6 +462,7 @@ cleanup(void) {
 	Arg a = {.ui = ~0};
 	Layout foo = { "", NULL };
 	Monitor *m;
+	size_t i;
 
 	view(&a);
 	selmon->lt[selmon->sellt] = &foo;
@@ -471,15 +472,13 @@ cleanup(void) {
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	while(mons)
 		cleanupmon(mons);
-	drw_cur_free(drw, cursor[CurNormal]);
-	drw_cur_free(drw, cursor[CurResize]);
-	drw_cur_free(drw, cursor[CurMove]);
-	drw_clr_free(scheme[SchemeNorm].border);
-	drw_clr_free(scheme[SchemeNorm].bg);
-	drw_clr_free(scheme[SchemeNorm].fg);
-	drw_clr_free(scheme[SchemeSel].border);
-	drw_clr_free(scheme[SchemeSel].bg);
-	drw_clr_free(scheme[SchemeSel].fg);
+	for(i = 0; i < CurLast; i++)
+		drw_cur_free(drw, cursor[i]);
+	for(i = 0; i < SchemeLast; i++) {
+		drw_clr_free(scheme[i].border);
+		drw_clr_free(scheme[i].bg);
+		drw_clr_free(scheme[i].fg);
+	}
 	drw_free(drw);
 	XSync(dpy, False);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
