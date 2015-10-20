@@ -630,8 +630,7 @@ Monitor *
 createmon(void) {
 	Monitor *m;
 
-	if(!(m = (Monitor *)calloc(1, sizeof(Monitor))))
-		die("fatal: could not malloc() %u bytes\n", sizeof(Monitor));
+	m = ecalloc(1, sizeof(Monitor));
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
 	m->nmaster = nmaster;
@@ -1007,8 +1006,7 @@ manage(Window w, XWindowAttributes *wa) {
 	Window trans = None;
 	XWindowChanges wc;
 
-	if(!(c = calloc(1, sizeof(Client))))
-		die("fatal: could not malloc() %u bytes\n", sizeof(Client));
+	c = ecalloc(1, sizeof(Client));
 	c->win = w;
 	updatetitle(c);
 	if(XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
@@ -1788,8 +1786,7 @@ updategeom(void) {
 
 		for(n = 0, m = mons; m; m = m->next, n++);
 		/* only consider unique geometries as separate screens */
-		if(!(unique = (XineramaScreenInfo *)malloc(sizeof(XineramaScreenInfo) * nn)))
-			die("fatal: could not malloc() %u bytes\n", sizeof(XineramaScreenInfo) * nn);
+		unique = ecalloc(nn, sizeof(XineramaScreenInfo));
 		for(i = 0, j = 0; i < nn; i++)
 			if(isuniquegeom(unique, j, &info[i]))
 				memcpy(&unique[j++], &info[i], sizeof(XineramaScreenInfo));
