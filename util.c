@@ -27,6 +27,8 @@ die(const char *fmt, ...) {
 	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
 		fputc(' ', stderr);
 		perror(NULL);
+	} else {
+		fputc('\n', stderr);
 	}
 
 	exit(1);

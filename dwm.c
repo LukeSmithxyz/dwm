@@ -1561,7 +1561,7 @@ setup(void)
 	root = RootWindow(dpy, screen);
 	drw = drw_create(dpy, screen, root, sw, sh);
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
-		die("no fonts could be loaded.\n");
+		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
 	bh = drw->fonts->h + 2;
 	updategeom();
@@ -2101,7 +2101,7 @@ xerrordummy(Display *dpy, XErrorEvent *ee)
 int
 xerrorstart(Display *dpy, XErrorEvent *ee)
 {
-	die("dwm: another window manager is already running\n");
+	die("dwm: another window manager is already running");
 	return -1;
 }
 
@@ -2123,13 +2123,13 @@ int
 main(int argc, char *argv[])
 {
 	if (argc == 2 && !strcmp("-v", argv[1]))
-		die("dwm-"VERSION "\n");
+		die("dwm-"VERSION);
 	else if (argc != 1)
-		die("usage: dwm [-v]\n");
+		die("usage: dwm [-v]");
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))
-		die("dwm: cannot open display\n");
+		die("dwm: cannot open display");
 	checkotherwm();
 	setup();
 	scan();
