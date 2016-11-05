@@ -12,7 +12,7 @@ ecalloc(size_t nmemb, size_t size)
 	void *p;
 
 	if (!(p = calloc(nmemb, size)))
-		perror(NULL);
+		die("calloc:");
 	return p;
 }
 
