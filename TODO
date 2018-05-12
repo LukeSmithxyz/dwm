@@ -1,4 +1,0 @@
-- add a flag to Key to execute the command on release (needed for commands
-		affecting the keyboard grab, see scrot -s for example)
-- add updategeom() hook for external tools like dzen
-- consider onscreenkeyboard hooks for tablet deployment

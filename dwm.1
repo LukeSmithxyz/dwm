@@ -158,7 +158,7 @@ code. This keeps it fast, secure and simple.
 .SH SEE ALSO
 .BR dmenu (1),
 .BR st (1)
-.SH BUGS
+.SH ISSUES
 Java applications which use the XToolkit/XAWT backend may draw grey windows
 only. The XToolkit/XAWT backend breaks ICCCM-compliance in recent JDK 1.5 and early
 JDK 1.6 versions, because it assumes a reparenting window manager. Possible workarounds
@@ -172,11 +172,5 @@ or
 (to pretend that a non-reparenting window manager is running that the
 XToolkit/XAWT backend can recognize) or when using OpenJDK setting the environment variable
 .BR _JAVA_AWT_WM_NONREPARENTING=1 .
-.P
-GTK 2.10.9+ versions contain a broken
-.BR Save\-As
-file dialog implementation,
-which requests to reconfigure its window size in an endless loop. However, its
-window is still respondable during this state, so you can simply ignore the flicker
-until a new GTK version appears, which will fix this bug, approximately
-GTK 2.10.12+ versions.
+.SH BUGS
+Send all bug reports with a patch to hackers@suckless.org.
