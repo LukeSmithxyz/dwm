@@ -2138,7 +2138,7 @@ main(int argc, char *argv[])
 	checkotherwm();
 	setup();
 #ifdef __OpenBSD__
-	if (pledge("stdio proc exec", NULL) == -1)
+	if (pledge("stdio rpath proc exec", NULL) == -1)
 		die("pledge");
 #endif /* __OpenBSD__ */
 	scan();
