@@ -1411,6 +1411,7 @@ void
 runAutostart(void) {
 	system("cd ~/.local/bin/; ./dwmautostart &");
 }
+
 void
 scan(void)
 {
@@ -2198,6 +2199,7 @@ zoom(const Arg *arg)
 int
 main(int argc, char *argv[])
 {
+	runAutostart();
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION);
 	else if (argc != 1)
@@ -2214,7 +2216,6 @@ main(int argc, char *argv[])
 #endif /* __OpenBSD__ */
 	scan();
 	run();
-	runAutostart();
 	cleanup();
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
