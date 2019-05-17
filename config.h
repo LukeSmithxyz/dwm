@@ -84,6 +84,7 @@ static const char *getunicode[]  = { "dmenuunicode", NULL };
 
 /* Audio Commands */
 static const char *pauseaudio[] = {"lmc", "toggle", NULL };
+static const char *pauseall[] = {"pauseallmpv", NULL };
 static const char *nexttrack[] = {"lmc", "next", NULL };
 static const char *prevtrack[] = {"lmc", "prev", NULL };
 static const char *restarttrack[] = {"lmc", "restart", NULL };
@@ -132,6 +133,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_m,		spawn,		{.v = musicplayer} },
 	{ MODKEY|ShiftMask,		XK_m,		spawn,		{.v = toggleaudio} },
 	{ MODKEY,			XK_p,		spawn,		{.v = pauseaudio} },
+	{ MODKEY|ShiftMask,		XK_p,		spawn,		{.v = pauseall} },
 
 	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,			XK_Return, spawn,          {.v = termcmd } },
