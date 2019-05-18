@@ -1412,6 +1412,7 @@ run(void)
 
 void
 runAutostart(void) {
+	system("killall dwmautostart");
 	system("cd ~/.local/bin/; ./dwmautostart &");
 }
 
