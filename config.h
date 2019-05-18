@@ -68,76 +68,13 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "st", NULL };
-
-static const char *promptshutdown[]  = { "prompt","Are you sure you want to shutdown?","sudo -A shutdown -h now", NULL };
-static const char *promptreboot[]  = { "prompt","Are you sure you want to reboot?","sudo -A reboot", NULL };
-static const char *displayselect[]  = { "displayselect", NULL };
-static const char *showreadme[]  = { "groff", "-mom", "~/.local/share/larbs/readme.mom", "-Tpdf","|", "zathura -", NULL };
-static const char *mountdrives[]  = { "dmenumount",NULL };
-static const char *unmountdrives[]  = { "dmenuumount",NULL };
-static const char *musicplayer[] = {"st", "-e", "ncmpcpp", NULL };
-static const char *filebrowser[] = {"st", "-e", "lf", NULL };
-static const char *email[] = {"st", "-e", "neomutt", NULL };
-static const char *rssreader[] = {"st", "-e", "newsboat", NULL };
-static const char *systeminfo[] = {"st", "-e", "htop", NULL };
-static const char *getunicode[]  = { "dmenuunicode", NULL };
-
-/* Audio Commands */
-static const char *pauseaudio[] = {"lmc", "toggle", NULL };
-static const char *pauseall[] = {"pauseallmpv", NULL };
-static const char *nexttrack[] = {"lmc", "next", NULL };
-static const char *prevtrack[] = {"lmc", "prev", NULL };
-static const char *restarttrack[] = {"lmc", "restart", NULL };
-static const char *toggleaudio[] = {"lmc", "toggle", NULL };
-static const char *seekfowardbig[] = {"lmc", "foward", "120", NULL };
-static const char *seekbackwardbig[] = {"lmc", "back", "120", NULL };
-static const char *seekfoward[] = {"lmc", "foward", "10", NULL };
-static const char *seekbackward[] = {"lmc", "back", "10", NULL };
-static const char *volup[] = {"lmc", "up", "5", NULL };
-static const char *voldown[] = {"lmc", "down", "5", NULL };
-static const char *volupbig[] = {"lmc", "up", "15", NULL };
-static const char *voldownbig[] = {"lmc", "down", "15", NULL };
-
-static const char *browser[] = {"$BROWSER", NULL };
+/* static const char *termcmd[]  = { "st", NULL }; */
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 
-	/* audio */
-	{ MODKEY,			XK_bracketright,spawn,		{.v = seekfoward} },
-	{ MODKEY,			XK_bracketleft,	spawn,		{.v = seekbackward} },
-	{ MODKEY|ShiftMask,		XK_bracketright,	spawn,		{.v = seekfowardbig} },
-	{ MODKEY|ShiftMask,		XK_bracketleft,	spawn,		{.v = seekbackwardbig} },
-	{ MODKEY,			XK_comma,	spawn,		{.v = prevtrack} },
-	{ MODKEY,			XK_period,	spawn,		{.v = nexttrack} },
-	{ MODKEY|ShiftMask,		XK_comma,	spawn,		{.v = restarttrack} },
-	{ MODKEY,			XK_equal,	spawn,		{.v = volup} },
-	{ MODKEY,			XK_minus,	spawn,		{.v = voldown} },
-	{ MODKEY|ShiftMask,		XK_equal,	spawn,		{.v = volupbig} },
-	{ MODKEY|ShiftMask,             XK_minus,	spawn,		{.v = voldownbig} },
-
-	{ MODKEY|ShiftMask,		XK_w,		spawn,		{.v = browser } },
-
-	{ MODKEY,			XK_F1,		spawn,		{.v = showreadme } },
-	{ MODKEY,			XK_F3,		spawn,		{.v = displayselect } },
-	{ MODKEY,			XK_F9,		spawn,		{.v = mountdrives } },
-	{ MODKEY,			XK_F10,		spawn,		{.v = unmountdrives } },
-	{ MODKEY,			XK_grave,	spawn,		{.v = getunicode } },
-
-	{ MODKEY|ShiftMask,		XK_BackSpace,	spawn,		{.v = promptreboot} },
-	{ MODKEY|ShiftMask,		XK_x,		spawn,		{.v = promptshutdown} },
-	{ MODKEY,			XK_r,		spawn,		{.v = filebrowser} },
-	{ MODKEY,			XK_i,		spawn,		{.v = systeminfo} },
-	{ MODKEY,			XK_e,		spawn,		{.v = email} },
-	{ MODKEY,			XK_n,		spawn,		{.v = rssreader} },
-	{ MODKEY,			XK_m,		spawn,		{.v = musicplayer} },
-	{ MODKEY|ShiftMask,		XK_m,		spawn,		{.v = toggleaudio} },
-	{ MODKEY,			XK_p,		spawn,		{.v = pauseaudio} },
-	{ MODKEY|ShiftMask,		XK_p,		spawn,		{.v = pauseall} },
-
-	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
-	{ MODKEY,			XK_Return, spawn,          {.v = termcmd } },
+	/* { MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } }, */
+	/* { MODKEY,			XK_Return, spawn,          {.v = termcmd } }, */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -186,7 +123,7 @@ static Button buttons[] = {
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
-	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
+	/* { ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } }, */
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
