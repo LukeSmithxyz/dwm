@@ -197,7 +197,6 @@ static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
 static void run(void);
-static void runAutostart(void);
 static void scan(void);
 static int sendevent(Client *c, Atom proto);
 static void sendmon(Client *c, Monitor *m);
@@ -1411,12 +1410,6 @@ run(void)
 }
 
 void
-runAutostart(void) {
-	system("killall dwmautostart");
-	system("cd ~/.local/bin/; ./dwmautostart &");
-}
-
-void
 scan(void)
 {
 	unsigned int i, num;
@@ -2213,7 +2206,6 @@ zoom(const Arg *arg)
 int
 main(int argc, char *argv[])
 {
-	runAutostart();
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION);
 	else if (argc != 1)
