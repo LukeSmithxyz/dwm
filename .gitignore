@@ -3,5 +3,4 @@
 *.rej
 *.o
 dwm
-patches/
 dwm.pdf
