@@ -112,7 +112,7 @@ static Key keys[] = {
 	{ MODKEY,			31,		setlayout,	{.v = &layouts[4]} },
 	{ MODKEY,			32,		setlayout,	{.v = &layouts[5]} },
 	{ MODKEY,			23,		view,		{0} },
-	{ MODKEY,			54	view,		{0} },
+	{ MODKEY,			54,	view,		{0} },
 	{ MODKEY|ShiftMask,		65,	togglefloating,	{0} },
 	/* { MODKEY,                       XK_space,  setlayout,      {0} }, */
 	/* { MODKEY,                       XK_comma,  focusmon,       {.i = -1 } }, */
@@ -131,7 +131,7 @@ static Key keys[] = {
 	{ MODKEY,                       19,		view,		{.ui = ~0 } },
 	{ MODKEY|ShiftMask,		19,		tag,		{.ui = ~0 } },
 	{ MODKEY,			68,		quit,		{0} },
-	{ MODKEY,			42		shiftview,	{ .i = -1 } },
+	{ MODKEY,			42,		shiftview,	{ .i = -1 } },
 	{ MODKEY,			47,	shiftview,	{ .i = 1 } },
 	{ MODKEY,			112,	shiftview,	{ .i = -1 } },
 	{ MODKEY,			117,	shiftview,	{ .i = 1 } },
