@@ -31,7 +31,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <X11/cursorfont.h>
-#include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
@@ -103,7 +102,7 @@ struct Client {
 
 typedef struct {
 	unsigned int mod;
-	KeySym keysym;
+	KeyCode keycode;
 	void (*func)(const Arg *);
 	const Arg arg;
 } Key;
@@ -966,10 +965,10 @@ grabkeys(void)
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for (i = 0; i < LENGTH(keys); i++)
-			if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-						True, GrabModeAsync, GrabModeAsync);
+      for (j = 0; j < LENGTH(modifiers); ++j)
+            XGrabKey(dpy, keys[i].keycode,
+                      keys[i].mod | modifiers[j], root, True,
+                      GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -996,13 +995,11 @@ void
 keypress(XEvent *e)
 {
 	unsigned int i;
-	KeySym keysym;
 	XKeyEvent *ev;
 
 	ev = &e->xkey;
-	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for (i = 0; i < LENGTH(keys); i++)
-		if (keysym == keys[i].keysym
+		if (ev->keycode == keys[i].keycode
 		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
 		&& keys[i].func)
 			keys[i].func(&(keys[i].arg));
