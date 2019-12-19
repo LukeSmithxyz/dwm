@@ -339,4 +339,5 @@ static Signal signals[] = {
 	{ "quit",           quit },
 	{ "setlayout",      setlayout },
 	{ "setlayoutex",    setlayoutex },
+	{ "xrdb",		xrdb },
 };
