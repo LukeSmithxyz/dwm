@@ -199,7 +199,7 @@ static Key keys[] = {
 	/* { MODKEY,			XK_F11,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_F12,		spawn,		SHCMD("st -e sudo nmtui") },
 
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	/* { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, */
 
 
 	{ MODKEY,			XK_space,	zoom,		{0} },
