@@ -234,6 +234,10 @@ static Key keys[] = {
 	{ 0,	XF86XK_Battery,		spawn,		SHCMD("notify-send \"Battery status\" \"$(batstat)\"") },
 	{ 0,	XF86XK_Launch1,		spawn,		SHCMD("xset dpms force off") },
 
+	{ 0,	XF86XK_TouchpadToggle,	spawn,		SHCMD("(synclient | grep 'TouchpadOff.*1' && synclient TouchpadOff=0) || synclient TouchpadOff=1") },
+	{ 0,	XF86XK_TouchpadOff,	spawn,		SHCMD("synclient TouchpadOff=1") },
+	{ 0,	XF86XK_TouchpadOn,	spawn,		SHCMD("synclient TouchpadOff=0") },
+
 	/* { MODKEY,                       XK_space,  setlayout,      {0} }, */
 
 	/* { MODKEY,                       XK_comma,  focusmon,       {.i = -1 } }, */
