@@ -171,7 +171,7 @@ static Key keys[] = {
 	/* { MODKEY|ShiftMask,		XK_v,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_b,		togglebar,	{0} },
 	{ MODKEY|ShiftMask,		XK_b,		spawn,		SHCMD("hover left") },
-	{ MODKEY,			XK_n,		spawn,		SHCMD("st -e newsboat") },
+	{ MODKEY,			XK_n,		spawn,		SHCMD("st -e newsboat; pkill -RTMIN+6 dwmblocks") },
 	{ MODKEY|ShiftMask,		XK_n,		spawn,		SHCMD("hover right") },
 	{ MODKEY,			XK_m,		spawn,		SHCMD("st -e ncmpcpp") },
 	{ MODKEY|ShiftMask,		XK_m,		spawn,		SHCMD("amixer sset Master toggle ; pkill -RTMIN+10 dwmblocks") },
