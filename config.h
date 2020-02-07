@@ -178,7 +178,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_comma,	spawn,		SHCMD("mpc prev") },
 	{ MODKEY|ShiftMask,		XK_comma,	spawn,		SHCMD("mpc seek 0%") },
 	{ MODKEY,			XK_period,	spawn,		SHCMD("mpc next") },
-	/* { MODKEY|ShiftMask,		XK_period,	spawn,		SHCMD("") }, */
+	{ MODKEY|ShiftMask,		XK_period,	spawn,		SHCMD("mpc repeat") },
 
 
 	{ MODKEY,			XK_Page_Up,	shiftview,	{ .i = -1 } },
