@@ -7,7 +7,7 @@ signal() {
 case $# in
 1)
 	case $1 in
-	setlayout | view | viewall | togglebar | togglefloating | zoom | killclient | quit)
+	setlayout | view | viewall | togglebar | togglefloating | zoom | killclient | quit | xrdb)
 		signal $1
 		;;
 	*)
