@@ -179,7 +179,7 @@ static Key keys[] = {
 
 	{ MODKEY,			XK_Page_Up,	shiftview,	{ .i = -1 } },
 	{ MODKEY,			XK_Page_Down,	shiftview,	{ .i = 1 } },
-	{ MODKEY,			XK_Insert,		spawn,		SHCMD("showclip") },
+	{ MODKEY,			XK_Insert,	spawn,		SHCMD("notify-send \"📋 Clipboard contents:\" \"$(xclip -o -selection clipboard)\"") },
 
 	{ MODKEY,			XK_F1,		spawn,		SHCMD("groff -mom $HOME/.local/share/larbs/readme.mom -Tpdf | zathura -") },
 	{ MODKEY,			XK_F2,		quit,		{0} },
@@ -223,7 +223,7 @@ static Key keys[] = {
 	{ 0, XF86XK_TaskPane,		spawn,		SHCMD("st -e htop") },
 	{ 0, XF86XK_Mail,		spawn,		SHCMD("st -e neomutt ; pkill -RTMIN+12 dwmblocks") },
 	{ 0, XF86XK_MyComputer,		spawn,		SHCMD("st -e $FILE /") },
-	{ 0, XF86XK_Battery,		spawn,		SHCMD("notify-send \"Battery status\" \"$(batstat)\"") },
+	/* { 0, XF86XK_Battery,		spawn,		SHCMD("") }, */
 	{ 0, XF86XK_Launch1,		spawn,		SHCMD("xset dpms force off") },
 	{ 0, XF86XK_TouchpadToggle,	spawn,		SHCMD("(synclient | grep 'TouchpadOff.*1' && synclient TouchpadOff=0) || synclient TouchpadOff=1") },
 	{ 0, XF86XK_TouchpadOff,	spawn,		SHCMD("synclient TouchpadOff=1") },
