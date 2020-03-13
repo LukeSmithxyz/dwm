@@ -19,3 +19,7 @@ This is suckless, mmmbud, the source code is the documentation! Check out `confi
 - shiftview to cycle tags
 - gaps around windows and bar
 - dwmc
+
+## Please install `libxft-rbgra`!
+
+This build of dwm does not block color emoji in the status/info bar, so you must install [libxft-rbgra](https://aur.archlinux.org/packages/libxft-bgra/) from the AUR, which fixes a libxft color emoji rendering problem, otherwise dwm will crash upon trying to render one. Hopefully this fix will be in all libxft soon enough.
