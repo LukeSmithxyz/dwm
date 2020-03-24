@@ -136,7 +136,7 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+r\fP \(en lf (file browser/manager)
 .ITEM
-\f(CWMod+e\fP \(en neomutt (email; not installed by default, see below)
+\f(CWMod+e\fP \(en neomutt (email) \(en Must be first configured by running \f(CWmw add\fP.
 .ITEM
 \f(CWMod+m\fP \(en ncmpcpp (music player)
 .ITEM
@@ -247,8 +247,6 @@ previous recordings as their names are based on their exact times.
 \f(CWMod+PrintScreen\fP \(en Opens dmenu menu to select kind of audio/video recording
 .ITEM
 \f(CWMod+Delete\fP \(en Kills any recording started in the above way.
-.ITEM
-\f(CWMod+ScrollLock\fP \(en Turn on and off screenkey (if installed) for visual typing display
 .ITEM
 \f(CWMod+Shift+c\fP \(en Toggles a webcam in the bottom right for screencasting.
 .ITEM
