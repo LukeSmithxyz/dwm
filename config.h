@@ -114,13 +114,13 @@ static Key keys[] = {
 	/* { MODKEY|ShiftMask,		XK_q,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_w,		spawn,		SHCMD("$BROWSER") },
 	{ MODKEY|ShiftMask,		XK_w,		spawn,		SHCMD("st -e sudo nmtui") },
-	{ MODKEY,			XK_e,		spawn,		SHCMD("st -e neomutt ; pkill -RTMIN+12 dwmblocks") },
+	{ MODKEY,			XK_e,		spawn,		SHCMD("st -e neomutt ; pkill -RTMIN+12 dwmblocks; rmdir ~/.abook") },
 	{ MODKEY|ShiftMask,		XK_e,		spawn,		SHCMD("tutorialvids") },
 	{ MODKEY,			XK_r,		spawn,		SHCMD("st -e lf") },
 	/* { MODKEY|ShiftMask,		XK_r,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_t,		setlayout,	{.v = &layouts[0]} },
 	/* { MODKEY|ShiftMask,		XK_t,		spawn,		SHCMD("") }, */
-	/* { MODKEY,			XK_y,		spawn,		SHCMD("") }, */
+	{ MODKEY,			XK_y,		setlayout,	{.v = &layouts[4]} },
 	/* { MODKEY|ShiftMask,		XK_y,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_u,		setlayout,	{.v = &layouts[2]} },
 	/* { MODKEY|ShiftMask,		XK_u,		spawn,		SHCMD("") }, */
