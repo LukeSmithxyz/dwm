@@ -140,13 +140,13 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+m\fP \(en ncmpcpp (music player)
 .ITEM
-\f(CWMod+W\fP \(en Web browser (Brave)
+\f(CWMod+w\fP \(en Web browser (Brave)
 .ITEM
 \f(CWMod+n\fP \(en newsboat (RSS feed reader)
 .ITEM
 \f(CWMod+a\fP \(en alsamixer (audio system control)
 .ITEM
-\f(CWMod+w\fP \(en nmtui (for connecting to wireless internet)
+\f(CWMod+W\fP \(en nmtui (for connecting to wireless internet)
 .ITEM
 \f(CWMod+v\fP \(en vimwiki (for notes)
 .ITEM
