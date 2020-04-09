@@ -177,7 +177,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,		XK_z,		incrgaps,	{.i = -1 } },
 	{ MODKEY,			XK_x,		spawn,		SHCMD("slock & xset dpms force off; mpc pause ; pauseallmpv") },
 	{ MODKEY|ShiftMask,		XK_x,		spawn,		SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Shutdown computer?\")\" = Yes ] && sudo -A shutdown -h now") },
-	/* { MODKEY,			XK_c,		spawn,		SHCMD("") }, */
+	{ MODKEY,			XK_c,		spawn,		SHCMD("st -e bc -l") },
 	{ MODKEY|ShiftMask,		XK_c,		spawn,		SHCMD("mpv --no-cache --no-osc --no-input-default-bindings --input-conf=/dev/null --title=webcam $(ls /dev/video[0,2,4,6,8] | tail -n 1)") },
 	{ MODKEY,			XK_v,		spawn,		SHCMD("st -e $EDITOR -c \"VimwikiIndex\"") },
 	{ MODKEY|ShiftMask,		XK_v,		spawn,		SHCMD("{ killall xcompmgr || setsid xcompmgr & } ; xwallpaper --zoom ~/.config/wall.png") },
