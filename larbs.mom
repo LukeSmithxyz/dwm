@@ -144,7 +144,7 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+n\fP \(en newsboat (RSS feed reader)
 .ITEM
-\f(CWMod+a\fP \(en alsamixer (audio system control)
+\f(CWMod+a\fP \(en pulsemixer (audio system control)
 .ITEM
 \f(CWMod+W\fP \(en nmtui (for connecting to wireless internet)
 .ITEM
@@ -216,7 +216,7 @@ I use ncmpcpp as a music player, which is a front end for mpd.
 .ITEM
 \f(CWMod+]\fP \(en Forward 10 seconds (holding shift increases amount)
 .ITEM
-\f(CWMod+a\fP \(en alsamixer (general volume sink/source control)
+\f(CWMod+a\fP \(en pulsemixer (general volume sink/source control)
 .LIST OFF
 .HEADING 2 "Tags/Workspaces"
 .PP
@@ -271,9 +271,8 @@ As mentioned above, LARBS makes some keyboard changes with the \f(CWremaps\fP sc
 These settings may override your preferred settings, so you should open this file and comment out troublesome lines if you have issues.
 .HEADING 2 "My audio isn't working!"
 .PP
-On fresh install, the Linux audio system (ALSA) often mutes outputs.
-You may want to unbind
-You may also need to set your preferred default output sink which you can do by the command line, or by selecting one with \f(CWalsamixer\fP (\f(CWmod+a\fP).
+On fresh install, the Linux audio system often mutes outputs.
+You may also need to set your preferred default output sink which you can do by the command line, or by selecting one with \f(CWpulsemixer\fP (\f(CWmod+a\fP).
 .HEADING 2 "How do I copy and paste?"
 .PP
 Copying and pasting is always program-specific on any system.
