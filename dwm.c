@@ -1522,7 +1522,8 @@ run(void)
 
 void
 runAutostart(void) {
-	system("export STATUSBAR=\"dwmblocks\" ; killall dwmblocks ; dwmblocks &");
+	system("type startup >/dev/null 2>&1 && startup &");
+	system("killall dwmblocks ; dwmblocks &");
 }
 
 void
