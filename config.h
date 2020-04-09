@@ -81,6 +81,22 @@ static const char *termcmd[]  = { "st", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
+/* PulseAudio commands. Require pulsemixer. */
+static const char *volup[] = { "pulsemixer", "--change-volume", "+5", NULL };
+static const char *bigvolup[] = { "pulsemixer", "--change-volume", "+15", NULL };
+static const char *voldown[] = { "pulsemixer", "--change-volume", "-5", NULL };
+static const char *bigvoldown[] = { "pulsemixer", "--change-volume", "-15", NULL };
+static const char *voltoggle[] = { "pulsemixer", "--toggle-mute", NULL };
+static const char *audiocontrol[] = { "st", "-e", "pulsemixer", NULL };
+
+/* ALSA commands. Requires amixer in alsa-utils. */
+/* static const char *volup[] = { "amixer", "sset", "Master", "5%+", NULL }; */
+/* static const char *bigvolup[] = { "amixer", "sset", "Master", "15%+", NULL }; */
+/* static const char *voldown[] = { "amixer", "sset", "Master", "5%-", NULL }; */
+/* static const char *bigvoldown[] = { "amixer", "sset", "Master", "15%-", NULL }; */
+/* static const char *voltoggle[] = { "amixer", "sset", "Master", "toggle" NULL }; */
+/* static const char *audiocontrol[] = { "st", "-e", "alsamixer", NULL }; */
+
 #include <X11/XF86keysym.h>
 #include "shiftview.c"
 static Key keys[] = {
@@ -101,10 +117,10 @@ static Key keys[] = {
 	TAGKEYS(			XK_9,		8)
 	{ MODKEY,			XK_0,		view,		{.ui = ~0 } },
 	{ MODKEY|ShiftMask,		XK_0,		tag,		{.ui = ~0 } },
-	{ MODKEY,			XK_minus,	spawn,		SHCMD("lmc down") },
-	{ MODKEY|ShiftMask,		XK_minus,	spawn,		SHCMD("lmc down 15") },
-	{ MODKEY,			XK_equal,	spawn,		SHCMD("lmc up") },
-	{ MODKEY|ShiftMask,		XK_equal,	spawn,		SHCMD("lmc up 15") },
+	{ MODKEY,			XK_minus,	spawn,		{.v = voldown } },
+	{ MODKEY|ShiftMask,		XK_minus,	spawn,		{.v = bigvoldown } },
+	{ MODKEY,			XK_equal,	spawn,		{.v = volup } },
+	{ MODKEY|ShiftMask,		XK_equal,	spawn,		{.v = bigvolup } },
 	/* { MODKEY,			XK_BackSpace,	spawn,		SHCMD("") }, */
 	{ MODKEY|ShiftMask,		XK_BackSpace,	spawn,		SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Reboot computer?\")\" = Yes ] && sudo -A reboot") },
 
@@ -137,7 +153,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_backslash,		view,		{0} },
 	/* { MODKEY|ShiftMask,		XK_backslash,		spawn,		SHCMD("") }, */
 
-	{ MODKEY,			XK_a,		spawn,		SHCMD("st -e lmc control") },
+	{ MODKEY,			XK_a,		spawn,		{.v = audiocontrol} },
 	/* { MODKEY|ShiftMask,		XK_a,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_s,		togglesticky,	{0} },
 	/* { MODKEY|ShiftMask,		XK_s,		spawn,		SHCMD("") }, */
@@ -170,7 +186,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_n,		spawn,		SHCMD("st -e newsboat; pkill -RTMIN+6 dwmblocks") },
 	{ MODKEY|ShiftMask,		XK_n,		spawn,		SHCMD("hover right") },
 	{ MODKEY,			XK_m,		spawn,		SHCMD("st -e ncmpcpp") },
-	{ MODKEY|ShiftMask,		XK_m,		spawn,		SHCMD("lmc toggle") },
+	{ MODKEY|ShiftMask,		XK_m,		spawn,		{.v = voltoggle } },
 	{ MODKEY,			XK_comma,	spawn,		SHCMD("mpc prev") },
 	{ MODKEY|ShiftMask,		XK_comma,	spawn,		SHCMD("mpc seek 0%") },
 	{ MODKEY,			XK_period,	spawn,		SHCMD("mpc next") },
@@ -202,9 +218,9 @@ static Key keys[] = {
 	{ MODKEY,			XK_Delete,	spawn,		SHCMD("dmenurecord kill") },
 	{ MODKEY,			XK_Scroll_Lock,	spawn,		SHCMD("killall screenkey || screenkey &") },
 
-	{ 0, XF86XK_AudioMute,		spawn,		SHCMD("lmc toggle") },
-	{ 0, XF86XK_AudioRaiseVolume,	spawn,		SHCMD("lmc up") },
-	{ 0, XF86XK_AudioLowerVolume,	spawn,		SHCMD("lmc down") },
+	{ 0, XF86XK_AudioMute,		spawn,		{.v = voltoggle } },
+	{ 0, XF86XK_AudioRaiseVolume,	spawn,		{.v = volup } },
+	{ 0, XF86XK_AudioLowerVolume,	spawn,		{.v = voldown } },
 	{ 0, XF86XK_AudioPrev,		spawn,		SHCMD("mpc prev") },
 	{ 0, XF86XK_AudioNext,		spawn,		SHCMD("mpc next") },
 	{ 0, XF86XK_AudioPause,		spawn,		SHCMD("mpc pause") },
