@@ -133,7 +133,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_e,		spawn,		SHCMD("st -e neomutt ; pkill -RTMIN+12 dwmblocks; rmdir ~/.abook") },
 	{ MODKEY|ShiftMask,		XK_e,		spawn,		SHCMD("tutorialvids") },
 	{ MODKEY,			XK_r,		spawn,		SHCMD("st -e lf") },
-	/* { MODKEY|ShiftMask,		XK_r,		spawn,		SHCMD("") }, */
+	{ MODKEY|ShiftMask,		XK_r,		quit,		{1} },
 	{ MODKEY,			XK_t,		setlayout,	{.v = &layouts[0]} },
 	/* { MODKEY|ShiftMask,		XK_t,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_y,		setlayout,	{.v = &layouts[4]} },
@@ -153,7 +153,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_backslash,		view,		{0} },
 	/* { MODKEY|ShiftMask,		XK_backslash,		spawn,		SHCMD("") }, */
 
-	{ MODKEY,			XK_a,		spawn,		{.v = audiocontrol} },
+	{ MODKEY,			XK_a,		spawn,		{.v = audiocontrol } },
 	/* { MODKEY|ShiftMask,		XK_a,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_s,		togglesticky,	{0} },
 	/* { MODKEY|ShiftMask,		XK_s,		spawn,		SHCMD("") }, */
@@ -245,7 +245,7 @@ static Key keys[] = {
 	{ 0, XF86XK_TouchpadOn,		spawn,		SHCMD("synclient TouchpadOff=0") },
 	{ 0, XF86XK_MonBrightnessUp,	spawn,		SHCMD("xbacklight -inc 15") },
 	{ 0, XF86XK_MonBrightnessDown,	spawn,		SHCMD("xbacklight -dec 15") },
-	
+
 	/* { MODKEY,                       XK_space,  setlayout,      {0} }, */
 
 	/* { MODKEY,                       XK_comma,  focusmon,       {.i = -1 } }, */
