@@ -287,11 +287,9 @@ The script \f(CWsetbg\fP, if run on an image will set it as the persistent backg
 When using the file manager, you can simply hover over an image name and type \f(CWbg\fP and this will run \f(CWsetbg\fP.
 .HEADING 2 "How I change the colorscheme?"
 .PP
-LARBS no longer deploys Xresource by default, but you can still add an \f(CW~/.Xdefaults\fP file and add color settings to change the theme of numerous programs, including the terminal. See
-.PDF_WWW_LINK "https://wiki.archlinux.org/index.php/X_resources" "the Arch Wiki's article"
-for more information.
+LARBS no longer deploys Xresource by default, but check \f(CW~/.config/Xresources\fP for a list of color schemes you can activate or add your own. When you save the file, vim will automatically update the colorscheme. If you'd like these colors activated by default on login, there is a line in \f(CW~/.config/xprofile\fP you can uncomment to allow that.
 .PP
-If you want to use \f(CWwal\fP to automatically generate colorschemes from your wallpapers, just install it and \f(CWsetbg\fP will automatically detect and run it on startup and wallpaper change.
+Or, if you want to use \f(CWwal\fP to automatically generate colorschemes from your wallpapers, just install it and \f(CWsetbg\fP will automatically detect and run it on startup and wallpaper change.
 .HEADING 2 "How do I set up my email?"
 .PP
 LARBS comes with mutt-wizard, which gives the ability to receive and send all your email and keep an offline store of it all in your terminal, without the need for browser.
