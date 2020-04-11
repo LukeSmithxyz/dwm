@@ -1531,7 +1531,6 @@ run(void)
 
 void
 runAutostart(void) {
-	system("type startup >/dev/null 2>&1 && startup &");
 	system("killall dwmblocks ; dwmblocks &");
 }
 
