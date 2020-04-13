@@ -136,11 +136,11 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+U\fP \(en Monocle mode (all windows fullscreen and cycle through)
 .ITEM
-\f(CWMod+o\fP \(en Center the master window
+\f(CWMod+i\fP \(en Center the master window
 .ITEM
-\f(CWMod+O\fP \(en Center and float the master window
+\f(CWMod+I\fP \(en Center and float the master window
 .ITEM
-\f(CWMod+i/I\fP \(en Increase/decrease the number of master windows
+\f(CWMod+o/O\fP \(en Increase/decrease the number of master windows
 .LIST OFF
 .HEADING 2 "Basic Programs"
 .LI
