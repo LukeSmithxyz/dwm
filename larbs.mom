@@ -122,13 +122,23 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+t\fP \(en Tiling mode (active by default)
 .ITEM
+\f(CWMod+T\fP \(en Bottom stack mode (just like tiling, but master is on top)
+.ITEM
 \f(CWMod+f\fP \(en Fullscreen mode
 .ITEM
-\f(CWMod+y\fP \(en Fibbonacci mode (similar to tiling mode)
+\f(CWMod+F\fP \(en Floating (AKA normie) mode
 .ITEM
-\f(CWMod+u\fP \(en Center the master window
+\f(CWMod+y\fP \(en Fibbonacci spiral mode
 .ITEM
-\f(CWMod+o\fP \(en Center and float the master window
+\f(CWMod+Y\fP \(en Dwindle mode (similar to Fibonacci)
+.ITEM
+\f(CWMod+u\fP \(en Master on left, other windows in monocle mode
+.ITEM
+\f(CWMod+U\fP \(en Monocle mode (all windows fullscreen and cycle through)
+.ITEM
+\f(CWMod+o\fP \(en Center the master window
+.ITEM
+\f(CWMod+O\fP \(en Center and float the master window
 .ITEM
 \f(CWMod+i/I\fP \(en Increase/decrease the number of master windows
 .LIST OFF

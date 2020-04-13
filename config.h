@@ -1,17 +1,17 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 10;       /* vert outer gap between windows and screen edge */
-static const int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const unsigned int borderpx  = 3;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
+static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
+static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
+static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
+static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const int vertpad            = 0;       /* vertical padding of bar */
-static const int sidepad            = 0;       /* horizontal padding of bar */
+static const int vertpad            = 10;       /* vertical padding of bar */
+static const int sidepad            = 10;       /* horizontal padding of bar */
 static const char *fonts[]          = { "monospace:size=10", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
 static char dmenufont[]       = "monospace:size=10";
 static char normbgcolor[]           = "#222222";
@@ -43,16 +43,24 @@ static const Rule rules[] = {
 static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
-
-#include "fibonacci.c"
+#define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
+#include "vanitygaps.c"
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "|M|",      centeredmaster },
-	{ ">M>",      centeredfloatingmaster },
- 	{ "[@]",      spiral },
- 	{ "[\\]",      dwindle },
+ 	{ "[]=",	tile },			/* Default: Master on left, slaves on right */
+	{ "TTT",	bstack },		/* Master on top, slaves on bottom */
+
+	{ "[@]",	spiral },		/* Fibonacci spiral */
+	{ "[\\]",	dwindle },		/* Decreasing in size right and leftward */
+
+	{ "H[]",	deck },			/* Master on left, slaves in monocle-like mode on right */
+ 	{ "[M]",	monocle },		/* All windows on top of eachother */
+
+	{ "|M|",	centeredmaster },		/* Master in middle, slaves on sides */
+	{ ">M>",	centeredfloatingmaster },	/* Same but master floats */
+
+	{ "><>",	NULL },			/* no layout function means floating behavior */
+	{ NULL,		NULL },
 };
 
 /* key definitions */
@@ -135,13 +143,13 @@ static Key keys[] = {
 	{ MODKEY,			XK_r,		spawn,		SHCMD("st -e lf") },
 	{ MODKEY|ShiftMask,		XK_r,		quit,		{1} },
 	{ MODKEY,			XK_t,		setlayout,	{.v = &layouts[0]} },
-	/* { MODKEY|ShiftMask,		XK_t,		spawn,		SHCMD("") }, */
-	{ MODKEY,			XK_y,		setlayout,	{.v = &layouts[4]} },
-	/* { MODKEY|ShiftMask,		XK_y,		spawn,		SHCMD("") }, */
-	{ MODKEY,			XK_u,		setlayout,	{.v = &layouts[2]} },
-	/* { MODKEY|ShiftMask,		XK_u,		spawn,		SHCMD("") }, */
-	{ MODKEY,			XK_i,		setlayout,	{.v = &layouts[3]} },
-	/* { MODKEY|ShiftMask,		XK_i,		spawn,		SHCMD("") }, */
+	{ MODKEY|ShiftMask,		XK_t,		setlayout,	{.v = &layouts[1]} },
+	{ MODKEY,			XK_y,		setlayout,	{.v = &layouts[2]} },
+	{ MODKEY|ShiftMask,		XK_y,		setlayout,	{.v = &layouts[3]} },
+	{ MODKEY,			XK_u,		setlayout,	{.v = &layouts[4]} },
+	{ MODKEY|ShiftMask,		XK_u,		setlayout,	{.v = &layouts[5]} },
+	{ MODKEY,			XK_i,		setlayout,	{.v = &layouts[6]} },
+	{ MODKEY|ShiftMask,		XK_i,		setlayout,	{.v = &layouts[7]} },
 	{ MODKEY,			XK_o,		incnmaster,     {.i = +1 } },
 	{ MODKEY|ShiftMask,		XK_o,		incnmaster,     {.i = -1 } },
 	{ MODKEY,			XK_p,			spawn,		SHCMD("mpc toggle") },
@@ -160,7 +168,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_d,		spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,		XK_d,		togglegaps,	{0} },
 	{ MODKEY,			XK_f,		togglefullscr,	{0} },
-	/* { MODKEY|ShiftMask,		XK_f,		togglefullscr,	{0} }, */
+	{ MODKEY|ShiftMask,		XK_f,		setlayout,	{.v = &layouts[8]} },
 	{ MODKEY,			XK_g,		shiftview,	{ .i = -1 } },
 	/* { MODKEY|ShiftMask,		XK_g,		spawn,		SHCMD("") }, */
 	{ MODKEY,			XK_h,		setmfact,	{.f = -0.05} },
