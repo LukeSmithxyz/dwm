@@ -103,7 +103,7 @@ static Key keys[] = {
 	/* modifier                     key        function        argument */
 	STACKKEYS(MODKEY,                          focus)
 	STACKKEYS(MODKEY|ShiftMask,                push)
-	{ MODKEY|ShiftMask,		XK_Escape,	spawn,	SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Close Xorg?\")\" = Yes ] && killall Xorg") },
+	{ MODKEY|ShiftMask,		XK_Escape,	spawn,	SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Close dwm?\")\" = Yes ] && kill -TERM \"$(ps ax | grep dwm$ | cut -d' ' -f2)\"") },
 	{ MODKEY,			XK_grave,	spawn,	SHCMD("dmenuunicode") },
 	/* { MODKEY|ShiftMask,		XK_grave,	togglescratch,	SHCMD("") }, */
 	TAGKEYS(			XK_1,		0)
@@ -197,7 +197,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_Insert,	spawn,		SHCMD("notify-send \"📋 Clipboard contents:\" \"$(xclip -o -selection clipboard)\"") },
 
 	{ MODKEY,			XK_F1,		spawn,		SHCMD("groff -mom /usr/local/share/dwm/larbs.mom -Tpdf | zathura -") },
-	{ MODKEY,			XK_F2,		quit,		{0} },
+	{ MODKEY,			XK_F2,		quit,		{1} },
 	{ MODKEY,			XK_F3,		spawn,		SHCMD("displayselect") },
 	{ MODKEY,			XK_F4,		spawn,		SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Hibernate computer?\")\" = Yes ] && sudo -A zzz") },
 	{ MODKEY,			XK_F5,		xrdb,		{.v = NULL } },
