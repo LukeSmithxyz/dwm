@@ -243,6 +243,10 @@ There are nine tags, active tags are highlighted in the top left.
 \f(CWMod+g\fP \(en Go to left tag
 .ITEM
 \f(CWMod+;\fP \(en Go to right tag
+.ITEM
+\f(CWMod+Left\fP \(en Move to workspace to the left
+.ITEM
+\f(CWMod+Right\fP \(en Move to workspace to the right
 .LIST OFF
 .HEADING 2 "Recording"
 .PP
