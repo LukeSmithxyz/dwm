@@ -1579,7 +1579,7 @@ run(void)
 
 void
 runAutostart(void) {
-	system("killall dwmblocks ; dwmblocks &");
+	system("killall dwmblocks 2>/dev/null ; dwmblocks &");
 }
 
 void
