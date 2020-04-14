@@ -109,7 +109,7 @@ static Key keys[] = {
 	/* modifier                     key        function        argument */
 	STACKKEYS(MODKEY,                          focus)
 	STACKKEYS(MODKEY|ShiftMask,                push)
-	{ MODKEY|ShiftMask,		XK_Escape,	spawn,	SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Close dwm?\")\" = Yes ] && kill -TERM \"$(ps ax | grep dwm$ | cut -d' ' -f2)\"") },
+	{ MODKEY|ShiftMask,		XK_Escape,	spawn,	SHCMD("[ \"$(printf \"No\\nYes\" | dmenu -i -nb darkred -sb red -sf white -nf gray -p \"Close dwm?\")\" = Yes ] && kill -TERM $(pidof dwm)") },
 	{ MODKEY,			XK_grave,	spawn,	SHCMD("dmenuunicode") },
 	/* { MODKEY|ShiftMask,		XK_grave,	togglescratch,	SHCMD("") }, */
 	TAGKEYS(			XK_1,		0)
