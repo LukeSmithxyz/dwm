@@ -112,10 +112,6 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 \f(CWMod+Shift+Space\fP \(en Make a window float (move and resize with \f(CWMod+\fPleft/right click).
 .ITEM
 \f(CWMod+b\fP \(en Toggle status bar
-.ITEM
-\f(CWMod+B\fP \(en Toggle window float in bottom left corner (good for video watched intermittently)
-.ITEM
-\f(CWMod+N\fP \(en Same as above, but for the bottom right corner.
 .LIST OFF
 .HEADING 2 "Window layouts"
 .LI
@@ -166,23 +162,13 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .HEADING 2 "System"
 .LI
 .ITEM
-\f(CWMod+x\fP \(en Lock screen (Enter password to return)
-.ITEM
-\f(CWMod+X\fP \(en Shutdown (will ask to confirm)
-.ITEM
-\f(CWMod+Shift+Backspace\fP \(en Reboot (will ask to confirm)
-.ITEM
-\f(CWMod+Shift+Escape\fP \(en Exit the graphical environment (will ask to confirm)
+\f(CWMod+BackSpace\fP \(enChoose to lock screen, logout, shutdown, reboot, etc.
 .ITEM
 \f(CWMod+V\fP \(en Toggle xcompmgr (to remove transparency and window effects)
 .ITEM
-\f(CWMod+F1\fP \(en Shows this document
-.ITEM
-\f(CWMod+F2\fP \(en Restart dwm (makes active any changes you've made to dwm)
+\f(CWMod+F1\fP \(en Show this document
 .ITEM
 \f(CWMod+F3\fP \(en Select screen/display to use
-.ITEM
-\f(CWMod+F4\fP \(en Hibernate (will ask to confirm)
 .ITEM
 \f(CWMod+F5\fP \(en Update dwm's colorscheme if you have changed Xresources
 .ITEM
