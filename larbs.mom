@@ -166,6 +166,8 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 \f(CWMod+F4\fP \(en pulsemixer (audio system control)
 .ITEM
 \f(CWMod+Shift+Enter\fP \(en Show/hide dropdown terminal
+.ITEM
+\f(CWMod+'\fP \(en Show/hide dropdown calculator
 .LIST OFF
 .HEADING 2 "System"
 .LI
