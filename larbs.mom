@@ -63,7 +63,7 @@ Actually, this should go without saying, but \fIeverything\fP here can easily be
 Below in this document, there is information about where to change programs/components.
 .PP
 Additionally, while this isn't a part of the desktop environment, the default editing mode in the shell is using vi bindings.
-If you want to learn more of this, run \f(CWMod+Shift+E\fP and type and select the option for "vi mode in shell".
+If you want to learn more of this, run \f(CWMod+F2\fP and type and select the option for "vi mode in shell".
 This setting can be changed if you don't like it by deleting or commenting out the contents of \f(CW~/.config/inputrc\fP.
 .HEADING 2 "The Status Bar"
 .PP
@@ -78,13 +78,13 @@ The program dwmblocks is what is run to generate the statusbar from those script
 You can edit its config/source code in \f(CW~/.local/src/dwmblocks/\fP to tell it what scripts/commands you want it to display.
 .HEADING 2 "Deeper Tutorials"
 .PP
-Press \f(CWmod+shift+e\fP at any time to get a menu of programs to watch videos about streaming directly from YouTube.
+Press \f(CWmod+F2\fP at any time to get a menu of programs to watch videos about streaming directly from YouTube.
 You can also check the config files for programs which detail a lot of the specific bindings.
 .HEADING 1 "Key Bindings"
 .PP
 The window manager dwm abstractly orders all of your windows into a stack from most important to least based on when you last manipulated it.
 dwm is an easy to use window manager, but you should understand that it makes use of that stack layout.
-If you're not familiar, I recommend you press \f(CWMod+Shift+E\fP and select the "dwm" option to watch my brief tutorial (note that the bindings I discuss in the video are the default dwm binds, which are different (inferior) to those here).
+If you're not familiar, I recommend you press \f(CWMod+F2\fP and select the "dwm" option to watch my brief tutorial (note that the bindings I discuss in the video are the default dwm binds, which are different (inferior) to those here).
 .PP
 Notice also the case sensitivity of the shortcuts\c
 .FOOTNOTE
@@ -105,13 +105,17 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+h/l\fP \(en Change width of master window
 .ITEM
-\f(CWMod+z/Z\fP \(en Increase/decrease gaps
+\f(CWMod+z/Z\fP \(en Increase/decrease gaps (may also hold \f(CWMod\fP and scroll mouse)
 .ITEM
-\f(CWMod+D\fP \(en Toggle gaps
+\f(CWMod+a\fP \(en Toggle gaps
+.ITEM
+\f(CWMod+A\fP \(en Gaps return to default values (may also hold \f(CWMod\fP and middle click)
 .ITEM
 \f(CWMod+Shift+Space\fP \(en Make a window float (move and resize with \f(CWMod+\fPleft/right click).
 .ITEM
-\f(CWMod+b\fP \(en Toggle status bar
+\f(CWMod+s\fP \(en Make/unmake a window "sticky" (follows you from tag to tag)
+.ITEM
+\f(CWMod+S\fP \(en Toggle status bar (may also middle click on desktop)
 .LIST OFF
 .HEADING 2 "Window layouts"
 .LI
@@ -143,19 +147,23 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+r\fP \(en lf (file browser/manager)
 .ITEM
+\f(CWMod+R\fP \(en htop (task manager, system monitor that R*dditors use to look cool)
+.ITEM
 \f(CWMod+e\fP \(en neomutt (email) \(en Must be first configured by running \f(CWmw add\fP.
+.ITEM
+\f(CWMod+E\fP \(en abook (contacts) \(en Must be first configured by running \f(CWmw add\fP.
 .ITEM
 \f(CWMod+m\fP \(en ncmpcpp (music player)
 .ITEM
-\f(CWMod+w\fP \(en Web browser (Brave)
-.ITEM
-\f(CWMod+n\fP \(en newsboat (RSS feed reader)
-.ITEM
-\f(CWMod+a\fP \(en pulsemixer (audio system control)
+\f(CWMod+w\fP \(en Web browser (Brave by default)
 .ITEM
 \f(CWMod+W\fP \(en nmtui (for connecting to wireless internet)
 .ITEM
-\f(CWMod+v\fP \(en vimwiki (for notes)
+\f(CWMod+n\fP \(en vimwiki (for notes)
+.ITEM
+\f(CWMod+N\fP \(en newsboat (RSS feed reader)
+.ITEM
+\f(CWMod+F4\fP \(en pulsemixer (audio system control)
 .ITEM
 \f(CWMod+Shift+Enter\fP \(en Show/hide dropdown terminal
 .LIST OFF
@@ -164,13 +172,15 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+BackSpace\fP \(enChoose to lock screen, logout, shutdown, reboot, etc.
 .ITEM
-\f(CWMod+V\fP \(en Toggle xcompmgr (to remove transparency and window effects)
+\f(CWMod+D\fP \(en Bring up root terminal
 .ITEM
 \f(CWMod+F1\fP \(en Show this document
 .ITEM
+\f(CWMod+F2\fP \(en Watch tutorial videos on a subject
+.ITEM
 \f(CWMod+F3\fP \(en Select screen/display to use
 .ITEM
-\f(CWMod+F5\fP \(en Update dwm's colorscheme if you have changed Xresources
+\f(CWMod+F4\fP \(en pulsemixer (audio control)
 .ITEM
 \f(CWMod+F6\fP \(en Transmission torrent client (not installed by default)
 .ITEM
@@ -181,6 +191,10 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 \f(CWMod+F9\fP \(en Mount a USB drive/hard drive or Android
 .ITEM
 \f(CWMod+F10\fP \(en Unmount a non-essential drive or Android
+.ITEM
+\f(CWMod+F11\fP \(en View webcam
+.ITEM
+\f(CWMod+F12\fP \(en Update dwm's colorscheme if you have changed Xresources
 .ITEM
 \f(CWMod+`\fP \(en Select an emoji to copy to clipboard
 .ITEM
@@ -201,7 +215,9 @@ I use ncmpcpp as a music player, which is a front end for mpd.
 .ITEM
 \f(CWMod+>\fP \(en Toggle playlist looping
 .ITEM
-\f(CWMod+p\fP \(en Pause
+\f(CWMod+p\fP \(en Toggle pause
+.ITEM
+\f(CWMod+p\fP \(en Force pause music player daemon and all mpv videos
 .ITEM
 \f(CWMod+M\fP \(en Mute all audio
 .ITEM
@@ -213,7 +229,7 @@ I use ncmpcpp as a music player, which is a front end for mpd.
 .ITEM
 \f(CWMod+]\fP \(en Forward 10 seconds (holding shift increases amount)
 .ITEM
-\f(CWMod+a\fP \(en pulsemixer (general volume sink/source control)
+\f(CWMod+F4\fP \(en pulsemixer (general audio/volume sink/source control)
 .LIST OFF
 .HEADING 2 "Tags/Workspaces"
 .PP
@@ -273,7 +289,7 @@ These settings may override your preferred settings, so you should open this fil
 .HEADING 2 "My audio isn't working!"
 .PP
 On fresh install, the Linux audio system often mutes outputs.
-You may also need to set your preferred default output sink which you can do by the command line, or by selecting one with \f(CWpulsemixer\fP (\f(CWmod+a\fP).
+You may also need to set your preferred default output sink which you can do by the command line, or by selecting one with \f(CWpulsemixer\fP (\f(CWMod+F4\fP).
 .HEADING 2 "How do I copy and paste?"
 .PP
 Copying and pasting is always program-specific on any system.

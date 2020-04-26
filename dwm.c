@@ -1593,7 +1593,7 @@ run(void)
 
 void
 runAutostart(void) {
-	system("killall dwmblocks 2>/dev/null ; dwmblocks &");
+	system("pidof -s dwmblocks >/dev/null || dwmblocks &");
 }
 
 void
