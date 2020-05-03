@@ -69,7 +69,7 @@ This setting can be changed if you don't like it by deleting or commenting out t
 .PP
 To the left, you'll see the numbers of your current workspace/tag(s).
 On the right, you'll see various system status notifiers, the date, volume, even music and local weather if possible, etc.
-Each module on the right of the status bar is a script located in \f(CW~/.local/bin/statusbar/\fP.
+Each module on the right of the statusbar is a script located in \f(CW~/.local/bin/statusbar/\fP.
 You can see what they do and modify them from there.
 I'm sure you can figure it out.
 You can also right click on the module to see what it does.
@@ -105,7 +105,7 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+h/l\fP \(en Change width of master window
 .ITEM
-\f(CWMod+z/Z\fP \(en Increase/decrease gaps (may also hold \f(CWMod\fP and scroll mouse)
+\f(CWMod+z/x\fP \(en Increase/decrease gaps (may also hold \f(CWMod\fP and scroll mouse)
 .ITEM
 \f(CWMod+a\fP \(en Toggle gaps
 .ITEM
@@ -115,7 +115,7 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+s\fP \(en Make/unmake a window "sticky" (follows you from tag to tag)
 .ITEM
-\f(CWMod+S\fP \(en Toggle status bar (may also middle click on desktop)
+\f(CWMod+b\fP \(en Toggle statusbar (may also middle click on desktop)
 .LIST OFF
 .HEADING 2 "Window layouts"
 .LI
