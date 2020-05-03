@@ -244,9 +244,9 @@ There are nine tags, active tags are highlighted in the top left.
 .ITEM
 \f(CWMod+Tab\fP \(en Go to previous tag (may also use \f(CW\\\fP for Tab)
 .ITEM
-\f(CWMod+g\fP \(en Go to left tag
+\f(CWMod+g\fP \(en Go to left tag (hold shift to send window there)
 .ITEM
-\f(CWMod+;\fP \(en Go to right tag
+\f(CWMod+;\fP \(en Go to right tag (hold shift to send window there)
 .ITEM
 \f(CWMod+Left\fP \(en Move to workspace to the left
 .ITEM
