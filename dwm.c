@@ -848,13 +848,40 @@ drawbar(Monitor *m)
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
+	char *ts = stext;
+	char *tp = stext;
+	int tsw, tpw, tx = 0;
 	Client *c;
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		sw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-		drw_text(drw, m->ww - sw, 0, sw, bh, 0, stext, 0);
+		int counter=0;
+		char tmp[3];
+		while (*(tp+2) != '\0') {
+			if (*tp == 91 && *(tp+2) == 93) {
+				tmp[0]=*tp;
+				tmp[1]=*(tp+1);
+				tmp[2]=*(tp+2);
+				counter += TEXTW(tmp) - lrpad;
+			}
+			tp++;
+		}
+		sw = TEXTW(stext) - lrpad + 2 - counter;
+		tp = ts;
+		while (*(tp+2) != '\0') {
+			if (*tp == 91 && (unsigned int)*(tp+1) < (LENGTH(colors)+49) && *(tp+2) == 93) {
+				drw_text(drw, m->ww - sw + tx, 0, sw - tx, bh, 0, ts, 0);
+				drw_setscheme(drw, scheme[(unsigned int) *(tp+1)-49]);
+				tpw = TEXTW(tp) - lrpad; 
+				tsw = TEXTW(ts) - lrpad; 
+				tx += tsw - tpw;
+				ts = tp+3;
+				tp = tp+2;
+			}
+			tp++;
+		}
+		drw_text(drw, m->ww - sw + tx, 0, sw - tx, bh, 0, ts, 0);
 	}
 
 	for (c = m->clients; c; c = c->next) {
