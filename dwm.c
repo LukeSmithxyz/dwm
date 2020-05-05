@@ -359,6 +359,7 @@ applyrules(Client *c)
 		{
 			c->isterminal = r->isterminal;
 			c->isfloating = r->isfloating;
+			c->noswallow  = r->noswallow;
 			c->tags |= r->tags;
 			if ((r->tags & SPTAGMASK) && r->isfloating) {
 				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
