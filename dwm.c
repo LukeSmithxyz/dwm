@@ -485,6 +485,8 @@ swallow(Client *p, Client *c)
 {
 	if (c->noswallow || c->isterminal)
 		return;
+	if (!swallowfloating && c->isfloating)
+		return;
 
 	detach(c);
 	detachstack(c);
