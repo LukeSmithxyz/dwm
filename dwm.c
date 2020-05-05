@@ -499,8 +499,8 @@ swallow(Client *p, Client *c)
 	p->win = c->win;
 	c->win = w;
 	updatetitle(p);
-	arrange(p->mon);
 	XMoveResizeWindow(dpy, p->win, p->x, p->y, p->w, p->h);
+	arrange(p->mon);
 	configure(p);
 	updateclientlist();
 }
