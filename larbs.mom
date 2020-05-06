@@ -174,8 +174,6 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+BackSpace\fP \(enChoose to lock screen, logout, shutdown, reboot, etc.
 .ITEM
-\f(CWMod+D\fP \(en Bring up root terminal
-.ITEM
 \f(CWMod+F1\fP \(en Show this document
 .ITEM
 \f(CWMod+F2\fP \(en Watch tutorial videos on a subject
