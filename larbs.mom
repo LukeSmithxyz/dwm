@@ -151,7 +151,7 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+e\fP \(en neomutt (email) \(en Must be first configured by running \f(CWmw add\fP.
 .ITEM
-\f(CWMod+E\fP \(en abook (contacts) \(en Must be first configured by running \f(CWmw add\fP.
+\f(CWMod+E\fP \(en abook (contacts, addressbook, emails)
 .ITEM
 \f(CWMod+m\fP \(en ncmpcpp (music player)
 .ITEM
@@ -225,9 +225,9 @@ I use ncmpcpp as a music player, which is a front end for mpd.
 .ITEM
 \f(CWMod++\fP \(en Increase volume (holding shift increases amount)
 .ITEM
-\f(CWMod+[\fP \(en Back 10 seconds (holding shift increases amount)
+\f(CWMod+[\fP \(en Back 10 seconds (holding shift moves by one minute)
 .ITEM
-\f(CWMod+]\fP \(en Forward 10 seconds (holding shift increases amount)
+\f(CWMod+]\fP \(en Forward 10 seconds (holding shift moves by one minute)
 .ITEM
 \f(CWMod+F4\fP \(en pulsemixer (general audio/volume sink/source control)
 .LIST OFF
