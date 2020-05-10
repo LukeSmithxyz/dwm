@@ -167,7 +167,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_x,		incrgaps,	{.i = -3 } },
 	{ MODKEY,			XK_b,		togglebar,	{0} },
 	{ MODKEY,			XK_n,		spawn,		SHCMD("st -e nvim -c VimwikiIndex") },
-	{ MODKEY|ShiftMask,		XK_m,		spawn,		SHCMD("pamixer --toggle-mute; kill -44 $(pidof dwmblocks)") },
+	{ MODKEY|ShiftMask,		XK_m,		spawn,		SHCMD("pamixer -t; kill -44 $(pidof dwmblocks)") },
 
 	{ MODKEY,			XK_Left,	focusmon,	{.i = -1 } },
 	{ MODKEY|ShiftMask,		XK_Left,	tagmon,		{.i = -1 } },
