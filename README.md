@@ -5,7 +5,7 @@
      width="200"
      height="100" />
   
-#### Personal build of Dynamic Window Manager 
+#### Personal build of Dynamic Window Manager (DWM)
 This is suckless, the source code is the documentation! Check out [config.h](config.h).
 
 </div>
