@@ -54,27 +54,23 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 #define FORCE_VSPLIT 1  	     /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
 static const Layout layouts[] = {
-	/* symbol     arrange function */
- 	{ "[]=",	tile },			/* Default: Master on left, slaves on right */
-	{ "TTT",	bstack },		/* Master on top, slaves on bottom */
-
-	{ "[@]",	spiral },		/* Fibonacci spiral */
-	{ "[\\]",	dwindle },		/* Decreasing in size right and leftward */
-
-	{ "H[]",	deck },			/* Master on left, slaves in monocle-like mode on right */
- 	{ "[M]",	monocle },		/* All windows on top of eachother */
-
-	{ "|M|",	centeredmaster },		/* Master in middle, slaves on sides */
-	{ ">M>",	centeredfloatingmaster },	/* Same but master floats */
-
-	{ "><>",	NULL },			/* no layout function means floating behavior */
-	{ NULL,		NULL },
+	/* symbol     	   arrange function */
+ 	{ "[tiled]", 	   tile },/*Master on left, slaves on right */
+	{ "[b-stack]", 	   bstack },/* Master on top, slaves on bottom */
+	{ "[fibonacci]",   spiral },/* Fibonacci spiral */
+	{ "[dwindle]", 	   dwindle },/* Decreasing in size right and leftward */
+	{ "[deck]", 	   deck },/* Master left, slaves in monocle mode right */
+ 	{ "[monocle]", 	   monocle },/* All windows on top of eachother */
+	{ "[c-master]",    centeredmaster },/* Master in middle, slaves on sides */
+	{ "[c-f-master]",  centeredfloatingmaster }, /* Same but master floats */
+	{ "[floating]",    NULL },/* no layout function means floating behavior */
+	{  NULL,	   NULL },
 };
 
 /* key definitions */
@@ -193,7 +189,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,		XK_Print,	spawn,		SHCMD("dmenu_record kill") },
 	{ MODKEY,			XK_Delete,	spawn,		SHCMD("dmenu_record kill") },
 	{ MODKEY,			XK_Scroll_Lock,	spawn,		SHCMD("killall screenkey || screenkey &") },
-	
+
 	{ 0, XF86XK_MonBrightnessUp,	spawn,		SHCMD("xbacklight -inc 15") },
 	{ 0, XF86XK_MonBrightnessDown,	spawn,		SHCMD("xbacklight -dec 15") },
 
