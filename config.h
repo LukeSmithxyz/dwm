@@ -101,26 +101,26 @@ static Key keys[] = {
 	STACKKEYS(MODKEY,                 focus)
 	STACKKEYS(MODKEY|ShiftMask,       push)
 	/* Layout bindings  */
-    TAGKEYS(                XK_1,		 0)
-    TAGKEYS(                XK_2,		 1)
-    TAGKEYS(                XK_3,		 2)
-    TAGKEYS(                XK_4,		 3)
-    TAGKEYS(                XK_5,		 4)
-    TAGKEYS(                XK_6,		 5)
-    TAGKEYS(                XK_7,		 6)
-    TAGKEYS(                XK_8,		 7)
-    TAGKEYS(                XK_9,		 8)
-    { MODKEY,               XK_0,		 view,               {.ui = ~0 } },
-    { MODKEY|ShiftMask,     XK_0,		 tag,                {.ui = ~0 } },
-    { MODKEY,               XK_t,		 setlayout,          {.v = &layouts[0]} }, /* tile */
-    { MODKEY|ShiftMask,     XK_t,		 setlayout,          {.v = &layouts[1]} }, /* bstack */
-    { MODKEY,               XK_y,		 setlayout,          {.v = &layouts[2]} }, /* spiral */
-    { MODKEY|ShiftMask,     XK_y,		 setlayout,          {.v = &layouts[3]} }, /* dwindle */
-    { MODKEY,               XK_u,		 setlayout,          {.v = &layouts[4]} }, /* deck */
-    { MODKEY|ShiftMask,     XK_u,		 setlayout,          {.v = &layouts[5]} }, /* monocle */
-    { MODKEY,               XK_i,		 setlayout,          {.v = &layouts[6]} }, /* centered master */
-    { MODKEY|ShiftMask,     XK_i,		 setlayout,          {.v = &layouts[7]} }, /* centered floating master */
-    { MODKEY|ShiftMask,     XK_f,		 setlayout,          {.v = &layouts[8]} }, /* fullscreen */
+    TAGKEYS(                XK_1,		0)
+    TAGKEYS(                XK_2,		1)
+    TAGKEYS(                XK_3,		2)
+    TAGKEYS(                XK_4,		3)
+    TAGKEYS(                XK_5,		4)
+    TAGKEYS(                XK_6,		5)
+    TAGKEYS(                XK_7,		6)
+    TAGKEYS(                XK_8,		7)
+    TAGKEYS(                XK_9,		8)
+    { MODKEY,               XK_0,		view,                    {.ui = ~0 } },
+    { MODKEY|ShiftMask,     XK_0,		tag,                     {.ui = ~0 } },
+    { MODKEY,               XK_t,		setlayout,               {.v = &layouts[0]} }, /* tile */
+    { MODKEY|ShiftMask,     XK_t,		setlayout,               {.v = &layouts[1]} }, /* bstack */
+    { MODKEY,               XK_y,		setlayout,               {.v = &layouts[2]} }, /* spiral */
+    { MODKEY|ShiftMask,     XK_y,		setlayout,               {.v = &layouts[3]} }, /* dwindle */
+    { MODKEY,               XK_u,		setlayout,               {.v = &layouts[4]} }, /* deck */
+    { MODKEY|ShiftMask,     XK_u,		setlayout,               {.v = &layouts[5]} }, /* monocle */
+    { MODKEY,               XK_i,		setlayout,               {.v = &layouts[6]} }, /* centered master */
+    { MODKEY|ShiftMask,     XK_i,		setlayout,               {.v = &layouts[7]} }, /* centered floating master */
+    { MODKEY|ShiftMask,     XK_f,		setlayout,               {.v = &layouts[8]} }, /* fullscreen */
     /* Alphabetic keys */
     { MODKEY,               XK_a,               togglegaps,	         {0} },
     { MODKEY|ShiftMask,     XK_a,               defaultgaps,             {0} },
