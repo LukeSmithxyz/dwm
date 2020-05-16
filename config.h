@@ -60,14 +60,14 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 #define FORCE_VSPLIT 1  	     /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
 static const Layout layouts[] = {
-	/* symbol     	   arrange function */
- 	{ "[tiled]", 	   tile },/*Master on left, slaves on right */
-	{ "[b-stack]", 	   bstack },/* Master on top, slaves on bottom */
-	{ "[fibonacci]",   spiral },/* Fibonacci spiral */
+	/* mod+t, mod+shift+t */
+	{ "[tiled]", 	   tile },   /* Master on left, slaves on right */
+	{ "[b-stack]", 	   bstack }, /* Master on top, slaves on bottom */
+	{ "[fibonacci]",   spiral }, /* Fibonacci spiral */
 	{ "[dwindle]", 	   dwindle },/* Decreasing in size right and leftward */
-	{ "[deck]", 	   deck },/* Master left, slaves in monocle mode right */
+	{ "[deck]", 	   deck },   /* Master left, slaves in monocle mode right */
  	{ "[monocle]", 	   monocle },/* All windows on top of eachother */
-	{ "[c-master]",    centeredmaster },/* Master in middle, slaves on sides */
+	{ "[c-master]",    centeredmaster },         /* Master in middle, slaves on sides */
 	{ "[c-f-master]",  centeredfloatingmaster }, /* Same but master floats */
 	{ "[floating]",    NULL },/* no layout function means floating behavior */
 	{  NULL,	   NULL },
