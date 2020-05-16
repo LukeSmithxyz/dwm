@@ -116,6 +116,8 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 \f(CWMod+s\fP \(en Make/unmake a window "sticky" (follows you from tag to tag)
 .ITEM
 \f(CWMod+b\fP \(en Toggle statusbar (may also middle click on desktop)
+.ITEM
+\f(CWMod+v\fP \(en Jump to master window
 .LIST OFF
 .HEADING 2 "Window layouts"
 .LI
