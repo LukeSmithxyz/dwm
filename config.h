@@ -1,6 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
-/* appearance */
+/* Appearance */
 static const unsigned int borderpx  = 3;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
@@ -20,7 +20,7 @@ static char selfgcolor[]            = "#eeeeee";
 static char selbordercolor[]        = "#770000";
 static char selbgcolor[]            = "#005577";
 static char *colors[][3] = {
-       /*                   fg           bg           border     */
+       		      /*   fg            bg           border     */
        [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
        [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
 };
@@ -174,7 +174,6 @@ static Key keys[] = {
 	{ MODKEY,			XK_F3,		spawn,		SHCMD("dmenu_display_options") },
 	{ MODKEY,			XK_F4,		spawn,		SHCMD("dmenu_music_options; kill -44 $(pidof dwmblocks)") },
 	{ MODKEY,			XK_F5,		xrdb,		{.v = NULL } },
-	{ MODKEY,			XK_F12,		xrdb,		{.v = NULL } },
 };	
 
 /* Button definitions */
