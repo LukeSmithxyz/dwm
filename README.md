@@ -33,3 +33,5 @@ This is suckless, the source code is the documentation! Check out [config.h](con
 - Swallow: If a program run from a terminal would make it inoperable, it temporarily takes its place to save space.
 - Color bar: Change the foreground and background color of every statusbar element.
 - No border: No border if single window on tag
+- Per tag layout: Keeps layout, mwfact, barpos and nmaster per tag.
+
