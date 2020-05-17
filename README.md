@@ -14,7 +14,7 @@ This is suckless, the source code is the documentation! Check out [config.h](con
 
 - Clickable statusbar with my build of [dwmblocks](https://github.com/vladdoster/dwmblocks).
 - Reads Xresources colors/variables
-- Scratchpad
+- Scratchpads: Enables multiple scratchpads, each with one asigned window.
 - Layouts: 
      - tile
      - bstack
@@ -25,10 +25,11 @@ This is suckless, the source code is the documentation! Check out [config.h](con
      - centered master
      - centered floating master
      - true fullscreen (prevents focus shifting)
-- Windows can be made sticky (`super+s`).
+- Sticky: A sticky client is visible on all tags.
 - Stacker: Move windows up the stack manually (`super-K/J`).
 - Shiftview: Cycle through tags (`super+g/;`).
-- Vanity gaps: Gaps allowed across all layouts.
-- Swallow: If a program run from a terminal would make it inoperable, it temporarily takes its place to save space.
-- Color bar: Customize colors of status bar
-- No Border: No border if single window on tag
+- Vanity gaps: Adds (inner) gaps between client windows and (outer) gaps between windows and the screen edge.
+- Swallow: Adds "window swallowing" to dwm as known from Plan 9's windowing system rio.
+- Color bar: change the foreground and background color of every statusbar element.
+- No Border: Remove the border when there is only one window visible.
+- Per tag layout: Keeps layout, mwfact, barpos and nmaster per tag.
