@@ -121,7 +121,6 @@ static Key keys[] = {
     { MODKEY,               XK_i,		setlayout,               {.v = &layouts[6]} }, /* centered master */
     { MODKEY|ShiftMask,     XK_i,		setlayout,               {.v = &layouts[7]} }, /* centered floating master */
     { MODKEY|ShiftMask,     XK_f,		setlayout,               {.v = &layouts[8]} }, /* fullscreen */
-    { MODKEY,               XK_s,               swapfocus,               {.i = -1 } }, /* swapfocus */
     /* Alphabetic keys */
     { MODKEY,               XK_a,               togglegaps,	         {0} },
     { MODKEY|ShiftMask,     XK_a,               defaultgaps,             {0} },
@@ -139,7 +138,8 @@ static Key keys[] = {
     { MODKEY|ShiftMask,	    XK_o,               incnmaster,              {.i = -1 } },
     { MODKEY,               XK_r,               spawn,		         SHCMD("st -e ranger") },
     { MODKEY|ShiftMask,	    XK_r,               spawn,		         SHCMD("st -e htop") },
-    { MODKEY,               XK_s,               togglesticky,            {0} },
+    { MODKEY,               XK_s,               swapfocus,               {.i = -1 } },
+    { MODKEY|ShiftMask,     XK_s,               togglesticky,            {0} },
     { MODKEY,               XK_q,               killclient,	         {0} },
     { MODKEY,               XK_w,               spawn,		         SHCMD("$BROWSER") },
     { MODKEY|ShiftMask,	    XK_w,               spawn,		         SHCMD("st -e sudo nmtui") },
