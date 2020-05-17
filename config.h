@@ -121,6 +121,7 @@ static Key keys[] = {
     { MODKEY,               XK_i,		setlayout,               {.v = &layouts[6]} }, /* centered master */
     { MODKEY|ShiftMask,     XK_i,		setlayout,               {.v = &layouts[7]} }, /* centered floating master */
     { MODKEY|ShiftMask,     XK_f,		setlayout,               {.v = &layouts[8]} }, /* fullscreen */
+    { MODKEY,               XK_s,               swapfocus,               {.i = -1 } }, /* swapfocus */
     /* Alphabetic keys */
     { MODKEY,               XK_a,               togglegaps,	         {0} },
     { MODKEY|ShiftMask,     XK_a,               defaultgaps,             {0} },
