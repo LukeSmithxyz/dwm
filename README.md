@@ -15,7 +15,16 @@ This is suckless, the source code is the documentation! Check out [config.h](con
 - Clickable statusbar with my build of [dwmblocks](https://github.com/vladdoster/dwmblocks).
 - Reads Xresources colors/variables
 - Scratchpad: Accessible with mod+shift+enter.
-- Layouts: bstack, fibonacci, deck, centered master and more.
+- Layouts: 
+     - tile
+     - bstack
+     - spiral
+     - dwindle
+     - deck
+     - monocle
+     - centered master
+     - centered floating master
+     - fullscreen
 - True fullscreen (`super+f`) and prevents focus shifting.
 - Windows can be made sticky (`super+s`).
 - Stacker: Move windows up the stack manually (`super-K/J`).
