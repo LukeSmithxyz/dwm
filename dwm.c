@@ -206,7 +206,6 @@ static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
-static int getdwmblockspid();
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
@@ -246,7 +245,10 @@ static void setup(void);
 static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
+#ifndef __OpenBSD__
+static int getdwmblockspid();
 static void sigdwmblocks(const Arg *arg);
+#endif
 static void sighup(int unused);
 static void sigterm(int unused);
 static void spawn(const Arg *arg);
@@ -1016,6 +1018,7 @@ getatomprop(Client *c, Atom prop)
 	return atom;
 }
 
+#ifndef __OpenBSD__
 int
 getdwmblockspid()
 {
@@ -1027,6 +1030,7 @@ getdwmblockspid()
 	dwmblockspid = pid;
 	return pid != 0 ? 0 : -1;
 }
+#endif
 
 int
 getrootptr(int *x, int *y)
@@ -1908,6 +1912,7 @@ sigterm(int unused)
 	quit(&a);
 }
 
+#ifndef __OpenBSD__
 void
 sigdwmblocks(const Arg *arg)
 {
@@ -1924,6 +1929,7 @@ sigdwmblocks(const Arg *arg)
 		}
 	}
 }
+#endif
 
 void
 spawn(const Arg *arg)
