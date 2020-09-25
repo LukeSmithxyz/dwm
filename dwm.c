@@ -2157,8 +2157,10 @@ updatebarpos(Monitor *m)
 		m->wh -= bh;
 		m->by = m->topbar ? m->wy : m->wy + m->wh;
 		m->wy = m->topbar ? m->wy + bh : m->wy;
-	} else
+	} else {
 		m->by = -bh;
+	}
+	m->wh -= yoffset;
 }
 
 void
