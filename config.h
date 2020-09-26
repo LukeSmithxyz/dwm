@@ -41,6 +41,13 @@ static Sp scratchpads[] = {
 	{"spranger",    spcmd2},
 };
 
+/* Execute commands on startup. */
+/* See https://dwm.suckless.org/patches/cool_autostart/ for detailed usage. */
+static const char *const autostart[] = {
+	"st", NULL,
+	NULL /* terminate */
+};
+
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
