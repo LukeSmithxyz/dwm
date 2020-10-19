@@ -22,6 +22,7 @@ I haven't kept `man dwm`/`dwm.1` updated though. PRs welcome on that, lol.
 - shiftview: Cycle through tags (`super+g/;`).
 - vanitygaps: Gaps allowed across all layouts.
 - swallow patch: if a program run from a terminal would make it inoperable, it temporarily takes its place to save space.
+- systray: A simple system tray implementation. Multi-monitor is also supported.
 
 ## Please install `libxft-bgra`!
 
