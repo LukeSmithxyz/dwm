@@ -5,18 +5,17 @@
 #define TERMCLASS "St"
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
-static const unsigned int snap      = 32;       /* snap pixel */
-static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
-static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
-static const int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
-static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
-static char dmenufont[]             = "monospace:size=10";
+static unsigned int borderpx  = 3;        /* border pixel of windows */
+static unsigned int snap      = 32;       /* snap pixel */
+static unsigned int gappih    = 20;       /* horiz inner gap between windows */
+static unsigned int gappiv    = 10;       /* vert inner gap between windows */
+static unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
+static unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
+static int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
+static int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
+static int showbar            = 1;        /* 0 means no bar */
+static int topbar             = 1;        /* 0 means bottom bar */
+static char *fonts[]          = { "monospace:size=10", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
 static char normfgcolor[]           = "#bbbbbb";
@@ -58,9 +57,9 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
-static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+static float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static int nmaster     = 1;    /* number of clients in master area */
+static int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
 static const Layout layouts[] = {
@@ -101,12 +100,36 @@ static const Layout layouts[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]  = { TERMINAL, NULL };
+
+/*
+ * Xresources preferences to load at startup
+ */
+ResourcePref resources[] = {
+		{ "dwm.color0",		STRING,	&normbordercolor },
+		{ "dwm.color8",		STRING,	&selbordercolor },
+		{ "dwm.color0",		STRING,	&normbgcolor },
+		{ "dwm.color4",		STRING,	&normfgcolor },
+		{ "dwm.color0",		STRING,	&selfgcolor },
+		{ "dwm.color4",		STRING,	&selbgcolor },
+		{ "borderpx",		INTEGER, &borderpx },
+		{ "snap",		INTEGER, &snap },
+		{ "showbar",		INTEGER, &showbar },
+		{ "topbar",		INTEGER, &topbar },
+		{ "nmaster",		INTEGER, &nmaster },
+		{ "resizehints",	INTEGER, &resizehints },
+		{ "mfact",		FLOAT,	&mfact },
+		{ "gappih",		STRING, &gappih },
+		{ "gappiv",		STRING, &gappiv },
+		{ "gappoh",		STRING, &gappoh },
+		{ "gappov",		STRING, &gappov },
+		{ "swallowfloating",	STRING, &swallowfloating },
+		{ "smartgaps",		STRING, &smartgaps },
+};
 
 #include <X11/XF86keysym.h>
 #include "shiftview.c"
+
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	STACKKEYS(MODKEY,                          focus)
@@ -165,7 +188,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,		XK_a,		defaultgaps,	{0} },
 	{ MODKEY,			XK_s,		togglesticky,	{0} },
 	/* { MODKEY|ShiftMask,		XK_s,		spawn,		SHCMD("") }, */
-	{ MODKEY,			XK_d,		spawn,          {.v = dmenucmd } },
+	{ MODKEY,			XK_d,		spawn,          SHCMD("dmenu_run") },
 	/* { MODKEY,			XK_d,		spawn,		SHCMD("") } }, */
 	{ MODKEY,			XK_f,		togglefullscr,	{0} },
 	{ MODKEY|ShiftMask,		XK_f,		setlayout,	{.v = &layouts[8]} },
@@ -214,14 +237,14 @@ static Key keys[] = {
 	{ MODKEY,			XK_F2,		spawn,		SHCMD("tutorialvids") },
 	{ MODKEY,			XK_F3,		spawn,		SHCMD("displayselect") },
 	{ MODKEY,			XK_F4,		spawn,		SHCMD(TERMINAL " -e pulsemixer; kill -44 $(pidof dwmblocks)") },
-	{ MODKEY,			XK_F5,		xrdb,		{.v = NULL } },
+	/* { MODKEY,			XK_F5,		xrdb,		{.v = NULL } }, */
 	{ MODKEY,			XK_F6,		spawn,		SHCMD("torwrap") },
 	{ MODKEY,			XK_F7,		spawn,		SHCMD("td-toggle") },
 	{ MODKEY,			XK_F8,		spawn,		SHCMD("mw -Y") },
 	{ MODKEY,			XK_F9,		spawn,		SHCMD("dmenumount") },
 	{ MODKEY,			XK_F10,		spawn,		SHCMD("dmenuumount") },
 	{ MODKEY,			XK_F11,		spawn,		SHCMD("mpv --no-cache --no-osc --no-input-default-bindings --input-conf=/dev/null --title=webcam $(ls /dev/video[0,2,4,6,8] | tail -n 1)") },
-	{ MODKEY,			XK_F12,		xrdb,		{.v = NULL } },
+	/* { MODKEY,			XK_F12,		xrdb,		{.v = NULL } }, */
 	{ MODKEY,			XK_space,	zoom,		{0} },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	{0} },
 

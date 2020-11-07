@@ -153,7 +153,7 @@ xfont_free(Fnt *font)
 }
 
 Fnt*
-drw_fontset_create(Drw* drw, const char *fonts[], size_t fontcount)
+drw_fontset_create(Drw* drw, char *fonts[], size_t fontcount)
 {
 	Fnt *cur, *ret = NULL;
 	size_t i;
