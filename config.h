@@ -119,12 +119,12 @@ ResourcePref resources[] = {
 		{ "nmaster",		INTEGER, &nmaster },
 		{ "resizehints",	INTEGER, &resizehints },
 		{ "mfact",		FLOAT,	&mfact },
-		{ "gappih",		STRING, &gappih },
-		{ "gappiv",		STRING, &gappiv },
-		{ "gappoh",		STRING, &gappoh },
-		{ "gappov",		STRING, &gappov },
-		{ "swallowfloating",	STRING, &swallowfloating },
-		{ "smartgaps",		STRING, &smartgaps },
+		{ "gappih",		INTEGER, &gappih },
+		{ "gappiv",		INTEGER, &gappiv },
+		{ "gappoh",		INTEGER, &gappoh },
+		{ "gappov",		INTEGER, &gappov },
+		{ "swallowfloating",	INTEGER, &swallowfloating },
+		{ "smartgaps",		INTEGER, &smartgaps },
 };
 
 #include <X11/XF86keysym.h>
