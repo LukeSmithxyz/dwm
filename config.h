@@ -106,12 +106,12 @@ static const char *termcmd[]  = { TERMINAL, NULL };
  * Xresources preferences to load at startup
  */
 ResourcePref resources[] = {
-		{ "dwm.color0",		STRING,	&normbordercolor },
-		{ "dwm.color8",		STRING,	&selbordercolor },
-		{ "dwm.color0",		STRING,	&normbgcolor },
-		{ "dwm.color4",		STRING,	&normfgcolor },
-		{ "dwm.color0",		STRING,	&selfgcolor },
-		{ "dwm.color4",		STRING,	&selbgcolor },
+		{ "color0",		STRING,	&normbordercolor },
+		{ "color8",		STRING,	&selbordercolor },
+		{ "color0",		STRING,	&normbgcolor },
+		{ "color4",		STRING,	&normfgcolor },
+		{ "color0",		STRING,	&selfgcolor },
+		{ "color4",		STRING,	&selbgcolor },
 		{ "borderpx",		INTEGER, &borderpx },
 		{ "snap",		INTEGER, &snap },
 		{ "showbar",		INTEGER, &showbar },
