@@ -170,6 +170,8 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 \f(CWMod+Shift+Enter\fP \(en Show/hide dropdown terminal
 .ITEM
 \f(CWMod+'\fP \(en Show/hide dropdown calculator
+.ITEM
+\f(CWMod+D\fP \(en passmenu (password manager)
 .LIST OFF
 .HEADING 2 "System"
 .LI
