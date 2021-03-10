@@ -250,9 +250,9 @@ There are nine tags, active tags are highlighted in the top left.
 .ITEM
 \f(CWMod+;\fP \(en Go to right tag (hold shift to send window there)
 .ITEM
-\f(CWMod+Left\fP \(en Move to workspace to the left
+\f(CWMod+Left/Right\fP \(en Go to another display
 .ITEM
-\f(CWMod+Right\fP \(en Move to workspace to the right
+\f(CWMod+Shift+Left/+Right\fP \(en Move window to another display
 .LIST OFF
 .HEADING 2 "Recording"
 .PP
