@@ -64,7 +64,7 @@ Below in this document, there is information about where to change programs/comp
 .PP
 Additionally, while this isn't a part of the desktop environment, the default editing mode in the shell is using vi bindings.
 If you want to learn more of this, run \f(CWMod+F2\fP and type and select the option for "vi mode in shell".
-This setting can be changed if you don't like it by deleting or commenting out the contents of \f(CW~/.config/inputrc\fP.
+This setting can be changed if you don't like it by deleting or commenting out the contents of \f(CW~/.config/shell/inputrc\fP.
 .HEADING 2 "The Status Bar"
 .PP
 To the left, you'll see the numbers of your current workspace/tag(s).
@@ -173,6 +173,25 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+D\fP \(en passmenu (password manager)
 .LIST OFF
+.HEADING 2 "Tags/Workspaces"
+.PP
+There are nine tags, active tags are highlighted in the top left.
+.LI
+.ITEM
+\f(CWMod+(Number)\fP \(en Go to that number tag
+.ITEM
+\f(CWMod+Shift+(Number)\fP \(en Send window to that tag
+.ITEM
+\f(CWMod+Tab\fP \(en Go to previous tag (may also use \f(CW\\\fP for Tab)
+.ITEM
+\f(CWMod+g\fP \(en Go to left tag (hold shift to send window there)
+.ITEM
+\f(CWMod+;\fP \(en Go to right tag (hold shift to send window there)
+.ITEM
+\f(CWMod+Left/Right\fP \(en Go to another display
+.ITEM
+\f(CWMod+Shift+Left/+Right\fP \(en Move window to another display
+.LIST OFF
 .HEADING 2 "System"
 .LI
 .ITEM
@@ -235,25 +254,6 @@ I use ncmpcpp as a music player, which is a front end for mpd.
 .ITEM
 \f(CWMod+F4\fP \(en pulsemixer (general audio/volume sink/source control)
 .LIST OFF
-.HEADING 2 "Tags/Workspaces"
-.PP
-There are nine tags, active tags are highlighted in the top left.
-.LI
-.ITEM
-\f(CWMod+(Number)\fP \(en Go to that number tag
-.ITEM
-\f(CWMod+Shift+(Number)\fP \(en Send window to that tag
-.ITEM
-\f(CWMod+Tab\fP \(en Go to previous tag (may also use \f(CW\\\fP for Tab)
-.ITEM
-\f(CWMod+g\fP \(en Go to left tag (hold shift to send window there)
-.ITEM
-\f(CWMod+;\fP \(en Go to right tag (hold shift to send window there)
-.ITEM
-\f(CWMod+Left/Right\fP \(en Go to another display
-.ITEM
-\f(CWMod+Shift+Left/+Right\fP \(en Move window to another display
-.LIST OFF
 .HEADING 2 "Recording"
 .PP
 I use maim and ffmpeg to make different recordings of the desktop and audio.
@@ -280,11 +280,14 @@ buttons, screen brightness, email, web browsing buttons, etc.) to what you
 would expect.
 .HEADING 1 "Configuration"
 .PP
-Dotfiles/settings files are located in \f(CW~/.config/\fP, note that dotfiles to programs not included in LARBS are there as well by requests of users. I do not necessarily maintain all these dotfiles, but they remain as legacy.
+Dotfiles/settings files are located in \f(CW~/.config/\fP.
 .PP
-Suckless programs, dwm (the window manager), st (the terminal) and dmenu among others do not have traditional config files, but have their source code location in \f(CW~/.local/src/\fP.
-There you can modify their \f(CWconfig.h\fP files, then \f(CWsudo make install\fP to reinstall.
-(You'll have to restart the program to see its effects obviously.)
+Suckless programs, dwm (the window manager), st (the terminal) and dmenu among others do not have traditional config files, but have their source code location in \f(CW~/.local/src/\fP (press \f(CWrr\fP to jump to that directory).
+There you can modify their \f(CWconfig.h\fP files or other source code, then \f(CWsudo make install\fP to reinstall.
+.PP
+vim is set to automatically recompile and install these programs whenever you save changes to any \f(CWconfig.h\fP file
+(compilation will be nearly instantaneous).
+You'll have to restart the program to see its effects obviously.
 .HEADING 1 "Frequently Asked Questions (FAQs)"
 .HEADING 2 "My keyboard isn't working as expected!"
 .PP
@@ -305,19 +308,20 @@ Additionally, I've set vim to use the clipboard as the default buffer, which mea
 .PP
 The system will always read the file \f(CW~/.config/wall.png\fP as the wallpaper.
 The script \f(CWsetbg\fP, if run on an image will set it as the persistent background.
-When using the file manager, you can simply hover over an image name and type \f(CWbg\fP and this will run \f(CWsetbg\fP.
+When using the file manager, you can simply hover over an image name and type \f(CWb\fP and this will run \f(CWsetbg\fP.
 .HEADING 2 "How I change the colorscheme?"
 .PP
-LARBS no longer deploys Xresource by default, but check \f(CW~/.config/Xresources\fP for a list of color schemes you can activate or add your own. When you save the file, vim will automatically update the colorscheme. If you'd like these colors activated by default on login, there is a line in \f(CW~/.config/xprofile\fP you can uncomment to allow that.
+LARBS no longer deploys Xresources by default, but check \f(CW~/.config/x11/xresources\fP for a list of color schemes you can activate or add your own. When you save the file, vim will automatically update the colorscheme. If you'd like these colors activated by default on login, there is a line in \f(CW~/.config/x11/xprofile\fP you can uncomment to allow that.
 .PP
 Or, if you want to use \f(CWwal\fP to automatically generate colorschemes from your wallpapers, just install it and \f(CWsetbg\fP will automatically detect and run it on startup and wallpaper change.
 .HEADING 2 "How do I set up my email?"
 .PP
 LARBS comes with mutt-wizard, which gives the ability to receive and send all your email and keep an offline store of it all in your terminal, without the need for browser.
-You can add email accounts by running \f(CWmw add\fP.
+You can add email accounts by running \f(CWmw -a your@email.com\fP.
+See \f(CWman mw\fP for all the information you need about mutt-wizard.
 .PP
 Once you have successfully added your email address(es), you can open your mail with \f(CWneomutt\fP which is also bound to \f(CWMod+e\fP.
-You can sync your mail by pressing \f(CWMod+F8\fP and you can set a cronjob to sync mail every several minutes by running \f(CWmw cron\fP.
+You can sync your mail by pressing \f(CWMod+F8\fP and you can set a cronjob to sync mail every 10 minutes by running \f(CWmw -t 10\fP.
 .PP
 You may also want to install \f(CWpam-gnupg-git\fP, which can be set up to automatically unlock your GPG key on login, which will allow you avoid having put in a password to sync and send, all while keeping your password safe and encypted on your machine.
 .HEADING 2 "How do I set up my music?"
