@@ -26,7 +26,7 @@ I haven't kept `man dwm`/`dwm.1` updated though. PRs welcome on that, lol.
 ## Installation for newbs
 
 ```
-git clone https://github.com/LukeSmithxyz/dwm
+git clone https://github.com/LukeSmithxyz/dwm.git
 cd dwm
 sudo make install
 ```
