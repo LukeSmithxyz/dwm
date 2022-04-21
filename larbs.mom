@@ -3,58 +3,21 @@
 .SHIFT_LIST 10p
 ..
 .PARA_SPACE 1m
-.TITLE "\s+(10A Friendly Guide to LARBS!\s0"
-.AUTHOR "\s+5Luke Smith\s0"
+.TITLE "\s+(10Cheatsheet\s0"
+.AUTHOR "\s+5A.\s0"
 .DOCTYPE    DEFAULT
 .COPYSTYLE  FINAL
 .PRINTSTYLE TYPESET
-.PT_SIZE 12
+.PT_SIZE 10
 .START
-Use vim keys (\f(CWh/j/k/l\fP) to navigate this document.
-Pressing \f(CWs\fP will fit it to window width (\f(CWa\fP to revert).
-\f(CWK\fP and \f(CWJ\fP zoom in and out.
-\f(CWSuper+f\fP to toggle fullscreen.
-\f(CWq\fP to quit.
-(These are general binds set for \fBzathura\fP, the pdf reader.)
-.LI
-.ITEM
-\f(CWMod+F1\fP will show this document at any time.
-.ITEM
-By \f(CWMod\fP, I mean the Super Key, usually known as "the Windows Key."
-.LIST OFF
 .PP
-FAQs are at the end of this document.
-.HEADING 1 "Welcome!"
-.HEADING 2 "Basic goals and principles of this system:"
-.LI
-.ITEM
-\fBNaturalness\fP \(en
-Remove the border between mind and matter:
-everything important should be as few keypresses as possible away from you,
-and you shouldn't have to think about what you're doing.
-Immersion.
-.ITEM
-\fBEconomy\fP \(en
-Programs should be simple and light on system resources and highly extensible.
-Because of this, many are terminal or small ncurses programs that have all the magic inside of them.
-.ITEM
-\fBKeyboard/vim-centrality\fP \(en
-All terminal programs (and other programs) use vim keys when possible.
-Your hands never need leave the home row or thereabout.
-.ITEM
-\fBDecentralization\fP \(en
-This system is a web of small, modifiable and replaceable programs that users can easily customize.
-.LIST OFF
+\f(CWMod+F1\fP will show this document at any time.
 .HEADING 2 "General keyboard changes"
 .LI
 .ITEM
-Capslock is a useless key in high quality space.
-It's now remapped.
+Capslock is remapped.
 If you press it alone, it will function as escape, making vimcraft much more natural,
 but you can also hold it down and it will act as another Windows/super/mod key.
-.ITEM
-The menu button (usually between the right Alt and Ctrl) is an alternative Super/Mod button.
-This is to make one-handing on laptops easier.
 .LIST OFF
 .PP
 If you'd like to change any of these keyboard changes, you need only open and change the \f(CWremaps\fP script.
@@ -65,21 +28,6 @@ Below in this document, there is information about where to change programs/comp
 Additionally, while this isn't a part of the desktop environment, the default editing mode in the shell is using vi bindings.
 If you want to learn more of this, run \f(CWMod+F2\fP and type and select the option for "vi mode in shell".
 This setting can be changed if you don't like it by deleting or commenting out the contents of \f(CW~/.config/shell/inputrc\fP.
-.HEADING 2 "The Status Bar"
-.PP
-To the left, you'll see the numbers of your current workspace/tag(s).
-On the right, you'll see various system status notifiers, the date, volume, even music and local weather if possible, etc.
-Each module on the right of the statusbar is a script located in \f(CW~/.local/bin/statusbar/\fP.
-You can see what they do and modify them from there.
-I'm sure you can figure it out.
-You can also right click on the module to see what it does.
-.PP
-The program dwmblocks is what is run to generate the statusbar from those scripts.
-You can edit its config/source code in \f(CW~/.local/src/dwmblocks/\fP to tell it what scripts/commands you want it to display.
-.HEADING 2 "Deeper Tutorials"
-.PP
-Press \f(CWmod+F2\fP at any time to get a menu of programs to watch videos about streaming directly from YouTube.
-You can also check the config files for programs which detail a lot of the specific bindings.
 .HEADING 1 "Key Bindings"
 .PP
 The window manager dwm abstractly orders all of your windows into a stack from most important to least based on when you last manipulated it.
@@ -143,6 +91,10 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 \f(CWMod+I\fP \(en Center and float the master window
 .ITEM
 \f(CWMod+o/O\fP \(en Increase/decrease the number of master windows
+.ITEM
+\f(CWMod+left/rightclick\fP \(en move/resize window.
+.ITEM
+.PDF_WWW_LINK "https://github.com/LukeSmithxyz/dwm/blob/3eb52c30c6f547114cba6917de5a08d1925c4d56/dwm.1" "See also guide here."
 .LIST OFF
 .HEADING 2 "Basic Programs"
 .LI
@@ -288,6 +240,72 @@ There you can modify their \f(CWconfig.h\fP files or other source code, then \f(
 vim is set to automatically recompile and install these programs whenever you save changes to any \f(CWconfig.h\fP file
 (compilation will be nearly instantaneous).
 You'll have to restart the program to see its effects obviously.
+.HEADING 1 "Keybindings Cheatsheet for various Programs"
+.HEADING 2 Vim
+.LI
+.ITEM
+\f(CWCtrl+{,}\fP \(en to move between paragraphs.
+.ITEM
+\f(CWCtrl+I\fP \(en to move to newer position (as opposed to \f(CWCtrl+O\fP).
+.ITEM
+\f(CWD\fP \(en to delete to end of line (shorter than \f(CWd$\fP).
+.ITEM
+\f(CWdap/dip\fP \(en to delete around/in current paragraph.
+.ITEM
+\f(CW:earlier/later 1m or 30s\fP \(en to time travel to earlier/later.
+.ITEM
+\f(CW:25%\fP \(en to go to 25% of file.
+.ITEM
+\f(CW''\fP \(en to go back to old location (same as \f(CWctrl+O\fP).
+.ITEM
+\f(CWctrl+V\fP \(en visual block mode (highlight via blocks).
+.ITEM
+\f(CW:1,10norm {command}\fP \(en repeat command on lines 1-10.
+.ITEM
+\f(CWg+{$,0}\fP \(en g-move to end/beginning of shown line.
+.ITEM
+\f(CWgq\fP \(en convert large paragraph into separate lines (won't change output).
+.ITEM
+\f(CWgv\fP \(en select last selected.
+.ITEM
+\f(CWg&\fP \(en repeat substitute done on one line to entire document.
+.ITEM
+\f(CWJ\fP \(en join current and next line.
+.ITEM
+\f(CWfx/Fx\fP \(en jump to next/previous occurence of character x.
+.ITEM
+\f(CWtx/Tx\fP \(en jump to before/after next/previous occurence of character x.
+.ITEM
+\f(CW^\fP \(en jump to first non-blank character of line.
+.ITEM
+\f(CW>>/<<\fP \(en indent/de-indent line one shiftwidth.
+.ITEM
+\f(CWZZ\fP \(en write (save) and quit (same \f(CW:wq\fP).
+.ITEM
+\f(CWZQ\fP \(en quit without saving (same as \f(CW:q!\fP).
+.ITEM
+.PDF_WWW_LINK "https://vim.rtorr.com/" "See more shortcuts here."
+.LIST OFF
+.HEADING 2 "Vim-LaTeX"
+.LI
+.ITEM
+\f(CW[[/]]\fP \(en navigate sections.
+.ITEM
+\f(CW[m/[M/]m/]M\fP \(en navigate environment boundaries.
+.ITEM
+\f(CW[n/[N/]n/]N\fP \(en navigate math environment boundaries.
+.ITEM
+\f(CW(d,c)sc/(d,c)se/(d,c)s$/(d,c)sd\fP \(en delete/change surrounding command/environment/delimiter.
+.ITEM
+.PDF_WWW_LINK "https://github.com/lervag/vimtex/blob/master/doc/vimtex.txt" "See more shortcuts here."
+.LIST OFF
+.HEADING 2 "Zathura"
+.LI
+.ITEM
+\f(CWs\fP \(en fit to window width (\f(CWa\fP to revert).
+.ITEM
+\f(CWq\fP \(en quit.
+.LIST OFF
 .HEADING 1 "Frequently Asked Questions (FAQs)"
 .HEADING 2 "My keyboard isn't working as expected!"
 .PP
@@ -336,23 +354,3 @@ LARBS is deployed as a git repository in your home directory.
 You can use it as such to fetch, diff and merge changes from the remote repository.
 If you don't want to do that or don't know how to use git, you can actually just rerun the script (as root) and reinstall LARBS and it will automatically update an existing install if you select the same username.
 This will overwrite the original config files though, including changes you made for them, but this is an easier brute force approach that will also install any new dependencies.
-.HEADING 1 "Important Links"
-.PP
-You can follow links via the keyboard in this pdf reader by pressing \f(CWf\fP followed by the number that appears on the desired link.
-.LI
-.ITEM
-.PDF_WWW_LINK "mailto:luke@lukesmith.xyz" "luke@lukesmith.xyz"
-\(en For questions!
-.ITEM
-.PDF_WWW_LINK "http://lukesmith.xyz" "https://lukesmith.xyz"
-\(en For stalking!
-.ITEM
-.PDF_WWW_LINK "https://lukesmith.xyz/donate" "https://lukesmith.xyz/donate"
-\(en To incentivize more development of LARBS!
-.ITEM
-.PDF_WWW_LINK "https://github.com/LukeSmithxyz" "My Github Page"
-\(en For the code behind it!
-.ITEM
-.PDF_WWW_LINK "http://lukesmith.xyz/rss.xml" "RSS"
-\(en For updates!
-.LIST OFF
