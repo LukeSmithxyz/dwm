@@ -306,6 +306,63 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 \f(CWq\fP \(en quit.
 .LIST OFF
+.HEADING 2 "NeoMutt"
+.LI
+.ITEM
+\f(CWj/k\fP \(en Move down/up
+.ITEM
+\f(CWd/u\fP \(en Move down/up half page
+.ITEM
+\f(CWgg\fP \(en Move to top
+.ITEM
+\f(CWv\fP \(en View/download attachments
+.ITEM
+\f(CWG\fP \(en Move to last message
+.ITEM
+\f(CWr\fP \(en Reply
+.ITEM
+\f(CWR\fP \(en Reply all
+.ITEM
+\f(CWS\fP \(en Sync/save mailbox changes
+.ITEM
+\f(CWD\fP \(en Mark message for deletion
+.ITEM
+\f(CWU\fP \(en Unmark message for deletion
+.ITEM
+\f(CWctrl-u\fP \(en Seek urls
+.ITEM
+\f(CW,,\fP \(en Seek urls
+.ITEM
+\f(CWctrl-f\fP \(en Search mail indexed with notmuch
+.ITEM
+\f(CWctrl-r\fP \(en Mark all as read
+.ITEM
+\f(CWl\fP \(en Limit mail
+.ITEM
+\f(CWo\fP \(en Run quick sync with offlineimap
+.ITEM
+\f(CWO\fP \(en Run full sync with offlineimap
+.ITEM
+\f(CWC\fP \(en Copy a message to another mailbox
+.ITEM
+\f(CWM\fP \(en Move a message to another mailbox
+.ITEM
+\f(CWB\fP \(en Hide/reveal sidebar
+.ITEM
+\f(CWctrl-j/k\fP \(en Move down/up on sidebar
+.ITEM
+\f(CWctrl-o\fP \(en Open box selected in sidebar
+.ITEM
+\f(CWgi\fP \(en Go to inbox
+.ITEM
+\f(CWgs\fP \(en Go to sent mail
+.ITEM
+\f(CWgd\fP \(en Go to drafts
+.ITEM
+\f(CWgS\fP \(en Go to spam
+.ITEM
+\f(CWi#\fP \(en Go to a different account (# is the number of the account)
+.LIST OFF
 .HEADING 1 "Frequently Asked Questions (FAQs)"
 .HEADING 2 "My keyboard isn't working as expected!"
 .PP
