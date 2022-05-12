@@ -284,6 +284,8 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 \f(CWZQ\fP \(en quit without saving (same as \f(CW:q!\fP).
 .ITEM
+\f(CW:sp filename\fP \(en horizontal split open filename in same directory.
+.ITEM
 .PDF_WWW_LINK "https://vim.rtorr.com/" "See more shortcuts here."
 .LIST OFF
 .HEADING 2 "Vim-LaTeX"
