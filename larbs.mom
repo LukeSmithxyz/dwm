@@ -301,6 +301,13 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 .PDF_WWW_LINK "https://github.com/lervag/vimtex/blob/master/doc/vimtex.txt" "See more shortcuts here."
 .LIST OFF
+.HEADING 2 "Git"
+.LI
+.ITEM
+\f(CWgit remote set-url origin LINK\fP \(en set origin url.
+.ITEM
+\f(CWgit remote get-url origin\fP \(en get origin url.
+.LIST OFF
 .HEADING 2 "Zathura"
 .LI
 .ITEM
