@@ -23,34 +23,6 @@ I haven't kept `man dwm`/`dwm.1` updated though. PRs welcome on that, lol.
 - [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/): Gaps allowed across all layouts.
 - [swallow patch](https://dwm.suckless.org/patches/swallow/): if a program run from a terminal would make it inoperable, it temporarily takes its place to save space.
 
-## Installation on Arch Linux based distributions
-
-### Download the source code
-
-```bash
-git clone https://github.com/LukeSmithxyz/dwm.git
-cd dwm
-```
-
-### Configure
-
-To use a custom `config.h`, place it in the package directory.
-
-### Compile and install
-
-To compile dwm you need to install the `base-devel` package group if you haven't done it previously.
-
-If you have `paru` installed:
-
-```bash
-paru -Ui
-```
-
-Otherwise:
-
-```bash
-makepkg -cirs
-```
 
 ## Installation for newbs
 
@@ -60,6 +32,8 @@ cd dwm
 sudo make install
 ```
 
-## Please install `libxft-bgra`!
+There is also a `PKGBUILD` usable on distributions with pacman. Run `makepkg -si` instead of `sudo make install`.
 
-This build of dwm does not block color emoji in the status/info bar, so you must install [libxft-bgra](https://aur.archlinux.org/packages/libxft-bgra/) from the AUR, which fixes a libxft color emoji rendering problem, otherwise dwm will crash upon trying to render one. Hopefully this fix will be in all libxft soon enough.
+### You must also install `libxft-bgra`!
+
+This build of dwm does not block color emoji in the status/info bar, so you must install [libxft-bgra](https://aur.archlinux.org/packages/libxft-bgra/), which fixes a libxft color emoji rendering problem, otherwise dwm will crash upon trying to render one. Hopefully this fix will be in all libxft soon enough.

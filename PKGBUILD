@@ -1,5 +1,5 @@
 _pkgname=dwm
-pkgname=$_pkgname-luke-git
+pkgname=$_pkgname-larbs-git
 pkgver=6.2.r1888.0ac09e0
 pkgrel=1
 pkgdesc="Luke's build of dwm"
@@ -44,4 +44,3 @@ package() {
 	make PREFIX=/usr DESTDIR="$pkgdir" install
 	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
-# vim:set ts=4 sw=4 noet:
