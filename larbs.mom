@@ -130,7 +130,7 @@ To type capital letters, hold down the \f(CWShift\fP key\(emthat might sound lik
 .ITEM
 \f(CWMod+F\fP \(en Floating (AKA normie) mode
 .ITEM
-\f(CWMod+y\fP \(en Fibbonacci spiral mode
+\f(CWMod+y\fP \(en Fibonacci spiral mode
 .ITEM
 \f(CWMod+Y\fP \(en Dwindle mode (similar to Fibonacci)
 .ITEM
@@ -217,7 +217,7 @@ There are nine tags, active tags are highlighted in the top left.
 .ITEM
 \f(CWMod+F11\fP \(en View webcam
 .ITEM
-\f(CWMod+F12\fP \(en Rerun kayboard mapping scripts if new keyboard is attached
+\f(CWMod+F12\fP \(en Rerun keyboard mapping scripts if new keyboard is attached
 .ITEM
 \f(CWMod+`\fP \(en Select an emoji to copy to clipboard
 .ITEM
@@ -323,7 +323,7 @@ See \f(CWman mw\fP for all the information you need about mutt-wizard.
 Once you have successfully added your email address(es), you can open your mail with \f(CWneomutt\fP which is also bound to \f(CWMod+e\fP.
 You can sync your mail by pressing \f(CWMod+F8\fP and you can set a cronjob to sync mail every 10 minutes by running \f(CWmw -t 10\fP.
 .PP
-You may also want to install \f(CWpam-gnupg-git\fP, which can be set up to automatically unlock your GPG key on login, which will allow you avoid having put in a password to sync and send, all while keeping your password safe and encypted on your machine.
+You may also want to install \f(CWpam-gnupg-git\fP, which can be set up to automatically unlock your GPG key on login, which will allow you avoid having put in a password to sync and send, all while keeping your password safe and encrypted on your machine.
 .HEADING 2 "How do I set up my music?"
 .PP
 By default, mpd, the music daemon assumes that \f(CW~/Music\fP is your music directory.
