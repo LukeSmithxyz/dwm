@@ -372,6 +372,11 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 \f(CWi#\fP \(en Go to a different account (# is the number of the account)
 .LIST OFF
+.HEADING 2 "Misc"
+.LI
+.ITEM
+\f(CWunzip -a foo.zip\fP \(en Unzip zip file.
+.LIST OFF
 .HEADING 1 "Frequently Asked Questions (FAQs)"
 .HEADING 2 "My keyboard isn't working as expected!"
 .PP
