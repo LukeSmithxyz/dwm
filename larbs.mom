@@ -376,6 +376,12 @@ You'll have to restart the program to see its effects obviously.
 .LI
 .ITEM
 \f(CWunzip -a foo.zip\fP \(en Unzip zip file.
+.ITEM
+\f(CWpiactl connect/disconnect\fP \(en Start/stop piactl.
+.ITEM
+\f(CWtransmission-remote -l\fP \(en List torrents
+.ITEM
+\f(CWtransmission-remote -t ID -r\fP \(en Delete torrent with ID
 .LIST OFF
 .HEADING 1 "Frequently Asked Questions (FAQs)"
 .HEADING 2 "My keyboard isn't working as expected!"
