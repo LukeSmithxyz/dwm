@@ -372,6 +372,13 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 \f(CWi#\fP \(en Go to a different account (# is the number of the account)
 .LIST OFF
+.HEADING 2 "lf"
+.LI
+.ITEM
+\f(CWCtrl+n\fP \(en mkdir
+.ITEM
+\f(CWCtrl+r\fP \(en reload
+.LIST OFF
 .HEADING 2 "Misc"
 .LI
 .ITEM
