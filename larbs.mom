@@ -76,6 +76,9 @@ You can also right click on the module to see what it does.
 .PP
 The program dwmblocks is what is run to generate the statusbar from those scripts.
 You can edit its config/source code in \f(CW~/.local/src/dwmblocks/\fP to tell it what scripts/commands you want it to display.
+.HEADING 3 "HiDPI and 4K Displays"
+.PP
+If you have a screen with a very high dots-per-inch, the interface, particularly the status bar at the top may be very small. To change this, you can run \f(CWxrandr --dpi 96\fP, replacing 96 with a higher number, then you can refresh the window manager in the menu at \f(CWsuper+backspace\fP. To make this change persistent after reboot, edit \f(CW~/.xprofile\fP and you will see that same command which you can change to have the dots-per-inch value you want.
 .HEADING 2 "Deeper Tutorials"
 .PP
 Press \f(CWmod+F2\fP at any time to get a menu of programs to watch videos about streaming directly from YouTube.
