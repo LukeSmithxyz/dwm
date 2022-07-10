@@ -18,6 +18,7 @@ I haven't kept `man dwm`/`dwm.1` updated though. PRs welcome on that, lol.
 - New layouts: bstack, fibonacci, deck, centered master and more. All bound to keys <kbd>super+(shift+)t/y/u/i</kbd>.
 - True fullscreen (<kbd>super+f</kbd>) and prevents focus shifting.
 - Windows can be made sticky (<kbd>super+s</kbd>).
+- [hide vacant tags](https://dwm.suckless.org/patches/hide_vacant_tags/) hides tags with no windows.
 - [stacker](https://dwm.suckless.org/patches/stacker/): Move windows up the stack manually (<kbd>super-K/J</kbd>).
 - [shiftview](https://dwm.suckless.org/patches/nextprev/): Cycle through tags (<kbd>super+g/;</kbd>).
 - [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/): Gaps allowed across all layouts.
