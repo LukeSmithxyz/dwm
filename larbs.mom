@@ -384,6 +384,8 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 \f(CWunzip -a foo.zip\fP \(en Unzip zip file.
 .ITEM
+\f(CWsudo eject /dev/sda\fP \(en eject drive.
+.ITEM
 \f(CWpiactl connect/disconnect\fP \(en Start/stop piactl.
 .ITEM
 \f(CWtransmission-remote -l\fP \(en List torrents
