@@ -395,6 +395,8 @@ You'll have to restart the program to see its effects obviously.
 \f(CWtransmission-remote -t ID -r\fP \(en Delete torrent with ID
 .ITEM
 \f(CWhugo server -w\fP \(en Generate hugo site locally.
+.ITEM
+\f(CWfind . -maxdepth 1 -name "string" -print\fP \(en find files in current directory containing "string".
 .LIST OFF
 .HEADING 1 "Frequently Asked Questions (FAQs)"
 .HEADING 2 "My keyboard isn't working as expected!"
