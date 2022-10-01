@@ -230,6 +230,11 @@ previous recordings as their names are based on their exact times.
 I've mapped those extra buttons that some keyboards have (play and pause
 buttons, screen brightness, email, web browsing buttons, etc.) to what you
 would expect.
+.HEADING 2 "Arch"
+.LI
+.ITEM
+\f(CWpacman -Qu\fP \(en List upgradable packages.
+.LIST OFF
 .HEADING 1 "Configuration"
 .PP
 Dotfiles/settings files are located in \f(CW~/.config/\fP.
@@ -286,6 +291,10 @@ You'll have to restart the program to see its effects obviously.
 .ITEM
 \f(CW:sp filename\fP \(en horizontal split open filename in same directory.
 .ITEM
+\f(CWCtrl+W +/-\fP \(en increase/decrease height of windows.
+.ITEM
+\f(CWCtrl+W >/<\fP \(en increase/decrease width of windows.
+.ITEM
 .PDF_WWW_LINK "https://vim.rtorr.com/" "See more shortcuts here."
 .LIST OFF
 .HEADING 2 "Vim-LaTeX"
@@ -300,13 +309,6 @@ You'll have to restart the program to see its effects obviously.
 \f(CW(d,c)sc/(d,c)se/(d,c)s$/(d,c)sd\fP \(en delete/change surrounding command/environment/delimiter.
 .ITEM
 .PDF_WWW_LINK "https://github.com/lervag/vimtex/blob/master/doc/vimtex.txt" "See more shortcuts here."
-.LIST OFF
-.HEADING 2 "Git"
-.LI
-.ITEM
-\f(CWgit remote set-url origin LINK\fP \(en set origin url.
-.ITEM
-\f(CWgit remote get-url origin\fP \(en get origin url.
 .LIST OFF
 .HEADING 2 "Zathura"
 .LI
@@ -380,6 +382,14 @@ You'll have to restart the program to see its effects obviously.
 \f(CWCtrl+n\fP \(en mkdir
 .ITEM
 \f(CWCtrl+r\fP \(en reload
+.LIST OFF
+.HEADING 1 "Commands"
+.HEADING 2 "Git"
+.LI
+.ITEM
+\f(CWgit remote set-url origin LINK\fP \(en set origin url.
+.ITEM
+\f(CWgit remote get-url origin\fP \(en get origin url.
 .LIST OFF
 .HEADING 2 "Misc"
 .LI
