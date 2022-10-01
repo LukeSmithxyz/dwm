@@ -15,6 +15,7 @@ Pressing \f(CWs\fP will fit it to window width (\f(CWa\fP to revert).
 \f(CWK\fP and \f(CWJ\fP zoom in and out.
 \f(CWSuper+f\fP to toggle fullscreen.
 \f(CWq\fP to quit.
+\f(CW/\fP to search for text.
 (These are general binds set for \fBzathura\fP, the pdf reader.)
 .LI
 .ITEM

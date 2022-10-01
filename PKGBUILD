@@ -9,8 +9,6 @@ license=(MIT)
 makedepends=(git)
 depends=(freetype2 libx11 libxft)
 optdepends=(
-	'libxft-bgra: if dwm crashes when displaying emojis'
-	'libxft-bgra-git: if dwm crashes when displaying emojis'
 	'dmenu: program launcher'
 	'st: terminal emulator')
 provides=($_pkgname)
