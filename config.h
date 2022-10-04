@@ -15,7 +15,7 @@ static int swallowfloating    = 0;        /* 1 means swallow floating windows by
 static int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static int showbar            = 1;        /* 0 means no bar */
 static int topbar             = 0;        /* 0 means bottom bar */
-static char *fonts[]          = { "monospace:size=12", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
+static char *fonts[]          = { "monospace:size=16", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
 static char normfgcolor[]           = "#bbbbbb";
@@ -236,7 +236,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,		XK_Page_Down,	shifttag,	{ .i = +1 } },
 	{ MODKEY,			XK_Insert,	spawn,		SHCMD("xdotool type $(grep -v '^#' ~/.local/share/larbs/snippets | dmenu -i -l 50 | cut -d' ' -f1)") },
 
-	{ MODKEY,			XK_F1,		spawn,		SHCMD("groff -mom ~/.local/src/dwm/larbs.mom -Tpdf | zathura -") },
+	{ MODKEY,			XK_F1,		spawn,		SHCMD("groff -mom ~/acheat.mom -Tpdf | zathura -") },
 	{ MODKEY,			XK_F2,		spawn,		SHCMD("tutorialvids") },
 	{ MODKEY,			XK_F3,		spawn,		SHCMD("displayselect") },
 	{ MODKEY,			XK_F3,		spawn,		SHCMD("maim pic-full-$(date '+%y%m%d-%H%M-%S').png") },
