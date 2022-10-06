@@ -245,7 +245,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,			XK_F5,		spawn,		SHCMD("toggleredshift") },
 	{ MODKEY,			XK_F6,		spawn,		SHCMD("torwrap") },
 	{ MODKEY,			XK_F7,		spawn,		SHCMD("td-toggle") },
-	{ MODKEY,			XK_F8,		spawn,		SHCMD("mw -Y") },
+	{ MODKEY,			XK_F8,		spawn,		SHCMD("mbsync -c ~/.config/mbsync/config -a") },
 	{ MODKEY,			XK_F9,		spawn,		SHCMD("dmenumount") },
 	{ MODKEY,			XK_F10,		spawn,		SHCMD("dmenuumount") },
 	{ MODKEY,			XK_F11,		spawn,		SHCMD("mpv --untimed --no-cache --no-osc --no-input-default-bindings --profile=low-latency --input-conf=/dev/null --title=webcam av://v4l2:/dev/video0") },
