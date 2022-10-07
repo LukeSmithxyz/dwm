@@ -46,7 +46,7 @@ shifttag(const Arg *arg)
 			nextseltags = (curseltags << i) | (curseltags >> (LENGTH(tags) - i));
 
 		else // right circular shift
-			nextseltags = curseltags >> (- i) | (curseltags << (LENGTH(tags) + i));
+			nextseltags = (curseltags >> - i) | (curseltags << (LENGTH(tags) + i));
 
                 // Check if tag is visible
 		for (c = selmon->clients; c && !visible; c = c->next)
@@ -62,3 +62,4 @@ shifttag(const Arg *arg)
 		tag(&a);
 	}
 }
+
