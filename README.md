@@ -32,5 +32,12 @@ git clone https://github.com/LukeSmithxyz/dwm.git
 cd dwm
 sudo make install
 ```
-
+Additional packages required for newbs - for Debian example ! or any distro you're using:
+```
+sudo apt install libx11-dev
+sudo apt install libxinerama-dev
+sudo apt install libxft-dev
+sudo apt install libx11-xcb-dev
+sudo apt install libxcb-res0-dev
+```
 There is also a `PKGBUILD` usable on distributions with pacman. Run `makepkg -si` instead of `sudo make install`.
