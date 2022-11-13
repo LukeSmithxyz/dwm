@@ -42,7 +42,8 @@ static Sp scratchpads[] = {
 };
 
 /* tagging */
-static const char *tags[] = { "\u96f6", "\u767e", "\u5343", "\u842c", "\u5341\u842C", "\u767e\u842c", "\u5343\u842c", "\u5104", "\u5146" };
+/* static const char *tags[] = { "\u96f6", "\u767e", "\u5343", "\u842c", "\u5341\u842C", "\u767e\u842c", "\u5343\u842c", "\u5104", "\u5146" }; */
+static const char *tags[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九" };
 
 static const Rule rules[] = {
 	/* xprop(1):
