@@ -41,7 +41,7 @@ install: all
 	sed "s/VERSION/${VERSION}/g" < dwm.1 > ${DESTDIR}${MANPREFIX}/man1/dwm.1
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/dwm.1
 	mkdir -p ${DESTDIR}${PREFIX}/share/dwm
-	cp -f larbs.mom ${DESTDIR}${PREFIX}/share/dwm
+	#cp -f larbs.mom ${DESTDIR}${PREFIX}/share/dwm
 	chmod 644 ${DESTDIR}${PREFIX}/share/dwm/larbs.mom
 
 uninstall:
