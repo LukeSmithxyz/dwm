@@ -17,13 +17,13 @@ static int swallowfloating    = 0;        /* 1 means swallow floating windows by
 static int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static int showbar            = 1;        /* 0 means no bar */
 static int topbar             = 0;        /* 0 means bottom bar */
-static char *fonts[]          = { "monospace:size=12", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
-static char normbgcolor[]           = "#222222";
-static char normbordercolor[]       = "#444444";
-static char normfgcolor[]           = "#bbbbbb";
-static char selfgcolor[]            = "#eeeeee";
-static char selbordercolor[]        = "#770000";
-static char selbgcolor[]            = "#005577";
+static char *fonts[]          = { "monospace:size=12", "JoyPixels:pixelsize=10:antialias=true:autohint=true" };
+/* static char normbgcolor[]           = "#222222"; */
+/* static char normbordercolor[]       = "#444444"; */
+/* static char normfgcolor[]           = "#bbbbbb"; */
+/* static char selfgcolor[]            = "#eeeeee"; */
+/* static char selbordercolor[]        = "#770000"; */
+/* static char selbgcolor[]            = "#005577"; */
 /* #include "/home/amaryllis/.cache/wal/colors-wal-dwm.h" */
 /* static char *colors[][3] = { */
         /*               fg           bg           border   */
@@ -137,9 +137,9 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 
 static const char *colors[][3]      = {
     /*                     fg       bg      border */
-    [SchemeNorm]       = { gray3,   black,  gray2 },
-    [SchemeSel]        = { gray4,   blue,   blue  },
-    [SchemeTitle]      = { pink,   black,  black  }, // active window title
+    [SchemeNorm]       = { red,   black,  gray2 },
+    [SchemeSel]        = { purple,   blue,   blue  },
+    [SchemeTitle]      = { white,   black,  black  }, // active window title
     [TabSel]           = { blue,    gray2,  black },
     [TabNorm]          = { gray3,   black,  black },
     [SchemeTag]        = { gray3,   black,  black },
