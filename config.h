@@ -23,11 +23,11 @@ static char selfgcolor[]            = "#eeeeee";
 static char selbordercolor[]        = "#770000";
 static char selbgcolor[]            = "#005577";
 /* #include "/home/amaryllis/.cache/wal/colors-wal-dwm.h" */
-static char *colors[][3] = {
-       /*               fg           bg           border   */
-[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
-[SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
-};
+/* static char *colors[][3] = { */
+        /*               fg           bg           border   */
+/* [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor }, */
+/* [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  }, */
+/* }; */
 
 typedef struct {
 	const char *name;
@@ -42,8 +42,8 @@ static Sp scratchpads[] = {
 };
 
 /* tagging */
-/* static const char *tags[] = { "\u96f6", "\u767e", "\u5343", "\u842c", "\u5341\u842C", "\u767e\u842c", "\u5343\u842c", "\u5104", "\u5146" }; */
-static const char *tags[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九" };
+static const char *tags[] = { "\u96f6", "\u767e", "\u5343", "\u842c", "\u5341\u842C", "\u767e\u842c", "\u5343\u842c", "\u5104", "\u5146" };
+/* static const char *tags[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九" }; */
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -108,26 +108,48 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 /*
  * Xresources preferences to load at startup
  */
-ResourcePref resources[] = {
-		{ "color0",		STRING,	&normbordercolor },
-		{ "color6",		STRING,	&selbordercolor },
-		{ "color0",		STRING,	&normbgcolor },
-		{ "color4",		STRING,	&normfgcolor },
-		{ "color0",		STRING,	&selfgcolor },
-		{ "color4",		STRING,	&selbgcolor },
-		{ "borderpx",		INTEGER, &borderpx },
-		{ "snap",		INTEGER, &snap },
-		{ "showbar",		INTEGER, &showbar },
-		{ "topbar",		INTEGER, &topbar },
-		{ "nmaster",		INTEGER, &nmaster },
-		{ "resizehints",	INTEGER, &resizehints },
-		{ "mfact",		FLOAT,	&mfact },
-		{ "gappih",		INTEGER, &gappih },
-		{ "gappiv",		INTEGER, &gappiv },
-		{ "gappoh",		INTEGER, &gappoh },
-		{ "gappov",		INTEGER, &gappov },
-		{ "swallowfloating",	INTEGER, &swallowfloating },
-		{ "smar16gaps",		INTEGER, &smartgaps },
+/* ResourcePref resources[] = { */
+		/* { "color0",		STRING,	&normbordercolor }, */
+		/* { "color6",		STRING,	&selbordercolor }, */
+		/* { "color0",		STRING,	&normbgcolor }, */
+		/* { "color4",		STRING,	&normfgcolor }, */
+		/* { "color0",		STRING,	&selfgcolor }, */
+		/* { "color4",		STRING,	&selbgcolor }, */
+		/* { "borderpx",		INTEGER, &borderpx }, */
+		/* { "snap",		INTEGER, &snap }, */
+		/* { "showbar",		INTEGER, &showbar }, */
+		/* { "topbar",		INTEGER, &topbar }, */
+		/* { "nmaster",		INTEGER, &nmaster }, */
+		/* { "resizehints",	INTEGER, &resizehints }, */
+		/* { "mfact",		FLOAT,	&mfact }, */
+		/* { "gappih",		INTEGER, &gappih }, */
+		/* { "gappiv",		INTEGER, &gappiv }, */
+		/* { "gappoh",		INTEGER, &gappoh }, */
+		/* { "gappov",		INTEGER, &gappov }, */
+		/* { "swallowfloating",	INTEGER, &swallowfloating }, */
+		/* { "smar16gaps",		INTEGER, &smartgaps }, */
+/* }; */
+
+// theme
+#include "themes/catppuccin.h"
+
+static const char *colors[][3]      = {
+    /*                     fg       bg      border */
+    [SchemeNorm]       = { gray3,   black,  gray2 },
+    [SchemeSel]        = { gray4,   blue,   blue  },
+    [SchemeTitle]      = { pink,   black,  black  }, // active window title
+    [TabSel]           = { blue,    gray2,  black },
+    [TabNorm]          = { gray3,   black,  black },
+    [SchemeTag]        = { gray3,   black,  black },
+    [SchemeTag1]       = { blue,    black,  black },
+    [SchemeTag2]       = { red,     black,  black },
+    [SchemeTag3]       = { orange,  black,  black },
+    [SchemeTag4]       = { green,   black,  black },
+    [SchemeTag5]       = { pink,    black,  black },
+    [SchemeLayout]     = { green,   black,  black },
+    [SchemeBtnPrev]    = { green,   black,  black },
+    [SchemeBtnNext]    = { yellow,  black,  black },
+    [SchemeBtnClose]   = { red,     black,  black },
 };
 
 #include <X11/XF86keysym.h>

@@ -71,7 +71,21 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum {SchemeNorm,
+  SchemeSel,
+  SchemeTitle,
+  SchemeTag,
+  SchemeTag1,
+  SchemeTag2,
+  SchemeTag3,
+  SchemeTag4,
+  SchemeTag5,
+  SchemeLayout,
+  TabSel,
+  TabNorm,
+  SchemeBtnPrev,
+  SchemeBtnNext,
+  SchemeBtnClose}; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
@@ -2579,24 +2593,24 @@ resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst)
 	}
 }
 
-void
-load_xresources(void)
-{
-	Display *display;
-	char *resm;
-	XrmDatabase db;
-	ResourcePref *p;
-
-	display = XOpenDisplay(NULL);
-	resm = XResourceManagerString(display);
-	if (!resm)
-		return;
-
-	db = XrmGetStringDatabase(resm);
-	for (p = resources; p < resources + LENGTH(resources); p++)
-		resource_load(db, p->name, p->type, p->dst);
-	XCloseDisplay(display);
-}
+/* void */
+/* load_xresources(void) */
+/* { */
+	/* Display *display; */
+	/* char *resm; */
+	/* XrmDatabase db; */
+	/* ResourcePref *p; */
+/*  */
+	/* display = XOpenDisplay(NULL); */
+	/* resm = XResourceManagerString(display); */
+	/* if (!resm) */
+		/* return; */
+/*  */
+	/* db = XrmGetStringDatabase(resm); */
+	/* for (p = resources; p < resources + LENGTH(resources); p++) */
+		/* resource_load(db, p->name, p->type, p->dst); */
+	/* XCloseDisplay(display); */
+/* } */
 
 int
 main(int argc, char *argv[])
@@ -2613,7 +2627,7 @@ main(int argc, char *argv[])
 		die("dwm: cannot get xcb connection\n");
 	checkotherwm();
 	XrmInitialize();
-	load_xresources();
+	/*load_xresources();*/
 	setup();
 #ifdef __OpenBSD__
 	if (pledge("stdio rpath proc exec", NULL) == -1)
