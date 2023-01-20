@@ -4,8 +4,6 @@
 #define TERMINAL "st"
 #define TERMCLASS "St"
 
-#define SESSION_FILE "/tmp/dwm-session"
-
 /* appearance */
 static unsigned int borderpx  = 3;        /* border pixel of windows */
 static unsigned int snap      = 32;       /* snap pixel */
@@ -17,19 +15,19 @@ static int swallowfloating    = 0;        /* 1 means swallow floating windows by
 static int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static int showbar            = 1;        /* 0 means no bar */
 static int topbar             = 0;        /* 0 means bottom bar */
-static char *fonts[]          = { "monospace:size=10", "JoyPixels:pixelsize=10:antialias=true:autohint=true" };
-/* static char normbgcolor[]           = "#222222"; */
-/* static char normbordercolor[]       = "#444444"; */
-/* static char normfgcolor[]           = "#bbbbbb"; */
-/* static char selfgcolor[]            = "#eeeeee"; */
-/* static char selbordercolor[]        = "#770000"; */
-/* static char selbgcolor[]            = "#005577"; */
+static char *fonts[]          = { "monospace:size=16", "JoyPixels:pixelsize=10:antialias=true:autohint=true"  };
+static char normbgcolor[]           = "#222222";
+static char normbordercolor[]       = "#444444";
+static char normfgcolor[]           = "#bbbbbb";
+static char selfgcolor[]            = "#eeeeee";
+static char selbordercolor[]        = "#770000";
+static char selbgcolor[]            = "#005577";
 /* #include "/home/amaryllis/.cache/wal/colors-wal-dwm.h" */
-/* static char *colors[][3] = { */
-        /*               fg           bg           border   */
-/* [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor }, */
-/* [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  }, */
-/* }; */
+static char *colors[][3] = {
+       /*               fg           bg           border   */
+[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
+[SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+};
 
 typedef struct {
 	const char *name;
@@ -44,8 +42,8 @@ static Sp scratchpads[] = {
 };
 
 /* tagging */
-static const char *tags[] = { "\u96f6", "\u767e", "\u5343", "\u842c", "\u5341\u842C", "\u767e\u842c", "\u5343\u842c", "\u5104", "\u5146" };
-/* static const char *tags[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九" }; */
+/* static const char *tags[] = { "\u96f6", "\u767e", "\u5343", "\u842c", "\u5341\u842C", "\u767e\u842c", "\u5343\u842c", "\u5104", "\u5146" }; */
+static const char *tags[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -110,48 +108,26 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 /*
  * Xresources preferences to load at startup
  */
-/* ResourcePref resources[] = { */
-		/* { "color0",		STRING,	&normbordercolor }, */
-		/* { "color6",		STRING,	&selbordercolor }, */
-		/* { "color0",		STRING,	&normbgcolor }, */
-		/* { "color4",		STRING,	&normfgcolor }, */
-		/* { "color0",		STRING,	&selfgcolor }, */
-		/* { "color4",		STRING,	&selbgcolor }, */
-		/* { "borderpx",		INTEGER, &borderpx }, */
-		/* { "snap",		INTEGER, &snap }, */
-		/* { "showbar",		INTEGER, &showbar }, */
-		/* { "topbar",		INTEGER, &topbar }, */
-		/* { "nmaster",		INTEGER, &nmaster }, */
-		/* { "resizehints",	INTEGER, &resizehints }, */
-		/* { "mfact",		FLOAT,	&mfact }, */
-		/* { "gappih",		INTEGER, &gappih }, */
-		/* { "gappiv",		INTEGER, &gappiv }, */
-		/* { "gappoh",		INTEGER, &gappoh }, */
-		/* { "gappov",		INTEGER, &gappov }, */
-		/* { "swallowfloating",	INTEGER, &swallowfloating }, */
-		/* { "smar16gaps",		INTEGER, &smartgaps }, */
-/* }; */
-
-// theme
-#include "themes/catppuccin.h"
-
-static const char *colors[][3]      = {
-    /*                     fg       bg      border */
-    [SchemeNorm]       = { red,   black,  gray2 },
-    [SchemeSel]        = { purple,   blue,   blue  },
-    [SchemeTitle]      = { white,   black,  black  }, // active window title
-    [TabSel]           = { blue,    gray2,  black },
-    [TabNorm]          = { gray3,   black,  black },
-    [SchemeTag]        = { gray3,   black,  black },
-    [SchemeTag1]       = { blue,    black,  black },
-    [SchemeTag2]       = { red,     black,  black },
-    [SchemeTag3]       = { orange,  black,  black },
-    [SchemeTag4]       = { green,   black,  black },
-    [SchemeTag5]       = { pink,    black,  black },
-    [SchemeLayout]     = { green,   black,  black },
-    [SchemeBtnPrev]    = { green,   black,  black },
-    [SchemeBtnNext]    = { yellow,  black,  black },
-    [SchemeBtnClose]   = { red,     black,  black },
+ResourcePref resources[] = {
+		{ "color0",		STRING,	&normbordercolor },
+		{ "color6",		STRING,	&selbordercolor },
+		{ "color0",		STRING,	&normbgcolor },
+		{ "color4",		STRING,	&normfgcolor },
+		{ "color0",		STRING,	&selfgcolor },
+		{ "color4",		STRING,	&selbgcolor },
+		{ "borderpx",		INTEGER, &borderpx },
+		{ "snap",		INTEGER, &snap },
+		{ "showbar",		INTEGER, &showbar },
+		{ "topbar",		INTEGER, &topbar },
+		{ "nmaster",		INTEGER, &nmaster },
+		{ "resizehints",	INTEGER, &resizehints },
+		{ "mfact",		FLOAT,	&mfact },
+		{ "gappih",		INTEGER, &gappih },
+		{ "gappiv",		INTEGER, &gappiv },
+		{ "gappoh",		INTEGER, &gappoh },
+		{ "gappov",		INTEGER, &gappov },
+		{ "swallowfloating",	INTEGER, &swallowfloating },
+		{ "smar16gaps",		INTEGER, &smartgaps },
 };
 
 #include <X11/XF86keysym.h>
@@ -273,7 +249,7 @@ static Key keys[] = {
 	{ MODKEY,			XK_F8,		spawn,		SHCMD("mbsync -c ~/.config/mbsync/config -a") },
 	{ MODKEY,			XK_F9,		spawn,		SHCMD("dmenumount") },
 	{ MODKEY,			XK_F10,		spawn,		SHCMD("dmenuumount") },
-	{ MODKEY,			XK_F11,		spawn,		SHCMD("mpv --untimed --no-cache --no-osc --no-input-default-bindings --profile=low-latency --input-conf=/dev/null --title=webcam av://v4l2:/dev/video0") },
+	{ MODKEY,			XK_F11,		spawn,		SHCMD("mpv --untimed --no-cache --no-osc --no-input-default-bindings --profile=low-latency --input-conf=/dev/null --title=webcam $(ls /dev/video[0,2,4,6,8] | tail -n 1)") },
 	{ MODKEY,			XK_F12,		spawn,		SHCMD("remaps & notify-send \\\"⌨️ Keyboard remapping...\\\" \\\"Re-running keyboard defaults for any newly plugged-in keyboards.\\\"") },
 	{ MODKEY,			XK_space,	zoom,		{0} },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	{0} },
@@ -313,7 +289,7 @@ static Key keys[] = {
 	{ 0, XF86XK_TouchpadOn,		spawn,		SHCMD("synclient TouchpadOff=0") },
 	{ 0, XF86XK_MonBrightnessUp,	spawn,		SHCMD("xbacklight -inc 15") },
 	{ 0, XF86XK_MonBrightnessDown,	spawn,		SHCMD("xbacklight -dec 15") },
-	{ MODKEY|ControlMask|ShiftMask, XK_q,      quit,           {1} },
+
 	/* { MODKEY|Mod4Mask,              XK_h,      incrgaps,       {.i = +1 } }, */
 	/* { MODKEY|Mod4Mask,              XK_l,      incrgaps,       {.i = -1 } }, */
 	/* { MODKEY|Mod4Mask|ShiftMask,    XK_h,      incrogaps,      {.i = +1 } }, */
@@ -337,7 +313,7 @@ static Key keys[] = {
 static Button buttons[] = {
 	/* click                event mask      button          function        argument */
 #ifndef __OpenBSD__
-	/* { ClkWinTitle,          0,              Button2,        zoom,           {0} }, */
+	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button1,        sigdwmblocks,   {.i = 1} },
 	{ ClkStatusText,        0,              Button2,        sigdwmblocks,   {.i = 2} },
 	{ ClkStatusText,        0,              Button3,        sigdwmblocks,   {.i = 3} },
