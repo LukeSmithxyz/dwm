@@ -277,6 +277,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,		XK_F10,		spawn,		SHCMD("gitpush") },
 	{ MODKEY,			XK_F11,		spawn,		SHCMD("mpv --untimed --no-cache --no-osc --no-input-default-bindings --profile=low-latency --input-conf=/dev/null --title=webcam av://v4l2:/dev/video0") },
 	{ MODKEY,			XK_F12,		spawn,		SHCMD("remaps & notify-send \\\"⌨️ Keyboard remapping...\\\" \\\"Re-running keyboard defaults for any newly plugged-in keyboards.\\\"") },
+	{ MODKEY|ShiftMask,			XK_F12,		spawn,		SHCMD("toggleaudio") },
 	{ MODKEY,			XK_space,	zoom,		{0} },
 	{ MODKEY|ShiftMask,		XK_space,	togglefloating,	{0} },
 
