@@ -63,7 +63,6 @@ static const Rule rules[] = {
 static float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static int nmaster     = 1;    /* number of clients in master area */
 static int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
-static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
 static const Layout layouts[] = {
@@ -134,7 +133,7 @@ ResourcePref resources[] = {
 #include <X11/XF86keysym.h>
 #include "shiftview.c"
 
-static const Key keys[] = {
+static Key keys[] = {
 	/* modifier                     key        function        argument */
 	STACKKEYS(MODKEY,                          focus)
 	STACKKEYS(MODKEY|ShiftMask,                push)
@@ -309,7 +308,7 @@ static const Key keys[] = {
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
-static const Button buttons[] = {
+static Button buttons[] = {
 	/* click                event mask      button          function        argument */
 #ifndef __OpenBSD__
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
