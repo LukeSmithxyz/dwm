@@ -224,6 +224,8 @@ There are nine tags, active tags are highlighted in the top left.
 \f(CWMod+F12\fP \(en Rerun keyboard mapping scripts if new keyboard is attached
 .ITEM
 \f(CWMod+`\fP \(en Select an emoji to copy to clipboard
+.ITEM
+\f(CWMod+Insert\fP \(en Pastes text you have saved in a file at ~/.local/share/larbs/snippets
 .LIST OFF
 .HEADING 2 "Audio"
 .PP
