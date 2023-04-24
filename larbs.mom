@@ -225,7 +225,7 @@ There are nine tags, active tags are highlighted in the top left.
 .ITEM
 \f(CWMod+`\fP \(en Select an emoji to copy to clipboard
 .ITEM
-\f(CWMod+Insert\fP \(en Show contents of clipboard/primary selection
+\f(CWMod+Insert\fP \(en Pastes text you have saved in a file at ~/.local/share/larbs/snippets
 .LIST OFF
 .HEADING 2 "Audio"
 .PP
