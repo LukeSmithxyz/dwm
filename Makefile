@@ -42,11 +42,13 @@ install: all
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/dwm.1
 	mkdir -p ${DESTDIR}${PREFIX}/share/dwm
 	cp -f larbs.mom ${DESTDIR}${PREFIX}/share/dwm
+	cp -f dwm.desktop /usr/share/xsessions/dwm.desktop
 	chmod 644 ${DESTDIR}${PREFIX}/share/dwm/larbs.mom
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/dwm\
 		${DESTDIR}${PREFIX}/share/dwm/larbs.mom\
+		/usr/share/xsessions/dwm.desktop\
 		${DESTDIR}${MANPREFIX}/man1/dwm.1
 
 .PHONY: all options clean dist install uninstall
