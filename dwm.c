@@ -246,7 +246,7 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 #ifndef __OpenBSD__
-static int getdwmblockspid();
+static int getdwmblockspid(void);
 static void sigdwmblocks(const Arg *arg);
 #endif
 static void sighup(int unused);
@@ -1045,7 +1045,7 @@ getatomprop(Client *c, Atom prop)
 
 #ifndef __OpenBSD__
 int
-getdwmblockspid()
+getdwmblockspid(void)
 {
 	char buf[16];
 	FILE *fp = popen("pidof -s dwmblocks", "r");
@@ -2191,7 +2191,7 @@ updatebarpos(Monitor *m)
 }
 
 void
-updateclientlist()
+updateclientlist(void)
 {
 	Client *c;
 	Monitor *m;
