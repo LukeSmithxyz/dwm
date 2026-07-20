@@ -10,6 +10,7 @@
 .PRINTSTYLE TYPESET
 .PT_SIZE 12
 .START
+.PP
 Use vim keys (\f(CWh/j/k/l\fP) to navigate this document.
 Pressing \f(CWs\fP will fit it to window width (\f(CWa\fP to revert).
 \f(CWK\fP and \f(CWJ\fP zoom in and out.
